@@ -1,0 +1,768 @@
+{
+  "runs": [
+    {
+      "run": 40633435258,
+      "artifact": 12800657367,
+      "archive_sha256": "4a2b96630d19ba0daa44896e8e1fc4b8fac4cdb37db406078f329416b3d2e35a",
+      "source": {
+        "head": "b3030921dfa7b2d6d9685c7c360534928331f805",
+        "python": "3.12.15",
+        "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+        "sqlite": "3.45.1"
+      },
+      "junit_cases": 4393,
+      "suite_seconds": 7361.63,
+      "case_duration_kind": "JUnit total; includes setup/call/teardown, no separate case-phase export",
+      "retained_duration_phases": [
+        {
+          "seconds": 1322.06,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_history_operations.py::test_streaming_history_bounds_and_detach_cost_are_measured[400]"
+        },
+        {
+          "seconds": 465.31,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_advancement_graph.py::test_scalar_edit_does_not_read_or_write_imported_sample_history"
+        },
+        {
+          "seconds": 346.79,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_bootstrap.py::test_bootstrap_transfer_read_and_retention_bounds"
+        },
+        {
+          "seconds": 216.43,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_aged_save_continuation.py::test_year_60_world_continues_exactly_through_two_saved_years"
+        },
+        {
+          "seconds": 125.46,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_history_operations.py::test_streaming_history_bounds_and_detach_cost_are_measured[40]"
+        },
+        {
+          "seconds": 108.83,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_long_harness.py::test_long_harness_complete_lane_restores_exact_two_milestones"
+        },
+        {
+          "seconds": 107.94,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache"
+        },
+        {
+          "seconds": 106.99,
+          "phase": "call",
+          "test": "simulation/tests/test_checkpointed_upgrade_validation.py::test_p5_bridge_emits_normal_receipt_and_exact_continuation"
+        },
+        {
+          "seconds": 103.18,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_long_harness.py::test_staged_harness_resumes_checked_artifacts_without_rebuilding"
+        },
+        {
+          "seconds": 99.42,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_identity_headers.py::test_identity_header_comparison_never_reads_sequence_history[10000]"
+        },
+        {
+          "seconds": 96.49,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_history_type_admission.py::test_valid_paged_admission_reads_no_member_payload[10000-sequence]"
+        },
+        {
+          "seconds": 81.94,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_event_id_exceptions.py::test_pop_skips_large_removed_suffix_and_clear_replaces_authority"
+        },
+        {
+          "seconds": 80.79,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_lazy_souls.py::test_soul_history_scaling_is_bounded_by_requested_access[10000]"
+        },
+        {
+          "seconds": 72.84,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_sequence.py::test_delete_to_empty_root_and_failed_mutation_rollback"
+        },
+        {
+          "seconds": 64.88,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_session_open.py::test_open_close_event_history_bookkeeping_is_constant[400]"
+        },
+        {
+          "seconds": 62.12,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_session_open.py::test_review_append_seal_close_never_reads_cold_segments[400]"
+        },
+        {
+          "seconds": 60.81,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_history_bounds_are_independent_of_old_prefix[400]"
+        },
+        {
+          "seconds": 60.54,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_capture.py::test_capture_bounds_are_enforced_across_4_40_400_segments"
+        },
+        {
+          "seconds": 58.02,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_r3_cross_family_extra.py::test_three_owner_shared_members_are_bounded_and_portable[10000]"
+        },
+        {
+          "seconds": 49.21,
+          "phase": "call",
+          "test": "simulation/tests/test_continuation_checkpoint_ci.py::test_real_zip_transport_two_year_pipeline_uses_fresh_processes"
+        },
+        {
+          "seconds": 48.82,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_closeout.py::test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]"
+        },
+        {
+          "seconds": 46.78,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_paged_household_world.py::test_r3_world_open_digest_append_atomic_save_reopen[10000]"
+        },
+        {
+          "seconds": 45.97,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_sequence.py::test_repeated_same_gap_splits_then_merges_and_stable_occurrences"
+        },
+        {
+          "seconds": 45.57,
+          "phase": "call",
+          "test": "simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843002]"
+        },
+        {
+          "seconds": 44.82,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_currency_root_copy.py::test_currency_root_point_save_does_not_walk_map_history"
+        },
+        {
+          "seconds": 44.39,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_maintenance.py::test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]"
+        },
+        {
+          "seconds": 44.24,
+          "phase": "call",
+          "test": "simulation/tests/test_cultural_reconstruction.py::test_culture_reconstructs_without_label_entity"
+        },
+        {
+          "seconds": 43.84,
+          "phase": "call",
+          "test": "simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843001]"
+        },
+        {
+          "seconds": 43.7,
+          "phase": "call",
+          "test": "simulation/tests/test_development_systems.py::test_infrastructure_has_lineage_and_decay_maintenance_history"
+        },
+        {
+          "seconds": 43.63,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_settlement_memory.py::test_scalar_settlement_edit_has_fixed_imported_memory_work"
+        }
+      ],
+      "trends_top30": [
+        {
+          "name": "simulation.tests.test_persistence_history_operations.test_streaming_history_bounds_and_detach_cost_are_measured[400]",
+          "seconds": 1322.063,
+          "prior_seconds": 1284.42,
+          "ratio_to_prior": 1.0293073916631632
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_advancement_graph.test_scalar_edit_does_not_read_or_write_imported_sample_history",
+          "seconds": 465.309,
+          "prior_seconds": 475.891,
+          "ratio_to_prior": 0.9777638156636709
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_bootstrap.test_bootstrap_transfer_read_and_retention_bounds",
+          "seconds": 346.789,
+          "prior_seconds": 280.091,
+          "ratio_to_prior": 1.2381297506881692
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_aged_save_continuation.test_year_60_world_continues_exactly_through_two_saved_years",
+          "seconds": 216.432,
+          "prior_seconds": 223.421,
+          "ratio_to_prior": 0.9687182494035923
+        },
+        {
+          "name": "simulation.tests.test_persistence_history_operations.test_streaming_history_bounds_and_detach_cost_are_measured[40]",
+          "seconds": 125.461,
+          "prior_seconds": 130.113,
+          "ratio_to_prior": 0.9642464626901232
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_long_harness.test_long_harness_complete_lane_restores_exact_two_milestones",
+          "seconds": 108.836,
+          "prior_seconds": 113.816,
+          "ratio_to_prior": 0.9562451676389963
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_save_bounds.test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache",
+          "seconds": 107.945,
+          "prior_seconds": 93.907,
+          "ratio_to_prior": 1.1494883235541546
+        },
+        {
+          "name": "simulation.tests.test_checkpointed_upgrade_validation.test_p5_bridge_emits_normal_receipt_and_exact_continuation",
+          "seconds": 106.994,
+          "prior_seconds": 101.887,
+          "ratio_to_prior": 1.0501241571544946
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_long_harness.test_staged_harness_resumes_checked_artifacts_without_rebuilding",
+          "seconds": 103.183,
+          "prior_seconds": 106.472,
+          "ratio_to_prior": 0.9691092493801189
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_identity_headers.test_identity_header_comparison_never_reads_sequence_history[10000]",
+          "seconds": 99.42,
+          "prior_seconds": 103.74,
+          "ratio_to_prior": 0.9583574320416426
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_history_type_admission.test_valid_paged_admission_reads_no_member_payload[10000-sequence]",
+          "seconds": 96.493,
+          "prior_seconds": 103.054,
+          "ratio_to_prior": 0.936334348982087
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_event_id_exceptions.test_pop_skips_large_removed_suffix_and_clear_replaces_authority",
+          "seconds": 81.939,
+          "prior_seconds": 82.602,
+          "ratio_to_prior": 0.9919735599622284
+        },
+        {
+          "name": "simulation.tests.test_persistence_lazy_souls.test_soul_history_scaling_is_bounded_by_requested_access[10000]",
+          "seconds": 80.787,
+          "prior_seconds": 79.942,
+          "ratio_to_prior": 1.0105701633684423
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_sequence.test_delete_to_empty_root_and_failed_mutation_rollback",
+          "seconds": 72.84,
+          "prior_seconds": 73.58,
+          "ratio_to_prior": 0.9899429192715412
+        },
+        {
+          "name": "simulation.tests.test_persistence_session_open.test_open_close_event_history_bookkeeping_is_constant[400]",
+          "seconds": 64.883,
+          "prior_seconds": 60.547,
+          "ratio_to_prior": 1.0716137876360514
+        },
+        {
+          "name": "simulation.tests.test_persistence_session_open.test_review_append_seal_close_never_reads_cold_segments[400]",
+          "seconds": 62.122,
+          "prior_seconds": 59.374,
+          "ratio_to_prior": 1.046282884764375
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_save_bounds.test_cold_save_history_bounds_are_independent_of_old_prefix[400]",
+          "seconds": 60.811,
+          "prior_seconds": 50.295,
+          "ratio_to_prior": 1.2090863902972462
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_capture.test_capture_bounds_are_enforced_across_4_40_400_segments",
+          "seconds": 60.544,
+          "prior_seconds": 49.684,
+          "ratio_to_prior": 1.218581434667096
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_r3_cross_family_extra.test_three_owner_shared_members_are_bounded_and_portable[10000]",
+          "seconds": 58.017,
+          "prior_seconds": 59.641,
+          "ratio_to_prior": 0.972770409617545
+        },
+        {
+          "name": "simulation.tests.test_continuation_checkpoint_ci.test_real_zip_transport_two_year_pipeline_uses_fresh_processes",
+          "seconds": 49.216,
+          "prior_seconds": 47.978,
+          "ratio_to_prior": 1.0258034932677478
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_closeout.test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]",
+          "seconds": 48.82,
+          "prior_seconds": 48.966,
+          "ratio_to_prior": 0.9970183392558102
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_paged_household_world.test_r3_world_open_digest_append_atomic_save_reopen[10000]",
+          "seconds": 46.777,
+          "prior_seconds": 47.881,
+          "ratio_to_prior": 0.976942837451181
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_sequence.test_repeated_same_gap_splits_then_merges_and_stable_occurrences",
+          "seconds": 45.972,
+          "prior_seconds": 46.405,
+          "ratio_to_prior": 0.9906691089322271
+        },
+        {
+          "name": "simulation.tests.test_rank_loadout_invariant.test_ranked_living_people_have_complete_loadouts[843002]",
+          "seconds": 45.573,
+          "prior_seconds": 46.29,
+          "ratio_to_prior": 0.9845106934543099
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_currency_root_copy.test_currency_root_point_save_does_not_walk_map_history",
+          "seconds": 44.817,
+          "prior_seconds": 45.681,
+          "ratio_to_prior": 0.9810862284100611
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_maintenance.test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]",
+          "seconds": 44.392,
+          "prior_seconds": 45.296,
+          "ratio_to_prior": 0.9800423878488167
+        },
+        {
+          "name": "simulation.tests.test_cultural_reconstruction.test_culture_reconstructs_without_label_entity",
+          "seconds": 44.244,
+          "prior_seconds": 36.14,
+          "ratio_to_prior": 1.2242390702822357
+        },
+        {
+          "name": "simulation.tests.test_rank_loadout_invariant.test_ranked_living_people_have_complete_loadouts[843001]",
+          "seconds": 43.839,
+          "prior_seconds": 43.974,
+          "ratio_to_prior": 0.9969300040933279
+        },
+        {
+          "name": "simulation.tests.test_development_systems.test_infrastructure_has_lineage_and_decay_maintenance_history",
+          "seconds": 43.696,
+          "prior_seconds": 35.535,
+          "ratio_to_prior": 1.2296608977064867
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_settlement_memory.test_scalar_settlement_edit_has_fixed_imported_memory_work",
+          "seconds": 43.627,
+          "prior_seconds": 43.687,
+          "ratio_to_prior": 0.9986265937235335
+        }
+      ],
+      "queue_seconds": 4488,
+      "queue_meaning": "workflow created04:38:13Z to full-suite job created05:53:01Z; includes workflow concurrency wait, not measured test execution",
+      "runner_assignment_wait_seconds": 1,
+      "job_seconds": 7374,
+      "test_count_console": 4391,
+      "subtests_console": 2,
+      "top30": [
+        {
+          "name": "simulation.tests.test_persistence_history_operations.test_streaming_history_bounds_and_detach_cost_are_measured[400]",
+          "seconds": 1322.063
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_advancement_graph.test_scalar_edit_does_not_read_or_write_imported_sample_history",
+          "seconds": 465.309
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_bootstrap.test_bootstrap_transfer_read_and_retention_bounds",
+          "seconds": 346.789
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_aged_save_continuation.test_year_60_world_continues_exactly_through_two_saved_years",
+          "seconds": 216.432
+        },
+        {
+          "name": "simulation.tests.test_persistence_history_operations.test_streaming_history_bounds_and_detach_cost_are_measured[40]",
+          "seconds": 125.461
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_long_harness.test_long_harness_complete_lane_restores_exact_two_milestones",
+          "seconds": 108.836
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_save_bounds.test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache",
+          "seconds": 107.945
+        },
+        {
+          "name": "simulation.tests.test_checkpointed_upgrade_validation.test_p5_bridge_emits_normal_receipt_and_exact_continuation",
+          "seconds": 106.994
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_long_harness.test_staged_harness_resumes_checked_artifacts_without_rebuilding",
+          "seconds": 103.183
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_identity_headers.test_identity_header_comparison_never_reads_sequence_history[10000]",
+          "seconds": 99.42
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_history_type_admission.test_valid_paged_admission_reads_no_member_payload[10000-sequence]",
+          "seconds": 96.493
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_event_id_exceptions.test_pop_skips_large_removed_suffix_and_clear_replaces_authority",
+          "seconds": 81.939
+        },
+        {
+          "name": "simulation.tests.test_persistence_lazy_souls.test_soul_history_scaling_is_bounded_by_requested_access[10000]",
+          "seconds": 80.787
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_sequence.test_delete_to_empty_root_and_failed_mutation_rollback",
+          "seconds": 72.84
+        },
+        {
+          "name": "simulation.tests.test_persistence_session_open.test_open_close_event_history_bookkeeping_is_constant[400]",
+          "seconds": 64.883
+        },
+        {
+          "name": "simulation.tests.test_persistence_session_open.test_review_append_seal_close_never_reads_cold_segments[400]",
+          "seconds": 62.122
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_save_bounds.test_cold_save_history_bounds_are_independent_of_old_prefix[400]",
+          "seconds": 60.811
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_capture.test_capture_bounds_are_enforced_across_4_40_400_segments",
+          "seconds": 60.544
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_r3_cross_family_extra.test_three_owner_shared_members_are_bounded_and_portable[10000]",
+          "seconds": 58.017
+        },
+        {
+          "name": "simulation.tests.test_continuation_checkpoint_ci.test_real_zip_transport_two_year_pipeline_uses_fresh_processes",
+          "seconds": 49.216
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_closeout.test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]",
+          "seconds": 48.82
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_paged_household_world.test_r3_world_open_digest_append_atomic_save_reopen[10000]",
+          "seconds": 46.777
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_sequence.test_repeated_same_gap_splits_then_merges_and_stable_occurrences",
+          "seconds": 45.972
+        },
+        {
+          "name": "simulation.tests.test_rank_loadout_invariant.test_ranked_living_people_have_complete_loadouts[843002]",
+          "seconds": 45.573
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_currency_root_copy.test_currency_root_point_save_does_not_walk_map_history",
+          "seconds": 44.817
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_maintenance.test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]",
+          "seconds": 44.392
+        },
+        {
+          "name": "simulation.tests.test_cultural_reconstruction.test_culture_reconstructs_without_label_entity",
+          "seconds": 44.244
+        },
+        {
+          "name": "simulation.tests.test_rank_loadout_invariant.test_ranked_living_people_have_complete_loadouts[843001]",
+          "seconds": 43.839
+        },
+        {
+          "name": "simulation.tests.test_development_systems.test_infrastructure_has_lineage_and_decay_maintenance_history",
+          "seconds": 43.696
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_settlement_memory.test_scalar_settlement_edit_has_fixed_imported_memory_work",
+          "seconds": 43.627
+        }
+      ]
+    },
+    {
+      "run": 40591864732,
+      "artifact": 12781035092,
+      "archive_sha256": "22478553b07a60ed16d6c3c235ec393c69c7b099bbacafc89fe6a66a67e63149",
+      "source": {
+        "head": "0f8f768b76513b8b3736134a89887ca58398d90c",
+        "python": "3.12.15",
+        "runtime_tree": "45db29e0786dd83901ddb71e2e455bb878eb0574",
+        "sqlite": "3.45.1"
+      },
+      "junit_cases": 4334,
+      "suite_seconds": 7065.572,
+      "case_duration_kind": "JUnit total; includes setup/call/teardown, no separate case-phase export",
+      "retained_duration_phases": [
+        {
+          "seconds": 1284.42,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_history_operations.py::test_streaming_history_bounds_and_detach_cost_are_measured[400]"
+        },
+        {
+          "seconds": 475.89,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_advancement_graph.py::test_scalar_edit_does_not_read_or_write_imported_sample_history"
+        },
+        {
+          "seconds": 280.09,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_bootstrap.py::test_bootstrap_transfer_read_and_retention_bounds"
+        },
+        {
+          "seconds": 223.42,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_aged_save_continuation.py::test_year_60_world_continues_exactly_through_two_saved_years"
+        },
+        {
+          "seconds": 130.11,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_history_operations.py::test_streaming_history_bounds_and_detach_cost_are_measured[40]"
+        },
+        {
+          "seconds": 113.82,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_long_harness.py::test_long_harness_complete_lane_restores_exact_two_milestones"
+        },
+        {
+          "seconds": 106.47,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_long_harness.py::test_staged_harness_resumes_checked_artifacts_without_rebuilding"
+        },
+        {
+          "seconds": 103.74,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_identity_headers.py::test_identity_header_comparison_never_reads_sequence_history[10000]"
+        },
+        {
+          "seconds": 103.05,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_history_type_admission.py::test_valid_paged_admission_reads_no_member_payload[10000-sequence]"
+        },
+        {
+          "seconds": 101.89,
+          "phase": "call",
+          "test": "simulation/tests/test_checkpointed_upgrade_validation.py::test_p5_bridge_emits_normal_receipt_and_exact_continuation"
+        },
+        {
+          "seconds": 93.91,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache"
+        },
+        {
+          "seconds": 82.6,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_event_id_exceptions.py::test_pop_skips_large_removed_suffix_and_clear_replaces_authority"
+        },
+        {
+          "seconds": 79.94,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_lazy_souls.py::test_soul_history_scaling_is_bounded_by_requested_access[10000]"
+        },
+        {
+          "seconds": 73.58,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_sequence.py::test_delete_to_empty_root_and_failed_mutation_rollback"
+        },
+        {
+          "seconds": 60.55,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_session_open.py::test_open_close_event_history_bookkeeping_is_constant[400]"
+        },
+        {
+          "seconds": 59.64,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_r3_cross_family_extra.py::test_three_owner_shared_members_are_bounded_and_portable[10000]"
+        },
+        {
+          "seconds": 59.37,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_session_open.py::test_review_append_seal_close_never_reads_cold_segments[400]"
+        },
+        {
+          "seconds": 50.29,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_history_bounds_are_independent_of_old_prefix[400]"
+        },
+        {
+          "seconds": 49.68,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_cold_capture.py::test_capture_bounds_are_enforced_across_4_40_400_segments"
+        },
+        {
+          "seconds": 48.97,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_closeout.py::test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]"
+        },
+        {
+          "seconds": 47.98,
+          "phase": "call",
+          "test": "simulation/tests/test_continuation_checkpoint_ci.py::test_real_zip_transport_two_year_pipeline_uses_fresh_processes"
+        },
+        {
+          "seconds": 47.88,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_paged_household_world.py::test_r3_world_open_digest_append_atomic_save_reopen[10000]"
+        },
+        {
+          "seconds": 46.4,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_sequence.py::test_repeated_same_gap_splits_then_merges_and_stable_occurrences"
+        },
+        {
+          "seconds": 46.29,
+          "phase": "call",
+          "test": "simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843002]"
+        },
+        {
+          "seconds": 45.68,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_currency_root_copy.py::test_currency_root_point_save_does_not_walk_map_history"
+        },
+        {
+          "seconds": 45.3,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_maintenance.py::test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]"
+        },
+        {
+          "seconds": 43.97,
+          "phase": "call",
+          "test": "simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843001]"
+        },
+        {
+          "seconds": 43.69,
+          "phase": "call",
+          "test": "simulation/tests/test_stage_0_5_final_settlement_memory.py::test_scalar_settlement_edit_has_fixed_imported_memory_work"
+        },
+        {
+          "seconds": 42.49,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_lazy_typed_institution_divinity.py::test_real_nested_histories_use_bounded_points_and_header_reads[10000]"
+        },
+        {
+          "seconds": 36.83,
+          "phase": "call",
+          "test": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_one_token_consumption_writes_bounded_metadata[10000]"
+        }
+      ],
+      "top30": [
+        {
+          "name": "simulation.tests.test_persistence_history_operations.test_streaming_history_bounds_and_detach_cost_are_measured[400]",
+          "seconds": 1284.42
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_advancement_graph.test_scalar_edit_does_not_read_or_write_imported_sample_history",
+          "seconds": 475.891
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_bootstrap.test_bootstrap_transfer_read_and_retention_bounds",
+          "seconds": 280.091
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_aged_save_continuation.test_year_60_world_continues_exactly_through_two_saved_years",
+          "seconds": 223.421
+        },
+        {
+          "name": "simulation.tests.test_persistence_history_operations.test_streaming_history_bounds_and_detach_cost_are_measured[40]",
+          "seconds": 130.113
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_long_harness.test_long_harness_complete_lane_restores_exact_two_milestones",
+          "seconds": 113.816
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_long_harness.test_staged_harness_resumes_checked_artifacts_without_rebuilding",
+          "seconds": 106.472
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_identity_headers.test_identity_header_comparison_never_reads_sequence_history[10000]",
+          "seconds": 103.74
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_history_type_admission.test_valid_paged_admission_reads_no_member_payload[10000-sequence]",
+          "seconds": 103.054
+        },
+        {
+          "name": "simulation.tests.test_checkpointed_upgrade_validation.test_p5_bridge_emits_normal_receipt_and_exact_continuation",
+          "seconds": 101.887
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_save_bounds.test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache",
+          "seconds": 93.907
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_event_id_exceptions.test_pop_skips_large_removed_suffix_and_clear_replaces_authority",
+          "seconds": 82.602
+        },
+        {
+          "name": "simulation.tests.test_persistence_lazy_souls.test_soul_history_scaling_is_bounded_by_requested_access[10000]",
+          "seconds": 79.942
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_sequence.test_delete_to_empty_root_and_failed_mutation_rollback",
+          "seconds": 73.58
+        },
+        {
+          "name": "simulation.tests.test_persistence_session_open.test_open_close_event_history_bookkeeping_is_constant[400]",
+          "seconds": 60.547
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_r3_cross_family_extra.test_three_owner_shared_members_are_bounded_and_portable[10000]",
+          "seconds": 59.641
+        },
+        {
+          "name": "simulation.tests.test_persistence_session_open.test_review_append_seal_close_never_reads_cold_segments[400]",
+          "seconds": 59.374
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_save_bounds.test_cold_save_history_bounds_are_independent_of_old_prefix[400]",
+          "seconds": 50.295
+        },
+        {
+          "name": "simulation.tests.test_persistence_cold_capture.test_capture_bounds_are_enforced_across_4_40_400_segments",
+          "seconds": 49.684
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_closeout.test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]",
+          "seconds": 48.966
+        },
+        {
+          "name": "simulation.tests.test_continuation_checkpoint_ci.test_real_zip_transport_two_year_pipeline_uses_fresh_processes",
+          "seconds": 47.978
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_paged_household_world.test_r3_world_open_digest_append_atomic_save_reopen[10000]",
+          "seconds": 47.881
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_sequence.test_repeated_same_gap_splits_then_merges_and_stable_occurrences",
+          "seconds": 46.405
+        },
+        {
+          "name": "simulation.tests.test_rank_loadout_invariant.test_ranked_living_people_have_complete_loadouts[843002]",
+          "seconds": 46.29
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_currency_root_copy.test_currency_root_point_save_does_not_walk_map_history",
+          "seconds": 45.681
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_maintenance.test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]",
+          "seconds": 45.296
+        },
+        {
+          "name": "simulation.tests.test_rank_loadout_invariant.test_ranked_living_people_have_complete_loadouts[843001]",
+          "seconds": 43.974
+        },
+        {
+          "name": "simulation.tests.test_stage_0_5_final_settlement_memory.test_scalar_settlement_edit_has_fixed_imported_memory_work",
+          "seconds": 43.687
+        },
+        {
+          "name": "simulation.tests.test_persistence_lazy_typed_institution_divinity.test_real_nested_histories_use_bounded_points_and_header_reads[10000]",
+          "seconds": 42.494
+        },
+        {
+          "name": "simulation.tests.test_continuation_restore.test_restore_opens_copies_and_compares_actual_values_digest_and_counters",
+          "seconds": 38.659
+        }
+      ]
+    }
+  ]
+}

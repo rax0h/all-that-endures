@@ -1,0 +1,112 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________ test_restore_timeout_remains_censored _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_restore_timeout_remains_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbe5ceaf8f0>
+
+    def test_restore_timeout_remains_censored(tmp_path,monkeypatch):
+     from simulation import stage_0_5_mature_step_save as old
+     s=fixture(tmp_path,16);a=source_authority(s)
+     def slow(*args,**kw):time.sleep(.2)
+     monkeypatch.setattr(old,'open_lazy_world_session',slow)
+     value=mod().verify(s,tmp_path/'timeout.json',seconds=.02,expected_sha256=a['database']['sha256'],expected_bytes=a['database']['bytes'],rules_id=a['rules_id'],expected_year=a['world']['year'],expected_seed=a['world']['seed'],expected_generation=a['pin']['captured_head'],expected_store_identity=a['pin']['store_identity'],expected_digest='0'*64)
+     assert value['status']=='timeout' and value['censored']
+     assert value['phases']['fresh_open_total']['status']=='timeout'
+>    assert value['phases']['verification_total']['status']=='timeout'
+E    AssertionError: assert 'complete' == 'timeout'
+E      
+E      - timeout
+E      + complete
+
+.github/tests/test_stage_0_6_benchmark.py:70: AssertionError
+___ test_failed_preopen_verification_retains_final_diagnostic_receipt[hash] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_failed_preopen_verificati0')
+bad = 'hash'
+
+    @pytest.mark.parametrize('bad',['hash','size','sidecar'])
+    def test_failed_preopen_verification_retains_final_diagnostic_receipt(tmp_path,bad):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if bad=='sidecar':Path(str(s)+'-journal').write_bytes(b'not a closed checkpoint')
+>    value=mod().verify(s,tmp_path/'failed-restore.json',seconds=30,expected_sha256='0'*64 if bad=='hash' else a['database']['sha256'],expected_bytes=a['database']['bytes']+(1 if bad=='size' else 0),rules_id=a['rules_id'],expected_year=a['world']['year'],expected_seed=a['world']['seed'],expected_generation=a['pin']['captured_head'],expected_store_identity=a['pin']['store_identity'],expected_digest='0'*64)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_mature_benchmark.py:144: in verify
+    rec.finish_split('fresh_open_total','fresh_');result['phases']=rec.phases;result['runtime']=base._runtime_identity();result['machine']=machine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <simulation.stage_0_6_mature_benchmark.Recorder object at 0x7fbe5c436630>
+total = 'fresh_open_total', prefix = 'fresh_'
+
+    def finish_split(self,total,prefix=''):
+>       outer=self.phases[total];inner=self.phases.get(prefix+'database_open')
+              ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'fresh_open_total'
+
+simulation/stage_0_6_mature_benchmark.py:76: KeyError
+___ test_failed_preopen_verification_retains_final_diagnostic_receipt[size] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_failed_preopen_verificati1')
+bad = 'size'
+
+    @pytest.mark.parametrize('bad',['hash','size','sidecar'])
+    def test_failed_preopen_verification_retains_final_diagnostic_receipt(tmp_path,bad):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if bad=='sidecar':Path(str(s)+'-journal').write_bytes(b'not a closed checkpoint')
+>    value=mod().verify(s,tmp_path/'failed-restore.json',seconds=30,expected_sha256='0'*64 if bad=='hash' else a['database']['sha256'],expected_bytes=a['database']['bytes']+(1 if bad=='size' else 0),rules_id=a['rules_id'],expected_year=a['world']['year'],expected_seed=a['world']['seed'],expected_generation=a['pin']['captured_head'],expected_store_identity=a['pin']['store_identity'],expected_digest='0'*64)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_mature_benchmark.py:144: in verify
+    rec.finish_split('fresh_open_total','fresh_');result['phases']=rec.phases;result['runtime']=base._runtime_identity();result['machine']=machine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <simulation.stage_0_6_mature_benchmark.Recorder object at 0x7fbe5c497f20>
+total = 'fresh_open_total', prefix = 'fresh_'
+
+    def finish_split(self,total,prefix=''):
+>       outer=self.phases[total];inner=self.phases.get(prefix+'database_open')
+              ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'fresh_open_total'
+
+simulation/stage_0_6_mature_benchmark.py:76: KeyError
+__ test_failed_preopen_verification_retains_final_diagnostic_receipt[sidecar] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_failed_preopen_verificati2')
+bad = 'sidecar'
+
+    @pytest.mark.parametrize('bad',['hash','size','sidecar'])
+    def test_failed_preopen_verification_retains_final_diagnostic_receipt(tmp_path,bad):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if bad=='sidecar':Path(str(s)+'-journal').write_bytes(b'not a closed checkpoint')
+>    value=mod().verify(s,tmp_path/'failed-restore.json',seconds=30,expected_sha256='0'*64 if bad=='hash' else a['database']['sha256'],expected_bytes=a['database']['bytes']+(1 if bad=='size' else 0),rules_id=a['rules_id'],expected_year=a['world']['year'],expected_seed=a['world']['seed'],expected_generation=a['pin']['captured_head'],expected_store_identity=a['pin']['store_identity'],expected_digest='0'*64)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_mature_benchmark.py:144: in verify
+    rec.finish_split('fresh_open_total','fresh_');result['phases']=rec.phases;result['runtime']=base._runtime_identity();result['machine']=machine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <simulation.stage_0_6_mature_benchmark.Recorder object at 0x7fbe5c499af0>
+total = 'fresh_open_total', prefix = 'fresh_'
+
+    def finish_split(self,total,prefix=''):
+>       outer=self.phases[total];inner=self.phases.get(prefix+'database_open')
+              ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'fresh_open_total'
+
+simulation/stage_0_6_mature_benchmark.py:76: KeyError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_restore_timeout_remains_censored
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_failed_preopen_verification_retains_final_diagnostic_receipt[hash]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_failed_preopen_verification_retains_final_diagnostic_receipt[size]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_failed_preopen_verification_retains_final_diagnostic_receipt[sidecar]
+4 failed, 10 deselected in 2.24s

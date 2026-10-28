@@ -1,0 +1,39 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_temporary_key_high_water_is_not_reported_as_a_counter_delta _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_temporary_key_high_water_0')
+
+    def test_temporary_key_high_water_is_not_reported_as_a_counter_delta(tmp_path):
+     from dataclasses import fields
+     from types import SimpleNamespace
+     from ate_sim.persistence_lazy_store import LazyStoreDiagnostics
+     values={f.name:0 for f in fields(LazyStoreDiagnostics)};values['temporary_keys_peak']=100
+     recorder=mod().Recorder(tmp_path,{})
+     recorder.store=SimpleNamespace(diagnostics=lambda:LazyStoreDiagnostics(**values))
+     recorder.measure('higher',lambda:values.update(temporary_keys_peak=120))
+     recorder.measure('unchanged',lambda:None)
+>    assert 'temporary_keys_peak' not in recorder.phases['higher']['io']
+E    AssertionError: assert 'temporary_keys_peak' not in {'payload_reads': 0, 'payload_read_bytes': 0, 'payload_check_reads': 0, 'payload_check_bytes': 0, ...}
+
+.github/tests/test_stage_0_6_benchmark.py:125: AssertionError
+____ test_shell_timeout_retains_started_phase_and_censored_command_receipt _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_shell_timeout_retains_sta0')
+
+    def test_shell_timeout_retains_started_phase_and_censored_command_receipt(tmp_path):
+     import os,subprocess
+     root=tmp_path;output=root/'evidence/current';output.mkdir(parents=True)
+     code="from pathlib import Path; import time; from simulation.stage_0_6_mature_benchmark import Recorder; r=Recorder(Path("+repr(str(output))+"),{}); r.measure('database_copy',lambda:time.sleep(30))"
+     env=dict(os.environ,PYTHONPATH='.:simulation')
+     stopped=subprocess.run(['timeout','--signal=TERM','--kill-after=.2s','.5s','python','-c',code],env=env,capture_output=True,text=True)
+     assert stopped.returncode in (124,137),stopped.stderr
+>    value=importlib.import_module('simulation.stage_0_6_benchmark_launch').record_command_exit(root,'measure',stopped.returncode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    AttributeError: module 'simulation.stage_0_6_benchmark_launch' has no attribute 'record_command_exit'
+
+.github/tests/test_stage_0_6_benchmark.py:137: AttributeError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_temporary_key_high_water_is_not_reported_as_a_counter_delta
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_shell_timeout_retains_started_phase_and_censored_command_receipt
+2 failed, 14 deselected in 0.69s

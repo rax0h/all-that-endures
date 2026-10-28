@@ -71,22 +71,44 @@ default activation, merge and endurance remain outside this housekeeping step.
 
 | Origin | Finding | Concrete disposition and evidence | State |
 |---|---|---|---|
-| Terminal handoff | Shared budget mixes preparation with operations | Separate preparation budget; auth/copy/hash subtimers; optional independent phase caps; real-fixture timing regression | Closed locally |
-| Terminal handoff | Smoke exercises Stage 0.5 instead of current workflow | Explicit workflow selector; actual Stage 0.6 measure, fresh restore and final gate executed on tiny fixture | Closed locally |
-| Terminal handoff | Missing restore receipt hides primary timeout | Gate checks timing status first; timeout-before-missing-file regression | Closed locally |
-| Terminal handoff | Fresh open and digest lack separate timing | Separate authenticated-input, fresh-open, digest, close and final-hash phases; internal restore timeout receipt regression | Closed locally |
-| Terminal handoff | Workflow edit can launch expensive benchmark | Only a deliberate launch-record change triggers it; no launch record created | Closed |
-| Independent review, Important | Preparation error can lose result.json during cleanup | Missing-source RED/GREEN regression; postcheck failure captured separately | Closed locally |
+| Terminal handoff | Shared budget mixes preparation with operations | Current Stage 0.6 records source verification, copy and copy verification outside independent operation alarms; real-fixture timing regression | Closed locally |
+| Terminal handoff | Smoke exercises Stage 0.5 instead of current workflow | Current Stage 0.6 tests execute their own measurement and fresh-restore commands on a tiny fixture | Closed locally |
+| Terminal handoff | Missing restore receipt hides primary timeout | Current Stage 0.6 summary retains timing status, missing measurements and shell termination evidence explicitly | Closed locally |
+| Terminal handoff | Fresh open and digest lack separate timing | Current Stage 0.6 separates fresh database open, state restoration and logical digest, with timeout regressions | Closed locally |
+| Terminal handoff | Workflow edit can launch expensive benchmark | Current benchmark uses workflow_dispatch only; preservation workflow also manual after its first run | Closed |
+| Independent review, Important | Preparation error can lose result.json during cleanup | Initial legacy repair passed missing-source RED/GREEN; superseded by current Stage 0.6 final-receipt handling; legacy harness left unchanged | Closed locally |
 | Independent review, Important | Second retention failure discards verified first archive | Producer evidence fetched first, per-archive provenance, partial manifest, always upload only final ZIP/JSON names; partial-failure RED/GREEN regression | Closed locally |
-| Independent review, Minor | Preparation lacks component times | Source-authentication/copy/copy-hash subtimers; RED/GREEN component regression | Closed locally |
+| Independent review, Minor | Preparation lacks component times | Current Stage 0.6 source-verification/copy/copy-verification timers replace initial legacy subtimers | Closed locally |
 | Independent review, Minor | Residual overhead mislabeled preparation | Corrected analysis above; original raw measurements unchanged | Closed |
 | Retention deadline | Accepted source/acceptance expire Nov 1–2 | Dedicated bounded archive-only job requests 90-day retention; preserves exact original ZIPs and producer evidence | Hosted execution pending |
 
-Validation: 36 focused tests passed locally, plus the exact current-workflow
-measurement/restore/gate smoke. Independent whole-package review completed;
-all four findings were addressed. No simulation runtime files were changed.
-The existing 4,391-test green baseline remains prior evidence, not validation
-of this patch. The hosted preservation job repeats focused validation and smoke.
+## Reconciliation with concurrent source work
+
+Source branch advanced to `e3358b5c5b92e621497060c31b1e85972a5f0511`
+while the repair candidate was being prepared. That commit contains the reviewed
+canonical Stage 0.6 harness. Retain it and its single manual measurement workflow;
+remove the overlapping changes to the Stage 0.5 helper and old launcher smoke.
+This prevents breaking the current verifier's intentional use of its legacy
+helper under an outer alarm. Rename the archive-only workflow outside the
+`stage-0-6-*` measurement namespace. Do not launch it again during reconciliation.
+
+The first candidate passed 36 focused tests plus its measurement/restore/gate
+smoke. That independent review found four issues, all addressed before initial
+publication. Reconciliation is verified against the canonical Stage 0.6 tests,
+including actual measurement and verification shell commands. The local clone
+needed the full green-ancestor history for that source-fence test; the first
+reconciliation run failed that fence, not a simulation assertion. After fetching full history and committing the clean candidate, all **45 focused
+tests passed in 23.82 seconds**, including the exact current workflow shell smoke.
+Launch fingerprints, unchanged runtime tree, YAML and diff checks also passed.
+No simulation runtime files were changed. The existing 4,391-test green baseline remains prior
+evidence, not validation of this patch.
+
+The archive-only preservation run is
+[40758464881](https://github.com/rax0h/all-that-endures/actions/runs/40758464881),
+launched at initial candidate `5cfe4c73f76bed9f3adfbab337aa116956ef70a6`.
+It uses that candidate's self-contained focused checks and original-archive
+retention code; reconciliation does not cancel or restart it. Hosted completion
+and resulting artifact expiry remain unverified until the run finishes.
 
 ## Retention contract
 

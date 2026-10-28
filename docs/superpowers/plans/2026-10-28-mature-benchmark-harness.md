@@ -25,3 +25,7 @@ exists; caller alarm preservation; timed-out restore receipts; original producer
 identity versus mirror identity; no accidental mature/full-suite trigger.
 
 Hosted archive retention remains pending its own run result. Local validation: 36 focused tests passed and actual Stage 0.6 measurement/restore/gate smoke passed. Independent review: four findings resolved; see consolidated register.
+
+Reconciliation: source advanced to e3358b5 concurrently. Keep its canonical Stage 0.6 implementation and manual workflow, remove redundant legacy-helper changes/test, and retain the archive preservation addition. First combined check: 44 passed, source-fence smoke failed because fresh clone lacked b3030921 history. Fetch full ancestry, commit clean candidate, then rerun combined checks.
+
+Reconciliation verified: 45 focused tests passed in 23.82s, including canonical workflow shell smoke; fingerprints/YAML/runtime/diff checks passed. Publication retains canonical source work without a second measurement or retention launch.

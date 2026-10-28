@@ -1,0 +1,18 @@
+{
+  "run_id": 40712867500,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/40712867500",
+  "sha": "36a362d6bd51c27ba239f776792a692d4deeffa6",
+  "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+  "conclusion": "failure",
+  "artifact_id": 12840817860,
+  "archive_sha256": "dc0cf89a8264501ac85a923bf4242a6546ca237dbff9ae8d4fa67f0f2cda8676",
+  "archive_bytes": 37010,
+  "files": {
+    "candidate/result.json": "796020327b958e408c4137964f83efaeee11a7f6a30cf5bea84d4a8f82b7d20a",
+    "candidate-source.json": "f9349edd3ff18f2dc09a25567adacea07376386bf0f1682eb2f1549ce43e2174",
+    "disk-start.txt": "b7763e0f75386b81b4991d45d37e70b49a650e249ac0facd8c45675cab9b629e",
+    "measure.log": "f9e36aadd6533ae7c53efbee6d8353a8dd2ea40618e74f97bf0ea867a541bcf0",
+    "source-authority.json": "1ebf7c9489c8f98ef6b7c8f99d057dedf96ecffce7fc523dfad8c2452f83e7bd",
+    "source-transport.json": "00b033efe0f97f380d34feb64efb06840ac215fce1e4e43e1710bc91d1899519"
+  }
+}

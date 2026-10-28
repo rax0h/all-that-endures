@@ -1,0 +1,243 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_actual_small_checkpoint_has_separate_phases_and_immutable_source _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_actual_small_checkpoint_h0')
+
+    def test_actual_small_checkpoint_has_separate_phases_and_immutable_source(tmp_path):
+     s=fixture(tmp_path,16);a=source_authority(s)
+>    value=mod().run(s,tmp_path/'measurement',authority=a,budgets={'open':30,'first_step':30,'save':30,'warm_step':30})
+           ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_phase_timeout_is_censored_and_published _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_phase_timeout_is_censored0')
+
+    def test_phase_timeout_is_censored_and_published(tmp_path):
+>    recorder=mod().Recorder(tmp_path,{'slow':.01})
+              ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_wrong_source_authority_cannot_reach_step[hash] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_source_authority_ca0')
+field = 'hash'
+
+    @pytest.mark.parametrize('field',['hash','size','pin','world'])
+    def test_wrong_source_authority_cannot_reach_step(tmp_path,field):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if field=='hash':a['database']['sha256']='0'*64
+     elif field=='size':a['database']['bytes']+=1
+     elif field=='pin':a['pin']['captured_head']+=1
+     else:a['world']['year']+=1
+>    result=mod().run(s,tmp_path/'bad',authority=a,budgets={'open':30,'first_step':30,'save':30,'warm_step':30})
+            ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_wrong_source_authority_cannot_reach_step[size] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_source_authority_ca1')
+field = 'size'
+
+    @pytest.mark.parametrize('field',['hash','size','pin','world'])
+    def test_wrong_source_authority_cannot_reach_step(tmp_path,field):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if field=='hash':a['database']['sha256']='0'*64
+     elif field=='size':a['database']['bytes']+=1
+     elif field=='pin':a['pin']['captured_head']+=1
+     else:a['world']['year']+=1
+>    result=mod().run(s,tmp_path/'bad',authority=a,budgets={'open':30,'first_step':30,'save':30,'warm_step':30})
+            ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_wrong_source_authority_cannot_reach_step[pin] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_source_authority_ca2')
+field = 'pin'
+
+    @pytest.mark.parametrize('field',['hash','size','pin','world'])
+    def test_wrong_source_authority_cannot_reach_step(tmp_path,field):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if field=='hash':a['database']['sha256']='0'*64
+     elif field=='size':a['database']['bytes']+=1
+     elif field=='pin':a['pin']['captured_head']+=1
+     else:a['world']['year']+=1
+>    result=mod().run(s,tmp_path/'bad',authority=a,budgets={'open':30,'first_step':30,'save':30,'warm_step':30})
+            ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_wrong_source_authority_cannot_reach_step[world] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_source_authority_ca3')
+field = 'world'
+
+    @pytest.mark.parametrize('field',['hash','size','pin','world'])
+    def test_wrong_source_authority_cannot_reach_step(tmp_path,field):
+     s=fixture(tmp_path,16);a=source_authority(s)
+     if field=='hash':a['database']['sha256']='0'*64
+     elif field=='size':a['database']['bytes']+=1
+     elif field=='pin':a['pin']['captured_head']+=1
+     else:a['world']['year']+=1
+>    result=mod().run(s,tmp_path/'bad',authority=a,budgets={'open':30,'first_step':30,'save':30,'warm_step':30})
+            ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________________ test_runtime_fence_rejects_wrong_tree _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_runtime_fence_rejects_wro0')
+
+    def test_runtime_fence_rejects_wrong_tree(tmp_path):
+>    with pytest.raises(ValueError):mod().check_source(Path.cwd(),{'runtime_tree':'0'*40,'green_commit':'b3030921dfa7b2d6d9685c7c360534928331f805','fingerprints':{}},'0'*40)
+                                    ^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_benchmark.py:8: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'simulation.stage_0_6_mature_benchmark'
+import_ = <function _gcd_import at 0x7eff5b1100e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_mature_benchmark'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_actual_small_checkpoint_has_separate_phases_and_immutable_source
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_phase_timeout_is_censored_and_published
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_wrong_source_authority_cannot_reach_step[hash]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_wrong_source_authority_cannot_reach_step[size]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_wrong_source_authority_cannot_reach_step[pin]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_wrong_source_authority_cannot_reach_step[world]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_runtime_fence_rejects_wrong_tree
+7 failed in 2.87s

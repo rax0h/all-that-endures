@@ -1,167 +1,103 @@
-name: Stage 0.6 current mature-world performance
+name: Stage 0.6 current mature-world benchmark
+# Launch explicitly after reviewing the candidate and phase budgets.
 'on':
-  push:
-    branches: [sol/durable-proof-map]
-    paths:
-      # A deliberate launch record is required; editing this workflow cannot run it.
-      - .github/launch/stage-0-6-current-mature-performance.json
+  workflow_dispatch: {}
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: stage-0-6-current-mature
+  group: stage-0-6-mature-benchmark
   cancel-in-progress: false
 env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
 jobs:
   measure:
-    name: Current mature open-step-save
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          path: candidate
-      - uses: actions/checkout@v4
-        with:
-          ref: fb75f1c49edda0731287acbf0054a1151ec318c9
-          path: baseline
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install pytest pyyaml
-      - name: Smoke the exact launcher before downloading the mature checkpoint
-        working-directory: candidate
-        shell: bash
+      - name: Targeted harness gate before mature transport
         run: |
-          set -euo pipefail
-          python .github/tests/check_mature_step_save_launch.py --workspace "$GITHUB_WORKSPACE" --lane candidate --workflow stage-0-6-current-mature-performance.yml
-          python -m pytest -q simulation/tests/test_stage_0_5_performance_attribution.py
-      - name: Reserve disk on this disposable hosted runner
-        shell: bash
+          mkdir -p "$GITHUB_WORKSPACE/evidence"
+          python -m pytest -q .github/tests/test_stage_0_6_benchmark.py --junitxml="$GITHUB_WORKSPACE/evidence/harness-tests.xml"
+      - name: Reserve disposable runner disk
         run: |
-          set -euo pipefail
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
           sudo find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name Python -exec rm -rf {} +
           sudo docker image prune -af
-          mkdir -p evidence
           df -h . > evidence/disk-start.txt
-      - name: Authenticate exact accepted year-1001 source
-        working-directory: candidate
+      - name: Authenticate accepted mature fixture and current execution source
+        id: prepare
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import os, shutil, subprocess
-          from pathlib import Path
-          from simulation import continuation_receipts as r, continuation_checkpoint as checkpoint
-          from simulation import construction_mature_continuation_stages as stages
-          root = Path(os.environ['GITHUB_WORKSPACE'])
-          expected_tree = '76dee76973928dbce72860156feb32f2d7f02f86'
-          actual_tree = subprocess.check_output(['git', '-C', str(root/'baseline'), 'rev-parse', 'HEAD:simulation/ate_sim'], text=True).strip()
-          if actual_tree != expected_tree: raise ValueError('baseline runtime differs from accepted authority')
-          candidate_tree = subprocess.check_output(['git', '-C', str(root/'candidate'), 'rev-parse', 'HEAD:simulation/ate_sim'], text=True).strip()
-          candidate_head = subprocess.check_output(['git', '-C', str(root/'candidate'), 'rev-parse', 'HEAD'], text=True).strip()
-          if candidate_head != os.environ['GITHUB_SHA']: raise ValueError('candidate checkout differs from run SHA')
-          if subprocess.check_output(['git', '-C', str(root/'candidate'), 'status', '--porcelain', '--untracked-files=no'], text=True).strip(): raise ValueError('candidate tracked source is dirty')
-          r.publish_receipt(root/'evidence/candidate-source.json', dict(head=candidate_head, runtime_tree=candidate_tree))
-          launch = r.load_receipt('simulation/stage_0_5_save1002_preflight.json')
-          source = r.ArtifactRef.from_dict(launch['inputs']['candidate'])
-          accepted = r.ArtifactRef.from_dict(launch['inputs']['previous'])
-          database = launch['candidate_database']
-          required = 2*database['bytes'] + source.archive_bytes + 8*1024**3
-          if shutil.disk_usage(root).free < required: raise ValueError('insufficient source/copy/archive headroom')
-          transport = stages.download_ref(source, root/'source', members=r.SAVED_MEMBERS, database_cap=database['bytes'])
-          acceptance_transport = stages.download_ref(accepted, root/'accepted', members={'year-verified.json'})
-          authority = stages.mature_authority()
-          saved, retained = checkpoint._read_saved(root/'source', authority, source)
-          receipt = r.load_receipt(root/'accepted/year-verified.json')
-          r.validate_year_acceptance(receipt, authority)
-          r.match_producer(accepted, receipt['producer'], authority)
-          if (not r.same(database, saved['database']) or saved['year'] != 1001
-                  or not r.same(receipt['binding'], r.saved_binding(saved, source, retained['save.json']))):
-              raise ValueError('source is not the exact accepted year-1001 checkpoint')
-          performance_authority = dict(schema='ate-performance-source/1',
-              database={key: database[key] for key in ('sha256', 'bytes')},
-              rules_id=authority.source_config['rules_id'],
-              pin=dict(token=None, store_identity=saved['store_identity'], captured_head=saved['generation']),
-              world=dict(seed=authority.source_config['seed'], year=saved['year']),
-              provenance=dict(kind='authenticated-accepted-saved-artifact', artifact=source.to_dict(),
-                  acceptance=accepted.to_dict(), save_sha256=retained['save.json'],
-                  source_lease='Closed artifact has no live source lease; measured sessions record their complete actual pins'))
-          r.publish_receipt(root/'evidence/source-authority.json', performance_authority)
-          r.publish_receipt(root/'evidence/source-transport.json', dict(source=transport,
-              acceptance=acceptance_transport, saved_manifest=saved, accepted_binding=receipt['binding']))
-          PY
-      - name: Measure current mature open, first step, save and warm step
-        id: measure
-        continue-on-error: true
-        working-directory: candidate
-        shell: bash
-        run: |
-          set -euo pipefail
-          timeout --signal=TERM --kill-after=30s 80m python -m simulation.stage_0_5_mature_step_save run "$GITHUB_WORKSPACE/source/candidate.sqlite" "$GITHUB_WORKSPACE/evidence/candidate" --seconds 3600 --preparation-seconds 900 --phase-seconds 900 --expected-sha256 4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2 --authority "$GITHUB_WORKSPACE/evidence/source-authority.json" 2>&1 | tee "$GITHUB_WORKSPACE/evidence/measure.log"
-      - name: Verify saved year 1002 in a fresh process
-        id: restore
-        if: always() && steps.measure.outcome != 'skipped'
-        continue-on-error: true
-        working-directory: candidate
-        env:
-          LANE: candidate
-        shell: bash
-        run: |
-          set -euo pipefail
-          timeout --signal=TERM --kill-after=30s 90m python - <<'PY'
-          import json, os, runpy, sys
-          from pathlib import Path
-          root = Path(os.environ['GITHUB_WORKSPACE'])
-          lane = os.environ['LANE']
-          measured = json.loads((root/'evidence'/lane/'result.json').read_text())
-          if 'saved_database' not in measured:
-              from simulation import continuation_receipts as r
-              r.publish_receipt(root/'evidence'/lane/'fresh-restore.json',
-                  dict(status='skipped', reason='no closed saved checkpoint'))
-              raise SystemExit(0)
-          saved = measured['saved_database']
-          authority = json.loads((root/'evidence/source-authority.json').read_text())
-          script = root/'candidate/simulation/stage_0_5_mature_step_save.py'
-          output = root/'evidence'/lane/'fresh-restore.json'
-          sys.argv = [str(script), 'verify', str(root/'evidence'/lane/'operational.sqlite'), str(output),
-              '--expected-sha256', saved['sha256'], '--expected-bytes', str(saved['bytes']),
-              '--rules-id', authority['rules_id'], '--expected-year', '1002', '--expected-seed', '843000',
-              '--expected-generation', '127', '--expected-store-identity', authority['pin']['store_identity'],
-              '--expected-digest', '2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7',
-              '--seconds', '1800']
-          runpy.run_path(str(script), run_name='__main__')
-          PY
-      - name: Upload lane evidence
-        if: always()
+        run: python -m simulation.stage_0_6_benchmark_launch prepare --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json
+      - name: Retain authenticated input beyond original artifact expiry
+        if: steps.prepare.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: stage-0-6-current-mature-${{ github.sha }}
+          name: stage-0-6-authenticated-input-${{ github.sha }}
+          path: |
+            source/candidate.sqlite
+            source/checkpoint.json
+            source/save.json
+            accepted/year-verified.json
+            evidence/source-authority.json
+            evidence/source-transport.json
+          compression-level: 1
+          retention-days: 30
+          if-no-files-found: error
+      - name: Measure current open first step save and warm step
+        id: measure
+        continue-on-error: true
+        run: |
+          status=0
+          timeout --signal=TERM --kill-after=30s 210m python -m simulation.stage_0_6_mature_benchmark run --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json || status=$?
+          python -m simulation.stage_0_6_benchmark_launch record-exit --phase measure --status "$status" --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json
+          exit "$status"
+      - name: Fresh-process restore and accepted year1002 digest
+        id: restore
+        if: always() && steps.measure.outcome == 'success'
+        continue-on-error: true
+        run: |
+          status=0
+          timeout --signal=TERM --kill-after=30s 95m python -m simulation.stage_0_6_mature_benchmark verify --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json || status=$?
+          python -m simulation.stage_0_6_benchmark_launch record-exit --phase restore --status "$status" --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json
+          exit "$status"
+      - name: Preserve human and machine readable comparison
+        if: always() && steps.prepare.outcome == 'success'
+        continue-on-error: true
+        run: |
+          status=0
+          python -m simulation.stage_0_6_benchmark_launch summarize --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json || status=$?
+          if test -f evidence/summary.md; then cat evidence/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+          exit "$status"
+      - name: Capture final disk use
+        if: always()
+        run: df -h . > evidence/disk-end.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-6-mature-evidence-${{ github.sha }}
           path: |
             evidence/**/*.json
-            evidence/*.log
-            evidence/*.txt
-          retention-days: 14
-          if-no-files-found: warn
-      - name: Require completed timing and fresh restore
+            evidence/**/*.xml
+            evidence/**/*.md
+            evidence/disk-*.txt
+          retention-days: 30
+          if-no-files-found: error
+      - name: Require complete operational measurement and fresh verification
         if: always()
         env:
-          LANE: candidate
-        shell: bash
+          MEASURE: ${{ steps.measure.outcome }}
+          RESTORE: ${{ steps.restore.outcome }}
         run: |
-          set -euo pipefail
-          python - <<'PY'
-          import os, sys
-          from pathlib import Path
-          sys.path.insert(0, str(Path(os.environ['GITHUB_WORKSPACE'])/'candidate'))
-          sys.path.insert(0, str(Path(os.environ['GITHUB_WORKSPACE'])/'candidate/simulation'))
-          from simulation.stage_0_5_mature_step_save import require_complete
-          root=Path(os.environ['GITHUB_WORKSPACE'])/'evidence'/os.environ['LANE']
-          require_complete(root)
-          PY
+          test "$MEASURE" = success
+          test "$RESTORE" = success

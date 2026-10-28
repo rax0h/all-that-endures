@@ -1,0 +1,46 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_exact_workflow_measure_and_verify_launchers_on_small_fixture _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_exact_workflow_measure_an0')
+
+    def test_exact_workflow_measure_and_verify_launchers_on_small_fixture(tmp_path):
+     import json,os,shutil,subprocess,yaml
+     from ate_sim.engine import Simulation
+     from ate_sim.persistence_lazy import open_lazy_world_session
+     from simulation import continuation_receipts as r
+     repo=Path(__file__).resolve().parents[2];s=fixture(tmp_path,16);a=source_authority(s)
+     root=tmp_path/'workspace';(root/'source').mkdir(parents=True);(root/'evidence').mkdir();shutil.copyfile(s,root/'source/candidate.sqlite')
+     control=tmp_path/'control.sqlite';shutil.copyfile(s,control)
+     with open_lazy_world_session(control,rules_id=a['rules_id']) as session:
+      Simulation(session.world).run(1);expected=session.world.digest()
+     config=json.loads((repo/'simulation/stage_0_6_benchmark_launch.json').read_text());config.update(database=dict(name='candidate.sqlite',**a['database']),world=a['world'],pin={k:a['pin'][k] for k in ('store_identity','captured_head')},expected_saved_digest=expected,budgets={'open':30,'first_step':30,'save':30,'warm_step':30},verification_budget_seconds=60)
+     path=tmp_path/'smoke-config.json';path.write_text(json.dumps(config));r.publish_receipt(root/'evidence/source-authority.json',a)
+     workflow=yaml.safe_load((repo/'.github/workflows/stage-0-6-current-mature-performance.yml').read_text());env=dict(os.environ,GITHUB_WORKSPACE=str(root),GITHUB_SHA=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),PYTHONPATH='.:simulation')
+     for name in ('measure','restore'):
+      command=next(step['run'] for step in workflow['jobs']['measure']['steps'] if step.get('id')==name).replace('simulation/stage_0_6_benchmark_launch.json',str(path))
+      run=subprocess.run(['bash','-e','-o','pipefail','-c',command],cwd=repo,env=env,capture_output=True,text=True,timeout=90)
+>     assert run.returncode==0,(run.stdout,run.stderr)
+E     AssertionError: ('{"status": "error", "receipt": "/tmp/pytest-of-root/pytest-0/test_exact_workflow_measure_an0/workspace/evidence/candidate/result.json"}
+E       ', '')
+E     assert 1 == 0
+E      +  where 1 = CompletedProcess(args=['bash', '-e', '-o', 'pipefail', '-c', 'set -euo pipefail\ntimeout --signal=TERM --kill-after=30..."/tmp/pytest-of-root/pytest-0/test_exact_workflow_measure_an0/workspace/evidence/candidate/result.json"}\n', stderr='').returncode
+
+.github/tests/test_stage_0_6_benchmark.py:90: AssertionError
+______ test_only_one_stage06_measurement_workflow_and_no_automatic_launch ______
+
+    def test_only_one_stage06_measurement_workflow_and_no_automatic_launch():
+     import yaml
+     root=Path(__file__).resolve().parents[2]
+     paths=sorted((root/'.github/workflows').glob('stage-0-6-*.yml'))
+>    assert [p.name for p in paths]==['stage-0-6-current-mature-performance.yml']
+E    AssertionError: assert ['stage-0-6-c...enchmark.yml'] == ['stage-0-6-c...formance.yml']
+E      
+E      Left contains one more item: 'stage-0-6-mature-benchmark.yml'
+E      Use -v to get more diff
+
+.github/tests/test_stage_0_6_benchmark.py:147: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_exact_workflow_measure_and_verify_launchers_on_small_fixture
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_only_one_stage06_measurement_workflow_and_no_automatic_launch
+2 failed, 15 deselected in 1.08s
