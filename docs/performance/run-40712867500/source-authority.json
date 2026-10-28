@@ -1,0 +1,48 @@
+{
+  "database": {
+    "bytes": 29922463744,
+    "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
+  },
+  "pin": {
+    "captured_head": 126,
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+    "token": null
+  },
+  "provenance": {
+    "acceptance": {
+      "archive_bytes": 85723,
+      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+      "artifact_id": 12165934374,
+      "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
+      "name": "continuation-stage-accept-year-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39207586140,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
+    },
+    "artifact": {
+      "archive_bytes": 4419015875,
+      "archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+      "artifact_id": 12129336378,
+      "harness_sha": "dd795af561ca81a342fd3aa8e835db5233ef8d6b",
+      "name": "continuation-stage-save-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39098313631,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810"
+    },
+    "kind": "authenticated-accepted-saved-artifact",
+    "save_sha256": "72649d5bef65e4af16ed6cb269b26acde061b57966b728ddd633755ae667b827",
+    "source_lease": "Closed artifact has no live source lease; measured sessions record their complete actual pins"
+  },
+  "rules_id": "stage-0-5-final-release",
+  "schema": "ate-performance-source/1",
+  "world": {
+    "seed": 843000,
+    "year": 1001
+  }
+}

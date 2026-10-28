@@ -1,0 +1,53 @@
+{
+  "schema": "ate-stage06-measured-comparison/1",
+  "rows": [
+    {
+      "operation": "open",
+      "historical_seconds": 313.269865189,
+      "seconds": 454.541096038,
+      "status": "complete",
+      "censored": false,
+      "target_seconds": 10,
+      "result": "fail"
+    },
+    {
+      "operation": "first_step",
+      "historical_seconds": 2446.796163759,
+      "seconds": 4092.171436445,
+      "status": "complete",
+      "censored": false,
+      "target_seconds": null,
+      "result": "no defined target"
+    },
+    {
+      "operation": "save",
+      "historical_seconds": 2190.653148761,
+      "seconds": 3219.9801720140003,
+      "status": "complete",
+      "censored": false,
+      "target_seconds": 2,
+      "result": "fail"
+    },
+    {
+      "operation": "warm_step",
+      "historical_seconds": 2158.448431114,
+      "seconds": 2452.9550695769994,
+      "status": "timeout",
+      "censored": true,
+      "target_seconds": 1,
+      "result": "fail"
+    },
+    {
+      "operation": "fresh_restore",
+      "historical_seconds": null,
+      "seconds": null,
+      "status": "not reached",
+      "censored": false,
+      "target_seconds": null,
+      "result": "not measured"
+    }
+  ],
+  "measurement_complete": false,
+  "performance_targets_met": false,
+  "comparison_limit": "Different hosted runner/cache; observations do not isolate a code regression. Open includes restoration. Warm time is a censored lower bound from the shared budget, not a completed year."
+}

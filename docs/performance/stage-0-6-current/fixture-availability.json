@@ -1,0 +1,20 @@
+{
+  "accepted_receipt_sha256": "5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45",
+  "binding": {
+    "database": {
+      "bytes": 29922463744,
+      "name": "candidate.sqlite",
+      "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
+    },
+    "year": 1001,
+    "generation": 126,
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a"
+  },
+  "source_artifact_id": 12129336378,
+  "source_archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+  "source_expires_at": "2026-11-01T07:26:37Z",
+  "acceptance_artifact_id": 12165934374,
+  "acceptance_archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+  "acceptance_expires_at": "2026-11-02T06:04:38Z",
+  "large_database_download_hash_verification": "pending hosted transport; metadata availability and small acceptance archive/receipt checked locally"
+}

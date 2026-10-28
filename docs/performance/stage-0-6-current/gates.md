@@ -1,0 +1,11 @@
+# Stage0.6 gate audit before measurement
+
+- Correctness baseline: b3030921 green run40633435258, both jobs success; archived full suite4391 tests plus2 subtests, source/runtime and archive hash verified. This is not a mature latency result.
+- Current mature timing: MEASURED, FAIL. Run40712867500 at36a362d6: open454.541s, first year4092.171s, save3219.980s, warm year censored at2452.955s. Fresh restore skipped. Original receipts, verified archive identity and comparison are retained in ../run-40712867500/. Opening/restoration were combined in this run.
+- Default proof activation: OPEN and deliberately unchanged. New proof-aware sessions remain explicit; benchmark calls the current ordinary open_lazy_world_session path on the accepted historical format. No benchmark-harness change activates proof defaults.
+- Architecture approval: Oct21 Astra proof design is a recommendation and component reviews exist; final Stage0.6 end-to-end architecture/performance acceptance is OPEN. This benchmark review approves only the launch after fixes.
+- Fixture availability: original source expiresNov1 and acceptanceNov2; exact accepted source hash pinned. Run40712867500 did not retain the database. The reconciled workflow is configured to upload the authenticated source, original controls, acceptance and transport chain with30day retention before measurement, but a successful replacement upload remains OPEN. Do not claim retention from configuration alone.
+- Long-horizon scaling: bounded synthetic1k/10k/100k component/native results exist; end-to-end mature1000/3000/5000/7500/10000year sustainable performance remains OPEN. No endurance launch authorized here.
+- Findings: R1–R4 closed locally with regression evidence. No new unowned deferred findings. Performance gate itself remains owned by Stage0.6 Issue18.
+
+Next: preserve the expiring authenticated fixture and use bounded attribution of the first year and save before a runtime repair. These measured phases spend nearly all their elapsed time on CPU and perform millions of checked reads; the responsible functions are not yet isolated. Catalog scans/default integration remain candidates, not proven diagnoses. The single current benchmark workflow now requires explicit dispatch; no housekeeping push should run it.
