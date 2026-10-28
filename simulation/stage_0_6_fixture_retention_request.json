@@ -1,0 +1,11 @@
+{
+  "schema": "ate-stage06-retention-request/1",
+  "request_id": "retain-and-sample-2026-10-28-1",
+  "operation": "retain authenticated fixture then sample first simulation step; no save or full performance benchmark",
+  "source_artifact_id": 12129336378,
+  "source_database_sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2",
+  "open_budget_seconds": 900,
+  "first_step_profile_seconds": 60,
+  "diagnostic_shell_budget_minutes": 20,
+  "job_budget_minutes": 60
+}

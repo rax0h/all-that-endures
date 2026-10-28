@@ -1,0 +1,19 @@
+{
+  "tested_commit": "4cf1c0dcd1c2616aee42309f455baf28e7eeae31",
+  "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+  "tests": 51,
+  "seconds": 31.52,
+  "result": "passed",
+  "command": "PYTHONPATH=.:simulation python -m pytest -q .github/tests/test_stage_0_6_benchmark.py simulation/tests/test_stage_0_5_performance_runner.py simulation/tests/test_stage_0_5_performance_attribution.py",
+  "other_checks": [
+    "all workflow shell blocks bash -n",
+    "workflow YAML",
+    "all launch source fingerprints",
+    "clean imported-source/runtime/green-ancestor fence"
+  ],
+  "review": "one fresh Astra/high;0Critical3Important0Minor; all3fixed in one author RED/GREEN pass; no second review",
+  "files": {
+    "retain-sample-targeted.log": "90a8b424a6dc71bbd1d1168ff31e9a9b22ed2405b02b121f2f68cd55072da890",
+    "retain-sample-targeted.xml": "05f03b60b860a4c0633530db8c59087e8675323f4f93c8ef8ffff3fd7d9fe473"
+  }
+}

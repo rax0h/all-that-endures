@@ -49,14 +49,16 @@ class Recorder:
     def __init__(self,output,budgets):
         self.output=Path(output);self.budgets=budgets;self.phases={};self.store=None
         if any(type(n) not in (int,float) or not math.isfinite(n) or n<=0 for n in budgets.values()):raise ValueError('phase budgets must be finite and positive')
-    def measure(self,name,operation):
+    def measure(self,name,operation,*,on_budget_expiry=None):
         row=dict(status='running',budget_seconds=self.budgets.get(name));self.phases[name]=row
         r.publish_receipt(self.output/('phase-start-'+name+'.json'),dict(status='running',phase=name,started_unix=time.time(),budget_seconds=self.budgets.get(name)))
         before=resources();started=time.perf_counter();io=asdict(self.store.diagnostics()) if self.store is not None else {};row['resources_start']=before
         old=signal.getsignal(signal.SIGALRM);timer=signal.getitimer(signal.ITIMER_REAL)
         owns_alarm=name in self.budgets
         if owns_alarm and timer[0]:raise ValueError('cannot replace an active alarm')
-        def expired(*_):raise base.BudgetExpired(name+' phase budget exhausted')
+        def expired(*_):
+            if on_budget_expiry is not None:on_budget_expiry()
+            raise base.BudgetExpired(name+' phase budget exhausted')
         try:
             if owns_alarm:signal.signal(signal.SIGALRM,expired);signal.setitimer(signal.ITIMER_REAL,self.budgets[name])
             value=operation();row['status']='complete';return value

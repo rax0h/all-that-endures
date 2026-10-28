@@ -1,0 +1,111 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_profile_stops_at_budget_before_slow_exception_unwind ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-20/test_profile_stops_at_budget_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa031dff050>
+
+    def test_profile_stops_at_budget_before_slow_exception_unwind(tmp_path,monkeypatch):
+     from simulation.stage_0_6_profile_sample import sample
+     from ate_sim.engine import Simulation
+     def cleanup_after_alarm():time.sleep(.2)
+     def delayed(*_):
+      try:time.sleep(1)
+      finally:cleanup_after_alarm()
+     monkeypatch.setattr(Simulation,'run',delayed)
+     s=fixture(tmp_path,16);a=source_authority(s)
+     result=sample(s,tmp_path/'sample',authority=a,open_seconds=30,step_seconds=.01)
+     phase=result['phases']['first_step']
+     assert phase['wall_seconds']>=.2
+>    assert phase['profiled_wall_seconds']<.1
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    KeyError: 'profiled_wall_seconds'
+
+.github/tests/test_stage_0_6_benchmark.py:220: KeyError
+______________ test_sample_rehashes_original_even_if_close_raises ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-20/test_sample_rehashes_original_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa031e83740>
+
+    def test_sample_rehashes_original_even_if_close_raises(tmp_path,monkeypatch):
+     from simulation import stage_0_6_profile_sample as m
+     original=m.open_lazy_world_session
+     def opened(*args,**kwargs):
+      session=original(*args,**kwargs);close=session.close
+      def failing_close():close();raise RuntimeError('injected close error')
+      session.close=failing_close
+      return session
+     monkeypatch.setattr(m,'open_lazy_world_session',opened)
+     s=fixture(tmp_path,16);a=source_authority(s)
+     result=m.sample(s,tmp_path/'sample',authority=a,open_seconds=30,step_seconds=30)
+>    assert result['status']=='error' and 'injected close error' in result['close_error']
+                                                                    ^^^^^^^^^^^^^^^^^^^^^
+E    KeyError: 'close_error'
+
+.github/tests/test_stage_0_6_benchmark.py:236: KeyError
+____ test_actual_sample_shell_timeout_preserves_explicit_diagnostics[TERM] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-20/test_actual_sample_shell_timeo0')
+signum = 'TERM'
+
+    @pytest.mark.parametrize('signum',['TERM','KILL'])
+    def test_actual_sample_shell_timeout_preserves_explicit_diagnostics(tmp_path,signum):
+     import json,os,shlex,subprocess,yaml
+     from simulation import continuation_receipts as r
+     s=fixture(tmp_path,16);a=source_authority(s)
+     root=tmp_path/'workspace';(root/'evidence').mkdir(parents=True)
+     code="import time; from pathlib import Path; from ate_sim.engine import Simulation; from simulation.stage_0_6_profile_sample import sample; from simulation import continuation_receipts as r; Simulation.run=lambda *_:time.sleep(30); sample(Path("+repr(str(s))+"),Path("+repr(str(root/'evidence/sample'))+"),authority=r.load_receipt(Path("+repr(str(tmp_path/'authority.json'))+")),open_seconds=30,step_seconds=60)"
+     r.publish_receipt(tmp_path/'authority.json',a)
+     workflow=yaml.safe_load(Path('.github/workflows/stage-0-6-current-mature-performance.yml').read_text())
+     command=next(step['run'] for step in workflow['jobs']['retain']['steps'] if step.get('id')=='sample')
+     original='python -m simulation.stage_0_6_profile_sample --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json'
+     assert original in command
+     command=command.replace(original,'python -c '+shlex.quote(code)).replace('20m ','2s ').replace('--signal=TERM','--signal='+signum)
+     run=subprocess.run(['bash','-e','-o','pipefail','-c',command],env=dict(os.environ,PYTHONPATH='.:simulation',GITHUB_WORKSPACE=str(root)),capture_output=True,text=True,timeout=15)
+     assert run.returncode in (124,137),(run.returncode,run.stdout,run.stderr)
+>    exit_receipt=r.load_receipt(root/'evidence/command-exit-sample.json')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_benchmark.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-20/test_actual_sample_shell_timeo0/workspace/evidence/command-exit-sample.json')
+
+    def load_receipt(path):
+        path = Path(path)
+        if path.is_symlink() or not path.is_file() or path.stat().st_size > METADATA_MAX_BYTES:
+>           raise ValueError('invalid or oversized metadata file')
+E           ValueError: invalid or oversized metadata file
+
+simulation/continuation_receipts.py:90: ValueError
+____ test_actual_sample_shell_timeout_preserves_explicit_diagnostics[KILL] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-20/test_actual_sample_shell_timeo1')
+signum = 'KILL'
+
+    @pytest.mark.parametrize('signum',['TERM','KILL'])
+    def test_actual_sample_shell_timeout_preserves_explicit_diagnostics(tmp_path,signum):
+     import json,os,shlex,subprocess,yaml
+     from simulation import continuation_receipts as r
+     s=fixture(tmp_path,16);a=source_authority(s)
+     root=tmp_path/'workspace';(root/'evidence').mkdir(parents=True)
+     code="import time; from pathlib import Path; from ate_sim.engine import Simulation; from simulation.stage_0_6_profile_sample import sample; from simulation import continuation_receipts as r; Simulation.run=lambda *_:time.sleep(30); sample(Path("+repr(str(s))+"),Path("+repr(str(root/'evidence/sample'))+"),authority=r.load_receipt(Path("+repr(str(tmp_path/'authority.json'))+")),open_seconds=30,step_seconds=60)"
+     r.publish_receipt(tmp_path/'authority.json',a)
+     workflow=yaml.safe_load(Path('.github/workflows/stage-0-6-current-mature-performance.yml').read_text())
+     command=next(step['run'] for step in workflow['jobs']['retain']['steps'] if step.get('id')=='sample')
+     original='python -m simulation.stage_0_6_profile_sample --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_benchmark_launch.json'
+     assert original in command
+     command=command.replace(original,'python -c '+shlex.quote(code)).replace('20m ','2s ').replace('--signal=TERM','--signal='+signum)
+     run=subprocess.run(['bash','-e','-o','pipefail','-c',command],env=dict(os.environ,PYTHONPATH='.:simulation',GITHUB_WORKSPACE=str(root)),capture_output=True,text=True,timeout=15)
+>    assert run.returncode in (124,137),(run.returncode,run.stdout,run.stderr)
+E    AssertionError: (-9, '', '')
+E    assert -9 in (124, 137)
+E     +  where -9 = CompletedProcess(args=['bash', '-e', '-o', 'pipefail', '-c', 'timeout --signal=KILL --kill-after=30s 2s python -c \'im...sample_shell_timeo1/authority.json\'"\'"\')),open_seconds=30,step_seconds=60)\''], returncode=-9, stdout='', stderr='').returncode
+
+.github/tests/test_stage_0_6_benchmark.py:253: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_profile_stops_at_budget_before_slow_exception_unwind
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_sample_rehashes_original_even_if_close_raises
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_actual_sample_shell_timeout_preserves_explicit_diagnostics[TERM]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_actual_sample_shell_timeout_preserves_explicit_diagnostics[KILL]
+4 failed, 24 deselected in 6.48s

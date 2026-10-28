@@ -44,9 +44,9 @@ def summarize(root,config):
     return measured['status']=='complete' and fresh.get('status')=='complete'
 
 def record_command_exit(root,phase,status):
-    if phase not in ('measure','restore') or type(status) is not int:raise ValueError('invalid command exit')
-    root=Path(root);directory=root/'evidence/current' if phase=='measure' else root/'evidence'
-    output=directory/'result.json' if phase=='measure' else directory/'fresh-restore.json'
+    if phase not in ('measure','restore','sample') or type(status) is not int:raise ValueError('invalid command exit')
+    root=Path(root);directory=root/'evidence/current' if phase=='measure' else root/'evidence/sample' if phase=='sample' else root/'evidence'
+    output=directory/'result.json' if phase in ('measure','sample') else directory/'fresh-restore.json'
     value=dict(schema='ate-stage06-command-exit/1',command=phase,exit_status=status,status='complete' if status==0 else 'timeout' if status in (124,137) else 'error',censored=status in (124,137))
     r.publish_receipt(root/'evidence'/('command-exit-'+phase+'.json'),value)
     if status!=0 and not output.exists():
@@ -57,12 +57,12 @@ def record_command_exit(root,phase,status):
             start=r.load_receipt(p);name=start['phase']
             if name not in phases or phases[name].get('status')=='running':
                 phases[name]=dict(status=value['status'],censored=value['censored'],budget_seconds=start['budget_seconds'],elapsed_since_phase_start_at_diagnostic_seconds=max(0.,__import__('time').time()-start['started_unix']),diagnostic='process terminated; CPU/IO/final phase time unavailable')
-        r.publish_receipt(output,dict(schema='ate-stage06-terminated/1',status=value['status'],censored=value['censored'],runtime=__import__('simulation.profile_stage_0_5_performance',fromlist=['_runtime_identity'])._runtime_identity(),phases=phases,error='measurement command terminated; see command exit and phase journals'))
+        r.publish_receipt(output,dict(schema='ate-stage06-terminated/1',status=value['status'],censored=value['censored'],runtime=__import__('simulation.profile_stage_0_5_performance',fromlist=['_runtime_identity'])._runtime_identity(),phases=phases,**(dict(acceptance='not-run',profile_available=(directory/'first_step.prof').is_file(),profile_diagnostic='forced termination may prevent profile flush; inspect available journals') if phase=='sample' else {}),error='measurement command terminated; see command exit and phase journals'))
     return value
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','summarize','record-exit']);p.add_argument('--root',type=Path,required=True);p.add_argument('--config',type=Path,required=True);p.add_argument('--phase',choices=['measure','restore']);p.add_argument('--status',type=int);a=p.parse_args();c=r.load_receipt(a.config)
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','summarize','record-exit']);p.add_argument('--root',type=Path,required=True);p.add_argument('--config',type=Path,required=True);p.add_argument('--phase',choices=['measure','restore','sample']);p.add_argument('--status',type=int);a=p.parse_args();c=r.load_receipt(a.config)
     try:
         result=prepare(a.root,c) if a.command=='prepare' else record_command_exit(a.root,a.phase,a.status) if a.command=='record-exit' else summarize(a.root,c)
     except Exception as exc:

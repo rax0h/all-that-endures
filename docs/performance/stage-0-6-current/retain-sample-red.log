@@ -1,0 +1,90 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+______ test_only_one_stage06_measurement_workflow_and_no_automatic_launch ______
+
+    def test_only_one_stage06_measurement_workflow_and_no_automatic_launch():
+     import yaml
+     root=Path(__file__).resolve().parents[2]
+     paths=sorted((root/'.github/workflows').glob('stage-0-6-*.yml'))
+     assert [p.name for p in paths]==['stage-0-6-current-mature-performance.yml']
+     workflow=yaml.safe_load(paths[0].read_text())
+>    assert set(workflow['on'])=={'workflow_dispatch','push'}
+E    AssertionError: assert {'workflow_dispatch'} == {'push', 'workflow_dispatch'}
+E      
+E      Extra items in the right set:
+E      'push'
+E      Use -v to get more diff
+
+.github/tests/test_stage_0_6_benchmark.py:149: AssertionError
+__________ test_bounded_first_year_sample_has_profile_and_never_saves __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_bounded_first_year_sample0')
+
+    def test_bounded_first_year_sample_has_profile_and_never_saves(tmp_path):
+>    from simulation.stage_0_6_profile_sample import sample
+E    ModuleNotFoundError: No module named 'simulation.stage_0_6_profile_sample'
+
+.github/tests/test_stage_0_6_benchmark.py:160: ModuleNotFoundError
+___ test_bounded_sample_timeout_keeps_profile_without_claiming_complete_year ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_bounded_sample_timeout_ke0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff665fc44d0>
+
+    def test_bounded_sample_timeout_keeps_profile_without_claiming_complete_year(tmp_path,monkeypatch):
+>    from simulation.stage_0_6_profile_sample import sample
+E    ModuleNotFoundError: No module named 'simulation.stage_0_6_profile_sample'
+
+.github/tests/test_stage_0_6_benchmark.py:174: ModuleNotFoundError
+_____ test_sample_rejects_unbounded_or_invalid_budgets_before_copy[901-1] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_sample_rejects_unbounded_0')
+opening = 901, step = 1
+
+    @pytest.mark.parametrize('opening,step',[(901,1),(1,61),(0,1),(1,float('nan'))])
+    def test_sample_rejects_unbounded_or_invalid_budgets_before_copy(tmp_path,opening,step):
+>    from simulation.stage_0_6_profile_sample import sample
+E    ModuleNotFoundError: No module named 'simulation.stage_0_6_profile_sample'
+
+.github/tests/test_stage_0_6_benchmark.py:185: ModuleNotFoundError
+______ test_sample_rejects_unbounded_or_invalid_budgets_before_copy[1-61] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_sample_rejects_unbounded_1')
+opening = 1, step = 61
+
+    @pytest.mark.parametrize('opening,step',[(901,1),(1,61),(0,1),(1,float('nan'))])
+    def test_sample_rejects_unbounded_or_invalid_budgets_before_copy(tmp_path,opening,step):
+>    from simulation.stage_0_6_profile_sample import sample
+E    ModuleNotFoundError: No module named 'simulation.stage_0_6_profile_sample'
+
+.github/tests/test_stage_0_6_benchmark.py:185: ModuleNotFoundError
+______ test_sample_rejects_unbounded_or_invalid_budgets_before_copy[0-1] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_sample_rejects_unbounded_2')
+opening = 0, step = 1
+
+    @pytest.mark.parametrize('opening,step',[(901,1),(1,61),(0,1),(1,float('nan'))])
+    def test_sample_rejects_unbounded_or_invalid_budgets_before_copy(tmp_path,opening,step):
+>    from simulation.stage_0_6_profile_sample import sample
+E    ModuleNotFoundError: No module named 'simulation.stage_0_6_profile_sample'
+
+.github/tests/test_stage_0_6_benchmark.py:185: ModuleNotFoundError
+_____ test_sample_rejects_unbounded_or_invalid_budgets_before_copy[1-nan] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_sample_rejects_unbounded_3')
+opening = 1, step = nan
+
+    @pytest.mark.parametrize('opening,step',[(901,1),(1,61),(0,1),(1,float('nan'))])
+    def test_sample_rejects_unbounded_or_invalid_budgets_before_copy(tmp_path,opening,step):
+>    from simulation.stage_0_6_profile_sample import sample
+E    ModuleNotFoundError: No module named 'simulation.stage_0_6_profile_sample'
+
+.github/tests/test_stage_0_6_benchmark.py:185: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_only_one_stage06_measurement_workflow_and_no_automatic_launch
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_bounded_first_year_sample_has_profile_and_never_saves
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_bounded_sample_timeout_keeps_profile_without_claiming_complete_year
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_sample_rejects_unbounded_or_invalid_budgets_before_copy[901-1]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_sample_rejects_unbounded_or_invalid_budgets_before_copy[1-61]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_sample_rejects_unbounded_or_invalid_budgets_before_copy[0-1]
+FAILED .github/tests/test_stage_0_6_benchmark.py::test_sample_rejects_unbounded_or_invalid_budgets_before_copy[1-nan]
+7 failed, 16 deselected in 0.22s
