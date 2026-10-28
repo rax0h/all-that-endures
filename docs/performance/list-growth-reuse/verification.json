@@ -1,0 +1,41 @@
+{
+  "runtime_tree": "93cf7d28629844b85be07867a2c327ae5656e123",
+  "source_hashes": {
+    ".github/tests/run_proof_native_value_scaling.py": "559dd23ea0dd237cec33ef8ce9a67a5c8209c62763336ddc192c284e80d7a58e",
+    "simulation/ate_sim/persistence_proof_manifest_publish.py": "eeee27be4d279a22559155ece6364eea33a7948b4ffda35cfbb0cf0d833fa47c",
+    "simulation/ate_sim/persistence_proof_world_tail_pages.py": "4ad7aa6aead5fa2466425447f36bc41233d78f943508a88a67850afbb4cb3585",
+    "simulation/ate_sim/persistence_proof_world_value.py": "028440cf57f942dc66b0d2517e9ab05b27f46d969b43695c1d4707cb851cfb0c",
+    "simulation/tests/test_stage_0_5_proof_world_page_growth.py": "9c7fff9ce4866db937a12fb8550c87fd95954a535799ebee723d80fff8d03dd9"
+  },
+  "tests": [
+    {
+      "scope": "related",
+      "tests": 135,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "native",
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "compose",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "broad_hosted_gate": "pending",
+  "independent_probes": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 25.06,
+    "caveat": "10 real commit rejection probes;4 mocked predecessor classifier-only fallback probes"
+  }
+}

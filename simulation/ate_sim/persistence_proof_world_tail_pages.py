@@ -14,7 +14,7 @@ from .persistence_history_types import NAMESPACE as TYPES,TAG
 
 def prepare(store,request,versions,facts):
     codec=store.codec;ca=request.pairs[0][0];sa=request.pairs[1][0]
-    child_directory=sa.roots[4];eligible={};new_rows={};facts=list(facts)
+    child_directory=sa.roots[4];eligible={};new_rows={};facts=list(facts);request.tail_added=0
     if len(versions)>512 or sum(len(i['payload'] or b'')+len(i['memberships_blob']) for i in versions)>4*1048576:return {},tuple(facts),{},child_directory
     by_key={(i['namespace'],i['typed_key']):i for i in versions}
     def clean(i):return i is not None and not i['change'].delete and not i['change'].reinsertion and i['change'].record_schema==1 and i['memberships_blob']==codec.encode(())
@@ -24,13 +24,13 @@ def prepare(store,request,versions,facts):
         if type(inc) is not int or inc<=0 or type(new) is not tuple or len(new)!=3 or new[0]!='list' or any(type(n) is not int or n<=0 for n in new[1:]) or new[1]!=new[2]:continue
         if content._map(store).get(ca.versions,version_key(HISTORY,item['typed_key'])) is None:continue
         old=_parent(store,request,HISTORY,inc)
-        if type(old) is not tuple or len(old)!=3 or old[0]!='list' or type(old[1]) is not int or old[1]<=0 or old[1]!=old[2]:continue
+        if type(old) is not tuple or len(old)!=3 or old[0]!='list' or type(old[1]) is not int or old[1]<0 or old[1]!=old[2]:continue
         old_pages=(old[1]+127)//128;new_pages=(new[1]+127)//128
         if new_pages<=old_pages or new_pages-old_pages>128:continue
         types=by_key.get((TYPES,codec.encode(inc)))
         if not clean(types) or len(types['payload'])>4096:continue
         if codec.encode(_parent(store,request,TYPES,inc))!=codec.encode((TAG,'list',(old[1],0,0))) or types['payload']!=codec.encode((TAG,'list',(new[1],0,0))):continue
-        affected=[];added={};valid=True
+        affected=[];added={};absent=0;valid=True
         if old[1]%128:
             key=(inc,old_pages-1);page=by_key.get((PAGES,codec.encode(key)))
             if not clean(page):continue
@@ -45,8 +45,15 @@ def prepare(store,request,versions,facts):
             header_key=codec.encode((PAGES,key));header=by_key.get((catalog.OWNER_NAMESPACE,header_key))
             wanted=codec.encode(('identity-owner/v1',True,'lazy',request.pin.captured_head+1,1,_framed_sha(b'lazy-payload-v1',page['payload']),None,0,_framed_sha(b'identity-owner-empty-v1')))
             if not clean(header) or header['payload']!=wanted:valid=False;break
-            if any(content._map(store).get(ca.versions,version_key(ns,k)) is not None for ns,k in ((PAGES,typed),(catalog.OWNER_NAMESPACE,header_key))):
-                valid=False;break  # A retained tombstone needs the checked reuse path.
+            if content._map(store).get(ca.versions,version_key(PAGES,typed)) is not None:
+                valid=False;break
+            retained=content._map(store).get(ca.versions,version_key(catalog.OWNER_NAMESPACE,header_key))
+            if retained is not None:
+                before=_parent(store,request,catalog.OWNER_NAMESPACE,(PAGES,key))
+                if (type(before) is not tuple or len(before)!=9 or before[:3]!=('identity-owner/v1',False,'lazy')
+                        or before[4]!=1 or before[6:]!=(None,0,_framed_sha(b'identity-owner-empty-v1'))):
+                    valid=False;break
+            absent+=1+(retained is None)
             added[(PAGES,typed)]=page['payload'];added[(catalog.OWNER_NAMESPACE,header_key)]=wanted;affected.append(key)
         if not valid:continue
         OrderedSeekMap(store.db,b'').create_schema()
@@ -64,5 +71,5 @@ def prepare(store,request,versions,facts):
             mapping=world._map(store,label)
             if mapping.get(facts[index],key)!=wanted:raise StoreIntegrityError('tail predecessor lacks semantic backing authority')
             facts[index]=mapping.set(facts[index],key,replacement)
-        eligible[inc]=tuple(affected);new_rows.update(added)
+        eligible[inc]=tuple(affected);new_rows.update(added);request.tail_added+=absent
     return eligible,tuple(facts),new_rows,child_directory

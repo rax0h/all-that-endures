@@ -1,0 +1,816 @@
+FFFFF..F                                                                 [100%]
+=================================== FAILURES ===================================
+______ test_empty_list_growth_uses_authenticated_empty_child_inventory[1] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f064099ac90>
+count = 1
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+>      s.skills[1,'craft'].provenance.extend(range(count));assert s.save()==1;child=s.proof_manifest
+                                                                  ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:181: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f06408c6090>, GenerationPin(token='01d0fecd-4695-4b1f-86..., count=34)), b'\x02\xc5\xdd\xd1\xc0MjsU\xd3\xf6\xa1\x9cV$\xe6E\xac\xec\xe1\xd8\xe1\x8b[\xcd\x0f)Z\xf0\x81J\xf3'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: empty growth invoked full audit
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:115: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f064099ac90>
+count = 1
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f0640890290>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+_____ test_empty_list_growth_uses_authenticated_empty_child_inventory[128] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0640719550>
+count = 128
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+>      s.skills[1,'craft'].provenance.extend(range(count));assert s.save()==1;child=s.proof_manifest
+                                                                  ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:181: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f064064a1e0>, GenerationPin(token='cc6e13fe-6148-4210-94...ac', count=34)), b'\xcbc\x07\xd4\x15H$\xce\x02\x95\x81Z.\xf0Q+\xf3Z\x0f\x8dU\xd9\x08M\x05\x88;\x8e5\x06\x08\xd3'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: empty growth invoked full audit
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:115: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0640719550>
+count = 128
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f0640456ea0>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+_____ test_empty_list_growth_uses_authenticated_empty_child_inventory[129] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0640471eb0>
+count = 129
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+>      s.skills[1,'craft'].provenance.extend(range(count));assert s.save()==1;child=s.proof_manifest
+                                                                  ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:181: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f064064b500>, GenerationPin(token='ac6862c1-48ee-45d7-8c...83', count=34)), b'\xe7\xadTZ69[:TW\xa2\x87\xb5\xfa^\xaf\x88S\xe2\xef\xe2\xcf\xcf\x1e\xf8\xcf\xa1n\x86p\x81\x96'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: empty growth invoked full audit
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:115: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0640471eb0>
+count = 129
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f06406002f0>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+_____ test_empty_list_growth_uses_authenticated_empty_child_inventory[257] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f064147d8b0>
+count = 257
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+>      s.skills[1,'craft'].provenance.extend(range(count));assert s.save()==1;child=s.proof_manifest
+                                                                  ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:181: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f0640457a70>, GenerationPin(token='835cca2f-4ab5-4818-ab...unt=34)), b'\tM\xd5\xec\xaeB@\x7f\x82\xee\xe3\xf36\x8b\x13\xd4\xde$\x0e\x1e\x0fep\xc2X\x7f\x0bW\xc3\x89\xc1\x16'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('empty growth invoked full audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: empty growth invoked full audit
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:115: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_list_growth_uses_au3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f064147d8b0>
+count = 257
+
+    @pytest.mark.parametrize('count',[1,128,129,257])
+    def test_empty_list_growth_uses_authenticated_empty_child_inventory(tmp_path,monkeypatch,count):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[]
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f06408c5d90>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+______ test_regrowth_reuses_only_authenticated_inactive_empty_owner[None] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_regrowth_reuses_only_auth0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f06407b49e0>
+fault = None
+
+    @pytest.mark.parametrize('fault',[None,'before_head','before_commit','after_commit'])
+    def test_regrowth_reuses_only_authenticated_inactive_empty_owner(tmp_path,monkeypatch,fault):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      v=s.skills[1,'craft'].provenance;v.extend(range(97));assert s.save()==1
+      assert v.pop()==96;assert s.save()==2;parent=s.proof_manifest
+     with opened(path,parent) as s:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('regrowth invoked full audit'))
+       s.skills[1,'craft'].provenance.append(777)
+       if fault:
+        def stop(at):
+         if at==fault:raise RuntimeError('interrupted regrowth')
+        s.store._phase_hook=stop
+        with pytest.raises(RuntimeError):s.save()
+        s.store._phase_hook=lambda _:None
+>      else:assert s.save()==3
+                   ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:181: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f0640672540>, GenerationPin(token='382530cf-29cd-4ab8-b1...d\xde\x1c{\x82;D\x7f', count=34)), b'\xd8Qv\x1dQj\xf5\x1a\x02\xa2 \xaf~# .iYV\x85$]\xea/\x02\x1c\xabE\xfai\xadJ'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('regrowth invoked full audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: regrowth invoked full audit
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:130: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_regrowth_reuses_only_auth0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f06407b49e0>
+fault = None
+
+    @pytest.mark.parametrize('fault',[None,'before_head','before_commit','after_commit'])
+    def test_regrowth_reuses_only_authenticated_inactive_empty_owner(tmp_path,monkeypatch,fault):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      v=s.skills[1,'craft'].provenance;v.extend(range(97));assert s.save()==1
+      assert v.pop()==96;assert s.save()==2;parent=s.proof_manifest
+>    with opened(path,parent) as s:
+          ^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f063f54f980>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+__ test_regrowth_reuses_only_authenticated_inactive_empty_owner[after_commit] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_regrowth_reuses_only_auth3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0640649340>
+fault = 'after_commit'
+
+    @pytest.mark.parametrize('fault',[None,'before_head','before_commit','after_commit'])
+    def test_regrowth_reuses_only_authenticated_inactive_empty_owner(tmp_path,monkeypatch,fault):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      v=s.skills[1,'craft'].provenance;v.extend(range(97));assert s.save()==1
+      assert v.pop()==96;assert s.save()==2;parent=s.proof_manifest
+     with opened(path,parent) as s:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('regrowth invoked full audit'))
+       s.skills[1,'craft'].provenance.append(777)
+       if fault:
+        def stop(at):
+         if at==fault:raise RuntimeError('interrupted regrowth')
+        s.store._phase_hook=stop
+>       with pytest.raises(RuntimeError):s.save()
+                                         ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:181: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f063f54e5d0>, GenerationPin(token='a18190d5-7f84-4a92-be...\xd9>+\xaa', count=34)), b'\xec\x07\xd3I\x11\x95C\x06\xfd\x11\xc8\xe4\nj_|\x92#W?v\xd5s\xda\xda\xc8D_\x08\xd1uo'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('regrowth invoked full audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: regrowth invoked full audit
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:130: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_regrowth_reuses_only_auth3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0640649340>
+fault = 'after_commit'
+
+    @pytest.mark.parametrize('fault',[None,'before_head','before_commit','after_commit'])
+    def test_regrowth_reuses_only_authenticated_inactive_empty_owner(tmp_path,monkeypatch,fault):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      v=s.skills[1,'craft'].provenance;v.extend(range(97));assert s.save()==1
+      assert v.pop()==96;assert s.save()==2;parent=s.proof_manifest
+>    with opened(path,parent) as s:
+          ^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f0640254d10>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_empty_list_growth_uses_authenticated_empty_child_inventory[1]
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_empty_list_growth_uses_authenticated_empty_child_inventory[128]
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_empty_list_growth_uses_authenticated_empty_child_inventory[129]
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_empty_list_growth_uses_authenticated_empty_child_inventory[257]
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_regrowth_reuses_only_authenticated_inactive_empty_owner[None]
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_regrowth_reuses_only_authenticated_inactive_empty_owner[after_commit]
+6 failed, 2 passed, 14 deselected in 19.88s

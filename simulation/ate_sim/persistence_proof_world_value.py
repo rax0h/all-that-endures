@@ -134,9 +134,11 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             if item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
             continue
         kind='ordinary' if marker in ordinary_owners else 'lazy'
-        if old is None:
-            if (item['namespace'],item['typed_key']) not in (request.tail_new or {}):raise StoreIntegrityError('unproved new owner witness')
+        approved=(request.tail_new or {}).get((item['namespace'],item['typed_key']))
+        if approved is not None:
+            if item['payload']!=approved:raise StoreIntegrityError('revived owner differs from frozen authority')
             witnessed.add(marker);continue
+        if old is None:raise StoreIntegrityError('unproved new owner witness')
         expected=list(value)
         if len(expected)!=9 or expected[0]!='identity-owner/v1' or expected[1] is not True or expected[2]!=kind:return False
         expected[3]=g+1;expected[4]=source.record_schema;expected[5]=catalog._source_commitment(codec,source,kind,g+1)

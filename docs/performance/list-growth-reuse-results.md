@@ -1,0 +1,13 @@
+# Authenticated growth from empty and reused list pages
+
+The accepted baseline is0f8f768, run40591864732:4334 full-suite tests,1238 proof tests and28 matrices, with artifact archive hashes and source/runtime labels checked in run-40591864732/acceptance.json.
+
+This candidate extends the bounded native integer-list growth path to existing empty backings and to absent physical pages with retained inactive empty owner headers. It authenticates the retained header against accepted content, checks its inactive/lazy/schema1/empty tree form, and requires the exact canonical successor header over the frozen integer payload. A separate operation-private absent-row count distinguishes a replaced retained header from a newly inserted source row. The full expected child-directory root, unchanged owner/group/sequence roots and allocator, head namespace inventory, event root, changed-source witnesses and auxiliary collection/directory constructors remain gates.
+
+Tests exercise1/128/129/257 values from an empty list, ordinary and three fault seams for regrowth, simultaneous fresh and reused pages across distinct backings (including129→0→257), aliases after fresh audited reopen, and bool/float/reference fallback. Page deletion, noninteger/reference-bearing growth and budgets outside512 rows/4MiB/128 pages retain audited fallback.
+
+The native matrix retains scalar/fixed-shape/tail/page-growth controls. It now removes128 values with checked audited setup, closes, opens a fresh session, and restores128 values while forbidding full World audit and tracing selected versus unrelated physical history payload SELECTs. The regrowth measurement includes the interval-one SQLite VM progress handler; it is instrumented wall time, and is not directly comparable with unprofiled timings. Audited admission and deletion setup are outside that measured first-access/save interval. Final audited reopen checks aliases, size and restored tail values. Payload SELECT counts include absence probes, not disk IO/bytes.
+
+Exact results and source hashes are in list-growth-reuse/verification.json and native-scaling/*.json. Local scope is related/native regression tests plus the native matrix; full proof, full simulation suite and all28 matrices remain the next hosted acceptance gates. General structural saving, proof-based ordinary opening/default activation and mature workload targets remain unfinished. No endurance run or main merge.
+
+Local evidence:256 targeted/native tests pass(135 related,120 native,1 distinct-backing case). Regrowth1k/10k/100k instrumented timings440.39/477.46/350.95ms; VM steps357255/357657/360596;17 selected payload SELECTs including absence probes and0 unrelated each.

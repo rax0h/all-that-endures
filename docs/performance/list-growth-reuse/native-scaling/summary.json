@@ -1,0 +1,169 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "f178d9e18fd2352c9ebbc08d2803a0a7284e821d",
+    "runtime_tree": "93cf7d28629844b85be07867a2c327ae5656e123",
+    "sqlite": "3.53.1",
+    "driver_sha256": "559dd23ea0dd237cec33ef8ce9a67a5c8209c62763336ddc192c284e80d7a58e",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "f178d9e18fd2352c9ebbc08d2803a0a7284e821d",
+        "runtime_tree": "93cf7d28629844b85be07867a2c327ae5656e123",
+        "sqlite": "3.53.1",
+        "driver_sha256": "559dd23ea0dd237cec33ef8ce9a67a5c8209c62763336ddc192c284e80d7a58e",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 1.5211658499999885,
+      "audited_admission_seconds": 0.17028790500000923,
+      "native_first_access_and_save_ms": 721.0402469999622,
+      "native_first_access_and_save_unprofiled_ms": 124.4351990000041,
+      "python_peak_bytes": 524919,
+      "sqlite_vm_steps": 282871,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 174.46633299999803,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 315048,
+      "tail_first_access_and_save_ms": 220.35849799999596,
+      "tail_sql": {
+        "selected": 10,
+        "unrelated": 0
+      },
+      "tail_vm_steps": 340665,
+      "page_growth_first_access_and_save_ms": 260.831157000041,
+      "page_growth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "page_growth_vm_steps": 356778,
+      "regrowth_profiled_first_access_and_save_ms": 440.3943749999826,
+      "regrowth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "regrowth_vm_steps": 357255,
+      "regrowth_added_values": 128,
+      "page_growth_added_values": 128,
+      "page_growth_vm_added_values": 128,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "f178d9e18fd2352c9ebbc08d2803a0a7284e821d",
+        "runtime_tree": "93cf7d28629844b85be07867a2c327ae5656e123",
+        "sqlite": "3.53.1",
+        "driver_sha256": "559dd23ea0dd237cec33ef8ce9a67a5c8209c62763336ddc192c284e80d7a58e",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 3.7551687730000367,
+      "audited_admission_seconds": 0.3466833780000229,
+      "native_first_access_and_save_ms": 470.7014699999945,
+      "native_first_access_and_save_unprofiled_ms": 118.33984800000508,
+      "python_peak_bytes": 337748,
+      "sqlite_vm_steps": 282980,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 190.3529559999697,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 314995,
+      "tail_first_access_and_save_ms": 222.85375299998123,
+      "tail_sql": {
+        "selected": 10,
+        "unrelated": 0
+      },
+      "tail_vm_steps": 340722,
+      "page_growth_first_access_and_save_ms": 214.29534999998623,
+      "page_growth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "page_growth_vm_steps": 357313,
+      "regrowth_profiled_first_access_and_save_ms": 477.4635939999712,
+      "regrowth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "regrowth_vm_steps": 357657,
+      "regrowth_added_values": 128,
+      "page_growth_added_values": 128,
+      "page_growth_vm_added_values": 128,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "f178d9e18fd2352c9ebbc08d2803a0a7284e821d",
+        "runtime_tree": "93cf7d28629844b85be07867a2c327ae5656e123",
+        "sqlite": "3.53.1",
+        "driver_sha256": "559dd23ea0dd237cec33ef8ce9a67a5c8209c62763336ddc192c284e80d7a58e",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 29.60126391299997,
+      "audited_admission_seconds": 2.8323672580000334,
+      "native_first_access_and_save_ms": 537.1809829999847,
+      "native_first_access_and_save_unprofiled_ms": 104.34246199997688,
+      "python_peak_bytes": 351134,
+      "sqlite_vm_steps": 283946,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 192.4560809999889,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 317115,
+      "tail_first_access_and_save_ms": 207.98632100002123,
+      "tail_sql": {
+        "selected": 10,
+        "unrelated": 0
+      },
+      "tail_vm_steps": 342984,
+      "page_growth_first_access_and_save_ms": 192.75047399997902,
+      "page_growth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "page_growth_vm_steps": 360306,
+      "regrowth_profiled_first_access_and_save_ms": 350.9505209999588,
+      "regrowth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "regrowth_vm_steps": 360596,
+      "regrowth_added_values": 128,
+      "page_growth_added_values": 128,
+      "page_growth_vm_added_values": 128,
+      "archive_unit": "retained history values"
+    }
+  ]
+}

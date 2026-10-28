@@ -1,0 +1,246 @@
+{
+  "results": [
+    {
+      "actual_point_save": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 152977,
+        "seconds": 0.023080528999969374,
+        "selects": {
+          "other": 59,
+          "proof": 4,
+          "selected_mutable_payload": 1,
+          "selected_retained_payload": 0,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 3199,
+        "store_world_decode_counter": 0
+      },
+      "current": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 13725,
+        "seconds": 0.0033383940000248913,
+        "selects": {
+          "other": 18,
+          "proof": 4,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1599,
+        "store_world_decode_counter": 0
+      },
+      "database_bytes": 1253376,
+      "exact": true,
+      "full_fixture_and_audited_bootstrap_seconds": 0.15406032300001016,
+      "process_lifetime_peak_rss_bytes": 31313920,
+      "retained": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 12637,
+        "seconds": 0.0028670419999912156,
+        "selects": {
+          "other": 18,
+          "proof": 4,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1899,
+        "store_world_decode_counter": 0
+      },
+      "size": 1000,
+      "source": {
+        "driver_sha256": "810bf9e5fa72353ffc7a3e8fd560de07c0487d8f242b894b9554337c55b29fbb",
+        "fixture_sha256": "8f3289b5a410cf01b8a214bfc78999681c6d52fd8d04144ad70d7be35095d773",
+        "head": "0f8f768b76513b8b3736134a89887ca58398d90c",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "runtime_tree": "45db29e0786dd83901ddb71e2e455bb878eb0574",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "successor": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 11061,
+        "seconds": 0.00325608100001773,
+        "selects": {
+          "other": 18,
+          "proof": 4,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1699,
+        "store_world_decode_counter": 0
+      }
+    },
+    {
+      "actual_point_save": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 103584,
+        "seconds": 0.022839003000001412,
+        "selects": {
+          "other": 59,
+          "proof": 4,
+          "selected_mutable_payload": 1,
+          "selected_retained_payload": 0,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 3299,
+        "store_world_decode_counter": 0
+      },
+      "current": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 13325,
+        "seconds": 0.003567950000046949,
+        "selects": {
+          "other": 18,
+          "proof": 4,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1599,
+        "store_world_decode_counter": 0
+      },
+      "database_bytes": 10170368,
+      "exact": true,
+      "full_fixture_and_audited_bootstrap_seconds": 0.9690837350000265,
+      "process_lifetime_peak_rss_bytes": 39604224,
+      "retained": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 14349,
+        "seconds": 0.003083626000034201,
+        "selects": {
+          "other": 18,
+          "proof": 4,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1899,
+        "store_world_decode_counter": 0
+      },
+      "size": 10000,
+      "source": {
+        "driver_sha256": "810bf9e5fa72353ffc7a3e8fd560de07c0487d8f242b894b9554337c55b29fbb",
+        "fixture_sha256": "8f3289b5a410cf01b8a214bfc78999681c6d52fd8d04144ad70d7be35095d773",
+        "head": "0f8f768b76513b8b3736134a89887ca58398d90c",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "runtime_tree": "45db29e0786dd83901ddb71e2e455bb878eb0574",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "successor": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 14133,
+        "seconds": 0.0034467389999690567,
+        "selects": {
+          "other": 18,
+          "proof": 4,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1699,
+        "store_world_decode_counter": 0
+      }
+    },
+    {
+      "actual_point_save": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 103729,
+        "seconds": 0.024289283999962663,
+        "selects": {
+          "other": 59,
+          "proof": 5,
+          "selected_mutable_payload": 1,
+          "selected_retained_payload": 0,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 3299,
+        "store_world_decode_counter": 0
+      },
+      "current": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 14637,
+        "seconds": 0.004161092999993343,
+        "selects": {
+          "other": 18,
+          "proof": 5,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1599,
+        "store_world_decode_counter": 0
+      },
+      "database_bytes": 99762176,
+      "exact": true,
+      "full_fixture_and_audited_bootstrap_seconds": 10.884466798999995,
+      "process_lifetime_peak_rss_bytes": 107425792,
+      "retained": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 13957,
+        "seconds": 0.00365747600000077,
+        "selects": {
+          "other": 18,
+          "proof": 5,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1899,
+        "store_world_decode_counter": 0
+      },
+      "size": 100000,
+      "source": {
+        "driver_sha256": "810bf9e5fa72353ffc7a3e8fd560de07c0487d8f242b894b9554337c55b29fbb",
+        "fixture_sha256": "8f3289b5a410cf01b8a214bfc78999681c6d52fd8d04144ad70d7be35095d773",
+        "head": "0f8f768b76513b8b3736134a89887ca58398d90c",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "runtime_tree": "45db29e0786dd83901ddb71e2e455bb878eb0574",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "successor": {
+        "checked_payload_bytes": 41,
+        "checked_payloads": 1,
+        "python_peak_bytes": 13645,
+        "seconds": 0.004128917999992154,
+        "selects": {
+          "other": 18,
+          "proof": 5,
+          "selected_mutable_payload": 0,
+          "selected_retained_payload": 1,
+          "unrelated_payload": 0
+        },
+        "sqlite_vm_step_upper_bound": 1799,
+        "store_world_decode_counter": 0
+      }
+    }
+  ],
+  "schema": "ate-record-proof-summary/1",
+  "source": {
+    "driver_sha256": "810bf9e5fa72353ffc7a3e8fd560de07c0487d8f242b894b9554337c55b29fbb",
+    "fixture_sha256": "8f3289b5a410cf01b8a214bfc78999681c6d52fd8d04144ad70d7be35095d773",
+    "head": "0f8f768b76513b8b3736134a89887ca58398d90c",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "45db29e0786dd83901ddb71e2e455bb878eb0574",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}
