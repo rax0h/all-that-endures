@@ -1,0 +1,50 @@
+name: Preserve accepted mature checkpoint inputs
+'on':
+  push:
+    branches: [sol/mature-benchmark-harness-repair]
+    paths:
+      - .github/workflows/stage-0-6-preserve-mature-inputs.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: preserve-accepted-mature-inputs
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Verify bounded retention and measurement helpers
+        run: python -m pytest -q simulation/tests/test_preserve_mature_inputs.py simulation/tests/test_mature_benchmark_harness.py simulation/tests/test_stage_0_5_performance_attribution.py simulation/tests/test_stage_0_5_performance_runner.py
+      - name: Smoke current measurement, fresh restore and final gate on a tiny fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir "$RUNNER_TEMP/mature-launch-smoke"
+          ln -s "$GITHUB_WORKSPACE" "$RUNNER_TEMP/mature-launch-smoke/candidate"
+          ln -s "$GITHUB_WORKSPACE" "$RUNNER_TEMP/mature-launch-smoke/baseline"
+          python .github/tests/check_mature_step_save_launch.py --workspace "$RUNNER_TEMP/mature-launch-smoke" --lane candidate --workflow stage-0-6-current-mature-performance.yml
+      - name: Authenticate and retain exact original source and acceptance archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: timeout --signal=TERM --kill-after=30s 25m python -m simulation.preserve_mature_inputs
+      - name: Retain original ZIP bytes and producer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accepted-year-1001-original-archives
+          path: |
+            retained-mature-inputs/*.zip
+            retained-mature-inputs/*.json
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error

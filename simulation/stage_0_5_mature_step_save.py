@@ -42,9 +42,20 @@ def _world(session):
     return base._world(session)
 
 
-def run(source, output, *, seconds, expected_sha256, authority, attributed=False):
-    if type(seconds) not in (int, float) or not math.isfinite(seconds) or seconds <= 0:
+def _positive_seconds(value):
+    if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
         raise ValueError('seconds must be finite and positive')
+
+
+def run(source, output, *, seconds, expected_sha256, authority, attributed=False,
+        preparation_seconds=900, phase_seconds=None):
+    """Legacy seconds bounds operations together; phase_seconds gives each its own cap.
+
+    Preparation always has a separate budget. Neither mode times digest/audit work
+    as a simulation operation. A shell limit remains the final process boundary.
+    """
+    for budget in (seconds, preparation_seconds): _positive_seconds(budget)
+    if phase_seconds is not None: _positive_seconds(phase_seconds)
     source, output = Path(source).resolve(), Path(output).resolve()
     if source == output or source.is_relative_to(output):
         raise ValueError('output cannot contain source')
@@ -58,7 +69,10 @@ def run(source, output, *, seconds, expected_sha256, authority, attributed=False
               'machine': {'platform': platform.platform(), 'processor': platform.processor(),
                           'python': platform.python_version(), 'sqlite': sqlite3.sqlite_version,
                           'cpu_count': os.cpu_count()},
-              'budget_seconds': seconds, 'phases': {}, 'unavailable': ['phase_peak_rss']}
+              'budget_seconds': seconds, 'preparation_budget_seconds': preparation_seconds,
+              'phase_budget_seconds': phase_seconds,
+              'budget_mode': 'per-phase' if phase_seconds is not None else 'operations-total',
+              'phases': {}, 'unavailable': ['phase_peak_rss']}
     session = None
     trace = base._attribution() if attributed else None
     old_handler = signal.getsignal(signal.SIGALRM)
@@ -67,7 +81,7 @@ def run(source, output, *, seconds, expected_sha256, authority, attributed=False
         raise ValueError('cannot replace an active caller alarm')
 
     def expired(*_args):
-        raise base.BudgetExpired('mature step/save run budget exhausted')
+        raise base.BudgetExpired('mature benchmark budget exhausted')
 
     def measure(name, operation):
         nonlocal session
@@ -76,6 +90,8 @@ def run(source, output, *, seconds, expected_sha256, authority, attributed=False
         started, cpu, rss = time.perf_counter(), time.process_time(), base._rss()
         row = {'status': 'error', 'rss_start_bytes': rss}
         result['phases'][name] = row
+        if phase_seconds is not None:
+            signal.setitimer(signal.ITIMER_REAL, phase_seconds)
         try:
             with trace.phase(name) if trace is not None else nullcontext():
                 value = operation()
@@ -86,6 +102,7 @@ def run(source, output, *, seconds, expected_sha256, authority, attributed=False
             row['status'] = 'timeout'
             raise
         finally:
+            if phase_seconds is not None: signal.setitimer(signal.ITIMER_REAL, 0)
             row.update(wall_seconds=time.perf_counter() - started,
                        cpu_seconds=time.process_time() - cpu, rss_end_bytes=base._rss(),
                        process_peak_rss_bytes=base._peak_rss())
@@ -102,14 +119,38 @@ def run(source, output, *, seconds, expected_sha256, authority, attributed=False
     try:
         if trace is not None: trace.__enter__()
         signal.signal(signal.SIGALRM, expired)
-        signal.setitimer(signal.ITIMER_REAL, seconds)
-        base._verify_authority(source, expected_sha256, authority)
-        if shutil.disk_usage(output).free < source.stat().st_size + 8 * 1024**2:
-            raise ValueError('insufficient space for disposable checkpoint')
-        target = output / 'operational.sqlite'
-        shutil.copyfile(source, target)
-        if r.file_hash(target) != expected_sha256:
-            raise ValueError('disposable copy checksum differs')
+        signal.setitimer(signal.ITIMER_REAL, preparation_seconds)
+        started = time.perf_counter()
+        preparation = result['preparation'] = {'status': 'error', 'phases': {}}
+        def prepare(name, operation):
+            row = preparation['phases'][name] = {'status': 'error'}
+            start = time.perf_counter()
+            try:
+                value = operation()
+                row['status'] = 'complete'
+                return value
+            except base.BudgetExpired:
+                row['status'] = 'timeout'
+                raise
+            finally:
+                row['wall_seconds'] = time.perf_counter() - start
+        try:
+            prepare('source_authentication', lambda: base._verify_authority(source, expected_sha256, authority))
+            if shutil.disk_usage(output).free < source.stat().st_size + 8 * 1024**2:
+                raise ValueError('insufficient space for disposable checkpoint')
+            target = output / 'operational.sqlite'
+            prepare('copy', lambda: shutil.copyfile(source, target))
+            if prepare('copy_hash', lambda: r.file_hash(target)) != expected_sha256:
+                raise ValueError('disposable copy checksum differs')
+            preparation['status'] = 'complete'
+        except base.BudgetExpired:
+            preparation['status'] = 'timeout'
+            raise
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            preparation['wall_seconds'] = time.perf_counter() - started
+            r.publish_receipt(output / 'preparation.json', preparation)
+        if phase_seconds is None: signal.setitimer(signal.ITIMER_REAL, seconds)
 
         session = measure('open', lambda: open_lazy_world_session(
             target, rules_id=authority['rules_id']))
@@ -152,48 +193,76 @@ def run(source, output, *, seconds, expected_sha256, authority, attributed=False
         try:
             result['source_unchanged'] = r.file_hash(source) == expected_sha256
             if not result['source_unchanged']:
-                result.update(status='error', error='source changed during run')
+                result['status'] = 'error'
+                result.setdefault('error', 'source changed during run')
+        except Exception as exc:
+            result.update(status='error', source_unchanged=False,
+                          source_postcheck_error=f'{type(exc).__name__}: {exc}')
         finally:
             signal.signal(signal.SIGALRM, old_handler)
         target = output / 'operational.sqlite'
-        if result['status'] == 'complete':
+        if 'saved' in result and 'close_error' not in result:
             if not target.is_file() or target.is_symlink():
                 result.update(status='error', error='saved checkpoint is not a regular file')
             elif any(Path(str(target) + suffix).exists()
                      for suffix in ('-wal', '-journal', '-shm')):
                 result.update(status='error', error='saved checkpoint is not closed and standalone')
             else:
-                result['saved_database'] = {'sha256': r.file_hash(target),
-                                            'bytes': target.stat().st_size}
+                try:
+                    result['saved_database'] = {'sha256': r.file_hash(target),
+                                                'bytes': target.stat().st_size}
+                except Exception as exc:
+                    result.update(status='error', saved_manifest_error=f'{type(exc).__name__}: {exc}')
         r.publish_receipt(output / 'result.json', result)
     return result
 
 
 def verify_checkpoint(database, output, *, expected_sha256, expected_bytes, rules_id,
                       expected_year, expected_seed, expected_generation,
-                      expected_store_identity, expected_digest):
+                      expected_store_identity, expected_digest, seconds=1800):
+    _positive_seconds(seconds)
+    old_handler = signal.getsignal(signal.SIGALRM)
+    if signal.getitimer(signal.ITIMER_REAL)[0]:
+        raise ValueError('cannot replace an active caller alarm')
     database = Path(database).resolve()
     output = Path(output).resolve()
     result = {'schema': 'ate-mature-fresh-restore/1', 'status': 'error',
+              'phases': {}, 'budget_seconds': seconds,
               'expected': {'sha256': expected_sha256, 'bytes': expected_bytes,
                            'rules_id': rules_id, 'year': expected_year,
                            'seed': expected_seed, 'generation': expected_generation,
                            'store_identity': expected_store_identity, 'digest': expected_digest}}
     session = None
+    def expired(*_args):
+        raise base.BudgetExpired('fresh restore budget exhausted')
+    def timed(name, operation):
+        row = result['phases'][name] = {'status': 'error'}
+        started = time.perf_counter()
+        try:
+            value = operation()
+            row['status'] = 'complete'
+            return value
+        except base.BudgetExpired:
+            row['status'] = 'timeout'
+            raise
+        finally:
+            row['wall_seconds'] = time.perf_counter() - started
     try:
+        signal.signal(signal.SIGALRM, expired)
+        signal.setitimer(signal.ITIMER_REAL, seconds)
         if database.is_symlink() or not database.is_file():
             raise ValueError('checkpoint must be a regular file')
         if any(Path(str(database) + suffix).exists()
                for suffix in ('-wal', '-journal', '-shm')):
             raise ValueError('checkpoint is not closed and standalone')
-        before = r.file_hash(database)
+        before = timed('authenticate', lambda: r.file_hash(database))
         if database.stat().st_size != expected_bytes or before != expected_sha256:
             raise ValueError('checkpoint bytes/hash differ from the saved artifact')
 
-        session = open_lazy_world_session(database, rules_id=rules_id)
+        session = timed('fresh_open', lambda: open_lazy_world_session(database, rules_id=rules_id))
         pin = asdict(session.pin)
         world = {'seed': session.world.seed, 'year': session.world.year}
-        actual_digest = session.world.digest()
+        actual_digest = timed('digest', session.world.digest)
         result.update(world=world, pin=pin, actual_digest=actual_digest)
         if world != {'seed': expected_seed, 'year': expected_year}:
             raise ValueError('freshly opened world seed/year differs')
@@ -202,9 +271,9 @@ def verify_checkpoint(database, output, *, expected_sha256, expected_bytes, rule
             raise ValueError('freshly opened store identity/generation differs')
         if actual_digest != expected_digest:
             raise ValueError('freshly opened world digest differs')
-        session.close()
+        timed('close', session.close)
         session = None
-        reopened_hash = r.file_hash(database)
+        reopened_hash = timed('post_restore_hash', lambda: r.file_hash(database))
         result['database_sha256_after_restore_close'] = reopened_hash
         result['database_bytes_after_restore_close'] = database.stat().st_size
         result['database_bytes_changed_by_restore_open'] = reopened_hash != before
@@ -212,17 +281,33 @@ def verify_checkpoint(database, output, *, expected_sha256, expected_bytes, rule
                for suffix in ('-wal', '-journal', '-shm')):
             raise ValueError('fresh verification left SQLite sidecars')
         result['status'] = 'complete'
+    except base.BudgetExpired as exc:
+        result.update(status='timeout', error=str(exc))
     except Exception as exc:
         result['error'] = f'{type(exc).__name__}: {exc}'
     finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
         if session is not None:
             try:
                 session.close()
             except Exception as exc:
                 result['close_error'] = f'{type(exc).__name__}: {exc}'
                 result['status'] = 'error'
+        signal.signal(signal.SIGALRM, old_handler)
         r.publish_receipt(output, result)
     return result
+
+
+def require_complete(directory):
+    directory = Path(directory)
+    timing = r.load_receipt(directory/'result.json')
+    if timing.get('status') != 'complete':
+        raise ValueError(f"timing lane did not complete: {timing.get('status')}")
+    path = directory/'fresh-restore.json'
+    if not path.is_file(): raise ValueError('independent restore receipt is missing')
+    restore = r.load_receipt(path)
+    if restore.get('status') != 'complete':
+        raise ValueError(f"independent restore did not complete: {restore.get('status')}")
 
 
 def compare_receipts(baseline, candidate):
@@ -286,6 +371,9 @@ def main():
     run_parser.add_argument('source', type=Path)
     run_parser.add_argument('output', type=Path)
     run_parser.add_argument('--seconds', type=float, required=True)
+    run_parser.add_argument('--preparation-seconds', type=float, default=900)
+    run_parser.add_argument('--phase-seconds', type=float,
+                            help='independent cap for each operation, replaces shared --seconds budget')
     run_parser.add_argument('--expected-sha256', required=True)
     run_parser.add_argument('--authority', type=Path, required=True)
     run_parser.add_argument('--attributed', action='store_true')
@@ -300,6 +388,7 @@ def main():
     verify_parser.add_argument('--expected-generation', type=int, required=True)
     verify_parser.add_argument('--expected-store-identity', required=True)
     verify_parser.add_argument('--expected-digest', required=True)
+    verify_parser.add_argument('--seconds', type=float, default=1800)
     compare_parser = sub.add_parser('compare')
     compare_parser.add_argument('baseline', type=Path)
     compare_parser.add_argument('candidate', type=Path)
@@ -308,7 +397,8 @@ def main():
     if args.command == 'run':
         result = run(args.source, args.output, seconds=args.seconds,
                      expected_sha256=args.expected_sha256,
-                     authority=r.load_receipt(args.authority), attributed=args.attributed)
+                     authority=r.load_receipt(args.authority), attributed=args.attributed,
+                     preparation_seconds=args.preparation_seconds, phase_seconds=args.phase_seconds)
         receipt_path = args.output / 'result.json'
     elif args.command == 'verify':
         result = verify_checkpoint(args.database, args.output,
@@ -316,7 +406,7 @@ def main():
             rules_id=args.rules_id, expected_year=args.expected_year,
             expected_seed=args.expected_seed, expected_generation=args.expected_generation,
             expected_store_identity=args.expected_store_identity,
-            expected_digest=args.expected_digest)
+            expected_digest=args.expected_digest, seconds=args.seconds)
         receipt_path = args.output
     else:
         result = compare_receipts(r.load_receipt(args.baseline), r.load_receipt(args.candidate))
