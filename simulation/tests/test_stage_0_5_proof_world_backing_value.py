@@ -1,5 +1,6 @@
 """Shared mutable backing edits must preserve accepted semantic authority."""
 import pytest
+from ate_sim.incremental_store import Membership
 from simulation.tests.test_stage_0_5_proof_world_session import fixture,opened
 
 @pytest.mark.parametrize('kind',['list','map','eager-record'])
@@ -80,3 +81,49 @@ def test_backing_page_with_forged_owner_witness_cannot_reuse_facts(tmp_path):
   with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=tuple(forged),changes=(),new_segments=(),metadata=s.head_metadata())
   assert s.generation==0
  finally:s.close()
+
+@pytest.mark.parametrize('edit',['reference','map-key','map-ordinal','record-class'])
+def test_fixed_shape_classifier_preserves_reference_key_ordinal_and_class_boundaries(tmp_path,edit):
+ from types import SimpleNamespace
+ from ate_sim.persistence_proof_world_backing_value import eligible
+ from ate_sim.persistence_proof_manifest_publish import _pairs
+ from ate_sim.persistence_lazy_store import VersionChange
+ from ate_sim.persistence_lazy_nested_history import HistoryReference,PAGE_NAMESPACE,ENTRY_NAMESPACE
+ from ate_sim.persistence_record_headers import NAMESPACE as RECORDS
+ from ate_sim.core import Settlement
+ from simulation.tests.test_stage_0_5_proof_world import _proof_store
+ def configure(w):w.settlements[1]=Settlement(1,0,0,memory={'war':.25})
+ s,p,pair=_proof_store(tmp_path,configure=configure);request=SimpleNamespace(pin=p,pairs=_pairs(s,p.captured_head),tail={})
+ try:
+  if edit=='record-class':
+   old=('recursive-record/v1','core.LocalState/v1',(0,0,0,0),None)
+   new=('recursive-record/v1','skills.SkillHistory/v1',(1,'craft',.5,0,(),()),None)
+   assert not eligible(s,request,VersionChange(RECORDS,(1,0),new),old)
+  elif edit in ('map-key','map-ordinal'):
+   key=next(s.iter_keys(p,ENTRY_NAMESPACE));row=s.read_version(p,ENTRY_NAMESPACE,key,expected_record_schema=1);old=row.value
+   new=(old[0]+1,old[1],old[2]) if edit=='map-ordinal' else (old[0],'changed-key',old[2])
+   assert not eligible(s,request,VersionChange(ENTRY_NAMESPACE,(key[0],new[1]),new,memberships=(Membership('incarnation',key[0],new[0]),)),old)
+  else:
+   # Exact reference count is insufficient: changed target must invalidate reuse.
+   key=next(k for k in s.iter_keys(p,PAGE_NAMESPACE) if len(s.read_version(p,PAGE_NAMESPACE,k,expected_record_schema=1).value)==32)
+   # Existing integer page gaining a reference cannot satisfy member-type equality.
+   old=s.read_version(p,PAGE_NAMESPACE,key,expected_record_schema=1).value
+   assert not eligible(s,request,VersionChange(PAGE_NAMESPACE,key,(HistoryReference('list',key[0]),)+old[1:]),old)
+ finally:s.close()
+
+
+def test_auxiliary_reference_replacement_uses_checked_structural_path(tmp_path,monkeypatch):
+ from ate_sim import persistence_proof_world as world
+ from ate_sim.core import Settlement
+ def configure(w):
+  first=[];second=[]
+  w.settlements[1]=Settlement(1,0,0,memory={'nested':[first,second],'keep':first})
+ path,pair=fixture(tmp_path,configure=configure)
+ with opened(path,pair) as s:
+  values=s.world.settlements[1].memory['nested'];calls=[];original=world._audit_world
+  def audit(*a,**kw):calls.append(True);return original(*a,**kw)
+  with monkeypatch.context() as m:
+   m.setattr(world,'_audit_world',audit);values[0]=values[1];assert s.save()==1;child=s.proof_manifest
+  assert calls
+ with opened(path,child) as s:
+  values=s.world.settlements[1].memory['nested'];assert values[0] is values[1]

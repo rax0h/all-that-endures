@@ -202,3 +202,9 @@ def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
   assert s.save()==0
   with pytest.raises(StoreError):s.proof_manifest
  finally:s.store.close()
+
+@pytest.mark.parametrize('operation',['save','resolve_save'])
+def test_closed_proof_session_uses_store_error_without_publication(tmp_path,operation):
+ path,pair=fixture(tmp_path);s=opened(path,pair);s.close()
+ with pytest.raises(StoreError,match='closed'):getattr(s,operation)()
+ with opened(path,pair) as fresh:assert fresh.store.generation==0

@@ -91,3 +91,23 @@ def test_live_group_requires_one_checked_physical_placement(tmp_path):
  s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE incarnation_id=2');s.db.commit()
  with pytest.raises(StoreError):read(s,p,ref,a)
  s.close()
+
+@pytest.mark.parametrize('fault',['rechecksummed-descriptor','uncommitted-competing-kind','deleted-descriptor'])
+def test_raw_target_rejects_physical_corruption_behind_accepted_roots(tmp_path,fault):
+ from ate_sim.persistence_lazy_store import _version_checksum
+ from ate_sim.incremental_store import _framed_sha
+ from ate_sim import persistence_proof_publication as content
+ s,p,ref,a=make_target_store(tmp_path/'physical.sqlite');typed=s.codec.encode(2)
+ if fault=='rechecksummed-descriptor':
+  schema,version,start,end,members=s.db.execute('SELECT record_schema,codec_version,valid_from,valid_to,memberships FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(DESCRIPTOR_NAMESPACE,typed)).fetchone()
+  payload=s.codec.encode(('list',1,1));checksum=_version_checksum(DESCRIPTOR_NAMESPACE,typed,schema,version,start,end,members,payload)
+  s.db.execute('UPDATE lazy_record_versions SET payload=?,payload_checksum=?,row_checksum=? WHERE namespace=? AND typed_key=?',(payload,_framed_sha(b'lazy-payload-v1',payload),checksum,DESCRIPTOR_NAMESPACE,typed));s.db.commit()
+ elif fault=='deleted-descriptor':s.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(DESCRIPTOR_NAMESPACE,typed));s.db.commit()
+ else:
+  key=s.codec.encode((2,0));payload=s.codec.encode(nonreflexive_key_header(float('nan')));members=s.codec.encode(())
+  checksum=_version_checksum(NAN,key,1,s.codec.version,p.captured_head,None,members,payload)
+  # A coherent physical competing source is absent from accepted content roots.
+  s.db.execute('INSERT INTO lazy_record_versions(namespace,typed_key,valid_from,valid_to,record_schema,codec_version,payload,payload_checksum,memberships,row_checksum) VALUES(?,?,?,NULL,1,?,?,?,?,?)',(NAN,key,p.captured_head,s.codec.version,payload,_framed_sha(b'lazy-payload-v1',payload),members,checksum));s.db.commit()
+ if fault!='deleted-descriptor':assert content._source_version(s,p.captured_head,NAN if fault=='uncommitted-competing-kind' else DESCRIPTOR_NAMESPACE,key if fault=='uncommitted-competing-kind' else typed).payload==payload
+ with pytest.raises(StoreError):read(s,p,ref,a)
+ s.close()

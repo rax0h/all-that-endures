@@ -158,3 +158,28 @@ def test_unroutable_inline_key_and_set_references_fail_closed(tmp_path,container
  assert len(read_target_group(s,p,r,*a).group.occurrences)==3
  with pytest.raises(StoreError):read(s,p,r,a)
  s.close()
+
+
+def test_event_id_body_is_authenticated_once_per_incoming_operation(tmp_path,monkeypatch):
+ from ate_sim import persistence_proof_publication as content
+ s,p,r,a=make_target_store(tmp_path/'event.sqlite','event-ids')
+ original=content.read_version_content_bytes;reads=[]
+ def tracked(*args,**kw):
+  if args[4]=='world.event_ids':reads.append(args[5])
+  return original(*args,**kw)
+ with monkeypatch.context() as m:
+  m.setattr(content,'read_version_content_bytes',tracked)
+  value=read(s,p,r,a);assert value.target.kind=='event-ids'
+  assert reads==[s.codec.encode(0)]
+  reads.clear();assert read(s,p,r,a)==value;assert reads==[s.codec.encode(0)]
+ s.close()
+
+@pytest.mark.parametrize('field,value',[(3,99),(4,2),(5,'0'*64)])
+def test_reused_event_body_still_checks_owner_revision_schema_and_hash(tmp_path,field,value):
+ from ate_sim import persistence_lazy_identity_catalog as cat
+ from ate_sim.persistence_lazy_store import VersionChange
+ s,p,r,a=make_target_store(tmp_path/'witness.sqlite','event-ids')
+ key=('world.event_ids',0);header=list(s.read_version(p,cat.OWNER_NAMESPACE,key,expected_record_schema=1).value);header[field]=value
+ p=s.commit(p,commit_token='bad-witness',version_changes=(VersionChange(cat.OWNER_NAMESPACE,key,tuple(header)),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+ with pytest.raises(StoreError):read(s,p,r,a)
+ s.close()

@@ -37,10 +37,13 @@ def _body(s,namespace,typed,key,header,record_pair):
     if s.dependencies is not None:s.dependencies.add((0 if header[2]=='lazy' else 1,namespace,typed))
     if s.remaining<1:raise target.TargetProofBudgetError('incoming body exceeds aggregate budget')
     if header[2]=='lazy':
-        raw=target.content.read_version_content_bytes(s.store,s.pin,*s.pair,namespace,typed,
+        reused=namespace=='world.event_ids' and key==0 and type(key) is int and s.event_body is not None
+        raw=s.event_body if reused else target.content.read_version_content_bytes(s.store,s.pin,*s.pair,namespace,typed,
             expected_record_schema=header[4],max_bytes=min(s.per_source,s.remaining),max_metadata_bytes=s.metadata_limit)
         if raw is None:raise StoreIntegrityError('incoming lazy owner body is absent')
-        s.charge(len(raw.payload)+len(raw.memberships));revision=raw.valid_from
+        if type(header[4]) is not int or raw.record_schema!=header[4]:raise StoreIntegrityError('incoming lazy owner schema disagreement')
+        if not reused:s.charge(len(raw.payload)+len(raw.memberships))
+        revision=raw.valid_from
     else:
         if record_pair is None:raise StoreError('ordinary incoming owner requires accepted record authority')
         raw=records.read_record_proof_bytes(s.store,s.pin,*record_pair,namespace,typed,

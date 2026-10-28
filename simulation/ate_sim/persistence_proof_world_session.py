@@ -1,4 +1,4 @@
-"""Explicit fully audited native sessions; no fast admission or save claim.
+"""Explicit audited admission with bounded proof-reusing native saves.
 
 The existing native registry, frozen participants and SQLite publisher remain the
 only runtime/transaction authorities. External expected commitment is mandatory.
@@ -89,6 +89,7 @@ class _WorldProofAuthority:
 
     def execute(self,session,callback,*,recovery=False):
         from .persistence_proof_native_guard import NativeWriteGuard
+        if session._state=='closed':raise StoreError('native proof session is closed')
         if self.busy:raise StoreError('reentrant native proof operation')
         try:
             with NativeWriteGuard(self.store.db) as guard:

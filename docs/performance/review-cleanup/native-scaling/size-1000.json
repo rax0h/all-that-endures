@@ -1,0 +1,59 @@
+{
+  "size": 1000,
+  "source": {
+    "head": "d4acc2026de92fd9f3e3cb3bd01b46123c026b5d",
+    "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+    "sqlite": "3.53.1",
+    "driver_sha256": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "status": "complete",
+  "exact": true,
+  "construction_seconds": 1.3351217169999927,
+  "audited_admission_seconds": 0.1385260819999985,
+  "native_first_access_and_save_ms": 568.6494090000451,
+  "native_first_access_and_save_unprofiled_ms": 105.99954599979355,
+  "python_peak_bytes": 542586,
+  "sqlite_vm_steps": 282847,
+  "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+  "sql": {
+    "history_body": 0
+  },
+  "full_audits_during_save": 0,
+  "backing_first_access_and_save_ms": 198.74033600012808,
+  "backing_sql": {
+    "selected": 9,
+    "unrelated": 0
+  },
+  "backing_vm_steps": 314621,
+  "tail_first_access_and_save_ms": 201.53996800013374,
+  "tail_sql": {
+    "selected": 10,
+    "unrelated": 0
+  },
+  "tail_vm_steps": 340617,
+  "page_growth_first_access_and_save_ms": 218.7657560000389,
+  "page_growth_sql": {
+    "selected": 17,
+    "unrelated": 0
+  },
+  "page_growth_vm_steps": 356353,
+  "shrink_profiled_first_access_and_save_ms": 557.3726190000343,
+  "shrink_sql": {
+    "selected": 169,
+    "unrelated": 0
+  },
+  "shrink_vm_steps": 494612,
+  "shrink_removed_values": 128,
+  "regrowth_profiled_first_access_and_save_ms": 334.65231100012716,
+  "regrowth_sql": {
+    "selected": 17,
+    "unrelated": 0
+  },
+  "regrowth_vm_steps": 356803,
+  "regrowth_added_values": 128,
+  "page_growth_added_values": 128,
+  "page_growth_vm_added_values": 128,
+  "archive_unit": "retained history values"
+}

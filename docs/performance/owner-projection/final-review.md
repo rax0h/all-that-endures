@@ -23,3 +23,5 @@ Raw pytest RED logs contain trailing whitespace. Preserve raw evidence verbatim;
 - World activation and open/save/year performance: remain outside this component and unmeasured. Cost: no target-speed claim from these observations.
 
 Initial implementation rulings retained: five existing physical adapters instead of a new object walker (more adapters remain necessary); closed codec subset instead of caller hooks (custom codecs require another checked path). No finding dropped silently.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

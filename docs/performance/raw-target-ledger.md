@@ -15,3 +15,5 @@ Final: Ruling: complete aliases/owner projection, child extents/outgoing referen
 Final: Ruling: final-source scaling/full suite require candidate CI evidence, and archived baseline receipt was verified by executor rather than re-fetched by reviewer — cost if wrong: final CI remains unaccepted pending source/digest/XML/matrix verification.
 
 Task1 implementation/review/fix complete: final33 target cases, combined126 passed15.87s, all822 proof cases passed73.23s on final source. Physical-liveness regression RED→GREEN; AST/YAML/all workflow shell syntax and diff checks passed. Pre-fix point matrix30.31/35.48/32.62ms at1k/10k/100k, zero archive-body reads,38999/39199/39399 VM bounds, no World timing claim. Final-source physical witness changes runtime; candidate CI must supply final scaling and full simulation suite. No local full-suite claim or main merge. Deferred test-retention minor remains documented.
+
+Current disposition: [consolidated cleanup register](review-cleanup/register.md) tracks closure of these historical Minor findings.

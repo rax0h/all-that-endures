@@ -28,3 +28,5 @@ Previously deferred native stale-header and closed-session error-type Minors rem
   SQLite ProgrammingError rather than StoreError on closed-session operations.
 
 Verdict: ready for existing completion gates. No merge/default activation authorized.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

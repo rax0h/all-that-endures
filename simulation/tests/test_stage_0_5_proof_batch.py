@@ -164,3 +164,23 @@ def test_sqlite_batch_rollback_and_generator_fault_keep_old_roots(tmp_path):
     assert db.execute('SELECT count(*) FROM ate_proof_nodes').fetchone()[0] == before
     assert m.get(old, b'0') == value('old')
     db.close()
+
+@pytest.mark.parametrize('fault',['late-malformed','after-insert'])
+def test_late_batch_failures_rollback_written_nodes_and_preserve_root(tmp_path,fault):
+ from ate_sim.persistence_proof_map import ProofMap
+ db=sqlite3.connect(tmp_path/'late.sqlite');storage=ProofNodeStore(db);storage.create_schema()
+ m=ProofMap(DOMAIN,lambda d:storage.read(DOMAIN,d),lambda d,raw:storage.write(DOMAIN,d,raw))
+ db.execute('BEGIN')
+ old=update(m,empty_root(DOMAIN),iter(ordered((str(i).encode(),value('old')) for i in range(1024))));db.commit()
+ before=db.execute('SELECT count(*) FROM ate_proof_nodes').fetchone()[0]
+ def insert_then_fail(d,raw):
+  storage.write(DOMAIN,d,raw)
+  raise RuntimeError('after real insertion')
+ changes=ordered((str(i).encode(),value('new')) for i in range(512))
+ if fault=='late-malformed':changes[-1]=(changes[-1][0],b'bad')
+ tested=m if fault=='late-malformed' else ProofMap(DOMAIN,lambda d:storage.read(DOMAIN,d),insert_then_fail)
+ db.execute('BEGIN')
+ with pytest.raises(StoreIntegrityError if fault=='late-malformed' else RuntimeError):update(tested,old,iter(changes))
+ assert db.execute('SELECT count(*) FROM ate_proof_nodes').fetchone()[0]>before
+ db.rollback();assert db.execute('SELECT count(*) FROM ate_proof_nodes').fetchone()[0]==before
+ assert m.get(old,b'0')==value('old');db.close()

@@ -9,3 +9,5 @@ Minor: selected-body retained/recovery tests do not change referenced certificat
 Assessment: ready to proceed as an inactive component candidate. Not main merge or World readiness approval. Reviewer did not independently accept larger scaling/hosted full-suite evidence; the executor checks those separately.
 
 Declined behaviors and executor dispositions are recorded individually as Ruling lines in ../frozen-fixed-extents-ledger.md: recursive truth/closure; full field domains; sequence/Event-ID extents; complete alias/global topology; semantic producer/manifest/copy/fencing/participants; native World/performance/release; ancestor code/baseline authentication. Future integration gates remain closed. Baseline CI authentication was independently performed by the executor.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

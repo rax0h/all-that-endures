@@ -1,0 +1,79 @@
+{
+  "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+  "source_hashes": {
+    "simulation/ate_sim/persistence_proof_target.py": "d0cafbc4f30be26c95d3a4bbd76c0e543ba9fb453cad0a25d120aa26c607db97",
+    "simulation/ate_sim/persistence_proof_target_incoming.py": "679be008fe8ac3340a6b02fc14705471b7f1200c946763b9cf58ef8f3f5c97de",
+    "simulation/ate_sim/persistence_proof_world_session.py": "58d5c110fd6e58305557b72022b5656130aed231d8d559e031e8fac36782cc28",
+    "simulation/ate_sim/persistence_proof_world_tail_shrink.py": "32d6828160a3cbe7aba0fd62d59fd2b83cb0323aa1b0bac57315b7dcf81027a7",
+    "simulation/tests/test_stage_0_5_proof_batch.py": "08884fb25c7e47451d86c58367a58fb2513ea13a242e9c27fc37357936141707",
+    "simulation/tests/test_stage_0_5_proof_frozen_extents.py": "d028fca598c7140114dfdcffd61bbb13ce9eb82a0b61ce66d58fc529c5130391",
+    "simulation/tests/test_stage_0_5_proof_owner_targets.py": "7e318e1e33e770f82dd529cd75ee00fff3cadb62fbc43cc3e8f20f7a79d3e548",
+    "simulation/tests/test_stage_0_5_proof_reference_closure.py": "27c5571c5a392762c39c6899a964dbf7b53b26d231582ef8d3794d707e8ffbaa",
+    "simulation/tests/test_stage_0_5_proof_target.py": "06ae312a2f20259202f1bacd13b38f21fd152d45074d525ebcb8f9f498dde174",
+    "simulation/tests/test_stage_0_5_proof_target_incoming.py": "4bd06881643c0c49b1b2a41523604a6b0b794a7dbb76037eff5f81ca0b0adbf4",
+    "simulation/tests/test_stage_0_5_proof_world_backing_value.py": "a0c663cf26c6623a04052a50ef0c2b6b66748840bed9905dbd52d721960f34a0",
+    "simulation/tests/test_stage_0_5_proof_world_page_shrink.py": "5d856b4c281f51c611ad31a8259d9a3f97e88c66616e220358232564fadd33bf",
+    "simulation/tests/test_stage_0_5_proof_world_session.py": "7fa919e8e2b8af24c49b6758b5faf09e7bb425038ee7ecfe59cf585b07fb947c"
+  },
+  "tests": [
+    {
+      "scope": "related",
+      "tests": 290,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "native",
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "matrices": [
+    {
+      "kind": "incoming",
+      "source": {
+        "head": "d4acc2026de92fd9f3e3cb3bd01b46123c026b5d",
+        "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+        "driver_sha256": "30d38fc59b133bc17095eae3f6fee4b822dd60b8966e48e26382bf0d32d6b758",
+        "fixture_sha256": "116f865fa886e085af7180f1963660191d7386ac5840bcafae87f22aed8522cc",
+        "owner_fixture_sha256": "c54a2a92134814c9f9a02a027a247ce7ae40721f5f56054ecee4ef7ca7b2b543",
+        "target_fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "sqlite": "3.53.1"
+      },
+      "status": "complete"
+    },
+    {
+      "kind": "native",
+      "source": {
+        "head": "d4acc2026de92fd9f3e3cb3bd01b46123c026b5d",
+        "runtime_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+        "sqlite": "3.53.1",
+        "driver_sha256": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete"
+    }
+  ],
+  "hosted_acceptance": "pending",
+  "post_review_test_only_validation": {
+    "module": "reference_closure",
+    "tests": 38,
+    "failures": 0,
+    "errors": 0,
+    "new_distinct_cases": 1,
+    "seconds": 10.09
+  },
+  "independent_review": {
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "selected_cases_passed": 25,
+    "seconds": 17.79
+  },
+  "closed_actionable_groups": 10,
+  "remaining_minor_findings": 0
+}

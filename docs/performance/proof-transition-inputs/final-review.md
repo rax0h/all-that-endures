@@ -40,3 +40,5 @@ The executor accepts these boundaries and keeps them explicit. The single
 implementation ruling was to continue the authorized architecture inline in the
 existing isolated worktree; no World activation. Its cost if wrong is isolated
 code/tests requiring revision, not changed current saves.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

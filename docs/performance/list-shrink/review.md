@@ -17,3 +17,5 @@ Declined judgments and author rulings:
 4. Mature latency/full-year/memory/default/release/endurance/restore acceptance: not claimed or performed. Risk if extrapolated: premature acceptance; bounded synthetic save claims only.
 5. Exhaustive unsupported values/corruption/fault seams: focused tests plus inspected checked fallback, not exhaustive execution. Risk: uncovered combinations; new broad suite gate and conservative fallback remain.
 6. Independent forging empty owner over references: reviewer inspected content/owner commitments, integer values/types and topology gates, found no bypass, did not execute this adversarial test. Risk: inspection-only evidence for that composition; no claim of such a probe passing.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

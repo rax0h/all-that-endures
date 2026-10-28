@@ -11,6 +11,8 @@ from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE as HISTORY,PAG
 from .persistence_history_types import NAMESPACE as TYPES,TAG
 
 
+MAX_REMOVED_PAGES_PER_BACKING=128
+
 def prepare(store,request,versions,facts):
     codec=store.codec;sa=request.pairs[1][0];facts=list(facts);eligible={};removed={};headers={};directory=request.tail_child_root
     inspected=sum(len(i['payload'] or b'')+len(i['memberships_blob']) for i in versions)
@@ -32,7 +34,7 @@ def prepare(store,request,versions,facts):
         old=read(HISTORY,inc)
         if type(old) is not tuple or len(old)!=3 or old[0]!='list' or any(type(n) is not int or n<0 for n in old[1:]) or old[1]!=old[2] or new[1]>=old[1]:continue
         old_pages=(old[1]+127)//128;new_pages=(new[1]+127)//128
-        if old_pages<=new_pages or old_pages-new_pages>128:continue
+        if old_pages<=new_pages or old_pages-new_pages>MAX_REMOVED_PAGES_PER_BACKING:continue
         types=by_key.get((TYPES,codec.encode(inc)))
         if not clean(types) or len(types['payload'])>4096:continue
         if codec.encode(read(TYPES,inc))!=codec.encode((TAG,'list',(old[1],0,0))) or types['payload']!=codec.encode((TAG,'list',(new[1],0,0))):continue

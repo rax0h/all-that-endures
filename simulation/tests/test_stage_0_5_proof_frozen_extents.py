@@ -176,3 +176,26 @@ def test_certification_dependencies_share_aggregate_source_budget(tmp_path):
    with pytest.raises(StoreError):read(s,p,r,a,max_bytes=7000)
    assert len(read(s,p,r,a).certification_targets)==2
   s.close()
+
+
+def test_parent_and_child_certification_changes_preserve_retained_and_recovery(tmp_path):
+ from simulation.tests.proof_reference_closure_fixtures import make_graph
+ from ate_sim import persistence_lazy_identity_catalog as cat
+ from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+ from ate_sim.persistence_history_types import initial_type_change
+ from ate_sim.persistence_proof_publication import commit_content_proof,resolve_content_commit
+ from ate_sim.persistence_proof_inventory import bootstrap_inventory
+ child=HistoryReference('frozen-list',3);mutable=HistoryReference('list',4)
+ s,p,r,a,ra=make_graph(tmp_path/'bits.sqlite',{2:('frozen-list',(child,),True),3:('frozen-list',(),True),4:('list',())})
+ old=s.capture_pin();before=read(s,old,r,a)
+ owner=VersionChange(PAGE_NAMESPACE,(3,0),(mutable,));placements=(IdentityOccurrenceChange(PAGE_NAMESPACE,(3,0),(('index',0),),4),)
+ delta=cat.IdentityCatalog(s).prepare_delta(p,(owner,),placements,next_incarnation_id=5)
+ changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,('frozen-list',1,1,False)),VersionChange(DESCRIPTOR_NAMESPACE,3,('frozen-list',1,1,False)),initial_type_change(3,'list',(mutable,)),owner)+delta.decode(s.codec)[0]
+ result=commit_content_proof(s,p,*a[0],scope_authority=a[1],record_authority=ra,commit_token='both-bits',version_changes=changes,identity_changes=placements,next_incarnation_id=5,changes=(),new_segments=(),metadata=s.head_metadata())
+ newa=((result.certificate,result.commitment),(result.scope.certificate,result.scope.commitment),bootstrap_inventory(s,result.commit.pin))
+ assert read(s,old,r,a)==before
+ after=read(s,result.commit.pin,r,newa);assert after.certification_targets[0].descriptor==('frozen-list',1,1,False)
+ assert read(s,result.commit.pin,child,newa).members==(mutable,)
+ recovered=resolve_content_commit(s,p,*a[0],scope_authority=a[1],record_authority=ra,commit_token='both-bits')
+ assert recovered.commit.pin.captured_head==result.commit.pin.captured_head and recovered.scope.commitment==result.scope.commitment
+ assert read(s,old,r,a)==before;s.close()

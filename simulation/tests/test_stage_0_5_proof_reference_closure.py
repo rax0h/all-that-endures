@@ -1,6 +1,6 @@
 import importlib
 import pytest
-from ate_sim.incremental_store import StoreError
+from ate_sim.incremental_store import StoreError,Membership
 from ate_sim.persistence_lazy_store import VersionChange,IdentityOccurrenceChange
 from ate_sim.persistence_lazy_nested_history import HistoryReference as H,PAGE_NAMESPACE,DESCRIPTOR_NAMESPACE
 from ate_sim.persistence_record_headers import RecordReference as R
@@ -175,4 +175,41 @@ def test_large_extent_cached_projection_does_not_spend_incoming_budget(tmp_path)
  s,p,r,a,ra=make_graph(tmp_path/'g.sqlite',{2:('list',tuple(range(40000)))})
  v=read(s,p,r,a,max_members=1,max_targets=1,max_children=313,max_values=40000,max_edges=1)
  assert ids(v)==(2,) and len(v.targets[0].members)==40000 and v.targets[0].members[128:131]==(128,129,130) and v.targets[0].members[-1]==39999 and v.edges==()
+ s.close()
+
+@pytest.mark.parametrize('route',['nested','map-key','branch'])
+def test_nonlist_projection_mismatches_cannot_hide_in_accepted_content(tmp_path,route):
+ from simulation.tests.proof_sequence_event_fixtures import authorities
+ from ate_sim.persistence_lazy_nested_history import ENTRY_NAMESPACE
+ from ate_sim.persistence_lazy_sequence import NODE_NAMESPACE
+ from ate_sim.persistence_nonreflexive_keys import storage_equality_key
+ from ate_sim.persistence_history_types import initial_type_change
+ if route=='nested':nodes={2:('list',((H('list',3),),)),3:('list',())}
+ elif route=='map-key':nodes={2:('map',((N(3),1),)),3:('nan-key',bytes.fromhex('7ff8000000000042'))}
+ else:nodes={2:('sequence',tuple(range(257))),3:('list',())}
+ s,p,r,a,ra=make_graph(tmp_path/'projection.sqlite',nodes)
+ if route=='nested':
+  versions=(VersionChange(PAGE_NAMESPACE,(2,0),((1,),)),initial_type_change(2,'list',((1,),)));placements=()
+ elif route=='map-key':
+  key=(2,storage_equality_key(N(3)));old=s.read_version(p,ENTRY_NAMESPACE,key,expected_record_schema=1)
+  versions=(VersionChange(ENTRY_NAMESPACE,key,(0,'replacement',1),memberships=(Membership('incarnation',2,0),)),);placements=()
+ else:
+  key=next(key for key in s.iter_keys(p,NODE_NAMESPACE) if s.read_version(p,NODE_NAMESPACE,key,expected_record_schema=1).value[0]=='branch')
+  versions=();placements=(IdentityOccurrenceChange(NODE_NAMESPACE,key,(('key',1),),3),)
+ p=s.commit(p,commit_token='projection-corrupt',version_changes=versions,identity_changes=placements,changes=(),new_segments=(),metadata=s.head_metadata()).pin;a,ra=authorities(s,p)
+ with pytest.raises(StoreError):read(s,p,r,a)
+ s.close()
+
+
+def test_valid_replacement_map_key_requires_its_own_reference_projection(tmp_path):
+ from simulation.tests.proof_sequence_event_fixtures import authorities
+ from ate_sim.persistence_lazy_nested_history import ENTRY_NAMESPACE
+ from ate_sim.persistence_nonreflexive_keys import storage_equality_key
+ bits=bytes.fromhex('7ff8000000000042');old_key=N(3);new_key=N(4)
+ s,p,r,a,ra=make_graph(tmp_path/'key-projection.sqlite',{2:('map',((old_key,1),)),3:('nan-key',bits),4:('nan-key',bits)})
+ changes=(VersionChange(ENTRY_NAMESPACE,(2,storage_equality_key(old_key)),delete=True),VersionChange(ENTRY_NAMESPACE,(2,storage_equality_key(new_key)),(0,new_key,1),memberships=(Membership('incarnation',2,0),)))
+ # Physical key and typed locator agree, but the catalog retains only the old
+ # owner's reference relation. Raw construction deliberately permits that gap.
+ p=s.commit(p,commit_token='valid-key-unwitnessed',version_changes=changes,changes=(),new_segments=(),metadata=s.head_metadata()).pin;a,ra=authorities(s,p)
+ with pytest.raises(StoreError,match='projection'):read(s,p,r,a)
  s.close()

@@ -1,0 +1,87 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____ test_closed_proof_session_uses_store_error_without_publication[save] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_closed_proof_session_uses0')
+operation = 'save'
+
+    @pytest.mark.parametrize('operation',['save','resolve_save'])
+    def test_closed_proof_session_uses_store_error_without_publication(tmp_path,operation):
+     path,pair=fixture(tmp_path);s=opened(path,pair);s.close()
+>    with pytest.raises(StoreError,match='closed'):getattr(s,operation)()
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:94: in execute
+    with NativeWriteGuard(self.store.db) as guard:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_native_guard.NativeWriteGuard object at 0x7f30647e63f0>
+
+    def __enter__(self):
+>       if self.db.in_transaction:raise StoreError('native proof operation requires an owned transaction boundary')
+           ^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.ProgrammingError: Cannot operate on a closed database.
+
+simulation/ate_sim/persistence_proof_native_guard.py:32: ProgrammingError
+_ test_closed_proof_session_uses_store_error_without_publication[resolve_save] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_closed_proof_session_uses1')
+operation = 'resolve_save'
+
+    @pytest.mark.parametrize('operation',['save','resolve_save'])
+    def test_closed_proof_session_uses_store_error_without_publication(tmp_path,operation):
+     path,pair=fixture(tmp_path);s=opened(path,pair);s.close()
+>    with pytest.raises(StoreError,match='closed'):getattr(s,operation)()
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16804: in resolve_save
+    return self._resolve_save_native() if authority is None else authority.execute(self,self._resolve_save_native,recovery=True)
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:94: in execute
+    with NativeWriteGuard(self.store.db) as guard:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_native_guard.NativeWriteGuard object at 0x7f30648f1df0>
+
+    def __enter__(self):
+>       if self.db.in_transaction:raise StoreError('native proof operation requires an owned transaction boundary')
+           ^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.ProgrammingError: Cannot operate on a closed database.
+
+simulation/ate_sim/persistence_proof_native_guard.py:32: ProgrammingError
+_______ test_event_id_body_is_authenticated_once_per_incoming_operation ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_event_id_body_is_authenti0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3063f4a2a0>
+
+    def test_event_id_body_is_authenticated_once_per_incoming_operation(tmp_path,monkeypatch):
+     from ate_sim import persistence_proof_publication as content
+     s,p,r,a=make_target_store(tmp_path/'event.sqlite','event-ids')
+     original=content.read_version_content_bytes;reads=[]
+     def tracked(*args,**kw):
+      if args[4]=='world.event_ids':reads.append(args[5])
+      return original(*args,**kw)
+     with monkeypatch.context() as m:
+      m.setattr(content,'read_version_content_bytes',tracked)
+      value=read(s,p,r,a);assert value.target.kind=='event-ids'
+>     assert reads==[s.codec.encode(0)]
+E     assert [b'["int","0"...'["int","0"]'] == [b'["int","0"]']
+E       
+E       Left contains one more item: b'["int","0"]'
+E       Use -v to get more diff
+
+simulation/tests/test_stage_0_5_proof_target_incoming.py:173: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_closed_proof_session_uses_store_error_without_publication[save]
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_closed_proof_session_uses_store_error_without_publication[resolve_save]
+FAILED simulation/tests/test_stage_0_5_proof_target_incoming.py::test_event_id_body_is_authenticated_once_per_incoming_operation
+3 failed, 66 deselected in 2.97s

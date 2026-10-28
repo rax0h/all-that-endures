@@ -7,3 +7,5 @@ Fresh whole-change Astra high review found no Critical/Important defect. Minor d
 Final: Ruling: full-suite/final CI results require archived evidence; local all-proof/scaling results are executor evidence — cost if wrong: candidate stays unaccepted until exact source/digest/XML/matrix verification.
 Final: Ruling: recursive admission, complete aliases, parent extents and semantic transitions remain gated — this direct registered-owner join does not admit native objects — cost if wrong: full World/topology composition remains necessary.
 Task1 complete:17 new join+33 target50 GREEN6.11s;839 all-proof GREEN79.88s. Clean689a17c matrix41.83/49.92/49.70ms at1k/10k/100k, exact2 paths/1 target and zero archive payloads. Final runtime/driver/fixtures unchanged from measured checkpoint; docs/evidence only follow. AST/YAML/all workflow shell syntax and diff checks passed. Full simulation and hosted scaling assigned to candidate CI. No World activation/main merge/endurance.
+
+Current disposition: [consolidated cleanup register](review-cleanup/register.md) tracks closure of these historical Minor findings.

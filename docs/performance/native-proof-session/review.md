@@ -53,3 +53,5 @@ regression is included. Its two independent RED probes remain in native-world-re
   evidence stays separately attributed; hosted run40413908172 is authenticated through
   archives/source/hash/XML/matrix checks. Require next candidate hosted CI before acceptance.
   Cost: this read-only review is not an independent whole-suite/performance validation.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

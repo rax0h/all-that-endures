@@ -7,3 +7,5 @@ The executor reproduced the important finding RED with the40k-value tight-budget
 Review confirmed complete outgoing owner joins, alias/cycle handling, incoming validation of cached Event components, bottom-up frozen truth, shared context-bound operation-local budgets and unchanged nonmemoized public defaults. Approval is limited to an inactive bounded raw directed-closure candidate after verification.
 
 Declined behaviors and executor rulings are recorded individually in ../reference-closure-ledger.md: incoming unrelated pointers; wholly unindexed/global state; full field domains; cyclic frozen acceptance; durable semantic proofs/reuse/producers; manifests/migration/fencing/participants; native World/main integration; mature performance; full physical/external checkpoint integrity. None is silently promoted by this result.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

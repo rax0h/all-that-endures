@@ -70,3 +70,5 @@ and value suites passed53/53 in104.17s after these corrections. No second review
 Ruling: reject nested SQL from SQLite callbacks during a native operation — such writes
 are outside the prepared publication — cost is callbacks must remain SQL-free in this
 window. This remains a SQL capability, not arbitrary Python isolation.
+
+Current disposition: see [consolidated cleanup register](../review-cleanup/register.md) for closure of this checkpoint's recorded Minor findings. Historical review evidence above is preserved.

@@ -63,7 +63,7 @@ def _preflight(store,budget):
 class _Sources:
     def __init__(self,store,pin,pair,aggregate,per_source,metadata,*,read_limit=128,memoize=False):
         self.store,self.pin,self.pair=store,pin,pair;self.codec=_ProjectionCodec(metadata=True)
-        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit;self._memo={} if memoize else None;self.dependencies=set() if memoize else None
+        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit;self.event_body=None;self._memo={} if memoize else None;self.dependencies=set() if memoize else None
     def charge(self,n):
         self.remaining-=n
         if self.remaining<0:raise TargetProofBudgetError('target sources exceed aggregate budget')
@@ -151,6 +151,7 @@ def _event_owner(s,scope_pair):
     if value[0]==EXCEPTION_TAG:
         wanted.update({s.codec.encode((('field','_exact'),('field',name))):ref.incarnation for name,ref in zip(('removed','added'),value[2:4])})
     if slots!=wanted or len(slots)!=len(page.rows) or root in [v for k,v in wanted.items() if k!=s.codec.encode(())]:raise StoreIntegrityError('Event-ID descriptor and fixed owner slots disagree')
+    s.event_body=raw
     return root,value,raw,typed
 
 

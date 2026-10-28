@@ -106,3 +106,25 @@ def test_shrink_old_page_inspection_respects_aggregate_byte_budget(tmp_path,monk
    m.setattr(shrink,'_parent',read);assert s.save()==1;child=s.proof_manifest
   assert sum(inspected)<=4*1048576
  with opened(path,child) as s:assert len(s.skills[2,'craft'].provenance)==0
+
+@pytest.mark.parametrize('large',[False,True])
+def test_removed_page_allowance_is_per_backing_with_global_row_budget(tmp_path,monkeypatch,large):
+ from ate_sim import persistence_proof_world_tail_shrink as shrink,persistence_proof_world as world
+ from ate_sim.skills import SkillHistory
+ def configure(w):
+  first=list(range(257 if large else 129));second=list(range(129))
+  for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=first)
+  for i in (3,4):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=second)
+ path,pair=fixture(tmp_path,configure=configure)
+ with opened(path,pair) as s:
+  for _ in range(129 if large else 1):s.skills[1,'craft'].provenance.pop()
+  s.skills[3,'craft'].provenance.pop();calls=[];original=world._audit_world
+  def audit(*a,**kw):calls.append(True);return original(*a,**kw)
+  with monkeypatch.context() as m:
+   # Scale the per-backing threshold; two independent one-page removals fit.
+   m.setattr(shrink,'MAX_REMOVED_PAGES_PER_BACKING',1);m.setattr(world,'_audit_world',audit)
+   assert s.save()==1;child=s.proof_manifest
+  assert bool(calls)==large
+ with opened(path,child) as s:
+  assert list(s.skills[1,'craft'].provenance)==list(range(128))
+  assert list(s.skills[3,'craft'].provenance)==list(range(128))

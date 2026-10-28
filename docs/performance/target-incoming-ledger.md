@@ -20,3 +20,5 @@ Final review scope decisions:
 - Post-checkpoint documentation edits are author-checked; no second code review is claimed.
 - Native admission, mutable alias identity, namespace field-domain policies, child extents, recursive closure, complete inventory/unindexed owners and activation remain gated; enabling native behavior before those contracts would be unsound.
 - Review authorizes candidate CI only; merge/production/World readiness remain unclaimed.
+
+Current disposition: [consolidated cleanup register](review-cleanup/register.md) tracks closure of these historical Minor findings.

@@ -64,3 +64,46 @@ def test_join_source_guards(tmp_path,fault):
  elif fault=='limit-type':kw['max_references']=True
  with pytest.raises(StoreError):read(s,p,a,**kw)
  s.close()
+
+
+def test_duplicate_owner_references_resolve_target_once(tmp_path,monkeypatch):
+ from ate_sim import persistence_proof_target as target
+ s,p,ref,a=make_owner_target_store(tmp_path/'once.sqlite');original=target._resolve_target;calls=[]
+ def resolve(*args,**kw):calls.append(args[2].incarnation);return original(*args,**kw)
+ with monkeypatch.context() as patch:
+  patch.setattr(target,'_resolve_target',resolve);result=read(s,p,a)
+ assert len(result.references)==2 and [t.incarnation for t in result.targets]==[2] and calls==[2];s.close()
+
+
+def distinct_owner_targets(tmp_path,late_conflict=False):
+ from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+ from ate_sim.persistence_lazy_nested_history import HistoryReference
+ from ate_sim import persistence_lazy_identity_catalog as cat
+ s,p,ref,a=make_owner_target_store(tmp_path/'distinct.sqlite');other=HistoryReference('list',4)
+ values=(ref,other,HistoryReference('map',2)) if late_conflict else (ref,other)
+ owner=VersionChange(PAGE,(3,0),values)
+ placements=(IdentityOccurrenceChange(PAGE,(3,0),(('index',1),),4),)+((IdentityOccurrenceChange(PAGE,(3,0),(('index',2),),2),) if late_conflict else ())
+ delta=cat.IdentityCatalog(s).prepare_delta(p,(owner,),placements,next_incarnation_id=5)
+ p=s.commit(p,commit_token='distinct',version_changes=(owner,VersionChange(DESCRIPTOR_NAMESPACE,3,('list',len(values),len(values))),VersionChange(DESCRIPTOR_NAMESPACE,4,('list',0,0)))+delta.decode(s.codec)[0],identity_changes=placements,next_incarnation_id=5,changes=(),new_segments=(),metadata=s.head_metadata()).pin
+ return s,p,authorities(s,p)
+
+
+def test_distinct_targets_share_aggregate_source_budget(tmp_path,monkeypatch):
+ from ate_sim import persistence_proof_target as target
+ s,p,a=distinct_owner_targets(tmp_path);original=target._Sources.charge;charged=[]
+ def charge(self,n):charged.append(n);return original(self,n)
+ with monkeypatch.context() as patch:
+  patch.setattr(target._Sources,'charge',charge);result=read(s,p,a)
+ assert [t.incarnation for t in result.targets]==[2,4]
+ with pytest.raises(StoreError):read(s,p,a,max_bytes=sum(charged)-1)
+ assert read(s,p,a).targets==result.targets;s.close()
+
+
+def test_late_conflicting_kind_is_rejected_after_distinct_targets(tmp_path,monkeypatch):
+ from ate_sim import persistence_proof_target as target
+ s,p,a=distinct_owner_targets(tmp_path,True);original=target._resolve_target;calls=[]
+ def resolve(*args,**kw):calls.append(args[2].incarnation);return original(*args,**kw)
+ with monkeypatch.context() as patch:
+  patch.setattr(target,'_resolve_target',resolve)
+  with pytest.raises(StoreError,match='competing target kinds'):read(s,p,a)
+ assert calls==[2,4];s.close()
