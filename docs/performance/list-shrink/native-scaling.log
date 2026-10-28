@@ -1,0 +1,3 @@
+1000 100.82 ms unprofiled native first-access save; 644.15 ms with allocation profiling; 134.66 ms backing value save; 221.98 ms tail resize; 283.53 ms page growth; zero unrelated history bodies
+10000 124.61 ms unprofiled native first-access save; 568.71 ms with allocation profiling; 189.6 ms backing value save; 184.2 ms tail resize; 243.55 ms page growth; zero unrelated history bodies
+100000 102.28 ms unprofiled native first-access save; 475.72 ms with allocation profiling; 137.28 ms backing value save; 170.09 ms tail resize; 212.18 ms page growth; zero unrelated history bodies

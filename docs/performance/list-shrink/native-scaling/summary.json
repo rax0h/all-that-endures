@@ -1,0 +1,190 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "318dd27675f688bf621818c4ede687ff122548ae",
+    "runtime_tree": "08a515e8dcb652308431963bdf9275d0f8d4071e",
+    "sqlite": "3.53.1",
+    "driver_sha256": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "318dd27675f688bf621818c4ede687ff122548ae",
+        "runtime_tree": "08a515e8dcb652308431963bdf9275d0f8d4071e",
+        "sqlite": "3.53.1",
+        "driver_sha256": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 1.2042673409999907,
+      "audited_admission_seconds": 0.14053838499995663,
+      "native_first_access_and_save_ms": 644.1495720000034,
+      "native_first_access_and_save_unprofiled_ms": 100.82327300000316,
+      "python_peak_bytes": 534873,
+      "sqlite_vm_steps": 283033,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 134.65885400000843,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 315157,
+      "tail_first_access_and_save_ms": 221.9805099999803,
+      "tail_sql": {
+        "selected": 10,
+        "unrelated": 0
+      },
+      "tail_vm_steps": 341074,
+      "page_growth_first_access_and_save_ms": 283.5335209999812,
+      "page_growth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "page_growth_vm_steps": 356435,
+      "shrink_profiled_first_access_and_save_ms": 708.9120690000072,
+      "shrink_sql": {
+        "selected": 169,
+        "unrelated": 0
+      },
+      "shrink_vm_steps": 494667,
+      "shrink_removed_values": 128,
+      "regrowth_profiled_first_access_and_save_ms": 355.6195240000193,
+      "regrowth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "regrowth_vm_steps": 356858,
+      "regrowth_added_values": 128,
+      "page_growth_added_values": 128,
+      "page_growth_vm_added_values": 128,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "318dd27675f688bf621818c4ede687ff122548ae",
+        "runtime_tree": "08a515e8dcb652308431963bdf9275d0f8d4071e",
+        "sqlite": "3.53.1",
+        "driver_sha256": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 3.833442488000003,
+      "audited_admission_seconds": 0.40654071999995267,
+      "native_first_access_and_save_ms": 568.7070179999978,
+      "native_first_access_and_save_unprofiled_ms": 124.60794800000485,
+      "python_peak_bytes": 334308,
+      "sqlite_vm_steps": 283006,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 189.6031439999888,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 315236,
+      "tail_first_access_and_save_ms": 184.19505800000024,
+      "tail_sql": {
+        "selected": 10,
+        "unrelated": 0
+      },
+      "tail_vm_steps": 341507,
+      "page_growth_first_access_and_save_ms": 243.553181999971,
+      "page_growth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "page_growth_vm_steps": 357802,
+      "shrink_profiled_first_access_and_save_ms": 784.9982970000156,
+      "shrink_sql": {
+        "selected": 257,
+        "unrelated": 0
+      },
+      "shrink_vm_steps": 512062,
+      "shrink_removed_values": 128,
+      "regrowth_profiled_first_access_and_save_ms": 368.1125960000031,
+      "regrowth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "regrowth_vm_steps": 358092,
+      "regrowth_added_values": 128,
+      "page_growth_added_values": 128,
+      "page_growth_vm_added_values": 128,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "318dd27675f688bf621818c4ede687ff122548ae",
+        "runtime_tree": "08a515e8dcb652308431963bdf9275d0f8d4071e",
+        "sqlite": "3.53.1",
+        "driver_sha256": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 25.760114568000063,
+      "audited_admission_seconds": 2.370461411000065,
+      "native_first_access_and_save_ms": 475.7217059999448,
+      "native_first_access_and_save_unprofiled_ms": 102.28404000008595,
+      "python_peak_bytes": 347246,
+      "sqlite_vm_steps": 283864,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 137.2806040000114,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 316657,
+      "tail_first_access_and_save_ms": 170.09131400004662,
+      "tail_sql": {
+        "selected": 10,
+        "unrelated": 0
+      },
+      "tail_vm_steps": 343498,
+      "page_growth_first_access_and_save_ms": 212.17620300001272,
+      "page_growth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "page_growth_vm_steps": 360740,
+      "shrink_profiled_first_access_and_save_ms": 623.6867439999969,
+      "shrink_sql": {
+        "selected": 241,
+        "unrelated": 0
+      },
+      "shrink_vm_steps": 512120,
+      "shrink_removed_values": 128,
+      "regrowth_profiled_first_access_and_save_ms": 327.3770360000299,
+      "regrowth_sql": {
+        "selected": 17,
+        "unrelated": 0
+      },
+      "regrowth_vm_steps": 361084,
+      "regrowth_added_values": 128,
+      "page_growth_added_values": 128,
+      "page_growth_vm_added_values": 128,
+      "archive_unit": "retained history values"
+    }
+  ]
+}

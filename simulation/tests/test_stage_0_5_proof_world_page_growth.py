@@ -59,10 +59,11 @@ def test_new_tail_page_recovers_original_attempt_once(tmp_path,fault):
   assert s.skills[1,'craft'].provenance is s.skills[2,'craft'].provenance
 
 
-def test_removing_last_page_retains_checked_structural_fallback(tmp_path,monkeypatch):
+def test_removing_noninteger_last_page_retains_checked_structural_fallback(tmp_path,monkeypatch):
  from ate_sim import persistence_proof_world as world
  path,pair=fixture(tmp_path)
  with opened(path,pair) as s:
+  s.skills[1,'craft'].provenance[0]=.5
   s.skills[1,'craft'].provenance.extend(range(97));assert s.save()==1
   calls=[];original=world._audit_world
   def audit(*a,**kw):calls.append(True);return original(*a,**kw)

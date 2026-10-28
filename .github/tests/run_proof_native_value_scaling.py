@@ -114,11 +114,19 @@ def run(output):
    final=session.proof_manifest
    assert not calls and page_vm.steps<=page_vm.limit
   finally:session.close()
-  # Remove one page under checked audit, then measure authenticated reuse.
-  with open_audited_proof_world_session(path_out,rules_id=RULES,expected_commitment=final[1]) as setup:
-   values=setup.skills[1,'craft'].provenance
-   for _ in range(128):values.pop()
-   assert setup.save()==10;final=setup.proof_manifest
+  # Measure bounded page removal, then authenticated reuse.
+  session=open_audited_proof_world_session(path_out,rules_id=RULES,expected_commitment=final[1])
+  selected=tuple(session.store.codec.encode((raw.provenance.incarnation,p)).hex().lower() for p in ((n+127)//128,(n+255)//128));body={'selected':0,'unrelated':0};shrink_vm=_VMWorkBudget(6000000)
+  try:
+   session.store.db.set_trace_callback(history_trace);session.store.db.set_progress_handler(shrink_vm,1);world._audit_world=no_full;start=time.perf_counter()
+   try:
+    values=session.skills[1,'craft'].provenance
+    for _ in range(128):values.pop()
+    assert session.save()==10;shrink_elapsed=time.perf_counter()-start
+   finally:session.store.db.set_trace_callback(None);session.store.db.set_progress_handler(None,0);world._audit_world=original
+   final=session.proof_manifest;shrink_body=dict(body)
+   assert shrink_body['selected']>0 and shrink_body['unrelated']==0 and not calls and shrink_vm.steps<=shrink_vm.limit
+  finally:session.close()
   session=open_audited_proof_world_session(path_out,rules_id=RULES,expected_commitment=final[1])
   selected=tuple(session.store.codec.encode((raw.provenance.incarnation,p)).hex().lower() for p in ((n+127)//128,(n+255)//128));body={'selected':0,'unrelated':0};reuse_vm=_VMWorkBudget(6000000)
   try:
@@ -132,7 +140,7 @@ def run(output):
    assert reopened.skills[1,'craft'].level==.875 and reopened.skills[1,'craft'].provenance is reopened.skills[2,'craft'].provenance
    assert reopened.skills[2,'craft'].provenance[-1]==999
    assert reopened.skills[2,'craft'].provenance[0]==998 and len(reopened.skills[2,'craft'].provenance)==n+growth_count+128
-  row=dict(size=n,source=source,status='complete',exact=True,construction_seconds=construction,audited_admission_seconds=admission,native_first_access_and_save_ms=elapsed*1000,native_first_access_and_save_unprofiled_ms=raw_elapsed*1000,python_peak_bytes=peak,sqlite_vm_steps=vm.steps,vm_measurement='separate fresh-session first-access native save, interval-one guard',sql=counts,full_audits_during_save=0,backing_first_access_and_save_ms=backing_elapsed*1000,backing_sql=backing_body,backing_vm_steps=backing_vm.steps,tail_first_access_and_save_ms=tail_elapsed*1000,tail_sql=tail_body,tail_vm_steps=tail_vm.steps,page_growth_first_access_and_save_ms=page_elapsed*1000,page_growth_sql=page_body,page_growth_vm_steps=page_vm.steps,regrowth_profiled_first_access_and_save_ms=reuse_elapsed*1000,regrowth_sql=reuse_body,regrowth_vm_steps=reuse_vm.steps,regrowth_added_values=128,page_growth_added_values=growth_count,page_growth_vm_added_values=128,archive_unit='retained history values')
+  row=dict(size=n,source=source,status='complete',exact=True,construction_seconds=construction,audited_admission_seconds=admission,native_first_access_and_save_ms=elapsed*1000,native_first_access_and_save_unprofiled_ms=raw_elapsed*1000,python_peak_bytes=peak,sqlite_vm_steps=vm.steps,vm_measurement='separate fresh-session first-access native save, interval-one guard',sql=counts,full_audits_during_save=0,backing_first_access_and_save_ms=backing_elapsed*1000,backing_sql=backing_body,backing_vm_steps=backing_vm.steps,tail_first_access_and_save_ms=tail_elapsed*1000,tail_sql=tail_body,tail_vm_steps=tail_vm.steps,page_growth_first_access_and_save_ms=page_elapsed*1000,page_growth_sql=page_body,page_growth_vm_steps=page_vm.steps,shrink_profiled_first_access_and_save_ms=shrink_elapsed*1000,shrink_sql=shrink_body,shrink_vm_steps=shrink_vm.steps,shrink_removed_values=128,regrowth_profiled_first_access_and_save_ms=reuse_elapsed*1000,regrowth_sql=reuse_body,regrowth_vm_steps=reuse_vm.steps,regrowth_added_values=128,page_growth_added_values=growth_count,page_growth_vm_added_values=128,archive_unit='retained history values')
   results.append(row);(output/f'size-{n}.json').write_text(json.dumps(row,indent=2));print(n,round(raw_elapsed*1000,2),'ms unprofiled native first-access save;',round(elapsed*1000,2),'ms with allocation profiling;',round(backing_elapsed*1000,2),'ms backing value save;',round(tail_elapsed*1000,2),'ms tail resize;',round(page_elapsed*1000,2),'ms page growth; zero unrelated history bodies',flush=True)
  (output/'summary.json').write_text(json.dumps(dict(status='complete',source=source,results=results),indent=2))
 if __name__=='__main__':

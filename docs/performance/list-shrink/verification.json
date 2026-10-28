@@ -1,0 +1,37 @@
+{
+  "runtime_tree": "08a515e8dcb652308431963bdf9275d0f8d4071e",
+  "source_hashes": {
+    ".github/tests/run_proof_native_value_scaling.py": "816de7ff15b1e0cdea90cdd25946a0ee9b205bfb4438beb6960a69373713d03a",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "d8d828420092cc8e04694c1ce450030f0d9043e0bbc92d7385cde8480c702b33",
+    "simulation/ate_sim/persistence_proof_manifest_publish.py": "a5e167ea69da681ccd752eca78776b3c760f947ae024398ad2af2dda0c576915",
+    "simulation/ate_sim/persistence_proof_world_tail.py": "b01f626f71b5daf7eb8b2edb428914ec699d6f3401eb9202877750436164e1ae",
+    "simulation/ate_sim/persistence_proof_world_tail_shrink.py": "66135c5f2fc007d1be3795b6ed8ef884245306dc937dbc1201a8373c79ef71b0",
+    "simulation/ate_sim/persistence_proof_world_value.py": "9354f4db7e25af83ca32db8f1b2887b11fb9f39e5c2be15085755ba22c2204ed",
+    "simulation/tests/test_stage_0_5_proof_world_page_growth.py": "3279413e5f44045c745fc65e00ebe0430aa56e4de0a82107f2048d7487d0d481",
+    "simulation/tests/test_stage_0_5_proof_world_page_shrink.py": "29c8aa8ff16fb144fc7a470aeae52533bf2c7cf66d75a9aa6d8b429296dc3aa1"
+  },
+  "tests": [
+    {
+      "scope": "related",
+      "tests": 154,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "native",
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "scope": "budget",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "broad_hosted_gate": "pending"
+}

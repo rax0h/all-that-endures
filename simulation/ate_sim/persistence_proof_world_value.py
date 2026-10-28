@@ -63,23 +63,31 @@ def validate_value_transition(store,request,versions,ordinary,segments):
     from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
     from .core import Event
     from .persistence_proof_world_tail import metadata_allowed
-    if segments:return False
+    if segments or len(versions)>MAX_ROWS:return False
     codec=store.codec;g=request.pin.captured_head;ca=request.pairs[0][0];ra=request.pairs[3][0]
     rows=[];owners={};total=0
     for item in versions:
-        if len(rows)>=MAX_ROWS or item['change'].delete or item['change'].reinsertion:return False
+        if item['change'].reinsertion:return False
         ns,key=item['namespace'],item['typed_key']
         total+=len(ns.encode())+len(key)
         sizes=store._interval_rows('lazy_record_versions','length(payload)+length(memberships)',('namespace','typed_key'),(ns,key),g,'lazy_record_interval',limit=2)
-        if len(sizes)==1 and type(sizes[0][0]) is int and sizes[0][0]+len(item['payload'])+len(item['memberships_blob'])+total>MAX_BYTES:return False
+        if len(sizes)==1 and type(sizes[0][0]) is int and sizes[0][0]+len(item['payload'] or b'')+len(item['memberships_blob'])+total>MAX_BYTES:return False
         old=content._source_version(store,g,ns,key,max_bytes=MAX_BYTES)
+        if item['change'].delete:
+            approved=(request.tail_removed or {}).get((ns,key))
+            if approved is None:return False
+            if old is None or old.payload!=approved or old.record_schema!=1 or old.memberships!=codec.encode(()) or item['change'].record_schema!=1 or item['memberships_blob']!=codec.encode(()):raise StoreIntegrityError('removed page differs from frozen authority')
+            if content._map(store).get(ca.versions,version_key(ns,key))!=content._version_value(ns,key,old,codec.version):raise StoreIntegrityError('removed page lacks accepted content')
+            total+=len(old.payload)+len(old.memberships)
+            if total>MAX_BYTES:return False
+            continue
         if old is None:
             expected=(request.tail_new or {}).get((ns,key))
             if expected is None:return False
             if item['payload']!=expected or item['change'].record_schema!=1 or item['memberships_blob']!=codec.encode(()):raise StoreIntegrityError('new tail source differs from frozen authority')
             if content._map(store).get(ca.versions,version_key(ns,key)) is not None:raise StoreIntegrityError('new tail source lacks accepted content absence')
         if old is not None and content._map(store).get(ca.versions,version_key(ns,key))!=content._version_value(ns,key,old,codec.version):raise StoreIntegrityError('value transition old bytes lack accepted content')
-        total+=len(item['payload'])+len(item['memberships_blob'])+(len(old.payload)+len(old.memberships) if old is not None else 0)
+        total+=len(item['payload'] or b'')+len(item['memberships_blob'])+(len(old.payload)+len(old.memberships) if old is not None else 0)
         if total>MAX_BYTES or old is not None and old.record_schema!=item['change'].record_schema:return False
         frozen=replace(item['change'],key=codec.decode(key),value=codec.decode(item['payload']),memberships=tuple(Membership(*m) for m in codec.decode(item['memberships_blob'])))
         item=dict(item,change=frozen)
@@ -106,12 +114,12 @@ def validate_value_transition(store,request,versions,ordinary,segments):
     for item in ordinary:
         count+=1;ns,key=item['namespace'],item['typed_key'];total+=len(ns.encode())+len(key)
         change=replace(item['change'],key=codec.decode(key),value=None if item['change'].delete else codec.decode(item['payload']))
-        if count+len(rows)>MAX_ROWS or change.delete or change.memberships:return False
+        if count+len(versions)>MAX_ROWS or change.delete or change.memberships:return False
         row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",(MAX_BYTES,ns,key)).fetchone()
         if row is None:return False
         payload,checksum,version,schema,revision=row
         if type(payload) is not bytes:return False
-        total+=len(payload)+len(item['payload'])
+        total+=len(payload)+len(item['payload'] or b'')
         if total>MAX_BYTES or schema!=change.record_schema:return False
         if checksum!=_record_checksum(ns,key,schema,version,revision,payload) or records._map(store).get(ra.root,record_key(ns,key))!=record_commitment(ns,key,last_changed_generation=revision,codec_version=version,record_schema=schema,payload=payload):raise StoreIntegrityError('value transition ordinary predecessor lacks accepted content')
         if ns==EVENT_STORAGE and change.key==COMMIT_DESCRIPTOR_KEY:
@@ -131,6 +139,10 @@ def validate_value_transition(store,request,versions,ordinary,segments):
     for item,old,value in headers:
         change=item['change'];owner_ns,owner_key=change.key;marker=owner_ns,codec.encode(owner_key);source=owners.get(marker)
         if source is None:
+            approved=(request.tail_new or {}).get((item['namespace'],item['typed_key']))
+            if marker in (request.tail_removed or {}) and approved is not None:
+                if item['payload']!=approved:raise StoreIntegrityError('inactive owner differs from frozen authority')
+                continue
             if item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
             continue
         kind='ordinary' if marker in ordinary_owners else 'lazy'

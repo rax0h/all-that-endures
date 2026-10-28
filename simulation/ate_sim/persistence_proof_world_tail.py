@@ -56,4 +56,7 @@ def prepare(store,request,versions):
     eligible,facts=_same_page(store,request,versions)
     extra,next_facts,request.tail_new,request.tail_child_root=pages(store,request,versions,facts or request.facts)
     eligible.update(extra)
+    from .persistence_proof_world_tail_shrink import prepare as shrink
+    smaller,next_facts,request.tail_removed,headers,request.tail_child_root=shrink(store,request,versions,next_facts)
+    request.tail_new.update(headers);eligible.update(smaller)
     return eligible,next_facts if eligible else None

@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_shrink_old_page_inspection_respects_aggregate_byte_budget ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_shrink_old_page_inspectio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5332c93d40>
+
+    def test_shrink_old_page_inspection_respects_aggregate_byte_budget(tmp_path,monkeypatch):
+     from ate_sim import persistence_proof_world_tail_shrink as shrink
+     from ate_sim.persistence_lazy_nested_history import PAGE_NAMESPACE
+     from ate_sim.skills import SkillHistory
+     def configure(w):
+      shared=[10**4000]*1152
+      for i in (1,2):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      v=s.skills[1,'craft'].provenance
+      for _ in range(1152):v.pop()
+      inspected=[];original=shrink._parent
+      def read(store,request,namespace,key):
+       result=original(store,request,namespace,key)
+       if namespace==PAGE_NAMESPACE:inspected.append(len(store.codec.encode(result)))
+       return result
+      with monkeypatch.context() as m:
+       m.setattr(shrink,'_parent',read);assert s.save()==1;child=s.proof_manifest
+>     assert sum(inspected)<=4*1048576
+E     assert 4621923 <= (4 * 1048576)
+E      +  where 4621923 = sum([513547, 513547, 513547, 513547, 513547, 513547, ...])
+
+simulation/tests/test_stage_0_5_proof_world_page_shrink.py:107: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_page_shrink.py::test_shrink_old_page_inspection_respects_aggregate_byte_budget
+1 failed in 22.07s

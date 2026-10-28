@@ -95,6 +95,7 @@ class _Request:
     value_only:bool=False
     tail:object=None
     tail_facts:object=None
+    tail_removed:object=None
     tail_added:int=0
     tail_new:object=None
     tail_child_root:object=None
@@ -169,7 +170,7 @@ def _stage(store,r,g,writer,token,inventory_pair):
             structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4]==r.tail_child_root and sa[0].roots[5:]==oldsa[0].roots[5:]
                 and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id
                 and (da[0].root.count==oldda[0].root.count if r.tail_new else da[0].root==oldda[0].root)
-                and ca[0].versions.count==oldca[0].versions.count+r.tail_added and ca[0].events==oldca[0].events
+                and ca[0].versions.count==oldca[0].versions.count+r.tail_added-len(r.tail_removed or {}) and ca[0].events==oldca[0].events
                 and ia[0].head.namespace_inventory==oldia[0].head.namespace_inventory and ia[0].head.namespace_counts==oldia[0].head.namespace_counts)
             reuse=reuse or r.value_only and structural
             oldh=parent.head;newh=ia[0].head
