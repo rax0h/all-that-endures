@@ -133,6 +133,10 @@ class PerformanceAttribution:
                 ('persistence_lazy', 'LazyWorldSession', '_prepare_hybrid_save', 'save.prepare'),
                 ('persistence_lazy', 'LazyWorldSession', '_publish_committed_hybrid', 'save.publish'),
                 ('persistence_lazy', 'LazyWorldSession', '_shared_object_routes', 'identity.routes'),
+                # Proof-world outer operation includes guard/settlement; manifest commit
+                # includes checks beyond the inner SQLite store commit.
+                ('persistence_proof_world_session', '_WorldProofAuthority', 'execute', 'save.proof_execute'),
+                ('persistence_proof_world_session', '_WorldProofAuthority', 'commit', 'save.proof_manifest'),
                 ('persistence_lazy_store', 'LazyRecordStore', 'commit', 'save.commit'),
                 ('persistence_lazy_store', 'LazyRecordStore', 'read_version', 'store.read_version'),
                 ('persistence_lazy_store', 'LazyRecordStore', '_check_record_row', 'store.check_record_row'),
