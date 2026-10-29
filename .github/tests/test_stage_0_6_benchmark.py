@@ -167,8 +167,25 @@ def test_bounded_first_year_sample_has_profile_and_never_saves(tmp_path):
  assert value['acceptance']=='not-run' and value['source_unchanged']
  assert value['profile_top'] and (tmp_path/'sample/first_step.prof').is_file()
  assert {'open_total','first_step'}<=set(value['phases'])
+ counters=value['counter_attribution']
+ assert counters['start']['owner_cache'] is not None
+ for section, keys in (('owner_cache',('hits','misses')),('people',('person_payload_loads',))):
+  for key in keys:
+   assert counters['deltas'][section][key]==counters['end'][section][key]-counters['start'][section][key]
+   assert counters['deltas'][section][key]>=0
  with open_lazy_world_session(tmp_path/'sample/operational.sqlite',rules_id=a['rules_id']) as restored:
   assert restored.world.year==a['world']['year'] and restored.world.digest()==expected
+
+
+
+def test_sample_counter_attribution_flags_resets_and_absent_catalog():
+ from simulation.stage_0_6_profile_sample import _counter_attribution
+ before={'owner_cache':None,'people':{'person_payload_loads':9}}
+ after={'owner_cache':None,'people':{'person_payload_loads':2}}
+ value=_counter_attribution(before,after)
+ assert value['deltas']['owner_cache'] is None
+ assert value['deltas']['people']['person_payload_loads'] is None
+ assert value['start']==before and value['end']==after
 
 
 def test_bounded_sample_timeout_keeps_profile_without_claiming_complete_year(tmp_path,monkeypatch):
@@ -180,6 +197,8 @@ def test_bounded_sample_timeout_keeps_profile_without_claiming_complete_year(tmp
  assert value['status']=='complete' and value['diagnostic_status']=='sample_limit_reached'
  assert value['phases']['first_step']['status']=='timeout' and value['phases']['first_step']['censored']
  assert value['profile_top'] and value['acceptance']=='not-run' and value['source_unchanged']
+ assert value['counter_attribution']['deltas']['people']['person_payload_loads']>=0
+ assert value['counter_attribution']['deltas']['owner_cache'] is not None
 
 @pytest.mark.parametrize('opening,step',[(901,1),(1,61),(0,1),(1,float('nan'))])
 def test_sample_rejects_unbounded_or_invalid_budgets_before_copy(tmp_path,opening,step):

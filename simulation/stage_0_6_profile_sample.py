@@ -19,6 +19,33 @@ from ate_sim.persistence_lazy import open_lazy_world_session
 from simulation.stage_0_6_mature_benchmark import Recorder, base, check_source, machine, r
 
 
+def _counter_snapshot(session):
+    """Read existing in-memory counters; do not query persistence metadata."""
+    coordinator = getattr(session, '_identity_coordinator', None)
+    catalog = getattr(coordinator, 'catalog', None)
+    return {
+        'owner_cache': catalog.owner_cache_diagnostics() if catalog is not None else None,
+        'people': session.people.diagnostics(),
+    }
+
+
+def _counter_attribution(before, after):
+    deltas = {}
+    for section, keys in (('owner_cache', ('hits', 'misses')),
+                          ('people', ('person_payload_loads',))):
+        start, end = before[section], after[section]
+        deltas[section] = None if start is None or end is None else {
+            key: end[key] - start[key] if end[key] >= start[key] else None
+            for key in keys
+        }
+    return {
+        'start': before, 'end': after, 'deltas': deltas,
+        'meaning': ('Counters are cumulative; negative differences indicate a reset and are null. '
+                    'Owner-cache misses include required transactional bypasses, not just evictions. '
+                    'A censored sample measures only the observed prefix.'),
+    }
+
+
 def sample(source, output, *, authority, open_seconds=900, step_seconds=60):
     for value, cap in ((open_seconds, 900), (step_seconds, 60)):
         if type(value) not in (int, float) or not math.isfinite(value) or not 0 < value <= cap:
@@ -57,6 +84,7 @@ def sample(source, output, *, authority, open_seconds=900, step_seconds=60):
                 or any(initial['pin'][k] != authority['pin'][k] for k in ('store_identity', 'captured_head'))):
             raise ValueError('sample opened wrong world/pin')
         result['initial'] = initial
+        counters_before = _counter_snapshot(session)
         profiler = cProfile.Profile()
         profile_started = profile_finished = None
         def stop_profile():
@@ -80,6 +108,7 @@ def sample(source, output, *, authority, open_seconds=900, step_seconds=60):
             result['diagnostic_status'] = 'sample_limit_reached'
         finally:
             stop_profile()
+            result['counter_attribution'] = _counter_attribution(counters_before, _counter_snapshot(session))
             phase = rec.phases['first_step']
             phase['profiled_wall_seconds'] = ((profile_finished - profile_started)
                 if profile_started is not None and profile_finished is not None else 0.)
