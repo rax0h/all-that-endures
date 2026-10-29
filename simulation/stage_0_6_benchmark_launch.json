@@ -33,9 +33,9 @@
     "simulation/stage_0_5_mature_step_save.py": "81bccd7806fe48fbbbcad60bf9ce0b2ef187dcea80d94cec7a99e04483f24787",
     "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
     "simulation/stage_0_5_save1002_preflight.json": "7f0648786159007816c2a64ee1b8501c0210d2121f011052c4a2179db5a62b7a",
-    ".github/tests/test_stage_0_6_benchmark.py": "ed11d354430068b7313b9bbb888fb6e55a081dbb9e0715681fb86bbe96011060",
+    ".github/tests/test_stage_0_6_benchmark.py": "652e893fcc4d10969573f76b51a108cddfbfacfe11207b52a5b5df2fb8cfe9a7",
     ".github/workflows/stage-0-6-current-mature-performance.yml": "fdddb4f63c406b28a005203f9429a90d0d43c7711315883fe0f22ab29a268397",
-    "simulation/stage_0_6_profile_sample.py": "9dc2500713a420ae3d1608d99591871a00fe4f16a84566eb727074bb5282789d"
+    "simulation/stage_0_6_profile_sample.py": "9a3b531c7776a888642f8c91715e258c74abef8ec2c9dd20757807b389a7e5d6"
   },
   "world": {
     "seed": 843000,
