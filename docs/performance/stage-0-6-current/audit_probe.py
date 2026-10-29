@@ -28,6 +28,7 @@ TARGETS = {
     ('persistence_proof_world_session.py', '_audit_inner'): 'authority.audit_inner',
     ('persistence_proof_world_session.py', '_settle'): 'authority.settle',
     ('persistence_proof_manifest_publish.py', '_stage'): 'manifest.stage',
+    ('persistence_proof_manifest_publish.py', 'commit_world_manifest'): 'manifest.commit_world',
     ('persistence_proof_world.py', '_audit_world'): 'world.audit',
     ('persistence_lazy_store.py', 'verify_all'): 'store.verify_all',
     ('persistence_catalog_copy.py', '_verify_catalog'): 'catalog.verify',
@@ -40,6 +41,7 @@ class CallAttribution:
         self.stack = []
         self.save_ids = []
         self.save_count = 0
+        self.manifest_outcomes = []
         self.rows = defaultdict(lambda: defaultdict(lambda: [0, 0, 0, 0, 0]))
 
     def __call__(self, frame, event, arg):
@@ -66,12 +68,19 @@ class CallAttribution:
             if self.stack:
                 self.stack[-1][5] += wall
                 self.stack[-1][6] += cpu
+            if name == 'manifest.commit_world' and arg is not None:
+                reaudited = getattr(arg, 'reaudited', None)
+                outcome = getattr(getattr(arg, 'commit', None), 'outcome', None)
+                if type(reaudited) is bool and type(outcome) is str:
+                    self.manifest_outcomes.append({'bucket': bucket, 'reaudited': reaudited,
+                                                   'commit_outcome': outcome})
             if name == 'save':
                 self.save_ids.pop()
 
     def snapshot(self):
         return {
             'save_calls': self.save_count,
+            'manifest_outcomes': self.manifest_outcomes,
             'buckets': {
                 bucket: {
                     name: dict(zip(('calls', 'inclusive_wall_s', 'exclusive_wall_s',
