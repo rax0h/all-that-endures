@@ -1,0 +1,9 @@
+.................                                                        [100%]
+============================= slowest 5 durations ==============================
+136.89s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_generated_world_continues_through_two_proof_saves
+3.04s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[True]
+1.17s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[False]
+0.01s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_proof_record_hints_resolve_all_persisted_fields
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+17 passed in 141.32s (0:02:21)

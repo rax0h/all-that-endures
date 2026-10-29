@@ -26,6 +26,31 @@ VERSION_FIELDS = tuple(field for p in _PREFIXES for field in
 IDENTITY_FIELDS = tuple(p + 'identity_changes' for p in _PREFIXES) + ('nested_history_identity_changes',)
 
 
+def order_native_insertions(plan, codec, structural_orders):
+    """Freeze new/reinserted owners in their runtime insertion order.
+
+    The store allocates collection ordinals in publication order. Family query
+    memberships already use planned insertion ordinals, so key-sorted prepared
+    deltas must be reordered before capture. Only changed owners are visited;
+    auxiliary backing order and existing-owner update order stay unchanged.
+    """
+    def ordered(changes):
+        positions = {}
+        for index, change in enumerate(changes):
+            key = (change.namespace, codec.encode(change.key))
+            if key in structural_orders:
+                positions.setdefault(change.namespace, []).append((index, change, structural_orders[key]))
+        result = list(changes)
+        for entries in positions.values():
+            for (index, _, _), (_, change, _) in zip(entries, sorted(entries, key=lambda entry: entry[2])):
+                result[index] = change
+        return tuple(result)
+    updates = {field: ordered(getattr(plan, field)) for field in VERSION_FIELDS}
+    updates['scalar_record_plans'] = tuple(replace(unit, version_changes=ordered(unit.version_changes))
+                                           for unit in plan.scalar_record_plans)
+    return replace(plan, **updates)
+
+
 def _delta(codec, namespace, versions, records, identities):
     fingerprint = _framed_sha(b'save-participant-v1', codec.encode(namespace),
                              codec.encode((versions, records, identities)))

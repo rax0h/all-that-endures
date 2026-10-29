@@ -1,0 +1,40 @@
+{
+  "schema": "ate-stage06-world-integration-validation/1",
+  "base_sha": "7b0f69451f98110af61450384919d268266f1f29",
+  "runtime_tree": "d4b1e1edf9469c1672752260128749e4eef72d2f",
+  "checks": {
+    "new_continuation": {
+      "passed": 17,
+      "seconds": 141.32,
+      "fresh_process_years": [
+        3,
+        4
+      ]
+    },
+    "affected_regression": {
+      "passed": 124,
+      "seconds": 119.12
+    },
+    "exact_harness": {
+      "passed": 29,
+      "seconds": 21.23
+    },
+    "review": {
+      "critical": 0,
+      "important": 0,
+      "minor": 1,
+      "minor_closed": 1
+    }
+  },
+  "limitations": [
+    "small generated world; not mature performance acceptance",
+    "general native proof saves retain full-audit fallback",
+    "initial proof admission remains fully audited",
+    "full hosted validation pending"
+  ],
+  "runtime_files": {
+    "simulation/ate_sim/persistence_lazy.py": "274a68fc62371c705512751e115cf1caa936c0b00c54e5c3c738c85bbca4eb53",
+    "simulation/ate_sim/persistence_lazy_participants.py": "2debabc9ce29d733950ff2968884c6b61add20b844c0ba7cc1f7b5c65a84feae",
+    "simulation/ate_sim/persistence_proof_world.py": "0c8d48d36d96b6516cb13bfcf7548f8022c5310c17fe1363adf29db512936e51"
+  }
+}

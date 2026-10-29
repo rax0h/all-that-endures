@@ -128,6 +128,11 @@ def _check_family_value(store,namespace,key,value):
 @lru_cache(maxsize=256)
 def _record_hints(cls):
     from typing import get_type_hints
+    from .advancement import AbilityProgress
+    from .mastery_training import ResponseModel
+    # Advancement imports this type only for static checking to avoid a cycle.
+    # Supply the exact persisted class without changing the module's globals.
+    if cls is AbilityProgress:return get_type_hints(cls,localns={'ResponseModel':ResponseModel})
     return get_type_hints(cls)
 
 
@@ -139,7 +144,7 @@ def _check_field_values(store,namespace,cls,values):
     hints=_record_hints(cls)
     def allowed(annotation,ref):
         if annotation in (Any,object):return True
-        origin=get_origin(annotation)
+        origin=get_origin(annotation) or annotation
         if origin in (Union,UnionType):return any(allowed(a,ref) for a in get_args(annotation))
         if type(ref) is NonreflexiveKeyReference:return annotation is float
         if type(ref) is EventIdReference:return origin in (set,frozenset)
@@ -153,7 +158,7 @@ def _check_field_values(store,namespace,cls,values):
     for field,ref in zip(RECORD_FIELDS[cls],values):
         if type(ref) not in (HistoryReference,RecordReference,NonreflexiveKeyReference,EventIdReference):continue
         expected=NESTED_FIELD_KINDS.get((namespace,field))
-        if not allowed(hints[field],ref) or expected is not None and (type(ref) is not HistoryReference or ref.kind!=expected):raise StoreIntegrityError('World field reference has wrong member kind')
+        if not allowed(hints[field],ref) or expected is not None and (type(ref) is not HistoryReference or ref.kind!=expected):raise StoreIntegrityError(f'World field reference has wrong member kind: {cls.__name__}.{field}')
 
 
 def _check_field_references(store,namespace,value):
@@ -170,7 +175,10 @@ def _check_queries(store,pin,change):
     if order is None:raise StoreIntegrityError('World owner has no collection order')
     ordinal=order[0];v=change.value
     institutional=set(runtime.SCALAR_RECORD_SPECS)|{runtime.SOCIAL_EDGE_NAMESPACE,runtime.SOCIAL_PARTNERSHIP_NAMESPACE,runtime.TRANSMISSION_NAMESPACE,runtime.MOTIVE_NAMESPACE,runtime.INSTITUTION_MAGIC_RECORD_NAMESPACE,runtime.INSTITUTION_NOTICE_NAMESPACE,runtime.INSTITUTION_APPLICATION_NAMESPACE}
-    if ns in institutional:expected=runtime._institution_memberships(ns,v,ordinal)
+    # Partnership bodies store only the event ID; the pair belongs to the key.
+    # The shared projection validator consumes the logical (pair, event) entry.
+    if ns==runtime.SOCIAL_PARTNERSHIP_NAMESPACE:expected=runtime._institution_memberships(ns,(change.key,v),ordinal)
+    elif ns in institutional:expected=runtime._institution_memberships(ns,v,ordinal)
     elif ns=='world.people':expected=(('alive',bool(v.alive),ordinal),)
     elif ns=='world.magic_resources.resources':expected=runtime._resource_memberships(v,ordinal)
     elif ns=='world.materials.lots':expected=runtime._material_lot_memberships(v,ordinal)
@@ -178,7 +186,7 @@ def _check_queries(store,pin,change):
     elif ns=='world.culture.adoption':expected=tuple((m.index_name,m.value,m.ordinal) for m in adoption_memberships(change.key,v,ordinal))
     else:expected=()
     actual=tuple((m.index_name,m.value,m.ordinal) for m in change.memberships)
-    if store.codec.encode(tuple(sorted(actual,key=store.codec.encode)))!=store.codec.encode(tuple(sorted(expected,key=store.codec.encode))):raise StoreIntegrityError('World query projection disagrees with owner values')
+    if store.codec.encode(tuple(sorted(actual,key=store.codec.encode)))!=store.codec.encode(tuple(sorted(expected,key=store.codec.encode))):raise StoreIntegrityError(f'World query projection disagrees with owner values: {ns} {change.key!r}')
 
 
 def _check_events(store,pin,manifest):

@@ -1,0 +1,1609 @@
+{
+  "acceptance": "not-run",
+  "diagnostic_status": "sample_limit_reached",
+  "initial": {
+    "actions": 50000,
+    "pin": {
+      "captured_head": 126,
+      "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+      "token": "878a09a5-d902-451c-961b-528e1c3e95d0"
+    },
+    "seed": 843000,
+    "year": 1001
+  },
+  "instrumentation": "cProfile on sampled first step only",
+  "limitation": "Profile costs include instrumentation. A censored prefix is not a full year or a save benchmark.",
+  "machine": {
+    "cpu_count": 4,
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "processor": "AMD EPYC 9V45 96-Core Processor",
+    "python": "3.12.15",
+    "sqlite": "3.45.1"
+  },
+  "phases": {
+    "close_without_save": {
+      "budget_seconds": null,
+      "cpu_seconds": 0.3829706220000162,
+      "io": {
+        "maintenance_removed_rows": 256,
+        "maintenance_rows": 512,
+        "metadata_rows": 1,
+        "payload_check_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 4,
+        "query_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "after": 0,
+          "before": 0
+        }
+      },
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 706350,
+        "read_bytes": 606208,
+        "syscr": 179,
+        "syscw": 646,
+        "wchar": 1320724,
+        "write_bytes": 3141632
+      },
+      "resource_delta": {
+        "block_inputs": 1184,
+        "block_outputs": 6136,
+        "cpu_seconds": 0.3829706220000162,
+        "major_faults": 0,
+        "minor_faults": 641,
+        "peak_rss_bytes": 2621440,
+        "rss_bytes": 561152
+      },
+      "resources_end": {
+        "block_inputs": 172173520,
+        "block_outputs": 58539136,
+        "cpu_seconds": 360.846739746,
+        "major_faults": 2,
+        "minor_faults": 89346,
+        "peak_rss_bytes": 347447296,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 114842486477,
+          "read_bytes": 88152842240,
+          "syscr": 6714178,
+          "syscw": 160389,
+          "wchar": 30577872412,
+          "write_bytes": 29972037632
+        },
+        "rss_bytes": 345796608
+      },
+      "resources_start": {
+        "block_inputs": 172172336,
+        "block_outputs": 58533000,
+        "cpu_seconds": 360.463769124,
+        "major_faults": 2,
+        "minor_faults": 88705,
+        "peak_rss_bytes": 344825856,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 114841780127,
+          "read_bytes": 88152236032,
+          "syscr": 6713999,
+          "syscw": 159743,
+          "wchar": 30576551688,
+          "write_bytes": 29968896000
+        },
+        "rss_bytes": 345235456
+      },
+      "status": "complete",
+      "wall_seconds": 0.39466073599987794
+    },
+    "copy_verification": {
+      "budget_seconds": null,
+      "cpu_seconds": 17.749594681999998,
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 29922463907,
+        "read_bytes": 29922463744,
+        "syscr": 114152,
+        "syscw": 0,
+        "wchar": 0,
+        "write_bytes": 0
+      },
+      "resource_delta": {
+        "block_inputs": 58442312,
+        "block_outputs": 0,
+        "cpu_seconds": 17.749594681999998,
+        "major_faults": 0,
+        "minor_faults": 1,
+        "peak_rss_bytes": 0,
+        "rss_bytes": 0
+      },
+      "resources_end": {
+        "block_inputs": 172024672,
+        "block_outputs": 58442352,
+        "cpu_seconds": 49.188098753,
+        "major_faults": 2,
+        "minor_faults": 7446,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 89779563434,
+          "read_bytes": 88076632064,
+          "syscr": 230350,
+          "syscw": 27,
+          "wchar": 29922469409,
+          "write_bytes": 29922484224
+        },
+        "rss_bytes": 35930112
+      },
+      "resources_start": {
+        "block_inputs": 113582360,
+        "block_outputs": 58442352,
+        "cpu_seconds": 31.438504071,
+        "major_faults": 2,
+        "minor_faults": 7445,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 59857099527,
+          "read_bytes": 58154168320,
+          "syscr": 116198,
+          "syscw": 27,
+          "wchar": 29922469409,
+          "write_bytes": 29922484224
+        },
+        "rss_bytes": 35930112
+      },
+      "status": "complete",
+      "wall_seconds": 75.32237219299986
+    },
+    "database_copy": {
+      "budget_seconds": null,
+      "cpu_seconds": 13.722585144,
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 29922463894,
+        "read_bytes": 29077049344,
+        "syscr": 19,
+        "syscw": 15,
+        "wchar": 29922463744,
+        "write_bytes": 29922463744
+      },
+      "resource_delta": {
+        "block_inputs": 56791112,
+        "block_outputs": 58442312,
+        "cpu_seconds": 13.722585144,
+        "major_faults": 0,
+        "minor_faults": 0,
+        "peak_rss_bytes": 0,
+        "rss_bytes": 0
+      },
+      "resources_end": {
+        "block_inputs": 113582360,
+        "block_outputs": 58442336,
+        "cpu_seconds": 31.436358229,
+        "major_faults": 2,
+        "minor_faults": 7444,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 59857099364,
+          "read_bytes": 58154168320,
+          "syscr": 116194,
+          "syscw": 25,
+          "wchar": 29922465919,
+          "write_bytes": 29922476032
+        },
+        "rss_bytes": 35926016
+      },
+      "resources_start": {
+        "block_inputs": 56791248,
+        "block_outputs": 24,
+        "cpu_seconds": 17.713773085,
+        "major_faults": 2,
+        "minor_faults": 7444,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 29934635470,
+          "read_bytes": 29077118976,
+          "syscr": 116175,
+          "syscw": 10,
+          "wchar": 2175,
+          "write_bytes": 12288
+        },
+        "rss_bytes": 35926016
+      },
+      "status": "complete",
+      "wall_seconds": 198.01005315199995
+    },
+    "database_open": {
+      "cpu_seconds": 0.0015572940000012636,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 41,
+        "payload_check_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 0,
+        "query_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "after": 0,
+          "before": 0
+        }
+      },
+      "resources_end": {
+        "block_inputs": 172024824,
+        "block_outputs": 58442376,
+        "cpu_seconds": 49.191812275,
+        "major_faults": 2,
+        "minor_faults": 7462,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 89779617247,
+          "read_bytes": 88076709888,
+          "syscr": 230387,
+          "syscw": 29,
+          "wchar": 29922474591,
+          "write_bytes": 29922496512
+        },
+        "rss_bytes": 36384768
+      },
+      "resources_start": {
+        "block_inputs": 172024672,
+        "block_outputs": 58442376,
+        "cpu_seconds": 49.190232287,
+        "major_faults": 2,
+        "minor_faults": 7446,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 89779563760,
+          "read_bytes": 88076632064,
+          "syscr": 230358,
+          "syscw": 29,
+          "wchar": 29922474591,
+          "write_bytes": 29922496512
+        },
+        "rss_bytes": 35930112
+      },
+      "status": "complete",
+      "wall_seconds": 0.002166045999956623
+    },
+    "first_step": {
+      "budget_seconds": 60,
+      "censored": true,
+      "cpu_seconds": 58.48148247,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 805080,
+        "payload_check_bytes": 36255494,
+        "payload_check_reads": 150024,
+        "payload_read_bytes": 35198770,
+        "payload_reads": 144569,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 529038,
+        "query_rows": 5455
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "after": 0,
+          "before": 0
+        }
+      },
+      "non_profiled_wall_seconds": 0.7862797919999593,
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 1782757348,
+        "read_bytes": 71970816,
+        "syscr": 755007,
+        "syscw": 0,
+        "wchar": 0,
+        "write_bytes": 0
+      },
+      "profiled_wall_seconds": 60.00009954400002,
+      "resource_delta": {
+        "block_inputs": 140568,
+        "block_outputs": 0,
+        "cpu_seconds": 58.48148247,
+        "major_faults": 0,
+        "minor_faults": 14252,
+        "peak_rss_bytes": 55205888,
+        "rss_bytes": 58372096
+      },
+      "resources_end": {
+        "block_inputs": 172172336,
+        "block_outputs": 58532640,
+        "cpu_seconds": 360.37606084,
+        "major_faults": 2,
+        "minor_faults": 88705,
+        "peak_rss_bytes": 344825856,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 114841779949,
+          "read_bytes": 88152236032,
+          "syscr": 6713995,
+          "syscw": 159740,
+          "wchar": 30576374460,
+          "write_bytes": 29968711680
+        },
+        "rss_bytes": 345235456
+      },
+      "resources_start": {
+        "block_inputs": 172031768,
+        "block_outputs": 58532640,
+        "cpu_seconds": 301.89457837,
+        "major_faults": 2,
+        "minor_faults": 74453,
+        "peak_rss_bytes": 289619968,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 113059022601,
+          "read_bytes": 88080265216,
+          "syscr": 5958988,
+          "syscw": 159740,
+          "wchar": 30576374460,
+          "write_bytes": 29968711680
+        },
+        "rss_bytes": 286863360
+      },
+      "status": "timeout",
+      "wall_meaning": "inclusive operation/unwind; profiling stops before budget-exception cleanup",
+      "wall_seconds": 60.78637933599998
+    },
+    "open_total": {
+      "budget_seconds": 900,
+      "cpu_seconds": 252.70325751900003,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 2749351,
+        "payload_check_bytes": 2304298297,
+        "payload_check_reads": 628525,
+        "payload_read_bytes": 2304298297,
+        "payload_reads": 628525,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 239254,
+        "query_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "after": 0,
+          "before": 0
+        }
+      },
+      "process_io_delta": {
+        "cancelled_write_bytes": 26357760,
+        "rchar": 23279458826,
+        "read_bytes": 3633152,
+        "syscr": 5728630,
+        "syscw": 159709,
+        "wchar": 653890742,
+        "write_bytes": 46198784
+      },
+      "resource_delta": {
+        "block_inputs": 7096,
+        "block_outputs": 90232,
+        "cpu_seconds": 252.70325751900003,
+        "major_faults": 0,
+        "minor_faults": 67007,
+        "peak_rss_bytes": 253022208,
+        "rss_bytes": 250933248
+      },
+      "resources_end": {
+        "block_inputs": 172031768,
+        "block_outputs": 58532608,
+        "cpu_seconds": 301.892942659,
+        "major_faults": 2,
+        "minor_faults": 74453,
+        "peak_rss_bytes": 289619968,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 113059022423,
+          "read_bytes": 88080265216,
+          "syscr": 5958984,
+          "syscw": 159738,
+          "wchar": 30576365333,
+          "write_bytes": 29968695296
+        },
+        "rss_bytes": 286863360
+      },
+      "resources_start": {
+        "block_inputs": 172024672,
+        "block_outputs": 58442376,
+        "cpu_seconds": 49.18968514,
+        "major_faults": 2,
+        "minor_faults": 7446,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 89779563597,
+          "read_bytes": 88076632064,
+          "syscr": 230354,
+          "syscw": 29,
+          "wchar": 29922474591,
+          "write_bytes": 29922496512
+        },
+        "rss_bytes": 35930112
+      },
+      "status": "complete",
+      "wall_seconds": 252.949211569
+    },
+    "retained_input_verification": {
+      "budget_seconds": null,
+      "cpu_seconds": 17.092449423000005,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 0,
+        "payload_check_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 0,
+        "query_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "after": 0,
+          "before": 0
+        }
+      },
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 29922463922,
+        "read_bytes": 29077049344,
+        "syscr": 114152,
+        "syscw": 0,
+        "wchar": 0,
+        "write_bytes": 0
+      },
+      "resource_delta": {
+        "block_inputs": 56791112,
+        "block_outputs": 0,
+        "cpu_seconds": 17.092449423000005,
+        "major_faults": 0,
+        "minor_faults": 0,
+        "peak_rss_bytes": 0,
+        "rss_bytes": 0
+      },
+      "resources_end": {
+        "block_inputs": 228964632,
+        "block_outputs": 58539176,
+        "cpu_seconds": 377.940821086,
+        "major_faults": 2,
+        "minor_faults": 89346,
+        "peak_rss_bytes": 347447296,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 144764950577,
+          "read_bytes": 117229891584,
+          "syscr": 6828334,
+          "syscw": 160391,
+          "wchar": 30577887034,
+          "write_bytes": 29972058112
+        },
+        "rss_bytes": 345796608
+      },
+      "resources_start": {
+        "block_inputs": 172173520,
+        "block_outputs": 58539176,
+        "cpu_seconds": 360.848371663,
+        "major_faults": 2,
+        "minor_faults": 89346,
+        "peak_rss_bytes": 347447296,
+        "process_io": {
+          "cancelled_write_bytes": 26357760,
+          "rchar": 114842486655,
+          "read_bytes": 88152842240,
+          "syscr": 6714182,
+          "syscw": 160391,
+          "wchar": 30577887034,
+          "write_bytes": 29972058112
+        },
+        "rss_bytes": 345796608
+      },
+      "status": "complete",
+      "wall_seconds": 70.2439568079999
+    },
+    "source_verification": {
+      "budget_seconds": null,
+      "cpu_seconds": 17.56415921,
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 29922463880,
+        "read_bytes": 29077049344,
+        "syscr": 114152,
+        "syscw": 0,
+        "wchar": 0,
+        "write_bytes": 0
+      },
+      "resource_delta": {
+        "block_inputs": 56791112,
+        "block_outputs": 0,
+        "cpu_seconds": 17.56415921,
+        "major_faults": 0,
+        "minor_faults": 0,
+        "peak_rss_bytes": 0,
+        "rss_bytes": 0
+      },
+      "resources_end": {
+        "block_inputs": 56791248,
+        "block_outputs": 8,
+        "cpu_seconds": 17.712535077,
+        "major_faults": 2,
+        "minor_faults": 7442,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 29934635323,
+          "read_bytes": 29077118976,
+          "syscr": 116171,
+          "syscw": 8,
+          "wchar": 376,
+          "write_bytes": 4096
+        },
+        "rss_bytes": 35917824
+      },
+      "resources_start": {
+        "block_inputs": 136,
+        "block_outputs": 8,
+        "cpu_seconds": 0.148375867,
+        "major_faults": 2,
+        "minor_faults": 7442,
+        "peak_rss_bytes": 36597760,
+        "process_io": {
+          "cancelled_write_bytes": 0,
+          "rchar": 12171443,
+          "read_bytes": 69632,
+          "syscr": 2019,
+          "syscw": 8,
+          "wchar": 376,
+          "write_bytes": 4096
+        },
+        "rss_bytes": 35917824
+      },
+      "status": "complete",
+      "wall_seconds": 70.35240477799994
+    },
+    "state_restore": {
+      "cpu_seconds": 252.70170022500002,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 2749310,
+        "payload_check_bytes": 2304298297,
+        "payload_check_reads": 628525,
+        "payload_read_bytes": 2304298297,
+        "payload_reads": 628525,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 239254,
+        "query_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "after": 0,
+          "before": 0
+        }
+      },
+      "meaning": "open total minus database initialization; includes checked admission and canonical restoration",
+      "status": "complete",
+      "wall_seconds": 252.94704552300004
+    }
+  },
+  "profile_top": [
+    {
+      "calls": 1,
+      "cumulative_seconds": 59.99995349300001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/engine.py",
+      "function": "run",
+      "line": 29,
+      "primitive_calls": 1,
+      "self_seconds": 1.3650000000000001e-05
+    },
+    {
+      "calls": 1,
+      "cumulative_seconds": 59.999787362000006,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/engine.py",
+      "function": "step",
+      "line": 56,
+      "primitive_calls": 1,
+      "self_seconds": 5.762600000000001e-05
+    },
+    {
+      "calls": 1,
+      "cumulative_seconds": 34.890810477,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/engine.py",
+      "function": "_people",
+      "line": 79,
+      "primitive_calls": 1,
+      "self_seconds": 0.006799996
+    },
+    {
+      "calls": 27181,
+      "cumulative_seconds": 34.231872314,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "__getitem__",
+      "line": 3636,
+      "primitive_calls": 27181,
+      "self_seconds": 0.175323484
+    },
+    {
+      "calls": 23972,
+      "cumulative_seconds": 30.486325478,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+      "function": "read_owner_identity",
+      "line": 650,
+      "primitive_calls": 23972,
+      "self_seconds": 0.358584836
+    },
+    {
+      "calls": 25,
+      "cumulative_seconds": 29.890087638,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/core.py",
+      "function": "current_people",
+      "line": 105,
+      "primitive_calls": 25,
+      "self_seconds": 0.00028335700000000003
+    },
+    {
+      "calls": 14,
+      "cumulative_seconds": 29.889225132000004,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "select",
+      "line": 3799,
+      "primitive_calls": 14,
+      "self_seconds": 0.014377879000000001
+    },
+    {
+      "calls": 21121,
+      "cumulative_seconds": 28.904316253,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "_owner_identity_labels",
+      "line": 11044,
+      "primitive_calls": 21121,
+      "self_seconds": 0.039207171
+    },
+    {
+      "calls": 13,
+      "cumulative_seconds": 28.187587772,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/engine.py",
+      "function": "_die",
+      "line": 86,
+      "primitive_calls": 13,
+      "self_seconds": 0.000946227
+    },
+    {
+      "calls": 17,
+      "cumulative_seconds": 26.912785300000003,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/household_queries.py",
+      "function": "living_household_members",
+      "line": 9,
+      "primitive_calls": 17,
+      "self_seconds": 0.004739650000000001
+    },
+    {
+      "calls": 18064,
+      "cumulative_seconds": 23.442331191,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "_bind_loaded_person",
+      "line": 14198,
+      "primitive_calls": 18064,
+      "self_seconds": 0.161666323
+    },
+    {
+      "calls": 148710,
+      "cumulative_seconds": 21.751590957,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py",
+      "function": "read_version",
+      "line": 1362,
+      "primitive_calls": 148710,
+      "self_seconds": 0.402460184
+    },
+    {
+      "calls": 274891,
+      "cumulative_seconds": 15.2792057,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py",
+      "function": "_read_snapshot_start",
+      "line": 1246,
+      "primitive_calls": 274891,
+      "self_seconds": 0.538138199
+    },
+    {
+      "calls": 1,
+      "cumulative_seconds": 15.141520817000002,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/households.py",
+      "function": "household_step",
+      "line": 69,
+      "primitive_calls": 1,
+      "self_seconds": 0.00012807400000000002
+    },
+    {
+      "calls": 114153,
+      "cumulative_seconds": 14.729404271000002,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+      "function": "_read",
+      "line": 513,
+      "primitive_calls": 114153,
+      "self_seconds": 0.073914845
+    },
+    {
+      "calls": 27262,
+      "cumulative_seconds": 12.130191968,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+      "function": "_descriptor",
+      "line": 519,
+      "primitive_calls": 27262,
+      "self_seconds": 0.185386819
+    },
+    {
+      "calls": 1629264,
+      "cumulative_seconds": 9.603306423000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/incremental_store.py",
+      "function": "_framed_sha",
+      "line": 386,
+      "primitive_calls": 1629264,
+      "self_seconds": 4.217298263
+    },
+    {
+      "calls": 2175593,
+      "cumulative_seconds": 9.594719575000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_sqlite_guard.py",
+      "function": "execute",
+      "line": 74,
+      "primitive_calls": 2175593,
+      "self_seconds": 1.409548862
+    },
+    {
+      "calls": 566351,
+      "cumulative_seconds": 9.592618564,
+      "file": "~",
+      "function": "<built-in method builtins.sum>",
+      "line": 0,
+      "primitive_calls": 124083,
+      "self_seconds": 0.37411417
+    },
+    {
+      "calls": 2403,
+      "cumulative_seconds": 9.293247217000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "_shared_object_routes",
+      "line": 10957,
+      "primitive_calls": 2403,
+      "self_seconds": 0.0050566380000000005
+    },
+    {
+      "calls": 571463,
+      "cumulative_seconds": 9.06066391,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/incremental_store.py",
+      "function": "encode",
+      "line": 137,
+      "primitive_calls": 571463,
+      "self_seconds": 0.555180675
+    },
+    {
+      "calls": 1,
+      "cumulative_seconds": 8.550460333,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/engine.py",
+      "function": "_production",
+      "line": 70,
+      "primitive_calls": 1,
+      "self_seconds": 0.001280183
+    },
+    {
+      "calls": 150024,
+      "cumulative_seconds": 8.406103824,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py",
+      "function": "_check_record_row",
+      "line": 1335,
+      "primitive_calls": 150024,
+      "self_seconds": 0.47486595400000003
+    },
+    {
+      "calls": 1,
+      "cumulative_seconds": 7.597030099,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/households.py",
+      "function": "inheritance_property_step",
+      "line": 55,
+      "primitive_calls": 1,
+      "self_seconds": 0.006979033000000001
+    },
+    {
+      "calls": 2175593,
+      "cumulative_seconds": 7.412528902,
+      "file": "~",
+      "function": "<function GuardedConnection.execute at 0x7f169f2b36a0>",
+      "line": 0,
+      "primitive_calls": 2175593,
+      "self_seconds": 7.412528902
+    },
+    {
+      "calls": 7411,
+      "cumulative_seconds": 7.340018173000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_tracking.py",
+      "function": "hooked",
+      "line": 117,
+      "primitive_calls": 7411,
+      "self_seconds": 0.02003769
+    },
+    {
+      "calls": 564239,
+      "cumulative_seconds": 6.943816866000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py",
+      "function": "_interval_rows",
+      "line": 1305,
+      "primitive_calls": 564239,
+      "self_seconds": 1.008162994
+    },
+    {
+      "calls": 6520,
+      "cumulative_seconds": 6.8006711090000005,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/record_index.py",
+      "function": "__setattr__",
+      "line": 10,
+      "primitive_calls": 6520,
+      "self_seconds": 0.020092168
+    },
+    {
+      "calls": 9432,
+      "cumulative_seconds": 6.758696233,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "get",
+      "line": 3759,
+      "primitive_calls": 9432,
+      "self_seconds": 0.003572347
+    },
+    {
+      "calls": 28621,
+      "cumulative_seconds": 6.714937736,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+      "function": "walk",
+      "line": 678,
+      "primitive_calls": 21274,
+      "self_seconds": 0.034396956
+    },
+    {
+      "calls": 4276,
+      "cumulative_seconds": 6.082130365,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "__getitem__",
+      "line": 6914,
+      "primitive_calls": 4276,
+      "self_seconds": 0.019173648
+    },
+    {
+      "calls": 30556,
+      "cumulative_seconds": 6.000934142,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+      "function": "_node",
+      "line": 611,
+      "primitive_calls": 30556,
+      "self_seconds": 0.076065845
+    },
+    {
+      "calls": 1788247,
+      "cumulative_seconds": 5.968152346,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_adapters.py",
+      "function": "_encode_value",
+      "line": 99,
+      "primitive_calls": 571660,
+      "self_seconds": 1.8323645350000002
+    },
+    {
+      "calls": 364981,
+      "cumulative_seconds": 5.96740842,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/incremental_store.py",
+      "function": "decode",
+      "line": 141,
+      "primitive_calls": 364981,
+      "self_seconds": 0.290932269
+    },
+    {
+      "calls": 4795,
+      "cumulative_seconds": 5.799050955,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+      "function": "_before_indexed_assignment",
+      "line": 3481,
+      "primitive_calls": 4795,
+      "self_seconds": 0.031748761
+    },
+    {
+      "calls": 2576,
+      "cumulative_seconds": 5.708048628,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_coordinator.py",
+      "function": "_routes_for_mutation",
+      "line": 177,
+      "primitive_calls": 2576,
+      "self_seconds": 0.024720856000000003
+    },
+    {
+      "calls": 2489,
+      "cumulative_seconds": 5.707886241000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_identity_coordinator.py",
+      "function": "routes_for_mutation",
+      "line": 168,
+      "primitive_calls": 2489,
+      "self_seconds": 0.005806002
+    },
+    {
+      "calls": 260208,
+      "cumulative_seconds": 5.697380296,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py",
+      "function": "_checked_head_row",
+      "line": 708,
+      "primitive_calls": 260208,
+      "self_seconds": 0.5136706160000001
+    },
+    {
+      "calls": 1,
+      "cumulative_seconds": 5.464626202000001,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/households.py",
+      "function": "partnership_step",
+      "line": 5,
+      "primitive_calls": 1,
+      "self_seconds": 0.0027874
+    },
+    {
+      "calls": 1175,
+      "cumulative_seconds": 5.45765439,
+      "file": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/skills.py",
+      "function": "get",
+      "line": 18,
+      "primitive_calls": 1175,
+      "self_seconds": 0.001302107
+    }
+  ],
+  "runtime": {
+    "committed_tree": "63d5ac487d0157a5ef521b4def8ee9ce94532e0c",
+    "engine_path": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/engine.py",
+    "head": "b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+    "persistence_path": "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py",
+    "root": "/home/runner/work/all-that-endures/all-that-endures",
+    "source_sha256": "40248874e3fe6341ce4663242b4fa0dfd8e0a3392095eacf07fd469695a2ee2f"
+  },
+  "schema": "ate-stage06-profile-sample/1",
+  "source": {
+    "database": {
+      "bytes": 29922463744,
+      "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
+    },
+    "pin": {
+      "captured_head": 126,
+      "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+      "token": null
+    },
+    "provenance": {
+      "acceptance": {
+        "archive_bytes": 85723,
+        "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+        "artifact_id": 12165934374,
+        "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
+        "name": "continuation-stage-accept-year-1001",
+        "producer_job": "mature-stage",
+        "run_id": 39207586140,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
+      },
+      "artifact": {
+        "archive_bytes": 4419015875,
+        "archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+        "artifact_id": 12129336378,
+        "harness_sha": "dd795af561ca81a342fd3aa8e835db5233ef8d6b",
+        "name": "continuation-stage-save-1001",
+        "producer_job": "mature-stage",
+        "run_id": 39098313631,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810"
+      },
+      "kind": "authenticated-accepted-saved-artifact",
+      "save_sha256": "72649d5bef65e4af16ed6cb269b26acde061b57966b728ddd633755ae667b827",
+      "source_lease": "closed retained artifact; measured sessions record actual lease"
+    },
+    "rules_id": "stage-0-5-final-release",
+    "schema": "ate-performance-source/1",
+    "world": {
+      "seed": 843000,
+      "year": 1001
+    }
+  },
+  "source_unchanged": true,
+  "status": "complete",
+  "working_set": {
+    "advancement_paths": {
+      "advancement_payload_loads": 0,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_advancement_paths": 0,
+      "logical_advancement_paths": 9457,
+      "resident_advancement_paths": 0
+    },
+    "aspirations": {
+      "aspiration_payload_loads": 0,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_aspirations": 0,
+      "logical_aspirations": 16141,
+      "new_aspirations": 0,
+      "reinserted_aspirations": 0,
+      "removed_aspirations": 0,
+      "resident_aspirations": 0
+    },
+    "backing_dependencies": {
+      "dependencies": 4161,
+      "metadata_python_bytes": 986114,
+      "published_dependencies": 0
+    },
+    "community_memberships": {
+      "clean_cache_entries": 77,
+      "clean_cache_limit": 256,
+      "community_membership_payload_loads": 77,
+      "dirty_community_memberships": 37,
+      "logical_community_memberships": 138441,
+      "resident_community_memberships": 114
+    },
+    "cross_boundary_identity_links": 0,
+    "eager_bound_objects": 57653,
+    "eager_deleted_owners": 0,
+    "eager_dirty_owners": 104,
+    "event_disk_events": 1001472,
+    "event_pending_chunks": 0,
+    "event_tail_events": 4158,
+    "frozen_save": null,
+    "genealogy_children": {
+      "bucket_payload_loads": 15,
+      "clean_cache_entries": 9,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 6,
+      "logical_buckets": 13634,
+      "resident_buckets": 15
+    },
+    "genealogy_parents": {
+      "clean_cache_entries": 256,
+      "clean_cache_limit": 256,
+      "dirty_genealogy_parents": 3,
+      "genealogy_parent_payload_loads": 1722,
+      "logical_genealogy_parents": 17050,
+      "resident_genealogy_parents": 259
+    },
+    "history_cache": {
+      "bytes": 1002,
+      "entries": 3,
+      "evictions": 3106,
+      "metadata_python_bytes": 11530,
+      "owners": 3
+    },
+    "identity": {
+      "incarnations_with_occurrences": 56857,
+      "live_incarnations": 56867,
+      "max_owner_group_size": 1,
+      "metadata_container_bytes": 10781864,
+      "next_incarnation": 2217830,
+      "nonreflexive_key_checks": 0,
+      "nonreflexive_key_queue": 0,
+      "occurrences": 56857,
+      "owner_groups": 5734,
+      "owners_with_occurrences": 5734,
+      "strong_object_roots": 0,
+      "weak_forward_entries": 56867,
+      "weak_reverse_entries": 56867
+    },
+    "identity_coordinator": {
+      "clean_occurrences": 0,
+      "clean_python_bytes": 64276,
+      "dirty_group_occurrences": 1749,
+      "dirty_group_python_bytes": 1271630,
+      "dirty_groups": 2275,
+      "dirty_owners": 2350,
+      "discovered_groups": 1846,
+      "discovered_occurrences": 1749,
+      "group_discoveries": 102408,
+      "identity_cache_python_bytes": 1335906,
+      "overlay_placements": 526,
+      "spill_sqlite_cache_limit_bytes": 0,
+      "spilled_group_bytes": 0,
+      "value_routes": {
+        "byte_limit": 65536,
+        "bytes": 64276,
+        "entries": 32,
+        "entry_limit": 128,
+        "hits": 3143,
+        "misses": 1612
+      }
+    },
+    "institution_applications": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 0,
+      "logical_records": 9089,
+      "new_records": 0,
+      "overlay_query_checks": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 0,
+      "touched_membership_buckets": 0
+    },
+    "institution_magic_records": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 0,
+      "logical_records": 3135,
+      "new_records": 0,
+      "overlay_query_checks": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 0,
+      "touched_membership_buckets": 0
+    },
+    "institution_notices": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 0,
+      "logical_records": 3042,
+      "new_records": 0,
+      "overlay_query_checks": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 0,
+      "touched_membership_buckets": 0
+    },
+    "lineage_children": {
+      "bucket_payload_loads": 24,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 33,
+      "logical_buckets": 22175,
+      "resident_buckets": 33
+    },
+    "lineage_nodes": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 21,
+      "logical_records": 34298,
+      "new_records": 21,
+      "overlay_query_checks": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 21,
+      "touched_membership_buckets": 0
+    },
+    "material_active_index": {
+      "bucket_payload_loads": 0,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 0,
+      "logical_buckets": 5,
+      "resident_buckets": 0
+    },
+    "material_items": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 0,
+      "logical_records": 33299,
+      "new_records": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 0
+    },
+    "material_lot_index": {
+      "bucket_payload_loads": 0,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 0,
+      "logical_buckets": 5,
+      "resident_buckets": 0
+    },
+    "material_lots": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_material_lots": 0,
+      "logical_material_lots": 104441,
+      "material_lot_payload_loads": 0,
+      "resident_material_lots": 0
+    },
+    "motives": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 0,
+      "logical_records": 16141,
+      "new_records": 0,
+      "overlay_query_checks": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 0,
+      "touched_membership_buckets": 0
+    },
+    "owner_index": {
+      "bucket_payload_loads": 0,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 0,
+      "logical_buckets": 565,
+      "resident_buckets": 0
+    },
+    "people": {
+      "clean_cache_entries": 256,
+      "clean_cache_limit": 256,
+      "dirty_people": 1499,
+      "logical_people": 17177,
+      "new_people": 3,
+      "person_payload_loads": 18064,
+      "reinserted_people": 0,
+      "removed_people": 0,
+      "resident_people": 1755
+    },
+    "pressure_cache": {
+      "byte_limit": 65536,
+      "cold_miss_time_bound": "O(all household occurrences)",
+      "entries": 0,
+      "entry_limit": 64,
+      "hits": 0,
+      "misses": 0,
+      "occurrence_visits": 0,
+      "python_bytes": 128
+    },
+    "record_cache": {
+      "bytes": 1907080,
+      "entries": 1622,
+      "evictions": 0,
+      "metadata_python_bytes": 875543,
+      "owners": 11
+    },
+    "resources": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_resources": 0,
+      "logical_resources": 94971,
+      "new_resources": 0,
+      "reinserted_resources": 0,
+      "removed_resources": 0,
+      "resident_resources": 0,
+      "resource_payload_loads": 0
+    },
+    "scalar_records": {
+      "world.communities.communities": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 61,
+        "minimum_aux_cache_entries": 0,
+        "minimum_aux_cache_limit": 256,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.culture.adoption": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 76,
+        "payload_loads": 0,
+        "resident_records": 0
+      },
+      "world.culture.practices": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 33,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.divinity.churches": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 44,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.divinity.gods": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 17,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.divinity.great_astral_beings": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 3,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.economy.property": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 20,
+        "logical_records": 8461,
+        "new_records": 9,
+        "overlay_query_checks": 0,
+        "payload_loads": 11,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 20,
+        "touched_membership_buckets": 20
+      },
+      "world.households": {
+        "clean_cache_entries": 253,
+        "clean_cache_limit": 256,
+        "dirty_records": 30,
+        "logical_records": 8461,
+        "new_records": 9,
+        "overlay_query_checks": 0,
+        "payload_loads": 1836,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 283,
+        "touched_membership_buckets": 11
+      },
+      "world.infrastructure.assets": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 20,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.institutions.branches": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 10,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.institutions.institutions": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 2,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.knowledge.beliefs": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 2071,
+        "payload_loads": 0,
+        "resident_records": 0
+      },
+      "world.knowledge.claim_index": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 10,
+        "payload_loads": 0,
+        "resident_records": 0
+      },
+      "world.knowledge.claims": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 10,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.metaphysics.resurrection_tokens": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 0,
+        "minimum_aux_cache_entries": 0,
+        "minimum_aux_cache_limit": 256,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.society_accountability.inquiries": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 1,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.threat_ecology.resolutions": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 248,
+        "payload_loads": 0,
+        "resident_records": 0
+      },
+      "world.threat_ecology.threats": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 248,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      },
+      "world.warfare.conflicts": {
+        "clean_cache_entries": 0,
+        "clean_cache_limit": 256,
+        "dirty_records": 0,
+        "logical_records": 0,
+        "new_records": 0,
+        "overlay_query_checks": 0,
+        "payload_loads": 0,
+        "reinserted_records": 0,
+        "removed_records": 0,
+        "resident_records": 0,
+        "touched_membership_buckets": 0
+      }
+    },
+    "skills": {
+      "clean_cache_entries": 256,
+      "clean_cache_limit": 256,
+      "dirty_skills": 0,
+      "logical_skills": 59174,
+      "resident_skills": 256,
+      "skill_payload_loads": 1175
+    },
+    "social_adjacency": {
+      "bucket_payload_loads": 95,
+      "clean_cache_entries": 1,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 97,
+      "logical_buckets": 17177,
+      "resident_buckets": 98
+    },
+    "social_edges": {
+      "clean_cache_entries": 1,
+      "clean_cache_limit": 256,
+      "dirty_social_edges": 121,
+      "logical_social_edges": 120277,
+      "resident_social_edges": 122,
+      "social_edge_payload_loads": 18
+    },
+    "social_partnerships": {
+      "clean_cache_entries": 256,
+      "clean_cache_limit": 256,
+      "dirty_social_partnerships": 14,
+      "logical_social_partnerships": 13597,
+      "resident_social_partnerships": 270,
+      "social_partnership_payload_loads": 1064
+    },
+    "souls": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_souls": 16,
+      "logical_souls": 17177,
+      "new_souls": 3,
+      "reinserted_souls": 0,
+      "removed_souls": 0,
+      "resident_souls": 16,
+      "soul_payload_loads": 13
+    },
+    "state": "active",
+    "store": {
+      "maintenance_removed_rows": 0,
+      "maintenance_rows": 0,
+      "metadata_rows": 3554431,
+      "payload_check_bytes": 2340553791,
+      "payload_check_reads": 778549,
+      "payload_read_bytes": 2339497067,
+      "payload_reads": 773094,
+      "payload_write_bytes": 0,
+      "payload_writes": 0,
+      "pin_rows": 768292,
+      "query_rows": 5455,
+      "temporary_keys_peak": 0
+    },
+    "transmissions": {
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_records": 37,
+      "logical_records": 191167,
+      "new_records": 37,
+      "overlay_query_checks": 0,
+      "payload_loads": 0,
+      "reinserted_records": 0,
+      "removed_records": 0,
+      "resident_records": 37,
+      "touched_membership_buckets": 22
+    },
+    "treasuries": {
+      "bucket_payload_loads": 0,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 0,
+      "logical_buckets": 1,
+      "resident_buckets": 0
+    },
+    "wallets": {
+      "bucket_payload_loads": 4,
+      "clean_cache_entries": 0,
+      "clean_cache_limit": 256,
+      "dirty_buckets": 6,
+      "logical_buckets": 5566,
+      "resident_buckets": 6
+    }
+  }
+}

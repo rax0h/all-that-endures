@@ -1,0 +1,15 @@
+{
+  "run_id": 40760930962,
+  "head_sha": "b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+  "evidence_artifact_id": 12850530978,
+  "downloaded_evidence_zip_sha256": "b7cc00c6144a6ba8147316f1d439ec535308f6650100c71eb2389a81f6142845",
+  "retained_artifact_id": 12849181590,
+  "retained_archive_sha256": "4f040569fb91cef482bd5706230bcada058788a747278b99df7cca2c137d373f",
+  "retained_expires_at": "2026-11-27T20:23:25Z",
+  "checks": [
+    "downloaded evidence archive matches GitHub digest",
+    "retained receipt ID, digest and producer match GitHub metadata",
+    "original source database identity matches accepted authority"
+  ],
+  "limitation": "Large retained archive was not downloaded again; hosted source authentication and receipt are preserved."
+}

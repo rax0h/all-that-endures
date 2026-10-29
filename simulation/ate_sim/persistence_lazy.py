@@ -15303,7 +15303,14 @@ class LazyWorldSession:
             layout_value=layout_value,
             household_member_version_changes=household_member_version_changes,
         )
-        from .persistence_lazy_participants import freeze_hybrid_publication
+        from .persistence_lazy_participants import freeze_hybrid_publication, order_native_insertions
+        structural_orders = {
+            (namespace, self.store.codec.encode(key)): table._overlay_ordinals[key]
+            for namespace, table, structural, _label in layout_updates
+            for key in structural
+            if key not in table._removed and key in table._overlay_ordinals
+        }
+        plan = order_native_insertions(plan, self.store.codec, structural_orders)
         publication = freeze_hybrid_publication(self.store, self.pin, plan,
             next_incarnation=self._registry.next_incarnation,
             identity_coordinator=self._identity_coordinator,

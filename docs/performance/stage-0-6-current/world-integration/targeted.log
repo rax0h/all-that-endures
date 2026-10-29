@@ -1,0 +1,9 @@
+........................................................................ [ 58%]
+....................................................                     [100%]
+============================= slowest 5 durations ==============================
+2.95s call     simulation/tests/test_stage_0_5_proof_world_value.py::test_native_scalar_keeps_sealed_event_archive_payloads_cold
+2.22s call     simulation/tests/test_stage_0_5_proof_world_session.py::test_native_admission_rejects_wrong_external_authority[other-store]
+2.06s call     simulation/tests/test_stage_0_5_proof_world_value.py::test_shared_inline_native_records_keep_checked_alias_fallback
+1.89s call     simulation/tests/test_stage_0_5_proof_world_session.py::test_native_proof_save_matches_old_checked_world_digest_with_events
+1.71s call     simulation/tests/test_stage_0_5_proof_world_value.py::test_structural_reference_replacement_still_uses_full_audit
+124 passed in 119.12s (0:01:59)
