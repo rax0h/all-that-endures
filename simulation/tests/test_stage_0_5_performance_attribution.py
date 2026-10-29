@@ -159,3 +159,43 @@ def test_phase_snapshot_retains_route_proof_work_and_residency(tmp_path):
         assert row['value_routes']['entries'] > 0
         assert row['value_routes']['bytes'] <= row['value_routes']['byte_limit']
         assert row['dirty_owners'] > 0
+
+
+def test_opt_in_proof_save_spans_nest_and_restore_without_runtime_change():
+    """Proof guard/manifest costs remain separate from the inner store commit."""
+    from unittest.mock import patch
+    from ate_sim.persistence_proof_world_session import _WorldProofAuthority
+
+    original_execute = _WorldProofAuthority.execute
+    original_manifest = _WorldProofAuthority.commit
+    original_store = LazyRecordStore.commit
+
+    def fake_store_commit(self):
+        return 'committed'
+
+    def fake_manifest(self):
+        return LazyRecordStore.commit(object.__new__(LazyRecordStore))
+
+    def fake_execute(self):
+        return self.commit()
+
+    with (patch.object(_WorldProofAuthority, 'execute', fake_execute),
+          patch.object(_WorldProofAuthority, 'commit', fake_manifest),
+          patch.object(LazyRecordStore, 'commit', fake_store_commit)):
+        with attribution() as trace:
+            with trace.phase('proof-save'):
+                assert _WorldProofAuthority.execute(object.__new__(_WorldProofAuthority)) == 'committed'
+            result = trace.snapshot()
+        assert _WorldProofAuthority.execute is fake_execute
+        assert _WorldProofAuthority.commit is fake_manifest
+        assert LazyRecordStore.commit is fake_store_commit
+
+    assert _WorldProofAuthority.execute is original_execute
+    assert _WorldProofAuthority.commit is original_manifest
+    assert LazyRecordStore.commit is original_store
+    spans = result['spans']
+    for label in ('save.proof_execute', 'save.proof_manifest', 'save.commit'):
+        assert spans[label]['calls'] == 1
+    assert spans['save.proof_execute']['inclusive_wall_seconds'] >= spans['save.proof_manifest']['inclusive_wall_seconds']
+    assert spans['save.proof_manifest']['inclusive_wall_seconds'] >= spans['save.commit']['inclusive_wall_seconds']
+    assert abs(sum(v['exclusive_wall_seconds'] for v in spans.values()) - result['wall_seconds']) < .001
