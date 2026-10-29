@@ -1,0 +1,63 @@
+name: Stage 0.6 bounded audit attribution
+# One focused diagnostic on creation/change of this workflow; no full suite or mature fixture.
+'on':
+  push:
+    branches: [sol/durable-proof-map]
+    paths: [.github/workflows/stage-0-6-audit-attribution.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stage-0-6-audit-attribution-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+jobs:
+  audit-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing test dependencies
+        run: python -m pip install pytest pyyaml
+      - name: Record exact source and runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python - <<'PY'
+          import json,platform,sqlite3,subprocess
+          from pathlib import Path
+          def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
+          Path('evidence/audit-source.json').write_text(json.dumps({
+              'head':git('rev-parse','HEAD'),
+              'runtime_tree':git('rev-parse','HEAD:simulation/ate_sim'),
+              'python':platform.python_version(),
+              'sqlite':sqlite3.sqlite_version,
+              'tracked_dirty':bool(git('status','--porcelain','--untracked-files=no'))
+          },indent=2)+'\n')
+          PY
+      - name: Three authenticated no-op, scalar, and fallback save tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 10m python docs/performance/stage-0-6-current/audit_probe.py \
+            --output evidence/audit-attribution.json \
+            simulation/tests/test_stage_0_5_proof_world_session.py::test_native_noop_preserves_manifest_and_generation \
+            simulation/tests/test_stage_0_5_proof_world_value.py::test_actual_native_scalar_save_does_not_call_full_audit \
+            simulation/tests/test_stage_0_5_proof_world_tail.py::test_new_history_backing_retains_checked_structural_fallback
+          cat evidence/audit-attribution.json
+      - name: Preserve attribution even if tests fail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-0-6-bounded-audit-attribution-${{ github.sha }}
+          path: evidence/audit-*.json
+          retention-days: 14
+          if-no-files-found: warn
