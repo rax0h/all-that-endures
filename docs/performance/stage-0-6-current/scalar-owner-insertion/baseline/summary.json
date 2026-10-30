@@ -1,0 +1,52 @@
+{
+  "source": {
+    "head": "1de96bd4899f52a06be4f96e68af229abe36ce3b",
+    "runtime_tree": "fe7467eb2047aaee4debc48c5cad24a917895acd",
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "archive_unit": "retained history values",
+      "source": {
+        "head": "1de96bd4899f52a06be4f96e68af229abe36ce3b",
+        "runtime_tree": "fe7467eb2047aaee4debc48c5cad24a917895acd",
+        "python": "3.12.14",
+        "sqlite": "3.53.1"
+      },
+      "raw_save_seconds": 0.47625344200014297,
+      "raw_save_cpu_seconds": 0.46579648800000006,
+      "full_world_audits_within_save": 2,
+      "status": "complete"
+    },
+    {
+      "size": 10000,
+      "archive_unit": "retained history values",
+      "source": {
+        "head": "1de96bd4899f52a06be4f96e68af229abe36ce3b",
+        "runtime_tree": "fe7467eb2047aaee4debc48c5cad24a917895acd",
+        "python": "3.12.14",
+        "sqlite": "3.53.1"
+      },
+      "raw_save_seconds": 1.1370701790001476,
+      "raw_save_cpu_seconds": 1.1242710379999998,
+      "full_world_audits_within_save": 2,
+      "status": "complete"
+    },
+    {
+      "size": 100000,
+      "archive_unit": "retained history values",
+      "source": {
+        "head": "1de96bd4899f52a06be4f96e68af229abe36ce3b",
+        "runtime_tree": "fe7467eb2047aaee4debc48c5cad24a917895acd",
+        "python": "3.12.14",
+        "sqlite": "3.53.1"
+      },
+      "raw_save_seconds": 5.561772969999765,
+      "raw_save_cpu_seconds": 5.541895514000004,
+      "full_world_audits_within_save": 2,
+      "status": "complete"
+    }
+  ]
+}

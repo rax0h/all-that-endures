@@ -1,0 +1,37 @@
+{
+  "base_sha": "1de96bd4899f52a06be4f96e68af229abe36ce3b",
+  "measured_implementation_sha": "3921aa9bb133d54f6c33b2563384520fba90ac0a",
+  "runtime_tree": "7e1965077091ef3cab5a8e9c7e1d7de1514e0ead",
+  "affected": {
+    "passed": 105,
+    "seconds": 254.37,
+    "includes": "Two complete real generated-world saved years, fresh-process digest equality, rollback/recovery, native value/tail/insertion paths"
+  },
+  "harness": {
+    "passed": 88,
+    "seconds": 42.52
+  },
+  "independent_review": {
+    "important": 1,
+    "minor": 1,
+    "author_boundary": 1,
+    "closed": 3,
+    "open": 0,
+    "focused_passed": 6,
+    "seconds": 10.67
+  },
+  "scaling": {
+    "status": "complete",
+    "source": "candidate/summary.json",
+    "history_values": [
+      1000,
+      10000,
+      100000
+    ],
+    "unrelated_history_body_reads": 0,
+    "full_world_audits_during_save": 0
+  },
+  "exact_source_checks": "Workflow YAML, all Bash blocks, runtime pin, all launch fingerprints and git whitespace passed",
+  "hosted_full_proof_ci": "Pending publication",
+  "mature_acceptance": "Not established by synthetic insert scaling"
+}

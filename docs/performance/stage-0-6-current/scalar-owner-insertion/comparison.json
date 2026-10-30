@@ -1,0 +1,44 @@
+{
+  "baseline_source": {
+    "head": "1de96bd4899f52a06be4f96e68af229abe36ce3b",
+    "runtime_tree": "fe7467eb2047aaee4debc48c5cad24a917895acd",
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "candidate_source": {
+    "head": "3921aa9bb133d54f6c33b2563384520fba90ac0a",
+    "runtime_tree": "7e1965077091ef3cab5a8e9c7e1d7de1514e0ead",
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "driver_sha256": "3457d537ccc38f1b16864bba3d70b1e73fd2d17b55d004c75690654b1751e1ef"
+  },
+  "baseline_driver_sha256": "4c0a6352e58ece8313c7cb05af6945c043c142ef6ed70f7cb62c544a4e313ff2",
+  "comparison": [
+    {
+      "size": 1000,
+      "baseline_seconds": 0.47625344200014297,
+      "candidate_seconds": 0.17820648099996106,
+      "observed_speedup": 2.67248104181041,
+      "sqlite_vm_steps": 314875
+    },
+    {
+      "size": 10000,
+      "baseline_seconds": 1.1370701790001476,
+      "candidate_seconds": 0.12228536799989342,
+      "observed_speedup": 9.298497421221635,
+      "sqlite_vm_steps": 315413
+    },
+    {
+      "size": 100000,
+      "baseline_seconds": 5.561772969999765,
+      "candidate_seconds": 0.13563251200002924,
+      "observed_speedup": 41.00619304314416,
+      "sqlite_vm_steps": 316564
+    }
+  ],
+  "limitations": [
+    "Separate synthetic fixtures with the same constructor and second Person insertion; no controlled hardware/cache replication",
+    "Other local tests were active; these are observations, not timing guarantees",
+    "History values are not simulated years; full-year and mature-world gates remain open"
+  ]
+}

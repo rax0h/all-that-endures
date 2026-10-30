@@ -1,0 +1,14 @@
+........................................................................ [ 68%]
+.................................                                        [100%]
+============================= slowest 10 durations =============================
+111.77s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_generated_world_continues_through_two_proof_saves
+4.64s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_person_insertion_never_reads_unrelated_history_bodies[10000]
+3.07s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[True]
+2.89s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_mixed_new_scalar_families_and_later_insertions_restore_in_fresh_process
+2.88s call     simulation/tests/test_stage_0_5_proof_world_value.py::test_native_scalar_keeps_sealed_event_archive_payloads_cold
+2.29s call     simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_structural_fallback_reuses_only_matching_postcommit_audit[True]
+2.28s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_person_insertion_never_reads_unrelated_history_bodies[1000]
+2.23s call     simulation/tests/test_stage_0_5_proof_world_session.py::test_native_admission_rejects_wrong_external_authority[other-store]
+2.17s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[layout]
+2.16s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_new_owner_with_history_alias_retains_full_audit_fallback_and_identity
+105 passed in 254.37s (0:04:14)
