@@ -45,7 +45,7 @@ jobs:
               'tracked_dirty':bool(git('status','--porcelain','--untracked-files=no'))
           },indent=2)+'\n')
           PY
-      - name: Three authenticated no-op, scalar, and fallback save tests
+      - name: Eight bounded save, epoch, rollback, and corruption selectors
         shell: bash
         run: |
           set -euo pipefail
@@ -53,7 +53,12 @@ jobs:
             --output evidence/audit-attribution.json \
             simulation/tests/test_stage_0_5_proof_world_session.py::test_native_noop_preserves_manifest_and_generation \
             simulation/tests/test_stage_0_5_proof_world_value.py::test_actual_native_scalar_save_does_not_call_full_audit \
-            simulation/tests/test_stage_0_5_proof_world_tail.py::test_new_history_backing_retains_checked_structural_fallback
+            simulation/tests/test_stage_0_5_proof_world_tail.py::test_new_history_backing_retains_checked_structural_fallback \
+            simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_structural_fallback_reuses_only_matching_postcommit_audit \
+            simulation/tests/test_stage_0_5_proof_world_session.py::test_native_manifest_fault_resolves_original_parent_once \
+            simulation/tests/test_stage_0_5_proof_world_session.py::test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack \
+            simulation/tests/test_stage_0_5_proof_world_session.py::test_native_epoch_rejects_untracked_sql_before_fetch_or_save \
+            simulation/tests/test_stage_0_5_proof_world_value.py::test_native_acknowledgement_cannot_write_unlisted_source_rows
           cat evidence/audit-attribution.json
       - name: Preserve attribution even if tests fail
         if: always()
