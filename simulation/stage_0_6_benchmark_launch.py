@@ -3,24 +3,32 @@ import argparse,json,os,shutil,subprocess
 from pathlib import Path
 from simulation import continuation_receipts as r,continuation_checkpoint as checkpoint,construction_mature_continuation_stages as stages
 from simulation.stage_0_6_mature_benchmark import check_source
+from simulation.stage_0_6_retained_producer import PIN
+from simulation.stage_0_6_retained_launch import prepare_retained
 
 
 def prepare(root,config):
-    root=Path(root).resolve();r.publish_receipt(root/'evidence/launch.json',config);identity=check_source(Path.cwd(),config,os.environ['GITHUB_SHA'])
-    if os.environ.get('GITHUB_RUN_ATTEMPT')!='1':raise ValueError('measurement rerun requires a new reviewed launch')
-    launch=r.load_receipt('simulation/stage_0_5_save1002_preflight.json');source=r.ArtifactRef.from_dict(launch['inputs']['candidate']);accepted=r.ArtifactRef.from_dict(launch['inputs']['previous']);database=launch['candidate_database']
-    if database!=config['database']:raise ValueError('fixture differs from reviewed launch')
-    if shutil.disk_usage(root).free<2*database['bytes']+source.archive_bytes+8*1024**3:raise ValueError('insufficient source/copy/archive/upload disk headroom')
-    # This path verifies producer workflow/job/source pins before archive download,
-    # archive size/hash, member caps, checkpoint controls and original context.
-    transport=stages.download_ref(source,root/'source',members=r.SAVED_MEMBERS,database_cap=database['bytes'])
-    acceptance_transport=stages.download_ref(accepted,root/'accepted',members={'year-verified.json'})
-    authority=stages.mature_authority();saved,retained=checkpoint._read_saved(root/'source',authority,source);receipt=r.load_receipt(root/'accepted/year-verified.json')
-    r.validate_year_acceptance(receipt,authority);r.match_producer(accepted,receipt['producer'],authority)
-    if not r.same(database,saved['database']) or saved['year']!=config['world']['year'] or not r.same(receipt['binding'],r.saved_binding(saved,source,retained['save.json'])):raise ValueError('source is not exact accepted year1001')
-    performance=dict(schema='ate-performance-source/1',database={k:database[k] for k in ('sha256','bytes')},rules_id=authority.source_config['rules_id'],pin=dict(token=None,store_identity=saved['store_identity'],captured_head=saved['generation']),world=dict(seed=authority.source_config['seed'],year=saved['year']),provenance=dict(kind='authenticated-accepted-saved-artifact',artifact=source.to_dict(),acceptance=accepted.to_dict(),save_sha256=retained['save.json'],source_lease='closed retained artifact; measured sessions record actual lease'))
-    if performance['world']!=config['world'] or any(performance['pin'][k]!=config['pin'][k] for k in ('store_identity','captured_head')):raise ValueError('accepted source world/pin differs from launch')
-    r.publish_receipt(root/'evidence/source-authority.json',performance);r.publish_receipt(root/'evidence/source-transport.json',dict(source=transport,acceptance=acceptance_transport,saved_manifest=saved,accepted_binding=receipt['binding'],runtime=identity,producer=dict(run_id=os.environ['GITHUB_RUN_ID'],sha=os.environ['GITHUB_SHA'])))
+    root=Path(root).resolve()
+    r.publish_receipt(root/'evidence/launch.json',config)
+    identity=check_source(Path.cwd(),config,os.environ['GITHUB_SHA'])
+    if os.environ.get('GITHUB_RUN_ATTEMPT')!='1':
+        raise ValueError('measurement rerun requires a new reviewed launch')
+    launch=r.load_receipt('simulation/stage_0_5_save1002_preflight.json')
+    source=r.ArtifactRef.from_dict(launch['inputs']['candidate'])
+    accepted=r.ArtifactRef.from_dict(launch['inputs']['previous'])
+    database=launch['candidate_database']
+    if database!=config['database']:
+        raise ValueError('fixture differs from reviewed launch')
+    required=2*database['bytes']+PIN.archive_bytes+8*1024**3
+    if shutil.disk_usage(root).free<required:
+        raise ValueError('insufficient retained source/copy/archive/upload disk headroom')
+    authority=stages.mature_authority()
+    performance,transport=prepare_retained(
+        root,config,identity,source,accepted,database,authority)
+    r.publish_receipt(root/'evidence/source-authority.json',performance)
+    r.publish_receipt(root/'evidence/source-transport.json',dict(
+        **transport,producer=dict(
+            run_id=os.environ['GITHUB_RUN_ID'],sha=os.environ['GITHUB_SHA'])))
     return performance
 
 
