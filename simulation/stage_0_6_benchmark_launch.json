@@ -34,7 +34,7 @@
     "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
     "simulation/stage_0_5_save1002_preflight.json": "7f0648786159007816c2a64ee1b8501c0210d2121f011052c4a2179db5a62b7a",
     ".github/tests/test_stage_0_6_benchmark.py": "c81169337157133a746c8da15f03581c1395ad6150da83663f9d973cb5d2cc1b",
-    ".github/workflows/stage-0-6-current-mature-performance.yml": "fdddb4f63c406b28a005203f9429a90d0d43c7711315883fe0f22ab29a268397",
+    ".github/workflows/stage-0-6-current-mature-performance.yml": "06bfe8ad5c25042c421b20f85edc9bde9f89c5510a7572fe70476854b512b8bd",
     "simulation/stage_0_6_profile_sample.py": "9a3b531c7776a888642f8c91715e258c74abef8ec2c9dd20757807b389a7e5d6",
     "simulation/stage_0_6_retained_launch.py": "d277c1ff8452c08735c56723e6e50eb1aed6b2eb128b5601720b3fd4791e3d7c",
     "simulation/stage_0_6_retained_archive.py": "eed53bfd67771c7cabecceabe2b0a01143e3c716135ae9808a1b7137ed2bd94b",
