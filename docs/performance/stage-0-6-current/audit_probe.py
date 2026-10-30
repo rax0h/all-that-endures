@@ -42,6 +42,8 @@ class CallAttribution:
         self.save_ids = []
         self.save_count = 0
         self.manifest_outcomes = []
+        self.audit_epochs = defaultdict(list)
+        self.execution_epoch_checks = []
         self.rows = defaultdict(lambda: defaultdict(lambda: [0, 0, 0, 0, 0]))
 
     def __call__(self, frame, event, arg):
@@ -68,6 +70,25 @@ class CallAttribution:
             if self.stack:
                 self.stack[-1][5] += wall
                 self.stack[-1][6] += cpu
+            # Compare verified epochs only; never export connection/codec objects.
+            # The first authority audit in a fallback save occurs in commit();
+            # execute() may invoke a second audit after observing the epoch.
+            if name == 'authority.audit' and type(arg) is tuple:
+                self.audit_epochs[bucket].append(arg)
+            if name == 'proof.execute':
+                observed = frame.f_locals.get('observed')
+                verified = frame.f_locals.get('verified')
+                if type(observed) is tuple and type(verified) is tuple:
+                    epochs = self.audit_epochs.get(bucket, ())
+                    self.execution_epoch_checks.append({
+                        'bucket': bucket,
+                        'can_settle': getattr(frame.f_locals.get('self'), '_can_settle', None),
+                        'authority_audit_count': len(epochs),
+                        'first_audit_equals_observed': epochs[0] == observed if epochs else None,
+                        'first_audit_equals_final': epochs[0] == verified if epochs else None,
+                        'last_audit_equals_observed': epochs[-1] == observed if epochs else None,
+                        'observed_equals_final': observed == verified,
+                    })
             if name == 'manifest.commit_world' and arg is not None:
                 reaudited = getattr(arg, 'reaudited', None)
                 outcome = getattr(getattr(arg, 'commit', None), 'outcome', None)
@@ -81,6 +102,7 @@ class CallAttribution:
         return {
             'save_calls': self.save_count,
             'manifest_outcomes': self.manifest_outcomes,
+            'execution_epoch_checks': self.execution_epoch_checks,
             'buckets': {
                 bucket: {
                     name: dict(zip(('calls', 'inclusive_wall_s', 'exclusive_wall_s',
