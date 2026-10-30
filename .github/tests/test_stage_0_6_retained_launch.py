@@ -69,7 +69,7 @@ def fixture(monkeypatch, tmp_path):
     historical = dict(
         source=proof(source), acceptance=proof(accepted), saved_manifest=saved,
         accepted_binding=receipts.saved_binding(saved, source, 'e'*64),
-        producer={'run_id': 99, 'sha': 'f'*40}, runtime=identity)
+        producer={'run_id': '99', 'sha': 'f'*40}, runtime=identity)
     def download(destination, **kwargs):
         destination = Path(destination)
         for folder in ('source', 'accepted', 'evidence'):
