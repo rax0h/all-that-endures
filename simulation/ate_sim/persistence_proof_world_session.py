@@ -12,7 +12,7 @@ class _WorldProofAuthority:
     def __init__(self,expected):
         if type(expected) is not bytes or len(expected)!=32:raise StoreIntegrityError('invalid external World commitment')
         self.expected=expected;self.store=None;self.pair=None;self.epoch=None
-        self.busy=False;self.uncertain=False;self.pending=None
+        self.busy=False;self.uncertain=False;self.pending=None;self._postcommit_verified_epoch=None
 
     def bind(self,store):
         if self.store is not None:raise StoreError('native proof admission is single-use')
@@ -95,12 +95,15 @@ class _WorldProofAuthority:
             with NativeWriteGuard(self.store.db) as guard:
                 self._write_guard=guard
                 if not(recovery and self.pending is not None):self.guard()
-                guard.check();entry=self.epoch;self.busy=True;self._can_settle=not recovery
+                guard.check();entry=self.epoch;self.busy=True;self._can_settle=not recovery;self._postcommit_verified_epoch=None
                 try:
                     result=callback();guard.check();observed=self._epoch()
                     if self._can_settle:
                         verified=observed if observed==entry else self._settle(session.pin,entry)
-                    else:verified=self._audit(session.pin) if self.epoch!=observed else observed
+                    else:
+                        verified=self._postcommit_verified_epoch
+                        if verified is None or verified!=observed:
+                            verified=self._audit(session.pin) if self.epoch!=observed else observed
                     self.pending=None;self.uncertain=False;self.epoch=verified
                     return result
                 except BaseException as exc:
@@ -110,7 +113,7 @@ class _WorldProofAuthority:
                         self.pending=None;self.uncertain=False;self.epoch=verified
                     if guard.denied:raise StoreIntegrityError(guard.denied) from exc
                     raise
-        finally:self._write_guard=None;self.busy=False
+        finally:self._postcommit_verified_epoch=None;self._write_guard=None;self.busy=False
 
     def commit(self,session,plan):
         from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
@@ -129,7 +132,10 @@ class _WorldProofAuthority:
             result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
         if result.manifest:self.pair=result.manifest
         self._can_settle=not result.reaudited
-        if result.commit.outcome=='committed' and result.reaudited:self._audit(result.commit.pin)
+        if result.commit.outcome=='committed' and result.reaudited:
+            # Reuse only this committed attempt's fully verified postcommit epoch.
+            # execute() falls back to the original audit when the epoch changes.
+            self._postcommit_verified_epoch=self._audit(result.commit.pin)
         return result.commit
 
     def resolve(self,session,plan):
