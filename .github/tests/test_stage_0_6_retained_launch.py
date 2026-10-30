@@ -7,6 +7,10 @@ from pathlib import Path
 from types import SimpleNamespace
 import pytest
 
+from simulation.tests.test_continuation_checkpoint import publication
+from simulation.tests.test_continuation_verifiers import saved_template
+from simulation.tests.test_continuation_acceptance import verified_template
+
 PATH = Path(__file__).resolve().parents[2] / 'simulation/stage_0_6_retained_launch.py'
 
 
@@ -27,7 +31,7 @@ def fixture(monkeypatch, tmp_path):
              'database': {'sha256': 'd'*64, 'bytes': 100}}
     checkpoint._read_saved = lambda path, authority, source: (saved, {'save.json': 'e'*64})
     producer = types.ModuleType('simulation.stage_0_6_retained_producer')
-    producer.PIN = SimpleNamespace(run_id=99, head_sha='f'*40)
+    producer.PIN = SimpleNamespace(run_id=99, head_sha='f'*40, runtime_tree='x'*40)
     transport = types.ModuleType('simulation.stage_0_6_retained_transport')
     transport.download_retained = lambda *a, **k: None
     for name, module in [
@@ -51,7 +55,7 @@ def fixture(monkeypatch, tmp_path):
         archive_bytes=5, producer_job='accept', to_dict=lambda: {'original': 'accepted'})
     config = {'world': {'year': 1001, 'seed': 843000},
               'pin': {'store_identity': 'abc', 'captured_head': 126}}
-    identity = {'head': 'f'*40, 'committed_tree': 'x'*40}
+    identity = {'head': '9'*40, 'committed_tree': 'y'*40}
     authority = SimpleNamespace(source_config={'seed': 843000, 'rules_id': 'test'})
     database = saved['database']
     expected = dict(
@@ -69,7 +73,8 @@ def fixture(monkeypatch, tmp_path):
     historical = dict(
         source=proof(source), acceptance=proof(accepted), saved_manifest=saved,
         accepted_binding=receipts.saved_binding(saved, source, 'e'*64),
-        producer={'run_id': '99', 'sha': 'f'*40}, runtime=identity)
+        producer={'run_id': '99', 'sha': 'f'*40},
+        runtime={'head': 'f'*40, 'committed_tree': 'x'*40})
     def download(destination, **kwargs):
         destination = Path(destination)
         for folder in ('source', 'accepted', 'evidence'):
@@ -153,3 +158,68 @@ def test_existing_source_cannot_be_overwritten(fixture):
     with pytest.raises(FileExistsError):
         call(f)
     assert (f.root/'source').is_dir()
+
+
+def test_real_saved_and_accepted_bundle_supports_a_different_current_runtime(
+        tmp_path, verified_template, monkeypatch):
+    """Only network transport is substituted; all receipt validators are real."""
+    from dataclasses import replace
+    import zipfile
+    from simulation import continuation_receipts as r
+    from simulation import stage_0_6_retained_launch as launch
+    from simulation.stage_0_6_retained_archive import extract_retained
+    from simulation.stage_0_6_retained_producer import PIN
+    from simulation.tests.test_continuation_acceptance import accept_pair
+    from ate_sim.persistence_lazy import open_lazy_world_session
+
+    source_dir, authority, saved, source, *_ = verified_template
+    accepted = replace(source, artifact_id=13, name='accept1', producer_job='accept1')
+    receipt = accept_pair(verified_template)
+    database = saved['database']
+    performance = dict(schema='ate-performance-source/1',
+        database={key: database[key] for key in ('sha256', 'bytes')},
+        rules_id=authority.source_config['rules_id'],
+        pin=dict(token=None, store_identity=saved['store_identity'], captured_head=saved['generation']),
+        world=dict(seed=authority.source_config['seed'], year=saved['year']),
+        provenance=dict(kind='authenticated-accepted-saved-artifact',
+            artifact=source.to_dict(), acceptance=accepted.to_dict(),
+            save_sha256=r.file_hash(source_dir/'save.json'),
+            source_lease='closed retained artifact; measured sessions record actual lease'))
+
+    def proof(ref):
+        return {key: getattr(ref, key) for key in ('artifact_id', 'run_id', 'workflow_sha',
+                                                  'archive_sha256', 'archive_bytes', 'producer_job')}
+
+    historical = dict(source=proof(source), acceptance=proof(accepted),
+        saved_manifest=saved, accepted_binding=receipt['binding'],
+        producer=dict(run_id=str(PIN.run_id), sha=PIN.head_sha),
+        runtime=dict(head=PIN.head_sha, committed_tree=PIN.runtime_tree))
+    archive = tmp_path/'retained.zip'
+    with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as zipped:
+        for name in ('candidate.sqlite', 'checkpoint.json', 'save.json'):
+            zipped.write(source_dir/name, 'source/'+name)
+        zipped.writestr('accepted/year-verified.json', json.dumps(receipt))
+        zipped.writestr('evidence/source-authority.json', json.dumps(performance))
+        zipped.writestr('evidence/source-transport.json', json.dumps(historical))
+    original_hash = r.file_hash(source_dir/'candidate.sqlite')
+
+    def download(destination, **caps):
+        return extract_retained(archive, destination, archive_sha256=r.file_hash(archive),
+                                archive_bytes=archive.stat().st_size, **caps)
+
+    monkeypatch.setattr(launch, 'download_retained', download)
+    config = dict(world=performance['world'], pin=performance['pin'])
+    identity = dict(head='9'*40, committed_tree='8'*40)
+    target = tmp_path/'workspace'
+    target.mkdir()
+    actual, transport = launch.prepare_retained(target, config, identity, source, accepted,
+                                              database, authority)
+    assert actual == performance
+    assert transport['runtime'] == identity
+    assert transport['historical_producer'] == historical['producer']
+    assert r.file_hash(source_dir/'candidate.sqlite') == original_hash
+    assert r.file_hash(target/'source/candidate.sqlite') == original_hash
+    with open_lazy_world_session(target/'source/candidate.sqlite',
+                                 rules_id=authority.source_config['rules_id']) as session:
+        assert session.world.year == saved['year']
+        assert session.world.digest() == receipt['digest']['observation']['digest']

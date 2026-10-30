@@ -53,8 +53,8 @@ def test_signed_url_rejects_unsafe_redirect(monkeypatch, url):
     (b'12345', None), (b'1234', 'checksum or size'), (b'123456', 'exceeds pinned'),
     (b'abcde', 'checksum or size')])
 def test_stream_archive_bounded_and_authenticated(tmp_path, monkeypatch, payload, expected_error):
-    monkeypatch.setattr(transport.urllib.request, 'urlopen',
-                        lambda url, timeout: FakeResponse(payload))
+    monkeypatch.setattr(transport.urllib.request, 'build_opener',
+                        lambda handler: SimpleNamespace(open=lambda url, timeout: FakeResponse(payload)))
     dest = tmp_path / 'archive.zip'
     if expected_error:
         with pytest.raises(ValueError, match=expected_error):
@@ -68,8 +68,8 @@ def test_stream_archive_bounded_and_authenticated(tmp_path, monkeypatch, payload
 
 
 def test_stream_rejects_http_downgrade(tmp_path, monkeypatch):
-    monkeypatch.setattr(transport.urllib.request, 'urlopen',
-                        lambda url, timeout: FakeResponse(b'12345', 'http://objects.example.com/signed'))
+    monkeypatch.setattr(transport.urllib.request, 'build_opener',
+                        lambda handler: SimpleNamespace(open=lambda url, timeout: FakeResponse(b'12345', 'http://objects.example.com/signed')))
     with pytest.raises(ValueError, match='insecure'):
         transport._stream_archive('https://objects.example.com/signed', tmp_path / 'archive.zip',
                                   archive_sha256=hashlib.sha256(b'12345').hexdigest(),
@@ -95,8 +95,8 @@ def test_download_retained_calls_authenticated_extractor(tmp_path, monkeypatch):
         'archive_bytes': pin.archive_bytes})
     monkeypatch.setattr(transport, '_signed_url',
                         lambda artifact_id: 'https://objects.example.com/signed')
-    monkeypatch.setattr(transport.urllib.request, 'urlopen',
-                        lambda url, timeout: FakeResponse(payload))
+    monkeypatch.setattr(transport.urllib.request, 'build_opener',
+                        lambda handler: SimpleNamespace(open=lambda url, timeout: FakeResponse(payload)))
     observed = []
 
     def extract(archive, destination, **kwargs):
@@ -112,3 +112,45 @@ def test_download_retained_calls_authenticated_extractor(tmp_path, monkeypatch):
     assert observed[0][1]['archive_sha256'] == pin.archive_sha256
     assert observed[0][1]['database_bytes'] == 300
     assert not list(tmp_path.glob('.stage06-download-*'))
+
+
+@pytest.mark.parametrize('redirect', ['http://objects.example.com/plain',
+                                    'https://user:pass@objects.example.com/private',
+                                    'https://objects.example.com/next'])
+def test_redirect_policy_precedes_redirected_request(tmp_path, monkeypatch, redirect):
+    from email.message import Message
+    import urllib.response
+
+    seen = []
+    payload = b'12345'
+
+    class NoNetwork(transport.urllib.request.BaseHandler):
+        handler_order = 0
+        def https_open(self, request):
+            seen.append(request.full_url)
+            assert request.get_header('Authorization') is None
+            if len(seen) == 1:
+                headers = Message()
+                headers['Location'] = redirect
+                response = urllib.response.addinfourl(io.BytesIO(b''),
+                    headers, request.full_url, 302)
+            else:
+                response = urllib.response.addinfourl(io.BytesIO(payload), {}, request.full_url, 200)
+            response.msg = 'test response'
+            return response
+
+        def http_open(self, request):
+            pytest.fail('insecure redirected request was sent')
+
+    build = transport.urllib.request.build_opener
+    monkeypatch.setattr(transport.urllib.request, 'build_opener',
+                        lambda handler: build(transport.urllib.request.ProxyHandler({}), NoNetwork(), handler))
+    args = dict(archive_sha256=hashlib.sha256(payload).hexdigest(), archive_bytes=5)
+    initial = 'https://objects.example.com/start'
+    if redirect.endswith('/next'):
+        assert transport._stream_archive(initial, tmp_path/'archive.zip', **args) == 5
+        assert seen == [initial, redirect]
+    else:
+        with pytest.raises(ValueError, match='unsafe'):
+            transport._stream_archive(initial, tmp_path/'archive.zip', **args)
+        assert seen == [initial]

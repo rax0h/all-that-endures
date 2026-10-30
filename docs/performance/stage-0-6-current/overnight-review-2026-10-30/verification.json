@@ -1,0 +1,41 @@
+{
+  "reviewed_base": "d070eb75685a549913a1e18da4690e42d42b2a2f",
+  "reviewed_head": "a42f110ddad522aa73b7dfd5f6c03fbcdcf47e4a",
+  "overnight_commits": 16,
+  "runtime_changed": false,
+  "review": {
+    "critical": 0,
+    "medium": 1,
+    "minor": 1,
+    "closed": 2
+  },
+  "initial_combined_tests": {
+    "passed": 84,
+    "seconds": 22.04
+  },
+  "actual_acceptance_tests": {
+    "passed": 10,
+    "seconds": 17.47
+  },
+  "full_suite": {
+    "sha": "d070eb75685a549913a1e18da4690e42d42b2a2f",
+    "passed": 4411,
+    "subtests": 2,
+    "seconds": 7337.76
+  },
+  "automation_observed": "disabled; no next run",
+  "new_ci_launched": false,
+  "mature_world_measurement": "not performed",
+  "final_combined_tests": {
+    "passed": 88,
+    "seconds": 39.17,
+    "warnings": 1,
+    "warning_meaning": "intentional duplicate ZIP name in rejection regression"
+  },
+  "checks": [
+    "unchanged simulation runtime since d070eb7",
+    "all launch fingerprints match",
+    "workflow YAML and shell syntax valid",
+    "diff whitespace clean"
+  ]
+}

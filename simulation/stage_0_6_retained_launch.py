@@ -67,7 +67,7 @@ def authenticate_staged(staged, config, identity, source, accepted, database, au
             or previous_producer.get('sha') != PIN.head_sha
             or not isinstance(previous_runtime, dict)
             or previous_runtime.get('head') != PIN.head_sha
-            or previous_runtime.get('committed_tree') != identity['committed_tree']):
+            or previous_runtime.get('committed_tree') != PIN.runtime_tree):
         raise ValueError('retained source transport provenance differs from producing run/runtime')
     return performance, previous_transport
 

@@ -21,6 +21,20 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+def _require_https(url):
+    parsed = urllib.parse.urlsplit(url)
+    if (parsed.scheme != 'https' or not parsed.hostname or parsed.username is not None
+            or parsed.password is not None or parsed.fragment or parsed.port not in (None, 443)):
+        raise ValueError('unsafe signed artifact URL')
+
+
+class _HttpsRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, message, headers, newurl):
+        # Enforce the boundary before urllib sends the redirected request.
+        _require_https(newurl)
+        return super().redirect_request(request, fp, code, message, headers, newurl)
+
+
 def _signed_url(artifact_id):
     """Request a GitHub-signed redirect without forwarding the bearer token."""
     from os import environ
@@ -38,10 +52,7 @@ def _signed_url(artifact_id):
         raise ValueError('expected GitHub signed artifact redirect')
     if not isinstance(redirect, str):
         raise ValueError('missing signed artifact URL')
-    parsed = urllib.parse.urlsplit(redirect)
-    if (parsed.scheme != 'https' or not parsed.hostname or parsed.username is not None
-            or parsed.password is not None or parsed.fragment or parsed.port not in (None, 443)):
-        raise ValueError('unsafe signed artifact URL')
+    _require_https(redirect)
     return redirect
 
 
@@ -49,7 +60,8 @@ def _stream_archive(url, archive, *, archive_sha256, archive_bytes):
     """Download with a hard byte ceiling, hashing as bytes arrive."""
     digest = hashlib.sha256()
     copied = 0
-    with urllib.request.urlopen(url, timeout=120) as response, Path(archive).open('xb') as target:
+    _require_https(url)
+    with urllib.request.build_opener(_HttpsRedirect()).open(url, timeout=120) as response, Path(archive).open('xb') as target:
         if urllib.parse.urlsplit(response.geturl()).scheme != 'https':
             raise ValueError('signed artifact redirected to insecure URL')
         while True:

@@ -12,6 +12,7 @@ class RetainedPin:
     run_id: int = 40760930962
     artifact_id: int = 12849181590
     head_sha: str = 'b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf'
+    runtime_tree: str = '63d5ac487d0157a5ef521b4def8ee9ce94532e0c'
     branch: str = 'sol/durable-proof-map'
     workflow: str = '.github/workflows/stage-0-6-current-mature-performance.yml'
     job: str = 'retain'
