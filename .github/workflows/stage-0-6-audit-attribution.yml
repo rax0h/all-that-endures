@@ -1,9 +1,11 @@
 name: Stage 0.6 bounded audit attribution
-# One focused diagnostic on creation/change of this workflow; no full suite or mature fixture.
+# One focused diagnostic on workflow/probe changes; no full suite or mature fixture.
 'on':
   push:
     branches: [sol/durable-proof-map]
-    paths: [.github/workflows/stage-0-6-audit-attribution.yml]
+    paths:
+      - .github/workflows/stage-0-6-audit-attribution.yml
+      - docs/performance/stage-0-6-current/audit_probe.py
   workflow_dispatch:
 permissions:
   contents: read
