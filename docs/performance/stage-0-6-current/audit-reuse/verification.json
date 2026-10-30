@@ -1,0 +1,25 @@
+{
+  "base_sha": "82d8af6f55c2b2302add869d88d14316611847be",
+  "runtime_tree": "fe7467eb2047aaee4debc48c5cad24a917895acd",
+  "boundary": {
+    "passed": 7,
+    "seconds": 8.86
+  },
+  "affected": {
+    "passed": 86,
+    "seconds": 195.07
+  },
+  "review": {
+    "critical": 0,
+    "medium": 2,
+    "minor": 2,
+    "closed": 4
+  },
+  "mature_performance": "unmeasured on this candidate",
+  "hosted_full_suite": "pending",
+  "harness": {
+    "passed": 29,
+    "seconds": 19.85
+  },
+  "author_compatibility_finding": "C1 closed: exact mature launcher plus bounded diagnostic policy"
+}

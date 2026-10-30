@@ -140,12 +140,12 @@ def test_shell_timeout_retains_started_phase_and_censored_command_receipt(tmp_pa
  assert (output/'result.json').is_file()
 
 
-def test_only_one_stage06_workflow_and_no_automatic_full_measurement():
+def test_single_stage06_mature_workflow_and_bounded_diagnostic_lane():
  import yaml
  root=Path(__file__).resolve().parents[2]
  paths=sorted((root/'.github/workflows').glob('stage-0-6-*.yml'))
- assert [p.name for p in paths]==['stage-0-6-current-mature-performance.yml']
- workflow=yaml.safe_load(paths[0].read_text())
+ assert [p.name for p in paths]==['stage-0-6-audit-attribution.yml','stage-0-6-current-mature-performance.yml']
+ workflow=yaml.safe_load((root/'.github/workflows/stage-0-6-current-mature-performance.yml').read_text())
  assert set(workflow['on'])=={'workflow_dispatch','push'}
  assert workflow['on']['push']['paths']==['simulation/stage_0_6_fixture_retention_request.json']
  assert workflow['on']['push']['branches']==['sol/durable-proof-map']
@@ -154,6 +154,12 @@ def test_only_one_stage06_workflow_and_no_automatic_full_measurement():
  assert 'timeout --signal=TERM --kill-after=30s 20m ' in next(step for step in workflow['jobs']['retain']['steps'] if step.get('id')=='sample')['run']
  assert not any('stage_0_6_mature_benchmark run' in step.get('run','') for step in workflow['jobs']['retain']['steps'])
  assert workflow['concurrency']['cancel-in-progress'] is False
+ diagnostic=yaml.safe_load((root/'.github/workflows/stage-0-6-audit-attribution.yml').read_text())
+ assert set(diagnostic['jobs'])=={'audit-probe'}
+ assert diagnostic['jobs']['audit-probe']['timeout-minutes']==15
+ commands='\n'.join(step.get('run','') for step in diagnostic['jobs']['audit-probe']['steps'])
+ assert 'timeout --signal=TERM --kill-after=10s 10m python docs/performance/stage-0-6-current/audit_probe.py' in commands
+ assert not any(name in commands for name in ('stage_0_6_mature_benchmark','stage_0_6_benchmark_launch','run_long_history','download_ref'))
 
 
 def test_bounded_first_year_sample_has_profile_and_never_saves(tmp_path):

@@ -44,6 +44,7 @@ class CallAttribution:
         self.manifest_outcomes = []
         self.audit_epochs = defaultdict(list)
         self.execution_epoch_checks = []
+        self.execution_audit_starts = {}
         self.rows = defaultdict(lambda: defaultdict(lambda: [0, 0, 0, 0, 0]))
 
     def __call__(self, frame, event, arg):
@@ -55,6 +56,8 @@ class CallAttribution:
                 self.save_count += 1
                 self.save_ids.append(self.save_count)
             bucket = f'save_{self.save_ids[-1]}' if self.save_ids else 'outside_save'
+            if name == 'proof.execute':
+                self.execution_audit_starts[id(frame)] = len(self.audit_epochs[bucket])
             self.stack.append([frame, name, bucket, time.perf_counter_ns(), time.process_time_ns(), 0, 0])
         elif event == 'return' and self.stack and self.stack[-1][0] is frame:
             tracked = self.stack.pop()
@@ -79,7 +82,7 @@ class CallAttribution:
                 observed = frame.f_locals.get('observed')
                 verified = frame.f_locals.get('verified')
                 if type(observed) is tuple and type(verified) is tuple:
-                    epochs = self.audit_epochs.get(bucket, ())
+                    epochs = self.audit_epochs.get(bucket, ())[self.execution_audit_starts.get(id(frame), 0):]
                     self.execution_epoch_checks.append({
                         'bucket': bucket,
                         'can_settle': getattr(frame.f_locals.get('self'), '_can_settle', None),
@@ -102,6 +105,7 @@ class CallAttribution:
                             if observed[i] != verified[i]
                         },
                     })
+                self.execution_audit_starts.pop(id(frame), None)
             if name == 'manifest.commit_world' and arg is not None:
                 reaudited = getattr(arg, 'reaudited', None)
                 outcome = getattr(getattr(arg, 'commit', None), 'outcome', None)
@@ -137,9 +141,33 @@ def main(argv=None):
         parser.error('specify 1..8 explicit simulation/tests/...::test_... selectors (no whole-suite runs)')
     import pytest
 
+    path = Path(args.output)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    started = time.perf_counter()
+    try:
+        sha = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True,
+                             check=False, timeout=5).stdout.strip() or None
+    except (OSError, subprocess.TimeoutExpired):
+        sha = None
+
     class Plugin:
         def __init__(self):
             self.tests = []
+            self.active_selector = None
+
+        def checkpoint(self, exit_code=None):
+            report = {
+                'schema': 'ate-stage06-audit-probe/1', 'source_sha': sha,
+                'selectors': args.selectors, 'pytest_exit_code': exit_code,
+                'status': ('running' if exit_code is None else 'complete' if exit_code == 0 else 'failed'),
+                'active_selector': self.active_selector,
+                'instrumented_wall_seconds': round(time.perf_counter() - started, 6),
+                'warning': 'Python call profiling changes runtime; do not treat as mature-world latency',
+                'tests': self.tests,
+            }
+            temporary = path.with_name(path.name + '.tmp')
+            temporary.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+            temporary.replace(path)
 
         @pytest.hookimpl(hookwrapper=True)
         def pytest_runtest_call(self, item):
@@ -147,31 +175,21 @@ def main(argv=None):
             if previous is not None:
                 raise RuntimeError('refusing to replace an existing process profiler')
             tracker = CallAttribution()
+            self.active_selector = item.nodeid
+            self.checkpoint()
             sys.setprofile(tracker)
             try:
                 yield
             finally:
                 sys.setprofile(previous)
                 self.tests.append({'nodeid': item.nodeid, **tracker.snapshot()})
+                self.active_selector = None
+                self.checkpoint()
 
     plugin = Plugin()
-    started = time.perf_counter()
+    plugin.checkpoint()
     exit_code = int(pytest.main(['-q', '--disable-warnings', *args.selectors], plugins=[plugin]))
-    try:
-        sha = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True,
-                             check=False, timeout=5).stdout.strip() or None
-    except (OSError, subprocess.TimeoutExpired):
-        sha = None
-    report = {
-        'schema': 'ate-stage06-audit-probe/1', 'source_sha': sha,
-        'selectors': args.selectors, 'pytest_exit_code': exit_code,
-        'instrumented_wall_seconds': round(time.perf_counter() - started, 6),
-        'warning': 'Python call profiling changes runtime; do not treat as mature-world latency',
-        'tests': plugin.tests,
-    }
-    path = Path(args.output)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    plugin.checkpoint(exit_code)
     print(f'Audit attribution written to {path} (pytest exit {exit_code})')
     return exit_code
 

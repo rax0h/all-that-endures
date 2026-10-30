@@ -1,0 +1,1604 @@
+{
+  "instrumented_wall_seconds": 207.942605,
+  "pytest_exit_code": 0,
+  "schema": "ate-stage06-audit-probe/1",
+  "selectors": [
+    "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_noop_preserves_manifest_and_generation",
+    "simulation/tests/test_stage_0_5_proof_world_value.py::test_actual_native_scalar_save_does_not_call_full_audit",
+    "simulation/tests/test_stage_0_5_proof_world_tail.py::test_new_history_backing_retains_checked_structural_fallback",
+    "simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_structural_fallback_reuses_only_matching_postcommit_audit",
+    "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_manifest_fault_resolves_original_parent_once",
+    "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack",
+    "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_epoch_rejects_untracked_sql_before_fetch_or_save",
+    "simulation/tests/test_stage_0_5_proof_world_value.py::test_native_acknowledgement_cannot_write_unlisted_source_rows"
+  ],
+  "source_sha": "95b27c5d7ced850beb7213f5eec91851acfffd9f",
+  "tests": [
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.3e-05,
+            "exclusive_wall_s": 2.6e-05,
+            "inclusive_cpu_s": 1.828201,
+            "inclusive_wall_s": 1.832032
+          },
+          "authority.audit_inner": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.248279,
+            "exclusive_wall_s": 0.248285,
+            "inclusive_cpu_s": 1.828178,
+            "inclusive_wall_s": 1.832005
+          },
+          "catalog.verify": {
+            "calls": 9,
+            "exclusive_cpu_s": 1.623593,
+            "exclusive_wall_s": 1.655892,
+            "inclusive_cpu_s": 2.897377,
+            "inclusive_wall_s": 2.935491
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.722922,
+            "exclusive_wall_s": 0.745042,
+            "inclusive_cpu_s": 0.722922,
+            "inclusive_wall_s": 0.745042
+          },
+          "store.verify_all": {
+            "calls": 22,
+            "exclusive_cpu_s": 1.798819,
+            "exclusive_wall_s": 1.798843,
+            "inclusive_cpu_s": 1.798819,
+            "inclusive_wall_s": 1.798843
+          },
+          "world.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 2.354669,
+            "exclusive_wall_s": 2.354676,
+            "inclusive_cpu_s": 3.159989,
+            "inclusive_wall_s": 3.16761
+          }
+        },
+        "save_1": {
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.025759,
+            "exclusive_wall_s": 0.025765,
+            "inclusive_cpu_s": 0.025759,
+            "inclusive_wall_s": 0.025765
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 4.1e-05,
+            "exclusive_wall_s": 4.6e-05,
+            "inclusive_cpu_s": 0.0258,
+            "inclusive_wall_s": 0.025812
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 0,
+          "bucket": "save_1",
+          "can_settle": true,
+          "first_audit_equals_final": null,
+          "first_audit_equals_observed": null,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": null,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_noop_preserves_manifest_and_generation",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 4.3e-05,
+            "exclusive_wall_s": 4.9e-05,
+            "inclusive_cpu_s": 3.668702,
+            "inclusive_wall_s": 3.675456
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.504005,
+            "exclusive_wall_s": 0.504032,
+            "inclusive_cpu_s": 3.66866,
+            "inclusive_wall_s": 3.675407
+          },
+          "catalog.verify": {
+            "calls": 11,
+            "exclusive_cpu_s": 1.946358,
+            "exclusive_wall_s": 2.037654,
+            "inclusive_cpu_s": 3.544173,
+            "inclusive_wall_s": 3.671681
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.72832,
+            "exclusive_wall_s": 0.748922,
+            "inclusive_cpu_s": 0.72832,
+            "inclusive_wall_s": 0.748922
+          },
+          "store.verify_all": {
+            "calls": 23,
+            "exclusive_cpu_s": 1.907073,
+            "exclusive_wall_s": 1.90706,
+            "inclusive_cpu_s": 1.907073,
+            "inclusive_wall_s": 1.90706
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 3.549127,
+            "exclusive_wall_s": 3.549254,
+            "inclusive_cpu_s": 4.763331,
+            "inclusive_wall_s": 4.779562
+          }
+        },
+        "save_1": {
+          "authority.settle": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.258438,
+            "exclusive_wall_s": 0.258437,
+            "inclusive_cpu_s": 0.258438,
+            "inclusive_wall_s": 0.258437
+          },
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.495285,
+            "exclusive_wall_s": 0.495312,
+            "inclusive_cpu_s": 1.599882,
+            "inclusive_wall_s": 1.605743
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.241318,
+            "exclusive_wall_s": 0.241335,
+            "inclusive_cpu_s": 0.241318,
+            "inclusive_wall_s": 0.241335
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005653,
+            "exclusive_wall_s": 0.005655,
+            "inclusive_cpu_s": 1.605535,
+            "inclusive_wall_s": 1.611398
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.237467,
+            "exclusive_wall_s": 0.237497,
+            "inclusive_cpu_s": 2.10144,
+            "inclusive_wall_s": 2.107332
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3.3e-05,
+            "exclusive_wall_s": 3.5e-05,
+            "inclusive_cpu_s": 2.101473,
+            "inclusive_wall_s": 2.107367
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.863279,
+            "exclusive_wall_s": 0.869096,
+            "inclusive_cpu_s": 1.104597,
+            "inclusive_wall_s": 1.110431
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 0,
+          "bucket": "save_1",
+          "can_settle": true,
+          "first_audit_equals_final": null,
+          "first_audit_equals_observed": null,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": null,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_1",
+          "commit_outcome": "committed",
+          "reaudited": false
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_value.py::test_actual_native_scalar_save_does_not_call_full_audit",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 4.3e-05,
+            "exclusive_wall_s": 4.9e-05,
+            "inclusive_cpu_s": 3.80564,
+            "inclusive_wall_s": 3.812053
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.498495,
+            "exclusive_wall_s": 0.498587,
+            "inclusive_cpu_s": 3.805597,
+            "inclusive_wall_s": 3.812004
+          },
+          "catalog.verify": {
+            "calls": 11,
+            "exclusive_cpu_s": 1.969295,
+            "exclusive_wall_s": 1.985869,
+            "inclusive_cpu_s": 3.591314,
+            "inclusive_wall_s": 3.613998
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.729379,
+            "exclusive_wall_s": 0.749193,
+            "inclusive_cpu_s": 0.729379,
+            "inclusive_wall_s": 0.749193
+          },
+          "store.verify_all": {
+            "calls": 23,
+            "exclusive_cpu_s": 1.888013,
+            "exclusive_wall_s": 1.888115,
+            "inclusive_cpu_s": 1.888013,
+            "inclusive_wall_s": 1.888115
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 3.631698,
+            "exclusive_wall_s": 3.631984,
+            "inclusive_cpu_s": 4.884454,
+            "inclusive_wall_s": 4.893789
+          }
+        },
+        "save_1": {
+          "authority.audit": {
+            "calls": 1,
+            "exclusive_cpu_s": 9.3e-05,
+            "exclusive_wall_s": 9.3e-05,
+            "inclusive_cpu_s": 2.179669,
+            "inclusive_wall_s": 2.182811
+          },
+          "authority.audit_inner": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.257888,
+            "exclusive_wall_s": 0.257908,
+            "inclusive_cpu_s": 2.179576,
+            "inclusive_wall_s": 2.182718
+          },
+          "catalog.verify": {
+            "calls": 4,
+            "exclusive_cpu_s": 0.857499,
+            "exclusive_wall_s": 0.86362,
+            "inclusive_cpu_s": 1.711513,
+            "inclusive_wall_s": 1.719898
+          },
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.593306,
+            "exclusive_wall_s": 0.593349,
+            "inclusive_cpu_s": 3.855178,
+            "inclusive_wall_s": 3.866041
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.218127,
+            "exclusive_wall_s": 0.218186,
+            "inclusive_cpu_s": 2.107153,
+            "inclusive_wall_s": 2.110331
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.009074,
+            "exclusive_wall_s": 0.009082,
+            "inclusive_cpu_s": 6.043921,
+            "inclusive_wall_s": 6.057934
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.418311,
+            "exclusive_wall_s": 0.418392,
+            "inclusive_cpu_s": 6.462231,
+            "inclusive_wall_s": 6.476325
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3.3e-05,
+            "exclusive_wall_s": 4e-05,
+            "inclusive_cpu_s": 6.462264,
+            "inclusive_wall_s": 6.476365
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 1.154718,
+            "exclusive_wall_s": 1.162361,
+            "inclusive_cpu_s": 3.261872,
+            "inclusive_wall_s": 3.272692
+          },
+          "store.verify_all": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.210421,
+            "exclusive_wall_s": 0.210411,
+            "inclusive_cpu_s": 0.210421,
+            "inclusive_wall_s": 0.210411
+          },
+          "world.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 2.742794,
+            "exclusive_wall_s": 2.742923,
+            "inclusive_cpu_s": 3.810714,
+            "inclusive_wall_s": 3.816954
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 1,
+          "bucket": "save_1",
+          "can_settle": false,
+          "first_audit_equals_final": true,
+          "first_audit_equals_observed": true,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": true,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_1",
+          "commit_outcome": "committed",
+          "reaudited": true
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_tail.py::test_new_history_backing_retains_checked_structural_fallback",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 4.2e-05,
+            "exclusive_wall_s": 4.8e-05,
+            "inclusive_cpu_s": 3.844637,
+            "inclusive_wall_s": 3.85081
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.499689,
+            "exclusive_wall_s": 0.499699,
+            "inclusive_cpu_s": 3.844595,
+            "inclusive_wall_s": 3.850762
+          },
+          "catalog.verify": {
+            "calls": 11,
+            "exclusive_cpu_s": 1.977159,
+            "exclusive_wall_s": 2.000691,
+            "inclusive_cpu_s": 3.604789,
+            "inclusive_wall_s": 3.634618
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.730664,
+            "exclusive_wall_s": 0.760899,
+            "inclusive_cpu_s": 0.730664,
+            "inclusive_wall_s": 0.760899
+          },
+          "store.verify_all": {
+            "calls": 23,
+            "exclusive_cpu_s": 1.901064,
+            "exclusive_wall_s": 1.901098,
+            "inclusive_cpu_s": 1.901064,
+            "inclusive_wall_s": 1.901098
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 3.673402,
+            "exclusive_wall_s": 3.673702,
+            "inclusive_cpu_s": 4.930174,
+            "inclusive_wall_s": 4.939398
+          }
+        },
+        "save_1": {
+          "authority.audit": {
+            "calls": 1,
+            "exclusive_cpu_s": 9.4e-05,
+            "exclusive_wall_s": 9.4e-05,
+            "inclusive_cpu_s": 2.181606,
+            "inclusive_wall_s": 2.184848
+          },
+          "authority.audit_inner": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.257541,
+            "exclusive_wall_s": 0.25755,
+            "inclusive_cpu_s": 2.181512,
+            "inclusive_wall_s": 2.184754
+          },
+          "catalog.verify": {
+            "calls": 4,
+            "exclusive_cpu_s": 0.863643,
+            "exclusive_wall_s": 0.870269,
+            "inclusive_cpu_s": 1.723793,
+            "inclusive_wall_s": 1.733007
+          },
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.590375,
+            "exclusive_wall_s": 0.590404,
+            "inclusive_cpu_s": 3.875285,
+            "inclusive_wall_s": 3.896723
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.220798,
+            "exclusive_wall_s": 0.220796,
+            "inclusive_cpu_s": 2.132667,
+            "inclusive_wall_s": 2.136198
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.009179,
+            "exclusive_wall_s": 0.009182,
+            "inclusive_cpu_s": 6.06607,
+            "inclusive_wall_s": 6.090753
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.414368,
+            "exclusive_wall_s": 0.414412,
+            "inclusive_cpu_s": 6.480438,
+            "inclusive_wall_s": 6.505164
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3.3e-05,
+            "exclusive_wall_s": 3.9e-05,
+            "inclusive_cpu_s": 6.48047,
+            "inclusive_wall_s": 6.505203
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 1.152242,
+            "exclusive_wall_s": 1.170121,
+            "inclusive_cpu_s": 3.28491,
+            "inclusive_wall_s": 3.306319
+          },
+          "store.verify_all": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.212439,
+            "exclusive_wall_s": 0.212462,
+            "inclusive_cpu_s": 0.212439,
+            "inclusive_wall_s": 0.212462
+          },
+          "world.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 2.759757,
+            "exclusive_wall_s": 2.759875,
+            "inclusive_cpu_s": 3.835839,
+            "inclusive_wall_s": 3.842606
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 1,
+          "bucket": "save_1",
+          "can_settle": false,
+          "first_audit_equals_final": true,
+          "first_audit_equals_observed": true,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": true,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_1",
+          "commit_outcome": "committed",
+          "reaudited": true
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_structural_fallback_reuses_only_matching_postcommit_audit[False]",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 4.6e-05,
+            "exclusive_wall_s": 5.1e-05,
+            "inclusive_cpu_s": 3.807714,
+            "inclusive_wall_s": 3.814152
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.501869,
+            "exclusive_wall_s": 0.501905,
+            "inclusive_cpu_s": 3.807669,
+            "inclusive_wall_s": 3.814101
+          },
+          "catalog.verify": {
+            "calls": 11,
+            "exclusive_cpu_s": 1.993357,
+            "exclusive_wall_s": 2.010848,
+            "inclusive_cpu_s": 3.632077,
+            "inclusive_wall_s": 3.655896
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.731437,
+            "exclusive_wall_s": 0.7504,
+            "inclusive_cpu_s": 0.731437,
+            "inclusive_wall_s": 0.7504
+          },
+          "store.verify_all": {
+            "calls": 23,
+            "exclusive_cpu_s": 1.897976,
+            "exclusive_wall_s": 1.898026,
+            "inclusive_cpu_s": 1.897976,
+            "inclusive_wall_s": 1.898026
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 3.628925,
+            "exclusive_wall_s": 3.629141,
+            "inclusive_cpu_s": 4.885349,
+            "inclusive_wall_s": 4.895067
+          }
+        },
+        "save_1": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.000205,
+            "exclusive_wall_s": 0.000208,
+            "inclusive_cpu_s": 4.364896,
+            "inclusive_wall_s": 4.390725
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.520536,
+            "exclusive_wall_s": 0.520545,
+            "inclusive_cpu_s": 4.364691,
+            "inclusive_wall_s": 4.390517
+          },
+          "catalog.verify": {
+            "calls": 6,
+            "exclusive_cpu_s": 1.296991,
+            "exclusive_wall_s": 1.325905,
+            "inclusive_cpu_s": 2.588797,
+            "inclusive_wall_s": 2.641207
+          },
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.589551,
+            "exclusive_wall_s": 0.589573,
+            "inclusive_cpu_s": 3.86468,
+            "inclusive_wall_s": 3.917881
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.220539,
+            "exclusive_wall_s": 0.220537,
+            "inclusive_cpu_s": 2.113721,
+            "inclusive_wall_s": 2.117034
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.008869,
+            "exclusive_wall_s": 0.008872,
+            "inclusive_cpu_s": 6.056225,
+            "inclusive_wall_s": 6.11273
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.41663,
+            "exclusive_wall_s": 0.416618,
+            "inclusive_cpu_s": 8.655074,
+            "inclusive_wall_s": 8.734095
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3e-05,
+            "exclusive_wall_s": 3.4e-05,
+            "inclusive_cpu_s": 8.655105,
+            "inclusive_wall_s": 8.734129
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 1.161407,
+            "exclusive_wall_s": 1.211274,
+            "inclusive_cpu_s": 3.275128,
+            "inclusive_wall_s": 3.328308
+          },
+          "store.verify_all": {
+            "calls": 3,
+            "exclusive_cpu_s": 0.316731,
+            "exclusive_wall_s": 0.316727,
+            "inclusive_cpu_s": 0.316731,
+            "inclusive_wall_s": 0.316727
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 4.123615,
+            "exclusive_wall_s": 4.123836,
+            "inclusive_cpu_s": 5.737336,
+            "inclusive_wall_s": 5.766469
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 2,
+          "bucket": "save_1",
+          "can_settle": false,
+          "first_audit_equals_final": false,
+          "first_audit_equals_observed": true,
+          "first_audit_to_final_epoch_delta": {
+            "temp_schema_version": [
+              65,
+              89
+            ],
+            "total_changes": [
+              2255,
+              2864
+            ]
+          },
+          "last_audit_equals_observed": false,
+          "observed_equals_final": false,
+          "observed_to_final_epoch_delta": {
+            "temp_schema_version": [
+              65,
+              89
+            ],
+            "total_changes": [
+              2255,
+              2864
+            ]
+          }
+        }
+      ],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_1",
+          "commit_outcome": "committed",
+          "reaudited": true
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_structural_fallback_reuses_only_matching_postcommit_audit[True]",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 4,
+            "exclusive_cpu_s": 0.000226,
+            "exclusive_wall_s": 0.000237,
+            "inclusive_cpu_s": 7.661743,
+            "inclusive_wall_s": 7.68943
+          },
+          "authority.audit_inner": {
+            "calls": 4,
+            "exclusive_cpu_s": 1.016384,
+            "exclusive_wall_s": 1.016442,
+            "inclusive_cpu_s": 7.661517,
+            "inclusive_wall_s": 7.689193
+          },
+          "catalog.verify": {
+            "calls": 15,
+            "exclusive_cpu_s": 2.673883,
+            "exclusive_wall_s": 2.71191,
+            "inclusive_cpu_s": 4.993562,
+            "inclusive_wall_s": 5.040615
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.598289,
+            "exclusive_wall_s": 0.599437,
+            "inclusive_cpu_s": 4.615147,
+            "inclusive_wall_s": 4.622814
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.729054,
+            "exclusive_wall_s": 0.749784,
+            "inclusive_cpu_s": 0.729054,
+            "inclusive_wall_s": 0.749784
+          },
+          "store.verify_all": {
+            "calls": 25,
+            "exclusive_cpu_s": 2.080992,
+            "exclusive_wall_s": 2.081078,
+            "inclusive_cpu_s": 2.080992,
+            "inclusive_wall_s": 2.081078
+          },
+          "world.audit": {
+            "calls": 5,
+            "exclusive_cpu_s": 6.084663,
+            "exclusive_wall_s": 6.085242,
+            "inclusive_cpu_s": 8.216801,
+            "inclusive_wall_s": 8.247596
+          }
+        },
+        "save_1": {
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.489949,
+            "exclusive_wall_s": 0.489959,
+            "inclusive_cpu_s": 0.800988,
+            "inclusive_wall_s": 0.802044
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005718,
+            "exclusive_wall_s": 0.005735,
+            "inclusive_cpu_s": 0.806707,
+            "inclusive_wall_s": 0.807779
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.111131,
+            "exclusive_wall_s": 0.111112,
+            "inclusive_cpu_s": 0.917838,
+            "inclusive_wall_s": 0.918891
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.3e-05,
+            "exclusive_wall_s": 2.6e-05,
+            "inclusive_cpu_s": 0.917861,
+            "inclusive_wall_s": 0.918917
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.311039,
+            "exclusive_wall_s": 0.312085,
+            "inclusive_cpu_s": 0.311039,
+            "inclusive_wall_s": 0.312085
+          }
+        },
+        "save_2": {
+          "authority.settle": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.25803,
+            "exclusive_wall_s": 0.258035,
+            "inclusive_cpu_s": 0.25803,
+            "inclusive_wall_s": 0.258035
+          },
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.490278,
+            "exclusive_wall_s": 0.490327,
+            "inclusive_cpu_s": 1.575002,
+            "inclusive_wall_s": 1.596795
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.24022,
+            "exclusive_wall_s": 0.240228,
+            "inclusive_cpu_s": 0.24022,
+            "inclusive_wall_s": 0.240228
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005582,
+            "exclusive_wall_s": 0.005584,
+            "inclusive_cpu_s": 1.580584,
+            "inclusive_wall_s": 1.602379
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.221431,
+            "exclusive_wall_s": 0.221452,
+            "inclusive_cpu_s": 2.060045,
+            "inclusive_wall_s": 2.081866
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.6e-05,
+            "exclusive_wall_s": 2.6e-05,
+            "inclusive_cpu_s": 2.060071,
+            "inclusive_wall_s": 2.081892
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.844503,
+            "exclusive_wall_s": 0.86624,
+            "inclusive_cpu_s": 1.084723,
+            "inclusive_wall_s": 1.106468
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 3,
+          "bucket": "outside_save",
+          "can_settle": false,
+          "first_audit_equals_final": false,
+          "first_audit_equals_observed": false,
+          "first_audit_to_final_epoch_delta": {
+            "temp_schema_version": [
+              27,
+              51
+            ],
+            "total_changes": [
+              553,
+              1685
+            ]
+          },
+          "last_audit_equals_observed": false,
+          "observed_equals_final": false,
+          "observed_to_final_epoch_delta": {
+            "temp_schema_version": [
+              27,
+              51
+            ],
+            "total_changes": [
+              1133,
+              1685
+            ]
+          }
+        },
+        {
+          "authority_audit_count": 0,
+          "bucket": "save_2",
+          "can_settle": true,
+          "first_audit_equals_final": null,
+          "first_audit_equals_observed": null,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": null,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_2",
+          "commit_outcome": "committed",
+          "reaudited": false
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_manifest_fault_resolves_original_parent_once[before_head]",
+      "save_calls": 2
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 4,
+            "exclusive_cpu_s": 0.000224,
+            "exclusive_wall_s": 0.000233,
+            "inclusive_cpu_s": 7.65519,
+            "inclusive_wall_s": 7.667893
+          },
+          "authority.audit_inner": {
+            "calls": 4,
+            "exclusive_cpu_s": 1.008329,
+            "exclusive_wall_s": 1.008384,
+            "inclusive_cpu_s": 7.654966,
+            "inclusive_wall_s": 7.667659
+          },
+          "catalog.verify": {
+            "calls": 15,
+            "exclusive_cpu_s": 2.686321,
+            "exclusive_wall_s": 2.70887,
+            "inclusive_cpu_s": 5.017863,
+            "inclusive_wall_s": 5.049436
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.59513,
+            "exclusive_wall_s": 0.596306,
+            "inclusive_cpu_s": 4.600125,
+            "inclusive_wall_s": 4.608061
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.730766,
+            "exclusive_wall_s": 0.762938,
+            "inclusive_cpu_s": 0.730766,
+            "inclusive_wall_s": 0.762938
+          },
+          "store.verify_all": {
+            "calls": 25,
+            "exclusive_cpu_s": 2.103363,
+            "exclusive_wall_s": 2.10348,
+            "inclusive_cpu_s": 2.103363,
+            "inclusive_wall_s": 2.10348
+          },
+          "world.audit": {
+            "calls": 5,
+            "exclusive_cpu_s": 6.078371,
+            "exclusive_wall_s": 6.078803,
+            "inclusive_cpu_s": 8.220836,
+            "inclusive_wall_s": 8.236429
+          }
+        },
+        "save_1": {
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.488739,
+            "exclusive_wall_s": 0.488811,
+            "inclusive_cpu_s": 0.799409,
+            "inclusive_wall_s": 0.806199
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005719,
+            "exclusive_wall_s": 0.005721,
+            "inclusive_cpu_s": 0.805127,
+            "inclusive_wall_s": 0.81192
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.112299,
+            "exclusive_wall_s": 0.11231,
+            "inclusive_cpu_s": 0.917426,
+            "inclusive_wall_s": 0.92423
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.5e-05,
+            "exclusive_wall_s": 2.8e-05,
+            "inclusive_cpu_s": 0.917451,
+            "inclusive_wall_s": 0.924258
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.310669,
+            "exclusive_wall_s": 0.317388,
+            "inclusive_cpu_s": 0.310669,
+            "inclusive_wall_s": 0.317388
+          }
+        },
+        "save_2": {
+          "authority.settle": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.258102,
+            "exclusive_wall_s": 0.258106,
+            "inclusive_cpu_s": 0.258102,
+            "inclusive_wall_s": 0.258106
+          },
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.487899,
+            "exclusive_wall_s": 0.487893,
+            "inclusive_cpu_s": 1.560408,
+            "inclusive_wall_s": 1.565319
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.240441,
+            "exclusive_wall_s": 0.240466,
+            "inclusive_cpu_s": 0.240441,
+            "inclusive_wall_s": 0.240466
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005726,
+            "exclusive_wall_s": 0.005729,
+            "inclusive_cpu_s": 1.566134,
+            "inclusive_wall_s": 1.571048
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.223201,
+            "exclusive_wall_s": 0.223206,
+            "inclusive_cpu_s": 2.047438,
+            "inclusive_wall_s": 2.05236
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3.9e-05,
+            "exclusive_wall_s": 3.9e-05,
+            "inclusive_cpu_s": 2.047477,
+            "inclusive_wall_s": 2.052399
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.832067,
+            "exclusive_wall_s": 0.836959,
+            "inclusive_cpu_s": 1.072509,
+            "inclusive_wall_s": 1.077425
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 3,
+          "bucket": "outside_save",
+          "can_settle": false,
+          "first_audit_equals_final": false,
+          "first_audit_equals_observed": false,
+          "first_audit_to_final_epoch_delta": {
+            "temp_schema_version": [
+              27,
+              51
+            ],
+            "total_changes": [
+              553,
+              1689
+            ]
+          },
+          "last_audit_equals_observed": false,
+          "observed_equals_final": false,
+          "observed_to_final_epoch_delta": {
+            "temp_schema_version": [
+              27,
+              51
+            ],
+            "total_changes": [
+              1137,
+              1689
+            ]
+          }
+        },
+        {
+          "authority_audit_count": 0,
+          "bucket": "save_2",
+          "can_settle": true,
+          "first_audit_equals_final": null,
+          "first_audit_equals_observed": null,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": null,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_2",
+          "commit_outcome": "committed",
+          "reaudited": false
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_manifest_fault_resolves_original_parent_once[before_commit]",
+      "save_calls": 2
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 4,
+            "exclusive_cpu_s": 0.000304,
+            "exclusive_wall_s": 0.000334,
+            "inclusive_cpu_s": 7.721887,
+            "inclusive_wall_s": 7.736779
+          },
+          "authority.audit_inner": {
+            "calls": 4,
+            "exclusive_cpu_s": 1.01531,
+            "exclusive_wall_s": 1.017001,
+            "inclusive_cpu_s": 7.721582,
+            "inclusive_wall_s": 7.736445
+          },
+          "catalog.verify": {
+            "calls": 15,
+            "exclusive_cpu_s": 2.713861,
+            "exclusive_wall_s": 2.76353,
+            "inclusive_cpu_s": 5.073224,
+            "inclusive_wall_s": 5.131806
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.708953,
+            "exclusive_wall_s": 0.710358,
+            "inclusive_cpu_s": 4.757287,
+            "inclusive_wall_s": 4.766795
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.72899,
+            "exclusive_wall_s": 0.760885,
+            "inclusive_cpu_s": 0.72899,
+            "inclusive_wall_s": 0.760885
+          },
+          "store.verify_all": {
+            "calls": 25,
+            "exclusive_cpu_s": 2.078892,
+            "exclusive_wall_s": 2.078991,
+            "inclusive_cpu_s": 2.078892,
+            "inclusive_wall_s": 2.078991
+          },
+          "world.audit": {
+            "calls": 5,
+            "exclusive_cpu_s": 6.11759,
+            "exclusive_wall_s": 6.117908,
+            "inclusive_cpu_s": 8.285779,
+            "inclusive_wall_s": 8.302004
+          }
+        },
+        "save_1": {
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.489939,
+            "exclusive_wall_s": 0.489939,
+            "inclusive_cpu_s": 1.575394,
+            "inclusive_wall_s": 1.579483
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.241258,
+            "exclusive_wall_s": 0.241273,
+            "inclusive_cpu_s": 0.241258,
+            "inclusive_wall_s": 0.241273
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005678,
+            "exclusive_wall_s": 0.00568,
+            "inclusive_cpu_s": 1.581071,
+            "inclusive_wall_s": 1.585162
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.111954,
+            "exclusive_wall_s": 0.111962,
+            "inclusive_cpu_s": 1.693026,
+            "inclusive_wall_s": 1.697124
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.4e-05,
+            "exclusive_wall_s": 2.7e-05,
+            "inclusive_cpu_s": 1.69305,
+            "inclusive_wall_s": 1.697151
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.844196,
+            "exclusive_wall_s": 0.848271,
+            "inclusive_cpu_s": 1.085455,
+            "inclusive_wall_s": 1.089544
+          }
+        },
+        "save_2": {
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.023551,
+            "exclusive_wall_s": 0.023549,
+            "inclusive_cpu_s": 0.023551,
+            "inclusive_wall_s": 0.023549
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3e-05,
+            "exclusive_wall_s": 3.2e-05,
+            "inclusive_cpu_s": 0.023581,
+            "inclusive_wall_s": 0.023581
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 3,
+          "bucket": "outside_save",
+          "can_settle": false,
+          "first_audit_equals_final": false,
+          "first_audit_equals_observed": false,
+          "first_audit_to_final_epoch_delta": {
+            "temp_schema_version": [
+              27,
+              65
+            ],
+            "total_changes": [
+              553,
+              1844
+            ]
+          },
+          "last_audit_equals_observed": false,
+          "observed_equals_final": false,
+          "observed_to_final_epoch_delta": {
+            "temp_schema_version": [
+              41,
+              65
+            ],
+            "total_changes": [
+              1292,
+              1844
+            ]
+          }
+        },
+        {
+          "authority_audit_count": 0,
+          "bucket": "save_2",
+          "can_settle": true,
+          "first_audit_equals_final": null,
+          "first_audit_equals_observed": null,
+          "first_audit_to_final_epoch_delta": {},
+          "last_audit_equals_observed": null,
+          "observed_equals_final": true,
+          "observed_to_final_epoch_delta": {}
+        }
+      ],
+      "manifest_outcomes": [],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_manifest_fault_resolves_original_parent_once[after_commit]",
+      "save_calls": 2
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 4,
+            "exclusive_cpu_s": 0.000356,
+            "exclusive_wall_s": 0.000368,
+            "inclusive_cpu_s": 7.272857,
+            "inclusive_wall_s": 7.285766
+          },
+          "authority.audit_inner": {
+            "calls": 4,
+            "exclusive_cpu_s": 1.029135,
+            "exclusive_wall_s": 1.030722,
+            "inclusive_cpu_s": 7.272501,
+            "inclusive_wall_s": 7.285398
+          },
+          "catalog.verify": {
+            "calls": 13,
+            "exclusive_cpu_s": 2.403028,
+            "exclusive_wall_s": 2.425154,
+            "inclusive_cpu_s": 4.453764,
+            "inclusive_wall_s": 4.484507
+          },
+          "proof.execute": {
+            "calls": 2,
+            "exclusive_cpu_s": 1.305584,
+            "exclusive_wall_s": 1.306651,
+            "inclusive_cpu_s": 6.736677,
+            "inclusive_wall_s": 6.747014
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.733163,
+            "exclusive_wall_s": 0.753166,
+            "inclusive_cpu_s": 0.733163,
+            "inclusive_wall_s": 0.753166
+          },
+          "store.verify_all": {
+            "calls": 25,
+            "exclusive_cpu_s": 2.006537,
+            "exclusive_wall_s": 2.00751,
+            "inclusive_cpu_s": 2.006537,
+            "inclusive_wall_s": 2.00751
+          },
+          "world.audit": {
+            "calls": 5,
+            "exclusive_cpu_s": 6.039873,
+            "exclusive_wall_s": 6.040114,
+            "inclusive_cpu_s": 7.820393,
+            "inclusive_wall_s": 7.835228
+          }
+        },
+        "save_1": {
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.489125,
+            "exclusive_wall_s": 0.489179,
+            "inclusive_cpu_s": 1.574352,
+            "inclusive_wall_s": 1.577551
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.24365,
+            "exclusive_wall_s": 0.243661,
+            "inclusive_cpu_s": 0.24365,
+            "inclusive_wall_s": 0.243661
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005777,
+            "exclusive_wall_s": 0.00578,
+            "inclusive_cpu_s": 1.580129,
+            "inclusive_wall_s": 1.583331
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.111405,
+            "exclusive_wall_s": 0.111409,
+            "inclusive_cpu_s": 1.691533,
+            "inclusive_wall_s": 1.69474
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.3e-05,
+            "exclusive_wall_s": 2.7e-05,
+            "inclusive_cpu_s": 1.691557,
+            "inclusive_wall_s": 1.694766
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.841576,
+            "exclusive_wall_s": 0.844712,
+            "inclusive_cpu_s": 1.085226,
+            "inclusive_wall_s": 1.088372
+          }
+        }
+      },
+      "execution_epoch_checks": [
+        {
+          "authority_audit_count": 3,
+          "bucket": "outside_save",
+          "can_settle": false,
+          "first_audit_equals_final": false,
+          "first_audit_equals_observed": false,
+          "first_audit_to_final_epoch_delta": {
+            "temp_schema_version": [
+              27,
+              65
+            ],
+            "total_changes": [
+              553,
+              2410
+            ]
+          },
+          "last_audit_equals_observed": false,
+          "observed_equals_final": false,
+          "observed_to_final_epoch_delta": {
+            "temp_schema_version": [
+              41,
+              65
+            ],
+            "total_changes": [
+              1858,
+              2410
+            ]
+          }
+        }
+      ],
+      "manifest_outcomes": [],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 3.8e-05,
+            "exclusive_wall_s": 4.3e-05,
+            "inclusive_cpu_s": 3.190266,
+            "inclusive_wall_s": 3.193672
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.500562,
+            "exclusive_wall_s": 0.500565,
+            "inclusive_cpu_s": 3.190228,
+            "inclusive_wall_s": 3.193628
+          },
+          "catalog.verify": {
+            "calls": 9,
+            "exclusive_cpu_s": 1.631401,
+            "exclusive_wall_s": 1.645683,
+            "inclusive_cpu_s": 2.914643,
+            "inclusive_wall_s": 2.933958
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.730873,
+            "exclusive_wall_s": 0.749258,
+            "inclusive_cpu_s": 0.730873,
+            "inclusive_wall_s": 0.749258
+          },
+          "store.verify_all": {
+            "calls": 23,
+            "exclusive_cpu_s": 1.810258,
+            "exclusive_wall_s": 1.810304,
+            "inclusive_cpu_s": 1.810258,
+            "inclusive_wall_s": 1.810304
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 3.457761,
+            "exclusive_wall_s": 3.458014,
+            "inclusive_cpu_s": 4.272271,
+            "inclusive_wall_s": 4.278933
+          }
+        },
+        "save_1": {
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.000293,
+            "exclusive_wall_s": 0.000292,
+            "inclusive_cpu_s": 0.000293,
+            "inclusive_wall_s": 0.000292
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3.3e-05,
+            "exclusive_wall_s": 3.6e-05,
+            "inclusive_cpu_s": 0.000326,
+            "inclusive_wall_s": 0.000328
+          }
+        }
+      },
+      "execution_epoch_checks": [],
+      "manifest_outcomes": [],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_epoch_rejects_untracked_sql_before_fetch_or_save[False]",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 3.7e-05,
+            "exclusive_wall_s": 4.3e-05,
+            "inclusive_cpu_s": 3.195256,
+            "inclusive_wall_s": 3.201891
+          },
+          "authority.audit_inner": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.498673,
+            "exclusive_wall_s": 0.498678,
+            "inclusive_cpu_s": 3.195218,
+            "inclusive_wall_s": 3.201848
+          },
+          "catalog.verify": {
+            "calls": 9,
+            "exclusive_cpu_s": 1.636326,
+            "exclusive_wall_s": 1.653178,
+            "inclusive_cpu_s": 2.923052,
+            "inclusive_wall_s": 2.948362
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.726771,
+            "exclusive_wall_s": 0.746155,
+            "inclusive_cpu_s": 0.726771,
+            "inclusive_wall_s": 0.746155
+          },
+          "store.verify_all": {
+            "calls": 23,
+            "exclusive_cpu_s": 1.806451,
+            "exclusive_wall_s": 1.806497,
+            "inclusive_cpu_s": 1.806451,
+            "inclusive_wall_s": 1.806497
+          },
+          "world.audit": {
+            "calls": 3,
+            "exclusive_cpu_s": 3.472342,
+            "exclusive_wall_s": 3.47266,
+            "inclusive_cpu_s": 4.291045,
+            "inclusive_wall_s": 4.300638
+          }
+        },
+        "save_1": {
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.000346,
+            "exclusive_wall_s": 0.000345,
+            "inclusive_cpu_s": 0.000346,
+            "inclusive_wall_s": 0.000345
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 3.4e-05,
+            "exclusive_wall_s": 3.8e-05,
+            "inclusive_cpu_s": 0.000381,
+            "inclusive_wall_s": 0.000383
+          }
+        }
+      },
+      "execution_epoch_checks": [],
+      "manifest_outcomes": [],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_session.py::test_native_epoch_rejects_untracked_sql_before_fetch_or_save[True]",
+      "save_calls": 1
+    },
+    {
+      "buckets": {
+        "outside_save": {
+          "authority.audit": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.3e-05,
+            "exclusive_wall_s": 2.6e-05,
+            "inclusive_cpu_s": 1.840564,
+            "inclusive_wall_s": 1.843722
+          },
+          "authority.audit_inner": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.249387,
+            "exclusive_wall_s": 0.249407,
+            "inclusive_cpu_s": 1.840541,
+            "inclusive_wall_s": 1.843696
+          },
+          "catalog.verify": {
+            "calls": 9,
+            "exclusive_cpu_s": 1.628736,
+            "exclusive_wall_s": 1.643365,
+            "inclusive_cpu_s": 2.908508,
+            "inclusive_wall_s": 2.928191
+          },
+          "store.commit": {
+            "calls": 2,
+            "exclusive_cpu_s": 0.73183,
+            "exclusive_wall_s": 0.751683,
+            "inclusive_cpu_s": 0.73183,
+            "inclusive_wall_s": 0.751683
+          },
+          "store.verify_all": {
+            "calls": 22,
+            "exclusive_cpu_s": 1.807196,
+            "exclusive_wall_s": 1.807272,
+            "inclusive_cpu_s": 1.807196,
+            "inclusive_wall_s": 1.807272
+          },
+          "world.audit": {
+            "calls": 2,
+            "exclusive_cpu_s": 2.361512,
+            "exclusive_wall_s": 2.36162,
+            "inclusive_cpu_s": 3.169215,
+            "inclusive_wall_s": 3.175687
+          }
+        },
+        "save_1": {
+          "manifest.commit_world": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.489563,
+            "exclusive_wall_s": 0.489608,
+            "inclusive_cpu_s": 1.570115,
+            "inclusive_wall_s": 1.57505
+          },
+          "manifest.stage": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.241192,
+            "exclusive_wall_s": 0.241188,
+            "inclusive_cpu_s": 0.241192,
+            "inclusive_wall_s": 0.241188
+          },
+          "proof.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.005691,
+            "exclusive_wall_s": 0.005694,
+            "inclusive_cpu_s": 1.575806,
+            "inclusive_wall_s": 1.580744
+          },
+          "proof.execute": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.217715,
+            "exclusive_wall_s": 0.217724,
+            "inclusive_cpu_s": 1.793521,
+            "inclusive_wall_s": 1.798468
+          },
+          "save": {
+            "calls": 1,
+            "exclusive_cpu_s": 2.9e-05,
+            "exclusive_wall_s": 5e-05,
+            "inclusive_cpu_s": 1.79355,
+            "inclusive_wall_s": 1.798519
+          },
+          "store.commit": {
+            "calls": 1,
+            "exclusive_cpu_s": 0.83936,
+            "exclusive_wall_s": 0.844254,
+            "inclusive_cpu_s": 1.080552,
+            "inclusive_wall_s": 1.085441
+          }
+        }
+      },
+      "execution_epoch_checks": [],
+      "manifest_outcomes": [
+        {
+          "bucket": "save_1",
+          "commit_outcome": "committed",
+          "reaudited": false
+        }
+      ],
+      "nodeid": "simulation/tests/test_stage_0_5_proof_world_value.py::test_native_acknowledgement_cannot_write_unlisted_source_rows",
+      "save_calls": 1
+    }
+  ],
+  "warning": "Python call profiling changes runtime; do not treat as mature-world latency"
+}

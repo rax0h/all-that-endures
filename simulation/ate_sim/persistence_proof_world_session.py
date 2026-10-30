@@ -104,11 +104,16 @@ class _WorldProofAuthority:
                         verified=self._postcommit_verified_epoch
                         if verified is None or verified!=observed:
                             verified=self._audit(session.pin) if self.epoch!=observed else observed
+                        else:
+                            # A matching SQLite epoch does not describe an open
+                            # transaction or in-place mutation of codec methods.
+                            if self.store.db.in_transaction:raise StoreError('native proof acknowledgement left an open transaction')
+                            world._require_closed_codec(self.store)
                     self.pending=None;self.uncertain=False;self.epoch=verified
                     return result
                 except BaseException as exc:
                     self.uncertain=True
-                    if session._state=='active' and session._pending_save is None:
+                    if session._state=='active' and session._pending_save is None and not self.store.db.in_transaction:
                         verified=self._audit(session.pin)
                         self.pending=None;self.uncertain=False;self.epoch=verified
                     if guard.denied:raise StoreIntegrityError(guard.denied) from exc
