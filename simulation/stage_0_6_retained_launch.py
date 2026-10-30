@@ -63,7 +63,7 @@ def authenticate_staged(staged, config, identity, source, accepted, database, au
     previous_producer = previous_transport.get('producer')
     previous_runtime = previous_transport.get('runtime')
     if (not isinstance(previous_producer, dict)
-            or previous_producer.get('run_id') != PIN.run_id
+            or previous_producer.get('run_id') != str(PIN.run_id)
             or previous_producer.get('sha') != PIN.head_sha
             or not isinstance(previous_runtime, dict)
             or previous_runtime.get('head') != PIN.head_sha
