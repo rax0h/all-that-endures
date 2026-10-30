@@ -36,11 +36,11 @@
     ".github/tests/test_stage_0_6_benchmark.py": "c81169337157133a746c8da15f03581c1395ad6150da83663f9d973cb5d2cc1b",
     ".github/workflows/stage-0-6-current-mature-performance.yml": "fdddb4f63c406b28a005203f9429a90d0d43c7711315883fe0f22ab29a268397",
     "simulation/stage_0_6_profile_sample.py": "9a3b531c7776a888642f8c91715e258c74abef8ec2c9dd20757807b389a7e5d6",
-    "simulation/stage_0_6_retained_launch.py": "5d9e8368e33c6173537ea08649062b746b317dc9f22e2676f31d9efa667c5b9e",
+    "simulation/stage_0_6_retained_launch.py": "d277c1ff8452c08735c56723e6e50eb1aed6b2eb128b5601720b3fd4791e3d7c",
     "simulation/stage_0_6_retained_archive.py": "eed53bfd67771c7cabecceabe2b0a01143e3c716135ae9808a1b7137ed2bd94b",
     "simulation/stage_0_6_retained_producer.py": "af7138dd13c2cebf5b7fd5141b0ba4ac9b462e6127fb2829cfbfa972f2f2dff7",
     "simulation/stage_0_6_retained_transport.py": "3aa7d331f1d8d6c5c18a21939d581fc213d0f979f7ddc6be5791181ed8103f65",
-    ".github/tests/test_stage_0_6_retained_launch.py": "b087a94b60c1f0f2c5138b01a2989d12a3b6cdd6287c68d48d07b14d1144b92e"
+    ".github/tests/test_stage_0_6_retained_launch.py": "0e4547ec13ff542567e428f01c4c26a976eb5b6ee5d3e4c5e80752129054450f"
   },
   "world": {
     "seed": 843000,
