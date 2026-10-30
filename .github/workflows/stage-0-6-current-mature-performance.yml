@@ -37,7 +37,7 @@ jobs:
       - name: Targeted harness gate before mature transport
         run: |
           mkdir -p "$GITHUB_WORKSPACE/evidence"
-          python -m pytest -q .github/tests/test_stage_0_6_benchmark.py --junitxml="$GITHUB_WORKSPACE/evidence/harness-tests.xml"
+          python -m pytest -q .github/tests/test_stage_0_6_benchmark.py .github/tests/test_stage_0_6_retained_archive.py .github/tests/test_stage_0_6_retained_producer.py .github/tests/test_stage_0_6_retained_transport.py .github/tests/test_stage_0_6_retained_launch.py --junitxml="$GITHUB_WORKSPACE/evidence/harness-tests.xml"
       - name: Reserve disposable runner disk
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
@@ -127,7 +127,7 @@ jobs:
       - name: Targeted harness gate
         run: |
           mkdir -p "$GITHUB_WORKSPACE/evidence"
-          python -m pytest -q .github/tests/test_stage_0_6_benchmark.py --junitxml="$GITHUB_WORKSPACE/evidence/harness-tests.xml"
+          python -m pytest -q .github/tests/test_stage_0_6_benchmark.py .github/tests/test_stage_0_6_retained_archive.py .github/tests/test_stage_0_6_retained_producer.py .github/tests/test_stage_0_6_retained_transport.py .github/tests/test_stage_0_6_retained_launch.py --junitxml="$GITHUB_WORKSPACE/evidence/harness-tests.xml"
       - name: Reserve disposable runner disk
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
