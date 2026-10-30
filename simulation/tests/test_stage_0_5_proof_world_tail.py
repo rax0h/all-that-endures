@@ -79,3 +79,27 @@ def test_native_noninteger_cross_page_growth_keeps_full_audit_fallback(tmp_path,
    s.skills[1,'craft'].provenance.extend([.5]*97);assert s.save()==1
    assert calls;child=s.proof_manifest
  with opened(path,child) as s:assert len(s.skills[2,'craft'].provenance)==129
+
+
+@pytest.mark.parametrize('alter_epoch',[False,True])
+def test_native_structural_fallback_reuses_only_matching_postcommit_audit(tmp_path,monkeypatch,alter_epoch):
+ """One postcommit audit suffices only while its verified epoch is unchanged."""
+ path,pair=fixture(tmp_path)
+ with opened(path,pair) as s:
+  authority=s.store._world_proof_authority
+  original=authority._audit;calls=[]
+  def counted(pin):
+   verified=original(pin);calls.append(verified)
+   if alter_epoch and len(calls)==1:
+    # Simulate a stale audit receipt, not a database mutation: the controller
+    # must refuse reuse and execute the existing second-audit fallback.
+    return (*verified[:3],verified[3]+1,*verified[4:])
+   return verified
+  with monkeypatch.context() as m:
+   m.setattr(authority,'_audit',counted)
+   s.world.settlements[1].memory['new']=[1,2,3]
+   assert s.save()==1
+   assert len(calls)==(2 if alter_epoch else 1)
+   child=s.proof_manifest
+ with opened(path,child) as s:
+  assert list(s.world.settlements[1].memory['new'])==[1,2,3]
