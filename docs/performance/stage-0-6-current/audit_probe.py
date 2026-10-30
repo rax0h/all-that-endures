@@ -88,6 +88,19 @@ class CallAttribution:
                         'first_audit_equals_final': epochs[0] == verified if epochs else None,
                         'last_audit_equals_observed': epochs[-1] == observed if epochs else None,
                         'observed_equals_final': observed == verified,
+                        # Numeric epoch components only; never serialize DB/codec objects.
+                        'first_audit_to_final_epoch_delta': {
+                            label: [epochs[0][i], verified[i]]
+                            for i, label in ((2, 'data_version'), (3, 'total_changes'),
+                                             (4, 'main_schema_version'), (5, 'temp_schema_version'))
+                            if epochs and epochs[0][i] != verified[i]
+                        },
+                        'observed_to_final_epoch_delta': {
+                            label: [observed[i], verified[i]]
+                            for i, label in ((2, 'data_version'), (3, 'total_changes'),
+                                             (4, 'main_schema_version'), (5, 'temp_schema_version'))
+                            if observed[i] != verified[i]
+                        },
                     })
             if name == 'manifest.commit_world' and arg is not None:
                 reaudited = getattr(arg, 'reaudited', None)
