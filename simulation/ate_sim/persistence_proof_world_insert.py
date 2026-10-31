@@ -1,7 +1,7 @@
-"""Bounded fresh scalar-owner insertion using the existing catalog and proofs.
+"""Compose fresh scalar owners with existing value/tail proofs.
 
-Existing-owner edits, aliases, nested backings and retirement stay on their
-existing checked paths. This does not construct another identity authority.
+Unsupported topology, aliases and backing graphs retain checked fallback.
+This does not construct another identity authority.
 """
 from collections import Counter
 from dataclasses import replace
@@ -20,6 +20,10 @@ from . import persistence_proof_collection_directory as directory
 
 MAX_ROWS = 512
 MAX_BYTES = 4 * 1048576
+
+
+class _BudgetExceeded(Exception):
+    pass
 
 
 def prepare(store, request, versions, ordinary, segments):
@@ -58,19 +62,21 @@ def prepare(store, request, versions, ordinary, segments):
         predecessors[ns, typed] = old
         return True, old
 
-    owners, placements, incarnations = [], [], []
+    owners, placements, incarnations, sources = [], [], [], []
     catalog_rows, added = {}, 0
     declared = set()
     for item in versions:
         change = item['change']
         ns, typed = item['namespace'], item['typed_key']
-        if change.delete or change.reinsertion or change.record_schema != 1:
+        if change.reinsertion or change.record_schema != 1:
             return None
         within_budget, old = predecessor(ns, typed)
         if not within_budget:
             return None
-        added += old is None
+        added += (not change.delete) - (old is not None)
         if ns in catalog.CATALOG_NAMESPACES:
+            if change.delete:
+                return None
             catalog_rows[(ns, typed)] = item
             continue
         if ns == DEPENDENCIES:
@@ -79,7 +85,18 @@ def prepare(store, request, versions, ordinary, segments):
             if old is None or old.memberships != item['memberships_blob']:
                 return None
             continue
-        if ns not in world.FAMILIES or world.FAMILIES[ns].collection_kind != 'dict' or old is not None:
+        frozen = replace(change, key=codec.decode(typed),
+                         value=None if change.delete else codec.decode(item['payload']),
+                         memberships=tuple(Membership(*m) for m in codec.decode(item['memberships_blob'])))
+        from .persistence_lazy_sequence import NODE_NAMESPACE
+        branch = ns == NODE_NAMESPACE and type(frozen.value) is tuple and frozen.value and frozen.value[0] == 'branch'
+        if ns in catalog.IDENTITY_OWNER_FAMILIES and not branch:
+            sources.append(frozen)
+        if old is not None or (ns, typed) in (request.tail_new or {}):
+            # The complete remaining transition is checked by the existing
+            # value/tail validator below, including deletions and witnesses.
+            continue
+        if change.delete or ns not in world.FAMILIES or world.FAMILIES[ns].collection_kind != 'dict':
             return None
         # A family name alone does not authorize changing its representation.
         # Only an already declared native lazy collection can accept this slice.
@@ -88,8 +105,6 @@ def prepare(store, request, versions, ordinary, segments):
             if parent is None or not parent[0].declared:
                 return None
             declared.add(ns)
-        frozen = replace(change, key=codec.decode(typed), value=codec.decode(item['payload']),
-                         memberships=tuple(Membership(*m) for m in codec.decode(item['memberships_blob'])))
         projection = tuple(world._project(store, ns, frozen.key, frozen.value, False))
         if len(projection) > 1 or projection and (
                 projection[0][0] != () or projection[0][1] is not None
@@ -114,45 +129,32 @@ def prepare(store, request, versions, ordinary, segments):
                                                        sa[0].next_incarnation_id + len(incarnations))):
         return None
 
-    # Regenerate catalog witnesses with the existing causal primitive. This
-    # reads only the global descriptor and the fresh owners/groups just proved
-    # absent; it never discovers unrelated owners or historical bodies.
-    for key, item in catalog_rows.items():
-        if key[0] != catalog.CATALOG_NAMESPACE and content._map(store).get(ca[0].versions, version_key(*key)) is not None:
-            return None
-    # prepare_delta reads both singleton headers even when no identity is
-    # allocated. Authenticate and budget these dependencies before transfer.
-    for ns in (catalog.CATALOG_NAMESPACE, catalog.RETIRED_NAMESPACE):
-        within_budget, _old = predecessor(ns, codec.encode(0))
-        if not within_budget:
-            return None
-    active = store._active_read_transaction
-    store._active_read_transaction = True
-    try:
-        delta = catalog.IdentityCatalog(store).prepare_delta(
-            request.pin, tuple(c for c, _p in owners), tuple(placements),
-            next_incarnation_id=sa[0].next_incarnation_id + len(incarnations))
-    finally:
-        store._active_read_transaction = active
-    wanted = {(c.namespace, codec.encode(c.key)): codec.encode((c.value, c.record_schema,
-              c.delete, tuple((m.index_name, m.value, m.ordinal) for m in c.memberships), c.reinsertion))
-              for c in delta.decode(codec)[0]}
-    actual = {key: codec.encode((codec.decode(i['payload']), i['change'].record_schema, False,
-               codec.decode(i['memberships_blob']), False)) for key, i in catalog_rows.items()}
-    if actual != wanted:
-        raise StoreIntegrityError('fresh insertion catalog differs from canonical transition')
+    fresh = {(c.namespace, codec.encode(c.key)) for c, _p in owners}
+    remaining = []
+    for item in versions:
+        ns, typed = item['namespace'], item['typed_key']
+        if ns not in catalog.CATALOG_NAMESPACES:
+            if (ns, typed) not in fresh:
+                remaining.append(item)
+        elif ns == catalog.OWNER_NAMESPACE:
+            owner = codec.decode(typed)
+            if type(owner) is not tuple or len(owner) != 2 or type(owner[0]) is not str:
+                raise StoreIntegrityError('invalid catalog owner key in mixed transition')
+            if (owner[0], codec.encode(owner[1])) not in fresh:
+                remaining.append(item)
+    other_records = tuple(i for i in ordinary if (i['namespace'], i['typed_key']) !=
+                          (META, codec.encode(COLLECTION_LAYOUT)))
+    from .persistence_proof_world_value import validate_value_transition
+    if not validate_value_transition(store, request, tuple(remaining), other_records, segments):
+        return None
 
     counts = Counter(c.namespace for c, _p in owners)
     saw_layout = False
     scalars = {r + '.' + f for r, fs in ROOT_FIELDS.items() for f, k in fs.items() if k == 'int'}
+    ordinary_sources = []
     for item in ordinary:
         ns, key = item['namespace'], item['typed_key']
         c = item['change']
-        # Even identical ordinary owner bytes acquire a new revision/checksum.
-        # Their catalog source witness must advance, which this insertion-only
-        # slice deliberately does not authorize.
-        if ns in world.FAMILIES:
-            return None
         if c.delete or c.record_schema != 1 or item['memberships']:
             return None
         row = store.db.execute('SELECT CASE WHEN typeof(payload)=\'blob\' AND length(payload)<=? THEN payload END,'
@@ -185,6 +187,11 @@ def prepare(store, request, versions, ordinary, segments):
             if codec.encode(expected) != item['payload']:
                 raise StoreIntegrityError('insertion layout does not match new owners')
             saw_layout = True
+        elif ns in world.FAMILIES:
+            # Existing value proof above requires its exact updated catalog
+            # source witness even for a byte-identical ordinary owner rewrite.
+            ordinary_sources.append(replace(c, key=codec.decode(item['typed_key']),
+                                            value=codec.decode(item['payload'])))
         elif ns == EVENT_STORAGE and c.key == COMMIT_DESCRIPTOR_KEY:
             if item['payload'] != codec.encode((1, request.pin.captured_head + 1, codec.decode(request.token))):
                 raise StoreIntegrityError('insertion commit descriptor disagreement')
@@ -197,6 +204,40 @@ def prepare(store, request, versions, ordinary, segments):
             return None
     if not saw_layout:
         return None
+
+    # Existing catalog logic may read unchanged owner-tree metadata while
+    # checking fixed-shape backings. Every such dependency must be authenticated
+    # and charged, not just catalog rows that happen to appear in the delta.
+    class CheckedCatalog(catalog.IdentityCatalog):
+        def _read(self, pin, namespace, key):
+            within_budget, row = predecessor(namespace, codec.encode(key))
+            if not within_budget:
+                raise _BudgetExceeded()
+            if row is None or row.record_schema != 1:
+                raise StoreIntegrityError('missing required accepted catalog predecessor')
+            return codec.decode(row.payload)
+
+    for key in catalog_rows:
+        if key[0] not in (catalog.CATALOG_NAMESPACE, catalog.OWNER_NAMESPACE) and predecessors[key] is not None:
+            return None
+    active = store._active_read_transaction
+    store._active_read_transaction = True
+    try:
+        try:
+            delta = CheckedCatalog(store).prepare_delta(
+                request.pin, tuple(sources), tuple(placements), ordinary_changes=tuple(ordinary_sources),
+                next_incarnation_id=sa[0].next_incarnation_id + len(incarnations))
+        except _BudgetExceeded:
+            return None
+    finally:
+        store._active_read_transaction = active
+    wanted = {(c.namespace, codec.encode(c.key)): codec.encode((c.value, c.record_schema,
+              c.delete, tuple((m.index_name, m.value, m.ordinal) for m in c.memberships), c.reinsertion))
+              for c in delta.decode(codec)[0]}
+    actual = {key: codec.encode((codec.decode(i['payload']), i['change'].record_schema, False,
+               codec.decode(i['memberships_blob']), False)) for key, i in catalog_rows.items()}
+    if actual != wanted:
+        raise StoreIntegrityError('fresh insertion catalog differs from canonical transition')
     return owners, placements, added, sa[0].next_incarnation_id + len(incarnations)
 
 
@@ -206,7 +247,7 @@ def stage(store, request, pin, ca, sa, ia):
     oldca, oldsa, oldia, _ra, _da = request.pairs
     codec = store.codec
     roots = list(oldsa[0].roots)
-    facts = list(request.facts)
+    facts = list(request.tail_facts or request.facts)
     by_owner = {(p.owner_namespace, codec.encode(p.owner_key)): p.incarnation_id for p in placements}
     for change, projections in owners:
         ns, key = change.namespace, codec.encode(change.key)
@@ -233,7 +274,7 @@ def stage(store, request, pin, ca, sa, ia):
         facts[1] = semantic.set(facts[1], position, _digest(
             b'ate-world-placement/1', inc.to_bytes(8, 'big'), projections[0][2].encode()))
     if (sa[0].next_incarnation_id != allocator or sa[0].roots[:2] != tuple(roots[:2])
-            or sa[0].roots[4:] != oldsa[0].roots[4:]
+            or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:] != oldsa[0].roots[5:]
             or ca[0].versions.count != oldca[0].versions.count + added
             or ca[0].events != oldca[0].events
             or ia[0].head.namespace_inventory != oldia[0].head.namespace_inventory):

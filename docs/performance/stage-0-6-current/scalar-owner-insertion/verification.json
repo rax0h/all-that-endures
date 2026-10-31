@@ -32,6 +32,29 @@
     "full_world_audits_during_save": 0
   },
   "exact_source_checks": "Workflow YAML, all Bash blocks, runtime pin, all launch fingerprints and git whitespace passed",
-  "hosted_full_proof_ci": "Pending publication",
+  "hosted_full_proof_ci": {
+    "head": "d80ceb80c6add545e1da0a87cf3cc26c8aff38e0",
+    "runtime_tree": "7e1965077091ef3cab5a8e9c7e1d7de1514e0ead",
+    "run": 41077846816,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/41077846816",
+    "jobs": {
+      "full-suite": "success",
+      "proof-map": "success"
+    },
+    "suite_passed": 4430,
+    "subtests_passed": 2,
+    "suite_seconds": 6965.5,
+    "artifacts": [
+      {
+        "id": 12996591088,
+        "digest": "sha256:01f21ecf08bf9ad31461cf20d124509fe33328c56913e3fec91aca604fcf3807"
+      },
+      {
+        "id": 12989114800,
+        "digest": "sha256:78fcf8beb1df6ad90d4b44d584a485725cb94c8d32d8c57946ccfb90c8ac2a20"
+      }
+    ],
+    "archive_digest_verified": true
+  },
   "mature_acceptance": "Not established by synthetic insert scaling"
 }

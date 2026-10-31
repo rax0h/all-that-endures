@@ -103,3 +103,14 @@ all shell blocks, runtime pin, every launch fingerprint and whitespace checks
 passed. Original incomplete240s test attempt and initial malformed checksum
 probe are not counted as success; these are the replacement final results.
 See targeted.log/targeted.xml, harness.log/harness.xml and verification.json.
+
+## Hosted closure
+
+Published candidate d80ceb80c6add545e1da0a87cf3cc26c8aff38e0 has the exact
+measured runtime and driver. Run41077846816 passed both jobs:4430 simulation
+tests plus2 subtests in6965.50s, and proof/scaling validation. Both downloaded
+artifact ZIP digests matched GitHub; both source receipts identify d80ceb8.
+Hosted scalar insertion raw save at1k/10k/100k values was
+0.126529/0.116393/0.127276s, with0unrelated history bodies and0full World
+audits. Artifacts/source/summary retained in hosted-41077846816/. This closes
+the package correctness gate, not the complete-year or mature performance gate.

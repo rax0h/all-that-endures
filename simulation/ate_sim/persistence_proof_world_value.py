@@ -65,7 +65,7 @@ def validate_value_transition(store,request,versions,ordinary,segments):
     from .persistence_proof_world_tail import metadata_allowed
     if segments or len(versions)>MAX_ROWS:return False
     codec=store.codec;g=request.pin.captured_head;ca=request.pairs[0][0];ra=request.pairs[3][0]
-    rows=[];owners={};total=0
+    rows=[];owners={};source_only=set();total=0
     for item in versions:
         if item['change'].reinsertion:return False
         ns,key=item['namespace'],item['typed_key']
@@ -96,11 +96,19 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             from .persistence_proof_world_backing_value import eligible
             if eligible(store,request,frozen,value):owners[(ns,key)]=frozen
         if ns in world.FAMILIES and world._record_class(ns) not in (None,Event):owners[(ns,key)]=frozen
+        if ((ns,key) not in owners and ns in catalog.IDENTITY_OWNER_FAMILIES and old is not None
+                and item['payload']==old.payload and item['memberships_blob']==old.memberships):
+            from .persistence_lazy_sequence import NODE_NAMESPACE
+            # Branch nodes are structural metadata, not catalog owner sources.
+            # An unchanged registered body still acquires a new source revision;
+            # require its witness even when its native projection needs no edit.
+            if ns!=NODE_NAMESPACE or type(value) is not tuple or not value or value[0]!='branch':
+                owners[(ns,key)]=frozen;source_only.add((ns,key))
     headers=[];ordinary_owners=set()
     for item,old,value in rows:
         ns,key=item['namespace'],item['typed_key'];change=item['change'];new=change.value
         if (ns,key) in owners:
-            if not _projection(store,request,ns,change.key,value,new):return False
+            if (ns,key) not in source_only and not _projection(store,request,ns,change.key,value,new):return False
             if ns not in world.AUXILIARY_OWNER_FAMILIES:world._check_queries(store,request.pin,change)
         elif ns==catalog.OWNER_NAMESPACE:
             headers.append((item,old,value))
@@ -133,6 +141,9 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             if (type(before) is not tuple or type(after) is not tuple or len(before)!=2 or len(after)!=2
                     or type(before[0]) is not int or type(after[0]) is not int or before[0]!=after[0]):return False
             if not _projection(store,request,ns,change.key,before,after,ordinary=True):return False
+            owners[(ns,key)]=change;ordinary_owners.add((ns,key))
+        elif ns in catalog.IDENTITY_OWNER_FAMILIES:
+            if item['payload']!=payload:return False
             owners[(ns,key)]=change;ordinary_owners.add((ns,key))
         elif item['payload']!=payload:return False
     witnessed=set()

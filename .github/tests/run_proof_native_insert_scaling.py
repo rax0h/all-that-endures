@@ -22,13 +22,13 @@ def git(*args):
     return subprocess.check_output(['git', *args], text=True).strip()
 
 
-def run(output, sizes):
+def run(output, sizes, scenario='scalar'):
     if git('status', '--porcelain', '--untracked-files=no'):
         raise ValueError('tracked source is dirty')
     output.mkdir(parents=True, exist_ok=False)
     source = dict(head=git('rev-parse', 'HEAD'), runtime_tree=git('rev-parse', 'HEAD:simulation/ate_sim'),
                   python=platform.python_version(), sqlite=sqlite3.sqlite_version,
-                  driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+                  driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), scenario=scenario)
     rows = []
     for size in sizes:
         start = time.perf_counter()
@@ -38,6 +38,20 @@ def run(output, sizes):
         session = opened(path, pair)
         admission = time.perf_counter() - start
         body_reads = 0
+        from ate_sim.persistence_lazy_nested_history import PAGE_NAMESPACE
+        allowed_page = None
+        if scenario == 'mixed':
+            history = session.skills[1, 'craft'].provenance
+            allowed_page = "x'" + session.store.codec.encode((history._incarnation, (size-1)//128)).hex() + "'"
+
+        def mutate(session, person, generation):
+            session.world.people[person] = Person(person, 0, 1, 1)
+            session.world.next_person = person + 1
+            if scenario == 'mixed':
+                session.skills[1, 'craft'].level = generation / 10
+                session.skills[1, 'craft'].provenance.append(generation)
+                session.world.settlements[1].food_stock = 100. + generation
+                session.world.year = generation
 
         def trace(sql):
             nonlocal body_reads
@@ -46,7 +60,8 @@ def run(output, sizes):
                     or re.match(r'select\s+\*', text)) and any(ns in text for ns in (
                         'aux.lazy.nested.list_pages', 'aux.lazy.nested.entries',
                         'aux.lazy.sequence.nodes', 'from segments'))):
-                body_reads += 1
+                if not (scenario == 'mixed' and PAGE_NAMESPACE in text and allowed_page in text):
+                    body_reads += 1
 
         def forbidden(*args, **kw):
             raise AssertionError('fresh scalar insertion invoked full World audit')
@@ -56,8 +71,7 @@ def run(output, sizes):
             session.store.db.set_trace_callback(trace)
             world._audit_world = forbidden
             start = time.perf_counter()
-            session.world.people[99] = Person(99, 0, 1, 1)
-            session.world.next_person = 100
+            mutate(session, 99, 1)
             assert session.save() == 1
             instrumented = time.perf_counter() - start
             pair = session.proof_manifest
@@ -71,8 +85,7 @@ def run(output, sizes):
             world._audit_world = forbidden
             start_wall, start_cpu = time.perf_counter(), time.process_time()
             try:
-                session.world.people[100] = Person(100, 0, 1, 1)
-                session.world.next_person = 101
+                mutate(session, 100, 2)
                 assert session.save() == 2
                 raw_wall, raw_cpu = time.perf_counter() - start_wall, time.process_time() - start_cpu
                 pair = session.proof_manifest
@@ -89,8 +102,7 @@ def run(output, sizes):
             session.store.db.set_progress_handler(vm_work, 1)
             world._audit_world = forbidden
             try:
-                session.world.people[101] = Person(101, 0, 1, 1)
-                session.world.next_person = 102
+                mutate(session, 101, 3)
                 assert session.save() == 3
                 pair = session.proof_manifest
             finally:
@@ -98,7 +110,13 @@ def run(output, sizes):
                 session.store.db.set_progress_handler(None, 0)
         with opened(path, pair) as restored:
             assert tuple(restored.world.people) == (99, 100, 101)
-            assert len(restored.skills[1, 'craft'].provenance) == size
+            assert len(restored.skills[1, 'craft'].provenance) == size + (3 if scenario == 'mixed' else 0)
+            if scenario == 'mixed':
+                assert list(restored.skills[1, 'craft'].provenance[-3:]) == [1, 2, 3]
+                assert restored.skills[1, 'craft'].level == .3
+                assert restored.skills[1, 'craft'].provenance is restored.skills[2, 'craft'].provenance
+                assert restored.world.settlements[1].food_stock == 103.
+                assert restored.world.year == 3
         row = dict(size=size, archive_unit='retained history values', source=source,
                    construction_seconds=construction, audited_admission_seconds=admission,
                    traced_first_save_seconds=instrumented, raw_save_seconds=raw_wall,
@@ -108,7 +126,7 @@ def run(output, sizes):
                    limitation='Synthetic history scaling; not mature-world latency acceptance')
         (output / f'size-{size}.json').write_text(json.dumps(row, indent=2) + '\n')
         rows.append(row)
-        print(size, 'values:', round(raw_wall, 6), 's raw save;', steps, 'VM steps; zero history bodies', flush=True)
+        print(size, 'values:', round(raw_wall, 6), 's raw save;', steps, 'VM steps; zero unrelated history bodies', flush=True)
     (output / 'summary.json').write_text(json.dumps(dict(status='complete', source=source, results=rows), indent=2) + '\n')
 
 
@@ -116,7 +134,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--sizes', type=int, nargs='+', default=[1000, 10000, 100000])
+    parser.add_argument('--scenario', choices=['scalar', 'mixed'], default='scalar')
     args = parser.parse_args()
     if not args.sizes or any(n not in (1000, 10000, 100000) for n in args.sizes):
         parser.error('sizes must be selected from 1000,10000,100000 retained values')
-    run(args.output, args.sizes)
+    run(args.output, args.sizes, args.scenario)

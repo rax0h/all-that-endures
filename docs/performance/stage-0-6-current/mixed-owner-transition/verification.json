@@ -1,0 +1,35 @@
+{
+  "base_sha": "d80ceb80c6add545e1da0a87cf3cc26c8aff38e0",
+  "measured_implementation_sha": "ffe67b588a6eac1c2f38b5f4951a11c4f96c966a",
+  "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+  "harness": {
+    "passed": 88,
+    "seconds": 34.8
+  },
+  "review": {
+    "open": 0,
+    "author_important_closed": 1,
+    "contract_clarification_closed": 1,
+    "final_focused_passed": 9,
+    "seconds": 11.93,
+    "source_fingerprints_match": true
+  },
+  "source_witness_regressions": {
+    "passed": 4,
+    "seconds": 4.67
+  },
+  "scaling": {
+    "status": "complete",
+    "source": "candidate/summary.json",
+    "unrelated_history_body_reads": 0,
+    "full_world_audits_within_save": 0
+  },
+  "checks": "Workflow YAML, every shell block, runtime pin, all launch fingerprints and whitespace passed",
+  "mature_acceptance": "Open; synthetic mixed archives do not establish complete-year acceptance",
+  "hosted_validation": "One bundled full/proof run pending publication",
+  "affected": {
+    "passed": 186,
+    "seconds": 332.397,
+    "includes": "Mixed values/tails/new owners, source-witness rejection/recovery, native value/session/tail/backing and two complete generated-world saved years with fresh-process digests"
+  }
+}
