@@ -97,21 +97,22 @@ def _record_class(namespace):
     return cls if isinstance(cls,type) and cls in RECORD_FIELDS else None
 
 
-def _check_record_class(store,namespace,value):
+def _check_record_class(store,namespace,value,record_header=None):
     expected=_record_class(namespace)
     if expected is None:return
     if type(value) is RecordReference:
         from .persistence_record_headers import checked_record_header
-        row=store.db.execute('SELECT payload FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_to IS NULL',(RECORDS,store.codec.encode((value.incarnation,0)))).fetchone()
-        if row is None or checked_record_header(store.codec.decode(row[0]))[0] is not expected:raise StoreIntegrityError('World owner record class disagrees with namespace')
+        row=store.db.execute('SELECT payload FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_to IS NULL',(RECORDS,store.codec.encode((value.incarnation,0)))).fetchone() if record_header is None else None
+        header=record_header(value.incarnation) if record_header is not None else None if row is None else store.codec.decode(row[0])
+        if header is None or checked_record_header(header)[0] is not expected:raise StoreIntegrityError('World owner record class disagrees with namespace')
     elif type(value) is not expected:raise StoreIntegrityError('World owner record class disagrees with namespace')
 
 
-def _check_family_value(store,namespace,key,value):
+def _check_family_value(store,namespace,key,value,record_header=None):
     """The consuming family, rather than the reference tag, declares its type."""
     from typing import get_origin
     from .persistence_lazy import BUCKET_SPECS,SCALAR_MAP_SPECS,_valid_scalar_map_key
-    _check_record_class(store,namespace,value)
+    _check_record_class(store,namespace,value,record_header)
     if _record_class(namespace) is not None:return
     hint=_family_value_hint(namespace);origin=get_origin(hint)
     if namespace in SCALAR_MAP_SPECS:
@@ -136,7 +137,7 @@ def _record_hints(cls):
     return get_type_hints(cls)
 
 
-def _check_field_values(store,namespace,cls,values):
+def _check_field_values(store,namespace,cls,values,record_header=None):
     from typing import get_type_hints,get_origin,get_args,Any,Union
     from types import UnionType
     from .persistence_lazy import NESTED_FIELD_KINDS
@@ -152,8 +153,9 @@ def _check_field_values(store,namespace,cls,values):
             return ref.kind in ({list:('list','sequence','frozen-list'),dict:('map','frozen-map'),set:('set',),tuple:('list','frozen-list'),frozenset:('set',)}.get(origin,()))
         if type(ref) is RecordReference:
             if not isinstance(annotation,type) or annotation not in RECORD_FIELDS:return False
-            row=store.db.execute('SELECT payload FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_to IS NULL',(RECORDS,store.codec.encode((ref.incarnation,0)))).fetchone()
-            return row is not None and checked_record_header(store.codec.decode(row[0]))[0] is annotation
+            row=store.db.execute('SELECT payload FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_to IS NULL',(RECORDS,store.codec.encode((ref.incarnation,0)))).fetchone() if record_header is None else None
+            header=record_header(ref.incarnation) if record_header is not None else None if row is None else store.codec.decode(row[0])
+            return header is not None and checked_record_header(header)[0] is annotation
         return False
     for field,ref in zip(RECORD_FIELDS[cls],values):
         if type(ref) not in (HistoryReference,RecordReference,NonreflexiveKeyReference,EventIdReference):continue
@@ -161,9 +163,9 @@ def _check_field_values(store,namespace,cls,values):
         if not allowed(hints[field],ref) or expected is not None and (type(ref) is not HistoryReference or ref.kind!=expected):raise StoreIntegrityError(f'World field reference has wrong member kind: {cls.__name__}.{field}')
 
 
-def _check_field_references(store,namespace,value):
+def _check_field_references(store,namespace,value,record_header=None):
     cls=type(value)
-    _check_field_values(store,namespace,cls,tuple(getattr(value,f) for f in RECORD_FIELDS[cls]))
+    _check_field_values(store,namespace,cls,tuple(getattr(value,f) for f in RECORD_FIELDS[cls]),record_header)
 
 
 def _check_queries(store,pin,change):
@@ -200,7 +202,7 @@ def _check_events(store,pin,manifest):
     finally:reader.close()
     _read_suffix(store,tail,prefix,captured_generation=pin.captured_head)
 
-def _project(store,namespace,key,value,ordinary):
+def _project(store,namespace,key,value,ordinary,*,record_header=None):
     """Existing World paths, including ordinary ordinal envelopes, no restoration."""
     from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE,PACKED_LIST_KEY,PACKED_LIST_PAYLOAD
     if ordinary:
@@ -220,10 +222,10 @@ def _project(store,namespace,key,value,ordinary):
         return
     if namespace==AGENCY_ACTIONS_NAMESPACE and key==PACKED_LIST_KEY:
         if type(value) is not tuple or len(value)!=2 or value[0]!=PACKED_LIST_PAYLOAD or type(value[1]) is not tuple:raise StoreIntegrityError('invalid packed World action owner')
-        for item in value[1]:_check_record_class(store,namespace,item)
+        for item in value[1]:_check_record_class(store,namespace,item,record_header)
         roots=[(v,(('index',i),)) for i,v in enumerate(value[1])]
     else:
-        _check_family_value(store,namespace,key,value)
+        _check_family_value(store,namespace,key,value,record_header)
         roots=[(value,())]
     pending=list(reversed(roots));seen=0
     while pending:
@@ -240,7 +242,7 @@ def _project(store,namespace,key,value,ordinary):
             yield path,None,kind,_digest(b'ate-inline-identity-value/1',store.codec.encode(v))
         if record:
             if cls not in RECORD_FIELDS:raise StoreIntegrityError('undeclared World record projection')
-            _check_field_references(store,namespace,v)
+            _check_field_references(store,namespace,v,record_header)
             pending.extend((getattr(v,n),path+(('field',n),)) for n in reversed(RECORD_FIELDS[cls]))
         elif cls in (dict,FrozenDict):
             for k,child in reversed(tuple(v.items())):

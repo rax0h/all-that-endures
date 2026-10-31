@@ -14,6 +14,8 @@ import time
 from pathlib import Path
 
 from ate_sim.core import Person
+from ate_sim.skills import SkillHistory
+from ate_sim.culture import Practice
 from ate_sim import persistence_proof_world as world
 from simulation.tests.test_stage_0_5_proof_world_session import fixture, opened
 
@@ -40,6 +42,7 @@ def run(output, sizes, scenario='scalar'):
         body_reads = 0
         from ate_sim.persistence_lazy_nested_history import PAGE_NAMESPACE
         allowed_page = None
+        old_allocator = session.store.read_identity_state(session.pin)
         if scenario == 'mixed':
             history = session.skills[1, 'craft'].provenance
             allowed_page = "x'" + session.store.codec.encode((history._incarnation, (size-1)//128)).hex() + "'"
@@ -47,11 +50,18 @@ def run(output, sizes, scenario='scalar'):
         def mutate(session, person, generation):
             session.world.people[person] = Person(person, 0, 1, 1)
             session.world.next_person = person + 1
-            if scenario == 'mixed':
+            if scenario in ('mixed', 'fresh'):
                 session.skills[1, 'craft'].level = generation / 10
-                session.skills[1, 'craft'].provenance.append(generation)
                 session.world.settlements[1].food_stock = 100. + generation
                 session.world.year = generation
+            if scenario == 'mixed':
+                session.skills[1, 'craft'].provenance.append(generation)
+            elif scenario == 'fresh':
+                session.world.skills.skills[person, 'new'] = SkillHistory(person, 'new', teachers=[7],
+                    provenance=session.skills[1, 'craft'].provenance)
+                record = SkillHistory(person, 'nested', provenance=[generation])
+                session.world.culture.practices[person] = Practice(person, 'craft', 'fresh', generation, 1,
+                    traits={'a': record, 'b': record, 'values': {1, 2, 3}})
 
         def trace(sql):
             nonlocal body_reads
@@ -60,7 +70,16 @@ def run(output, sizes, scenario='scalar'):
                     or re.match(r'select\s+\*', text)) and any(ns in text for ns in (
                         'aux.lazy.nested.list_pages', 'aux.lazy.nested.entries',
                         'aux.lazy.sequence.nodes', 'from segments'))):
-                if not (scenario == 'mixed' and PAGE_NAMESPACE in text and allowed_page in text):
+                fresh_body = False
+                if scenario == 'fresh':
+                    for literal in re.findall("x'([0-9a-f]+)'", text):
+                        try:
+                            key = session.store.codec.decode(bytes.fromhex(literal))
+                        except Exception:
+                            continue
+                        if type(key) is tuple and len(key) == 2 and type(key[0]) is int and key[0] >= old_allocator:
+                            fresh_body = True
+                if not fresh_body and not (scenario == 'mixed' and PAGE_NAMESPACE in text and allowed_page in text):
                     body_reads += 1
 
         def forbidden(*args, **kw):
@@ -111,12 +130,21 @@ def run(output, sizes, scenario='scalar'):
         with opened(path, pair) as restored:
             assert tuple(restored.world.people) == (99, 100, 101)
             assert len(restored.skills[1, 'craft'].provenance) == size + (3 if scenario == 'mixed' else 0)
-            if scenario == 'mixed':
-                assert list(restored.skills[1, 'craft'].provenance[-3:]) == [1, 2, 3]
+            if scenario in ('mixed', 'fresh'):
                 assert restored.skills[1, 'craft'].level == .3
                 assert restored.skills[1, 'craft'].provenance is restored.skills[2, 'craft'].provenance
                 assert restored.world.settlements[1].food_stock == 103.
                 assert restored.world.year == 3
+            if scenario == 'mixed':
+                assert list(restored.skills[1, 'craft'].provenance[-3:]) == [1, 2, 3]
+            if scenario == 'fresh':
+                for person in (99, 100, 101):
+                    assert restored.skills[person, 'new'].provenance is restored.skills[1, 'craft'].provenance
+                    assert list(restored.skills[person, 'new'].teachers) == [7]
+                    traits = restored.world.culture.practices[person].traits
+                    assert traits['a'] is traits['b']
+                    assert list(traits['a'].provenance) == [person-98]
+                    assert set(traits['values']) == {1, 2, 3}
         row = dict(size=size, archive_unit='retained history values', source=source,
                    construction_seconds=construction, audited_admission_seconds=admission,
                    traced_first_save_seconds=instrumented, raw_save_seconds=raw_wall,
@@ -134,7 +162,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--sizes', type=int, nargs='+', default=[1000, 10000, 100000])
-    parser.add_argument('--scenario', choices=['scalar', 'mixed'], default='scalar')
+    parser.add_argument('--scenario', choices=['scalar', 'mixed', 'fresh'], default='scalar')
     args = parser.parse_args()
     if not args.sizes or any(n not in (1000, 10000, 100000) for n in args.sizes):
         parser.error('sizes must be selected from 1000,10000,100000 retained values')

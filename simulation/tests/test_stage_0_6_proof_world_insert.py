@@ -129,7 +129,7 @@ def test_mixed_new_scalar_families_and_later_insertions_restore_in_fresh_process
         assert json.loads(result.stdout) == [year, year, year, .75]
 
 
-def test_new_owner_with_history_alias_retains_full_audit_fallback_and_identity(tmp_path, monkeypatch):
+def test_new_owner_with_backed_history_alias_uses_proofs_and_identity(tmp_path, monkeypatch):
     from ate_sim import persistence_proof_world as world
     from ate_sim.skills import SkillHistory
     path, pair = fixture(tmp_path)
@@ -145,7 +145,7 @@ def test_new_owner_with_history_alias_retains_full_audit_fallback_and_identity(t
             session.world.skills.skills[3, 'craft'] = SkillHistory(
                 3, 'craft', provenance=session.skills[1, 'craft'].provenance)
             assert session.save() == 1
-            assert calls
+            assert not calls
             child = session.proof_manifest
     with opened(path, child) as restored:
         assert restored.skills[3, 'craft'].provenance is restored.skills[1, 'craft'].provenance

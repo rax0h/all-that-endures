@@ -46,7 +46,9 @@ env:
 jobs:
   proof-map:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The previous green job used 52m; retain room for the added forest matrix
+    # and observed hosted variance. Individual scaling commands stay bounded.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,9 +124,10 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_reference_scaling.py --output evidence/reference-scaling 2>&1 | tee evidence/reference-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_world_value.py simulation/tests/test_stage_0_5_proof_world_backing_value.py simulation/tests/test_stage_0_5_proof_world_tail.py simulation/tests/test_stage_0_5_proof_world_page_growth.py simulation/tests/test_stage_0_5_proof_world_page_shrink.py --junitxml=evidence/native-value-tests.xml 2>&1 | tee evidence/native-value-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_value_scaling.py --output evidence/native-value-scaling 2>&1 | tee evidence/native-value-scaling.log
-          python -m pytest -q simulation/tests/test_stage_0_6_proof_world_insert.py simulation/tests/test_stage_0_6_proof_world_mixed.py --junitxml=evidence/native-insert-tests.xml 2>&1 | tee evidence/native-insert-tests.log
+          python -m pytest -q simulation/tests/test_stage_0_6_proof_world_insert.py simulation/tests/test_stage_0_6_proof_world_mixed.py simulation/tests/test_stage_0_6_proof_world_new_backings.py --junitxml=evidence/native-insert-tests.xml 2>&1 | tee evidence/native-insert-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --output evidence/native-insert-scaling 2>&1 | tee evidence/native-insert-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --scenario mixed --output evidence/native-mixed-scaling 2>&1 | tee evidence/native-mixed-scaling.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --scenario fresh --output evidence/native-fresh-scaling 2>&1 | tee evidence/native-fresh-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_world_session.py simulation/tests/test_stage_0_6_proof_world_continuation.py --junitxml=evidence/native-world-session-tests.xml 2>&1 | tee evidence/native-world-session-tests.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_world.py --junitxml=evidence/world-manifest-tests.xml 2>&1 | tee evidence/world-manifest-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_world_manifest_scaling.py --output evidence/world-manifest-scaling 2>&1 | tee evidence/world-manifest-scaling.log

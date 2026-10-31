@@ -197,7 +197,7 @@ def test_mixed_save_reads_only_the_changed_history_page(tmp_path, monkeypatch, s
         assert restored.skills[1, 'craft'].provenance[-1] == 42
 
 
-def test_mixed_new_backing_alias_keeps_checked_fallback(tmp_path, monkeypatch):
+def test_mixed_new_backing_alias_uses_bounded_proofs(tmp_path, monkeypatch):
     from ate_sim import persistence_proof_world as world
     from ate_sim.skills import SkillHistory
     path, pair = fixture(tmp_path)
@@ -216,7 +216,7 @@ def test_mixed_new_backing_alias_keeps_checked_fallback(tmp_path, monkeypatch):
             patch.setattr(world, '_audit_world', audit)
             assert session.save() == 1
             pair = session.proof_manifest
-        assert calls
+        assert not calls
     with opened(path, pair) as restored:
         assert restored.skills[3, 'craft'].provenance is restored.skills[1, 'craft'].provenance
         assert restored.skills[1, 'craft'].level == .75

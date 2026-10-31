@@ -1,6 +1,6 @@
-"""Compose fresh scalar owners with existing value/tail proofs.
+"""Compose fresh native owners/backing forests with existing value/tail proofs.
 
-Unsupported topology, aliases and backing graphs retain checked fallback.
+Unsupported topology and over-budget alias rosters retain checked fallback.
 This does not construct another identity authority.
 """
 from collections import Counter
@@ -27,6 +27,14 @@ class _BudgetExceeded(Exception):
 
 
 def prepare(store, request, versions, ordinary, segments):
+    from .persistence_proof_world_new_backings import Unsupported
+    try:
+        return _prepare(store, request, versions, ordinary, segments)
+    except Unsupported:
+        return None
+
+
+def _prepare(store, request, versions, ordinary, segments):
     """Authenticate the exact finite insertion, or retain checked fallback."""
     from .persistence_adapters import META, COLLECTION_LAYOUT
     from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES
@@ -62,7 +70,10 @@ def prepare(store, request, versions, ordinary, segments):
         predecessors[ns, typed] = old
         return True, old
 
-    owners, placements, incarnations, sources = [], [], [], []
+    from .persistence_proof_world_new_backings import Forest
+    forest = Forest(store, request, by_key, predecessor)
+    owners, placements, incarnations, sources = [], [], set(forest.backings), []
+    identities = {}
     catalog_rows, added = {}, 0
     declared = set()
     for item in versions:
@@ -75,13 +86,13 @@ def prepare(store, request, versions, ordinary, segments):
             return None
         added += (not change.delete) - (old is not None)
         if ns in catalog.CATALOG_NAMESPACES:
-            if change.delete:
-                return None
             catalog_rows[(ns, typed)] = item
             continue
         if ns == DEPENDENCIES:
-            # validate_lease_updates already checked ownership and canonical
-            # values; insertion does not introduce a backing or its lease row.
+            # validate_lease_updates checked publisher ownership. Fresh forest
+            # rows additionally bind the lease kind to their new descriptor.
+            if (ns, typed) in forest.new_rows:
+                continue
             if old is None or old.memberships != item['memberships_blob']:
                 return None
             continue
@@ -96,45 +107,54 @@ def prepare(store, request, versions, ordinary, segments):
             # The complete remaining transition is checked by the existing
             # value/tail validator below, including deletions and witnesses.
             continue
-        if change.delete or ns not in world.FAMILIES or world.FAMILIES[ns].collection_kind != 'dict':
+        concrete = ns in world.AUXILIARY_OWNER_FAMILIES and (ns, typed) in forest.new_rows
+        if (ns, typed) in forest.new_rows and not concrete:
+            continue
+        if change.delete or not concrete and (ns not in world.FAMILIES or world.FAMILIES[ns].collection_kind != 'dict'):
             return None
         # A family name alone does not authorize changing its representation.
         # Only an already declared native lazy collection can accept this slice.
-        if ns not in declared:
+        if not concrete and ns not in declared:
             parent = directory._lookup(store, da[0], ns)
             if parent is None or not parent[0].declared:
                 return None
             declared.add(ns)
-        projection = tuple(world._project(store, ns, frozen.key, frozen.value, False))
-        if len(projection) > 1 or projection and (
-                projection[0][0] != () or projection[0][1] is not None
-                or not projection[0][2].startswith('record:') or projection[0][3] is None):
-            return None
+        projection = forest.project(frozen)
+        forest.check(frozen, projection)
         if scope._resolve(store, sa[0], scope.OwnerScope(ns, typed)).count:
             raise StoreIntegrityError('fresh insertion has accepted predecessor placements')
-        if projection:
-            tree_key = (ns, frozen.key, catalog.path_hash(codec, ()))
-            leaf = by_key.get((catalog.OWNER_TREE_NAMESPACE, codec.encode(tree_key)))
-            value = None if leaf is None else codec.decode(leaf['payload'])
-            if (type(value) is not tuple or len(value) != 3 or value[:2] != ('owner-leaf/v1', ())
-                    or type(value[2]) is not int):
-                return None
-            inc = value[2]
-            if inc < sa[0].next_incarnation_id:
-                return None
-            incarnations.append(inc)
-            placements.append(IdentityOccurrenceChange(ns, frozen.key, (), incarnation_id=inc))
+        for path, inc, kind, fingerprint in projection:
+            if inc is None:
+                tree_key = (ns, frozen.key, catalog.path_hash(codec, path))
+                leaf = by_key.get((catalog.OWNER_TREE_NAMESPACE, codec.encode(tree_key)))
+                value = None if leaf is None or leaf['change'].delete else codec.decode(leaf['payload'])
+                if (type(value) is not tuple or len(value) != 3 or value[:2] != ('owner-leaf/v1', path)
+                        or type(value[2]) is not int):
+                    return None
+                inc = value[2]
+            if fingerprint is not None:
+                if inc < sa[0].next_incarnation_id:
+                    return None
+                incarnations.add(inc)
+            identity = kind, fingerprint
+            if inc in identities and identities[inc] != identity:
+                raise StoreIntegrityError('fresh aliases disagree on kind or inline value')
+            identities[inc] = identity
+            placements.append(IdentityOccurrenceChange(ns, frozen.key, path, incarnation_id=inc))
         owners.append((frozen, projection))
-    if not owners or sorted(incarnations) != list(range(sa[0].next_incarnation_id,
-                                                       sa[0].next_incarnation_id + len(incarnations))):
+    if (not owners or set(forest.backings) & {i for i, (_kind, fingerprint) in identities.items() if fingerprint is not None}
+            or sorted(incarnations) != list(range(sa[0].next_incarnation_id,
+                                                  sa[0].next_incarnation_id + len(incarnations)))
+            or not set(forest.backings) <= set(identities)):
         return None
+    forest.guard_alias_work(p.incarnation_id for p in placements)
 
     fresh = {(c.namespace, codec.encode(c.key)) for c, _p in owners}
     remaining = []
     for item in versions:
         ns, typed = item['namespace'], item['typed_key']
         if ns not in catalog.CATALOG_NAMESPACES:
-            if (ns, typed) not in fresh:
+            if (ns, typed) not in fresh and (ns, typed) not in forest.new_rows:
                 remaining.append(item)
         elif ns == catalog.OWNER_NAMESPACE:
             owner = codec.decode(typed)
@@ -148,7 +168,7 @@ def prepare(store, request, versions, ordinary, segments):
     if not validate_value_transition(store, request, tuple(remaining), other_records, segments):
         return None
 
-    counts = Counter(c.namespace for c, _p in owners)
+    counts = Counter(c.namespace for c, _p in owners if c.namespace in world.FAMILIES)
     saw_layout = False
     scalars = {r + '.' + f for r, fs in ROOT_FIELDS.items() for f, k in fs.items() if k == 'int'}
     ordinary_sources = []
@@ -217,14 +237,61 @@ def prepare(store, request, versions, ordinary, segments):
                 raise StoreIntegrityError('missing required accepted catalog predecessor')
             return codec.decode(row.payload)
 
-    for key in catalog_rows:
-        if key[0] not in (catalog.CATALOG_NAMESPACE, catalog.OWNER_NAMESPACE) and predecessors[key] is not None:
-            return None
+    class CatalogStore:
+        # Retirement range helpers read the store directly rather than _read.
+        # Keep those point dependencies under the same accepted byte authority.
+        def __getattr__(self, name): return getattr(store, name)
+        def __setattr__(self, name, value): setattr(store, name, value)
+        def read_version(self, pin, namespace, key, **kwargs):
+            within_budget, _row = predecessor(namespace, codec.encode(key))
+            if not within_budget: raise _BudgetExceeded()
+            return store.read_version(pin, namespace, key, **kwargs)
+        def _roster(self, table, columns, keys, values, index, expected):
+            nonlocal consumed
+            rows = store._interval_rows(table, columns, keys, values, request.pin.captured_head,
+                                        index, limit=expected+1, stream=True)
+            result = []
+            try:
+                for row in rows:
+                    if len(result) >= expected or any(v is None for v in row):
+                        raise StoreIntegrityError('catalog physical alias roster exceeds accepted scope')
+                    consumed += sum(len(v.encode()) if type(v) is str else len(v) for v in row)
+                    if consumed > MAX_BYTES: raise _BudgetExceeded()
+                    result.append(row)
+            finally:
+                rows.close()
+            if len(result) != expected:
+                raise StoreIntegrityError('catalog physical alias roster lacks accepted scope')
+            return result
+        def iter_identity_occurrences_for_incarnation(self, pin, incarnation):
+            count = scope._resolve(store, sa[0], scope.GroupScope(incarnation)).count
+            text = "CASE WHEN typeof(owner_namespace)='text' AND length(CAST(owner_namespace AS BLOB))<=4096 THEN owner_namespace END"
+            blobs = ["CASE WHEN typeof("+name+")='blob' AND length("+name+")<=4096 THEN "+name+" END" for name in ('owner_key', 'occurrence_path')]
+            self._roster('lazy_identity_occurrence_versions', ','.join((text, *blobs)),
+                         ('incarnation_id',), (incarnation,), 'lazy_identity_incarnation_interval', count)
+            return store.iter_identity_occurrences_for_incarnation(pin, incarnation)
+        def identity_occurrences_for_incarnation(self, pin, incarnation):
+            return tuple(self.iter_identity_occurrences_for_incarnation(pin, incarnation))
+        def iter_query_memberships(self, pin, namespace, index_name, value):
+            if namespace != catalog.LINK_NAMESPACE or index_name != 'incarnation':
+                raise _BudgetExceeded()
+            count = max(0, scope._resolve(store, sa[0], scope.GroupScope(value)).count-1)
+            rows = self._roster('lazy_query_versions',
+                "CASE WHEN typeof(record_key)='blob' AND length(record_key)<=4096 THEN record_key END",
+                ('namespace', 'index_name', 'index_value'), (namespace, index_name, codec.encode(value)),
+                'lazy_query_interval', count)
+            for (key,) in rows:
+                within_budget, _row = predecessor(namespace, key)
+                if not within_budget: raise _BudgetExceeded()
+            return store.iter_query_memberships(pin, namespace, index_name, value)
+        def query_memberships(self, pin, namespace, index_name, value, **kwargs):
+            rows = tuple(self.iter_query_memberships(pin, namespace, index_name, value))
+            return rows[:kwargs['limit']] if 'limit' in kwargs else rows
     active = store._active_read_transaction
     store._active_read_transaction = True
     try:
         try:
-            delta = CheckedCatalog(store).prepare_delta(
+            delta = CheckedCatalog(CatalogStore()).prepare_delta(
                 request.pin, tuple(sources), tuple(placements), ordinary_changes=tuple(ordinary_sources),
                 next_incarnation_id=sa[0].next_incarnation_id + len(incarnations))
         except _BudgetExceeded:
@@ -234,10 +301,11 @@ def prepare(store, request, versions, ordinary, segments):
     wanted = {(c.namespace, codec.encode(c.key)): codec.encode((c.value, c.record_schema,
               c.delete, tuple((m.index_name, m.value, m.ordinal) for m in c.memberships), c.reinsertion))
               for c in delta.decode(codec)[0]}
-    actual = {key: codec.encode((codec.decode(i['payload']), i['change'].record_schema, False,
+    actual = {key: codec.encode((None if i['change'].delete else codec.decode(i['payload']), i['change'].record_schema, i['change'].delete,
                codec.decode(i['memberships_blob']), False)) for key, i in catalog_rows.items()}
     if actual != wanted:
         raise StoreIntegrityError('fresh insertion catalog differs from canonical transition')
+    request.tail_facts, request.tail_child_root = forest.facts(request.tail_facts or request.facts, request.tail_child_root)
     return owners, placements, added, sa[0].next_incarnation_id + len(incarnations)
 
 
@@ -248,31 +316,43 @@ def stage(store, request, pin, ca, sa, ia):
     codec = store.codec
     roots = list(oldsa[0].roots)
     facts = list(request.tail_facts or request.facts)
-    by_owner = {(p.owner_namespace, codec.encode(p.owner_key)): p.incarnation_id for p in placements}
+    by_path = {(p.owner_namespace, codec.encode(p.owner_key), codec.encode(p.occurrence_path)): p.incarnation_id for p in placements}
+    groups = {}
     for change, projections in owners:
         ns, key = change.namespace, codec.encode(change.key)
-        world._check_queries(store, pin, change)
-        if not projections:
-            continue
-        inc = by_owner[ns, key]
-        path = codec.encode(())
-        raw = scope.RawOccurrence(ns, key, path, inc)
-        for kind, selected, position in ((0, scope.OwnerScope(ns, key), path),
-                                         (1, scope.GroupScope(inc), scope.group_order_key(ns, key, path))):
-            mapping = scope._map(store, kind)
-            if mapping.get(roots[kind], scope._scope_key(selected)) is not None:
-                raise StoreIntegrityError('fresh insertion scope is not absent in parent')
-            seek = OrderedSeekMap(store.db, scope._seek_domain(store, selected))
-            root = seek.set(seek.empty, position, scope.occurrence_member(
-                scope.occurrence_domain(store.store_identity, codec.version, selected), raw))
-            roots[kind] = mapping.set(roots[kind], scope._scope_key(selected),
-                                      scope._write_descriptor(store, selected, root))
-        semantic = world._map(store, b'owner-projections')
-        position = codec.encode((ns, key, path))
-        if semantic.get(facts[1], position) is not None or world._map(store, b'backing-inventory').get(facts[0], inc.to_bytes(8, 'big')) is not None:
-            raise StoreIntegrityError('fresh inline identity has competing semantic authority')
-        facts[1] = semantic.set(facts[1], position, _digest(
-            b'ate-world-placement/1', inc.to_bytes(8, 'big'), projections[0][2].encode()))
+        if ns in world.FAMILIES:
+            world._check_queries(store, pin, change)
+        owner = scope.OwnerScope(ns, key)
+        if scope._map(store, 0).get(roots[0], scope._scope_key(owner)) is not None:
+            raise StoreIntegrityError('fresh insertion scope is not absent in parent')
+        seek = OrderedSeekMap(store.db, scope._seek_domain(store, owner)); owner_root = seek.empty
+        for projected_path, _inc, kind, fingerprint in projections:
+            path = codec.encode(projected_path)
+            inc = by_path[ns, key, path]
+            raw = scope.RawOccurrence(ns, key, path, inc)
+            owner_root = seek.set(owner_root, path, scope.occurrence_member(
+                scope.occurrence_domain(store.store_identity, codec.version, owner), raw))
+            group = scope.GroupScope(inc)
+            group_seek = OrderedSeekMap(store.db, scope._seek_domain(store, group))
+            root = groups.get(inc)
+            if root is None:
+                root = group_seek.empty if inc >= oldsa[0].next_incarnation_id else scope._resolve(store, oldsa[0], group)
+            position = scope.group_order_key(ns, key, path)
+            if group_seek.get(root, position) is not None:
+                raise StoreIntegrityError('fresh placement already exists in parent group')
+            groups[inc] = group_seek.set(root, position, scope.occurrence_member(
+                scope.occurrence_domain(store.store_identity, codec.version, group), raw))
+            semantic = world._map(store, b'owner-projections')
+            position = codec.encode((ns, key, path))
+            if (semantic.get(facts[1], position) is not None or fingerprint is not None and
+                    world._map(store, b'backing-inventory').get(facts[0], inc.to_bytes(8, 'big')) is not None):
+                raise StoreIntegrityError('fresh identity has competing semantic authority')
+            facts[1] = semantic.set(facts[1], position, _digest(b'ate-world-placement/1', inc.to_bytes(8, 'big'), kind.encode()))
+        roots[0] = scope._map(store, 0).set(roots[0], scope._scope_key(owner),
+                    scope._write_descriptor(store, owner, owner_root) if owner_root.count else None)
+    for inc, root in groups.items():
+        group = scope.GroupScope(inc)
+        roots[1] = scope._map(store, 1).set(roots[1], scope._scope_key(group), scope._write_descriptor(store, group, root))
     if (sa[0].next_incarnation_id != allocator or sa[0].roots[:2] != tuple(roots[:2])
             or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:] != oldsa[0].roots[5:]
             or ca[0].versions.count != oldca[0].versions.count + added
