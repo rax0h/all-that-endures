@@ -1,0 +1,82 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+    "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+    "python": "3.12.15",
+    "sqlite": "3.45.1",
+    "driver_sha256": "9b0ed6781368f56793a5aa1406641c16177c521a30b2e0ef976331e316e63232",
+    "scenario": "mixed"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "archive_unit": "retained history values",
+      "source": {
+        "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+        "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+        "python": "3.12.15",
+        "sqlite": "3.45.1",
+        "driver_sha256": "9b0ed6781368f56793a5aa1406641c16177c521a30b2e0ef976331e316e63232",
+        "scenario": "mixed"
+      },
+      "construction_seconds": 1.5153635340002438,
+      "audited_admission_seconds": 0.22029928700021628,
+      "traced_first_save_seconds": 0.3569379890000164,
+      "raw_save_seconds": 0.30816193500004374,
+      "raw_save_cpu_seconds": 0.30589609799999984,
+      "unrelated_history_body_reads": 0,
+      "sqlite_vm_steps": 418014,
+      "full_world_audits_within_save": 0,
+      "database_bytes": 962560,
+      "status": "complete",
+      "limitation": "Synthetic history scaling; not mature-world latency acceptance"
+    },
+    {
+      "size": 10000,
+      "archive_unit": "retained history values",
+      "source": {
+        "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+        "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+        "python": "3.12.15",
+        "sqlite": "3.45.1",
+        "driver_sha256": "9b0ed6781368f56793a5aa1406641c16177c521a30b2e0ef976331e316e63232",
+        "scenario": "mixed"
+      },
+      "construction_seconds": 4.659186569000212,
+      "audited_admission_seconds": 0.5615960829995856,
+      "traced_first_save_seconds": 0.3487572989997716,
+      "raw_save_seconds": 0.29468999400023677,
+      "raw_save_cpu_seconds": 0.2913890860000006,
+      "unrelated_history_body_reads": 0,
+      "sqlite_vm_steps": 418833,
+      "full_world_audits_within_save": 0,
+      "database_bytes": 1589248,
+      "status": "complete",
+      "limitation": "Synthetic history scaling; not mature-world latency acceptance"
+    },
+    {
+      "size": 100000,
+      "archive_unit": "retained history values",
+      "source": {
+        "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+        "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+        "python": "3.12.15",
+        "sqlite": "3.45.1",
+        "driver_sha256": "9b0ed6781368f56793a5aa1406641c16177c521a30b2e0ef976331e316e63232",
+        "scenario": "mixed"
+      },
+      "construction_seconds": 36.5432362749998,
+      "audited_admission_seconds": 4.103546985999856,
+      "traced_first_save_seconds": 0.3659901220003121,
+      "raw_save_seconds": 0.30789319600035014,
+      "raw_save_cpu_seconds": 0.30492265599999513,
+      "unrelated_history_body_reads": 0,
+      "sqlite_vm_steps": 421392,
+      "full_world_audits_within_save": 0,
+      "database_bytes": 7856128,
+      "status": "complete",
+      "limitation": "Synthetic history scaling; not mature-world latency acceptance"
+    }
+  ]
+}

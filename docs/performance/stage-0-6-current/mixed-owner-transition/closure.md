@@ -110,3 +110,12 @@ pre-repair partial gates and scaling are not substituted for these receipts.
 All reviewed source fingerprints, workflow YAML, Bash blocks, runtime pin,
 launch fingerprints and whitespace checks pass. See targeted/harness logs and
 XML plus verification.json.
+
+## Hosted closure
+
+Published81f40bd full/proof run41172952568 passed:4450tests plus2subtests in
+4458.31s, and proof/scaling validation. Both downloaded artifact ZIP digests
+and source receipts were independently checked. Hosted mixed save at
+1k/10k/100k values measured0.308162/0.294690/0.307893s, with no unrelated
+history-body reads. Artifacts and source receipts:hosted-41172952568/. This
+closes this package gate; complete-year and mature targets remain open.

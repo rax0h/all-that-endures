@@ -1,0 +1,15 @@
+{
+  "size": 10000,
+  "source": {
+    "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+    "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "scenario": "fresh"
+  },
+  "archive_unit": "retained history values",
+  "raw_save_seconds": 1.2223061590002544,
+  "raw_save_cpu_seconds": 1.2078743509999992,
+  "full_world_audits_within_save": 2,
+  "status": "complete"
+}

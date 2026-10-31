@@ -1,0 +1,15 @@
+{
+  "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+  "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+  "run": 41172952568,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/41172952568",
+  "jobs": {
+    "full-suite": "success",
+    "proof-map": "success"
+  },
+  "tests_passed": 4450,
+  "subtests_passed": 2,
+  "suite_seconds": 4458.31,
+  "proof_job_seconds": 3152,
+  "zip_digests_verified": true
+}

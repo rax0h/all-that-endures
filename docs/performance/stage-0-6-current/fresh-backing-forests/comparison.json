@@ -1,0 +1,46 @@
+{
+  "baseline_source": {
+    "head": "81f40bd22da8d66afd65311e990416c2ee07345a",
+    "runtime_tree": "398fa5f0edf14e77ab48cff4871a626f8651ec8c",
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "scenario": "fresh"
+  },
+  "candidate_source": {
+    "head": "0f205f3843447ae8472c973fba5572704ce9bc2d",
+    "runtime_tree": "ec913495f7cd83dbef6b9eebe6c2a6dd9efe0bf7",
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "driver_sha256": "8b8ede40d272806af4902c576ac55e41f79fee4435b1dbc9766aece09dfc5bc3",
+    "scenario": "fresh"
+  },
+  "measurements": [
+    {
+      "size": 1000,
+      "baseline_seconds": 0.7473743109994757,
+      "candidate_seconds": 0.3909479120002288,
+      "observed_speedup": 1.9116979220470636,
+      "sqlite_vm_steps": 742445
+    },
+    {
+      "size": 10000,
+      "baseline_seconds": 1.2223061590002544,
+      "candidate_seconds": 0.33312751699941145,
+      "observed_speedup": 3.6691840110056533,
+      "sqlite_vm_steps": 746805
+    },
+    {
+      "size": 100000,
+      "baseline_seconds": 5.843947614999706,
+      "candidate_seconds": 0.3614005939998606,
+      "observed_speedup": 16.170276728991656,
+      "sqlite_vm_steps": 752668
+    }
+  ],
+  "baseline_driver_sha256": "94c338adb7b64fe33d1ff285e547add027991baa4990ed506b52821f022dde69",
+  "limits": [
+    "Retained values, not simulated years or mature acceptance",
+    "Same fixture/scenario on separate local files with other tests active; observational, not hardware/cache controlled",
+    "Admission and traced/VM phases are separate from raw second save"
+  ]
+}

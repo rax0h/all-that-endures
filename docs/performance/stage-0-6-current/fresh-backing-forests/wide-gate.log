@@ -1,0 +1,16 @@
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+........................................................................ [ 89%]
+..........................                                               [100%]
+============================= slowest 10 durations =============================
+97.45s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_generated_world_continues_through_two_proof_saves
+19.98s call     simulation/tests/test_stage_0_5_proof_world_page_shrink.py::test_shrink_old_page_inspection_respects_aggregate_byte_budget
+4.33s call     simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_new_owner_can_reference_existing_shared_history_without_scanning_it
+4.01s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_person_insertion_never_reads_unrelated_history_bodies[10000]
+3.82s call     simulation/tests/test_stage_0_6_proof_world_mixed.py::test_mixed_save_reads_only_the_changed_history_page[10000]
+2.41s call     simulation/tests/test_stage_0_6_proof_world_insert.py::test_mixed_new_scalar_families_and_later_insertions_restore_in_fresh_process
+2.39s call     simulation/tests/test_stage_0_5_proof_world_value.py::test_native_scalar_keeps_sealed_event_archive_payloads_cold
+2.29s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[True]
+2.07s call     simulation/tests/test_stage_0_5_proof_world_page_shrink.py::test_growth_and_shrink_compose_across_distinct_backings
+2.05s call     simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_empty_and_reused_pages_compose_across_distinct_backings
+242 passed in 415.57s (0:06:55)

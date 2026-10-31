@@ -1,0 +1,8 @@
+........................................                                 [100%]
+============================= slowest 5 durations ==============================
+95.99s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_generated_world_continues_through_two_proof_saves
+3.89s call     simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_new_owner_can_reference_existing_shared_history_without_scanning_it
+2.17s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[True]
+1.82s call     simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_new_nested_map_set_and_shared_record_forest_restores_exact_identity
+1.73s call     simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_recovers_original_frozen_attempt[after_commit]
+40 passed in 136.78s (0:02:16)

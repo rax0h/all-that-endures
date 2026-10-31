@@ -1,0 +1,45 @@
+{
+  "base_sha": "81f40bd22da8d66afd65311e990416c2ee07345a",
+  "validated_source": {
+    "head": "0f205f3843447ae8472c973fba5572704ce9bc2d",
+    "runtime_tree": "ec913495f7cd83dbef6b9eebe6c2a6dd9efe0bf7",
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "driver_sha256": "8b8ede40d272806af4902c576ac55e41f79fee4435b1dbc9766aece09dfc5bc3",
+    "scenario": "fresh"
+  },
+  "wide_gate": {
+    "source": "98c44a5ab78f98ed8174dfc69629ccecf8c36418",
+    "runtime_tree": "03ee3545feccf0228a3650cd5ac1881e72d49e08",
+    "passed": 242,
+    "seconds": 415.57
+  },
+  "final_gate": {
+    "source": "0f205f3843447ae8472c973fba5572704ce9bc2d",
+    "passed": 40,
+    "seconds": 136.782,
+    "includes": "23 fresh-forest cases plus complete generated-world continuation and fresh-process digests"
+  },
+  "harness": {
+    "passed": 88,
+    "seconds": 35.53
+  },
+  "exact_harness": {
+    "passed": 29,
+    "seconds": 17.438
+  },
+  "review": {
+    "findings_closed": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5",
+      "F6",
+      "F7"
+    ],
+    "open": 0
+  },
+  "mature_acceptance": "Open; synthetic archives are not complete years",
+  "hosted_full_proof": "Pending final branch publication"
+}
