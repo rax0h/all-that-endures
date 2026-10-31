@@ -137,14 +137,21 @@ def _guard(store,r,versions,ordinary,segments):
             if parent is not None:
                 d=codec.decode(parent.payload);frozen=type(d) is tuple and type(d[0]) is str and d[0].startswith('frozen-')
         if frozen and (old is None or old.payload!=item['payload'] or old.memberships!=item['memberships_blob']):raise StoreIntegrityError('manifest transition cannot edit an immutable backing')
-    from .persistence_proof_world_value import validate_value_transition,validate_lease_updates
-    validate_lease_updates(store,r,versions)
+    from .persistence_proof_world_value import validate_value_transition,validate_lease_updates,MAX_ROWS
+    leases=validate_lease_updates(store,r,versions)
+    # Keep all frozen rows in the transaction and content/inventory publisher.
+    # Already authenticated existing lease bookkeeping has an independent work
+    # budget and cannot consume unrelated semantic transition shape budgets.
+    # Do not materialize an oversized streamed preparation just to rediscover
+    # that the remaining semantic batch exceeds the existing shape budget.
+    semantic=(tuple(i for i in versions if (i['namespace'],i['typed_key']) not in leases)
+              if leases and len(versions)-len(leases)<=MAX_ROWS else versions)
     from .persistence_proof_world_tail import prepare
-    r.tail,r.tail_facts=prepare(store,r,versions)
-    r.value_only=validate_value_transition(store,r,versions,ordinary,segments)
+    r.tail,r.tail_facts=prepare(store,r,semantic)
+    r.value_only=validate_value_transition(store,r,semantic,ordinary,segments)
     if not r.value_only:
         from .persistence_proof_world_insert import prepare as prepare_insertions
-        r.insertions=prepare_insertions(store,r,versions,ordinary,segments)
+        r.insertions=prepare_insertions(store,r,semantic,ordinary,segments)
     r.guarded=True
 
 

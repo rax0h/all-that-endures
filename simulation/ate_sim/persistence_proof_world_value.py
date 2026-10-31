@@ -11,6 +11,8 @@ from . import persistence_lazy_identity_catalog as catalog
 
 MAX_ROWS=512
 MAX_BYTES=4*1048576
+MAX_LEASE_ROWS=4096
+MAX_LEASE_BYTES=4*1048576
 
 
 def _projection(store,request,namespace,key,old,new,ordinary=False):
@@ -34,9 +36,15 @@ def _projection(store,request,namespace,key,old,new,ordinary=False):
 
 
 def validate_lease_updates(store,request,versions):
-    """Publisher lease ownership is mandatory even on the full-audit fallback."""
+    """Validate every lease; return bounded existing-only semantic exemptions.
+
+    Exemptions affect shape classification, never publication or content proof.
+    Fresh/deleted/structural rows retain their original backing checks. Exhausting
+    this separate budget grants no partial exemption and keeps checked fallback.
+    """
     from .persistence_history_dependencies import NAMESPACE,dependency_value,_active_tokens
     codec=store.codec;ca=request.pairs[0][0];g=request.pin.captured_head
+    exempt=set();count=consumed=0;within_budget=True
     for item in versions:
         if item['namespace']!=NAMESPACE:continue
         key=item['typed_key'];old=content._source_version(store,g,NAMESPACE,key)
@@ -54,6 +62,16 @@ def validate_lease_updates(store,request,versions):
         removed=tuple(t for t in before if t not in after and t!=request.pin.token)
         if any(t!=request.pin.token for t in added) or _active_tokens(store,removed):raise StoreIntegrityError('transition changed a foreign publisher lease')
         if _active_tokens(store,added)!=added:raise StoreIntegrityError('transition added an inactive publisher lease')
+        count+=1
+        consumed+=len(NAMESPACE.encode())+len(key)+len(item['payload'] or b'')+len(item['memberships_blob'])
+        if old is not None:consumed+=len(old.payload)+len(old.memberships)
+        if count>MAX_LEASE_ROWS or consumed>MAX_LEASE_BYTES:
+            within_budget=False;exempt.clear()
+        if (within_budget and old is not None and not item['change'].delete
+                and not item['change'].reinsertion and old.record_schema==1
+                and old.memberships==item['memberships_blob']==codec.encode(())):
+            exempt.add((NAMESPACE,key))
+    return frozenset(exempt) if within_budget else frozenset()
 
 
 def validate_value_transition(store,request,versions,ordinary,segments):
