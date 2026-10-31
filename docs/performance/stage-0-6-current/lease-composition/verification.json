@@ -1,0 +1,46 @@
+{
+  "runtime_source_commit": "e8101580c93d748abd9236a7d4e4d44c9ea5f355",
+  "runtime_tree": "15aec0749a88d1c20be9dd8897812390fb70b15a",
+  "results": {
+    "affected": {
+      "tests": "168",
+      "failures": "0",
+      "errors": "0",
+      "time": "584.153"
+    },
+    "exact-final": {
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "time": "90.844"
+    },
+    "harness": {
+      "tests": "88",
+      "failures": "0",
+      "errors": "0",
+      "time": "63.528"
+    }
+  },
+  "additional_exact_cases": {
+    "tests": 2,
+    "seconds": 6.76,
+    "log": "allocation-final.log"
+  },
+  "scope": "Finite existing-lease composition; mature and complete-year fast paths remain open",
+  "limits": "Affected batch started before the final bounded allocation guard. Exact-final and allocation-final ran after that guard. Harness ran on the clean committed source.",
+  "artifact_sha256": {
+    "harness.xml": "a0e56ca8befb13ad1b2f6757feeef7d4d603b2065f350f16a05fc912c6dfd3d1",
+    "exact-final.log": "d49c2ecde813b49952c9723de1ebc4ace270d7e6865a0a8e514df644b373f6b5",
+    "review-fix-green.log": "23c3ea00a8f9daa807570915e1da6e90ed7a2321d4c410fef0341bbc418f1533",
+    "harness.log": "c4fda245c7d1ef77362109978887152e24b18ef7b5b64c638b5cceb57452cc09",
+    "diagnostic-driver.py": "f0512a41877b2d44484a05bc023ac064bf59d9fc7032d2e478312e7716275d5a",
+    "initial-red.log": "6270780a5f67f740317a87f37d44458219171b8e835c996ca79760df04d13f7c",
+    "affected.xml": "9255be689e3a5256e6e7ebbc5d85b710d141ccbd1e566042a1d280cdcfbee651",
+    "diagnostic-relaxed-caps.json": "88ac661c2f9d0d2c07909a66995be30cf3bd1a6b6168bf44ba7a9454dd78b191",
+    "exact-final.xml": "a33f785a82ef7c0cb843ec2b7258872e7226b2660f71202bccbb68a3f19604b9",
+    "affected.log": "32b1ebdb87ee8dab4378555edb46e8fbc364112cc602e4880ab533b9148f88da",
+    "allocation-final.log": "76c442db20d2d383615fd1e554edfcba79d8e8c368822f7476f819c256dad391"
+  },
+  "published_runtime_source_commit": "d9aa539cd01be986f0c23c7ea9fba8cdba5e951d",
+  "source_equivalence": "Published checkpoint tree exactly equals locally validated e810158 checkpoint tree 2f24b9bf9f74657afe2e46eec852565e713942c0"
+}

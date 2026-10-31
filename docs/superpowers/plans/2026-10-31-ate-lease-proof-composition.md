@@ -37,9 +37,11 @@
 - Consumes: `validate_lease_updates(store, request, versions)` and existing frozen prepared rows.
 - Produces: a bounded immutable set of authenticated existing lease `(namespace, typed_key)` markers, or empty when the budget is exceeded.
 
-- [ ] Write and run a real native-session regression with over 512 borrowed existing backings, a supported scalar edit, no save audit, exact reopened digest and sharing.
-- [ ] Return the finite existing-lease marker set from mandatory validation and use it only to partition semantic classifier input.
-- [ ] Verify foreign tokens, changed memberships, fresh dependencies, budget fallback and interrupted publication/recovery with real stores.
-- [ ] Run affected lease/value/tail/insertion/forest/native-session tests and complete generated-world continuation.
-- [ ] Obtain one independent whole-package review and close every actionable finding.
-- [ ] Refresh runtime launch pin, run exact harness checks, preserve raw evidence and publish one bundled validation run for this runtime package.
+- [x] Write and run a real native-session regression with over 512 borrowed existing backings, a supported scalar edit, no save audit, exact reopened digest and sharing.
+- [x] Return the finite existing-lease marker set from mandatory validation and use it only to partition semantic classifier input.
+- [x] Verify foreign tokens, changed memberships, fresh dependencies, budget fallback and interrupted publication/recovery with real stores.
+- [x] Run affected lease/value/tail/insertion/forest/native-session tests and complete generated-world continuation.
+- [x] Obtain one independent whole-package review and close every actionable finding.
+- [x] Refresh runtime launch pin, run exact harness checks, preserve raw evidence and publish one bundled validation run for this runtime package.
+
+Publication starts the existing full/proof workflow. Hosted completion is a separate pending gate; no mature performance or Stage 0.6 completion is claimed.
