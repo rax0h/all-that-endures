@@ -1,0 +1,65 @@
+{
+  "source": {
+    "local_checkpoint": "7cdfd1c2e46fbd7589a2908e0efba124df9aa3a3",
+    "published_checkpoint": "e026be8d074e36e1707a92ff3675bc035815ba85",
+    "complete_tree": "5f5d340d73ec0191897ec4bc3209744e422b3a2c",
+    "runtime_tree": "93308f7124a6cd1ca73dd5d46421c23ed597d2ad",
+    "mapping": "Full tree identical; commit metadata differs under connected API publication."
+  },
+  "tests": {
+    "final_component_and_backing": {
+      "passed": 40,
+      "seconds": 132.96,
+      "log": "components-compat-final.log"
+    },
+    "clean_source_launchers": {
+      "passed": 29,
+      "seconds": 23.61,
+      "log": "components-final-harness.log"
+    },
+    "initial_affected": {
+      "passed": 257,
+      "failed": 4,
+      "seconds": 905.86,
+      "qualification": "Run began before final test sentinel and minimal-request compatibility corrections. All four failures reproduced, corrected and pass in final40-case batch. Not a green full-suite claim.",
+      "log": "components-affected.log"
+    }
+  },
+  "review": {
+    "independent_reviews": 1,
+    "runtime_soundness_findings": 0,
+    "minor_coverage_findings": 1,
+    "all_findings_closed": true,
+    "register": "../review.md"
+  },
+  "real_year": {
+    "status": "complete",
+    "independent_eager_and_both_fresh_process_checks": "passed",
+    "accepted_input_unchanged": true,
+    "raw_seconds": {
+      "raw.copy": 0.10133863200007909,
+      "raw.open_and_full_admission": 10.614907142999982,
+      "raw.simulation_year": 2.423368718999882,
+      "raw.save": 31.085413116999916,
+      "raw.close": 0.016909031000068353,
+      "raw.fresh_process_restore_and_digest_verification": 14.318863921999991
+    },
+    "diagnostic_world_audits": 2,
+    "fallback_returns": [
+      {
+        "module": "persistence_proof_world_value.py",
+        "function": "validate_value_transition",
+        "line": 84,
+        "namespace": null
+      },
+      {
+        "module": "persistence_proof_world_insert.py",
+        "function": "_prepare",
+        "line": 150,
+        "namespace": "aux.lazy.history.dependencies"
+      }
+    ],
+    "qualification": "Small generated year, full checked fallback still required for ordinary event/action and replacement identities. Concurrent local tests; no controlled speedup/regression or mature-target claim."
+  },
+  "hosted": "Corrected package publication starts one full/proof cycle; result remains pending."
+}

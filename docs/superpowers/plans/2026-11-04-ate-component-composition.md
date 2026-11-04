@@ -36,7 +36,7 @@
 - [x] Write a real native composed save with more than 512 semantic rows, each source/catalog component below 512, and assert no World audit plus exact restored values/sharing. Run it RED against green parent.
 - [x] Add exhaustion, streamed input, catalog tamper and fault/recovery cases; run RED where new behavior is expected, keep existing rejection/fallback assertions meaningful.
 - [x] Implement bounded classifier and wire existing validators. Do not decode bodies in classifier; do not change original publisher input.
-- [ ] Run component tests and affected sequence/insertion/mixed/new-backing/lease tests. Require every case green.
+- [x] Run component tests and affected sequence/insertion/mixed/new-backing/lease tests. Require every case green.
 
 ## Task 2: Exact complete-year integration and package closure
 
@@ -45,8 +45,8 @@
 **Interfaces:** Real-year driver consumes clean exact source; produces raw timings and separate diagnostic fallback attribution, eager/fresh-process equality and unchanged accepted input.
 
 - [x] Reproduce complete-year baseline and identify remaining unsupported branches with explicitly instrumented scratch-only probes; never present relaxed diagnostic caps as product timings.
-- [ ] Run canonical complete-year driver on clean candidate. Add exact uncovered shape regressions if this implementation needs correction; preserve unsupported fallback rather than widen authority.
-- [ ] Refresh runtime pin; run clean-source launcher checks and YAML/bash/fingerprints.
+- [x] Run canonical complete-year driver on clean candidate. Add exact uncovered shape regressions if this implementation needs correction; preserve unsupported fallback rather than widen authority.
+- [x] Refresh runtime pin; run clean-source launcher checks and YAML/bash/fingerprints.
 - [x] One independent whole-package review; close every finding with RED/GREEN evidence in one register.
 - [ ] Commit evidence and publish once. Record exact source/tree mapping and start one bundled hosted validation. Hosted completion and mature targets remain explicit open gates until verified.
 

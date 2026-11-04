@@ -1,0 +1,276 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_existing_scalar_collection_growth_avoids_world_audit[set] ________
+
+tmp_path = PosixPath('/tmp/ate-growth-red/test_existing_scalar_collectio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7afc9c6d20>
+kind = 'set'
+
+    @pytest.mark.parametrize('kind', ['set', 'map'])
+    def test_existing_scalar_collection_growth_avoids_world_audit(tmp_path, monkeypatch, kind):
+        from ate_sim.core import Settlement
+        from ate_sim import persistence_proof_world as world
+        def configure(w):
+            values = {1, 2, 3} if kind == 'set' else {1: 'one', 2: 'two', 3: 'three'}
+            w.settlements[1] = Settlement(1, 0, 0, memory={'values': values, 'same': values})
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            values = session.world.settlements[1].memory['values']
+            if kind == 'set':values.update([7, 8])
+            else:values.update({7: 'seven', 8: 'eight'})
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_audit_world', lambda *a, **k: pytest.fail('scalar collection growth scanned World'))
+>               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_components.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:233: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:206: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f7afd4a20c0>, GenerationPin(token='b27c4b63-7633-4a04-8d...7\xc9>B', count=34)), b'\xa8\x11E(\xf4B\xac\xe01=D\x8d\xa9\'\xf7\xda\xf0\xff\xa1vvZy\xde\x0e$\x9e*"\xda\xf9\x04'), ...)
+k = {}
+
+>   patch.setattr(world, '_audit_world', lambda *a, **k: pytest.fail('scalar collection growth scanned World'))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: scalar collection growth scanned World
+
+simulation/tests/test_stage_0_6_proof_world_components.py:58: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-growth-red/test_existing_scalar_collectio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7afc9c6d20>
+kind = 'set'
+
+    @pytest.mark.parametrize('kind', ['set', 'map'])
+    def test_existing_scalar_collection_growth_avoids_world_audit(tmp_path, monkeypatch, kind):
+        from ate_sim.core import Settlement
+        from ate_sim import persistence_proof_world as world
+        def configure(w):
+            values = {1, 2, 3} if kind == 'set' else {1: 'one', 2: 'two', 3: 'three'}
+            w.settlements[1] = Settlement(1, 0, 0, memory={'values': values, 'same': values})
+        path, pair = fixture(tmp_path, configure=configure)
+>       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_components.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18022: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f7afc97bd10>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+________ test_existing_scalar_collection_growth_avoids_world_audit[map] ________
+
+tmp_path = PosixPath('/tmp/ate-growth-red/test_existing_scalar_collectio1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7afc93a510>
+kind = 'map'
+
+    @pytest.mark.parametrize('kind', ['set', 'map'])
+    def test_existing_scalar_collection_growth_avoids_world_audit(tmp_path, monkeypatch, kind):
+        from ate_sim.core import Settlement
+        from ate_sim import persistence_proof_world as world
+        def configure(w):
+            values = {1, 2, 3} if kind == 'set' else {1: 'one', 2: 'two', 3: 'three'}
+            w.settlements[1] = Settlement(1, 0, 0, memory={'values': values, 'same': values})
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            values = session.world.settlements[1].memory['values']
+            if kind == 'set':values.update([7, 8])
+            else:values.update({7: 'seven', 8: 'eight'})
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_audit_world', lambda *a, **k: pytest.fail('scalar collection growth scanned World'))
+>               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_components.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:233: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:206: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f7afc1734d0>, GenerationPin(token='de1ba7d0-b249-4344-a9...t=34)), b'\x9e\x890b\xba\x8aH\x9b\xd2S\xe6\x93\xbb\x17A\xfc\xd2\xfd\xd9^b\xb1\x9dp\xe5\x96\x9c\xf5\x97(\xbe\xe7'), ...)
+k = {}
+
+>   patch.setattr(world, '_audit_world', lambda *a, **k: pytest.fail('scalar collection growth scanned World'))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: scalar collection growth scanned World
+
+simulation/tests/test_stage_0_6_proof_world_components.py:58: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-growth-red/test_existing_scalar_collectio1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7afc93a510>
+kind = 'map'
+
+    @pytest.mark.parametrize('kind', ['set', 'map'])
+    def test_existing_scalar_collection_growth_avoids_world_audit(tmp_path, monkeypatch, kind):
+        from ate_sim.core import Settlement
+        from ate_sim import persistence_proof_world as world
+        def configure(w):
+            values = {1, 2, 3} if kind == 'set' else {1: 'one', 2: 'two', 3: 'three'}
+            w.settlements[1] = Settlement(1, 0, 0, memory={'values': values, 'same': values})
+        path, pair = fixture(tmp_path, configure=configure)
+>       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_components.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18022: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f7afc171ee0>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_existing_scalar_collection_growth_avoids_world_audit[set]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_existing_scalar_collection_growth_avoids_world_audit[map]
+2 failed, 1 deselected in 5.12s
