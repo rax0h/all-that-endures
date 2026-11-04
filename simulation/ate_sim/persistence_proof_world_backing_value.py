@@ -23,6 +23,12 @@ def eligible(store,request,change,old):
     from .persistence_record_headers import NAMESPACE as RECORDS,checked_record_header
     from .core import Event
     ns=change.namespace;new=change.value;adapter=AUXILIARY_OWNER_FAMILIES.get(ns)
+    from .persistence_lazy_sequence import NODE_NAMESPACE
+    from .persistence_proof_world_sequence import certified
+    if ns==NODE_NAMESPACE and certified(request,ns,store.codec.encode(change.key)):
+        if new[0]!='leaf':return False
+        adapter.validate_source(change,'lazy',store.codec)
+        return True
     if adapter is None or ns not in (PAGE_NAMESPACE,ENTRY_NAMESPACE,RECORDS):return False
     adapter.validate_source(change,'lazy',store.codec)
     if ns==RECORDS:

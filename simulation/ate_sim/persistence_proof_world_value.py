@@ -112,7 +112,9 @@ def validate_value_transition(store,request,versions,ordinary,segments):
         value=codec.decode(old.payload) if old is not None else ();rows.append((item,old,value))
         if ns in world.AUXILIARY_OWNER_FAMILIES:
             from .persistence_proof_world_backing_value import eligible
-            if eligible(store,request,frozen,value):owners[(ns,key)]=frozen
+            if eligible(store,request,frozen,value):
+                owners[(ns,key)]=frozen
+                if old is None:source_only.add((ns,key))
         if ns in world.FAMILIES and world._record_class(ns) not in (None,Event):owners[(ns,key)]=frozen
         if ((ns,key) not in owners and ns in catalog.IDENTITY_OWNER_FAMILIES and old is not None
                 and item['payload']==old.payload and item['memberships_blob']==old.memberships):

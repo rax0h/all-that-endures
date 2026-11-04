@@ -44,7 +44,9 @@ def _same_page(store,request,versions):
 
 
 def metadata_allowed(request,namespace,key):
-    return namespace in (HISTORY,TYPES) and type(key) is int and key in (request.tail or {})
+    from .persistence_proof_world_sequence import certified
+    return (certified(request,namespace,request.store.codec.encode(key))
+            or namespace in (HISTORY,TYPES) and type(key) is int and key in (request.tail or {}))
 
 
 def page_allowed(request,key):

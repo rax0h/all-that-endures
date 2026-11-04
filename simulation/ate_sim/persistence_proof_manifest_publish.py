@@ -102,6 +102,8 @@ class _Request:
     successor:object=None
     reaudited:bool=False
     insertions:object=None
+    sequence_rows:object=None
+    sequence_roots:object=None
 
 @dataclass(frozen=True)
 class WorldManifestCommit:
@@ -148,6 +150,8 @@ def _guard(store,r,versions,ordinary,segments):
               if leases and len(versions)-len(leases)<=MAX_ROWS else versions)
     from .persistence_proof_world_tail import prepare
     r.tail,r.tail_facts=prepare(store,r,semantic)
+    from .persistence_proof_world_sequence import prepare as prepare_sequence
+    prepare_sequence(store,r,semantic)
     r.value_only=validate_value_transition(store,r,semantic,ordinary,segments)
     if not r.value_only:
         from .persistence_proof_world_insert import prepare as prepare_insertions
@@ -178,7 +182,7 @@ def _stage(store,r,g,writer,token,inventory_pair):
         with store.read_snapshot(pin,_preflight=lambda:_schemas(store)):
             oldca,oldsa,oldia,oldra,oldda=r.pairs
             reuse=r.may_reuse and ca[0].versions==oldca[0].versions and ca[0].events==oldca[0].events and sa[0].roots==oldsa[0].roots and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id and da[0].root==oldda[0].root
-            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4]==r.tail_child_root and sa[0].roots[5:]==oldsa[0].roots[5:]
+            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4]==r.tail_child_root and sa[0].roots[5:]==r.sequence_roots
                 and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id
                 and (da[0].root.count==oldda[0].root.count if r.tail_new else da[0].root==oldda[0].root)
                 and ca[0].versions.count==oldca[0].versions.count+r.tail_added-len(r.tail_removed or {}) and ca[0].events==oldca[0].events

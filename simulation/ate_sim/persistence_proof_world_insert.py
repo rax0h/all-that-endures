@@ -354,7 +354,7 @@ def stage(store, request, pin, ca, sa, ia):
         group = scope.GroupScope(inc)
         roots[1] = scope._map(store, 1).set(roots[1], scope._scope_key(group), scope._write_descriptor(store, group, root))
     if (sa[0].next_incarnation_id != allocator or sa[0].roots[:2] != tuple(roots[:2])
-            or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:] != oldsa[0].roots[5:]
+            or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:] != request.sequence_roots
             or ca[0].versions.count != oldca[0].versions.count + added
             or ca[0].events != oldca[0].events
             or ia[0].head.namespace_inventory != oldia[0].head.namespace_inventory):
