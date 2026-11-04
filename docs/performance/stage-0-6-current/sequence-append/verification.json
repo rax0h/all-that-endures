@@ -1,0 +1,44 @@
+{
+  "local_source_checkpoint": "0eb978f959379a36156453d22a354eb3ee777a42",
+  "published_source_checkpoint": "08aee2bc02cfddb185c4690def3c799aa5fedd0f",
+  "source_tree": "537a8b36d9c20d3220a849597b32823dd37eac3a",
+  "runtime_tree": "e6871ff5fcdd2727c12b5af31d02d8cbc4b1365d",
+  "source_equivalence": "Published checkpoint complete tree exactly matches the locally tested source checkpoint; commit metadata differs.",
+  "results": {
+    "final": {
+      "tests": "21",
+      "errors": "0",
+      "failures": "0",
+      "time": "176.292"
+    },
+    "affected": {
+      "tests": "190",
+      "errors": "0",
+      "failures": "0",
+      "time": "492.481"
+    },
+    "harness": {
+      "tests": "88",
+      "errors": "0",
+      "failures": "0",
+      "time": "46.675"
+    }
+  },
+  "limits": "Affected batch began before final review fixes. Final 21 cases, harness and complete real-year probe ran after both fixes. No mature fixture timing or Stage0.6 completion claim.",
+  "artifact_sha256": {
+    "real-year-driver.py": "06534274c2903ec76770a23ed6b6be9505829e27cf126e11debab97f7f50e7e7",
+    "final.log": "7b420415f072e56f16eac28d2c91adbd4103fc77b046ae78edad6ce01e50d2e5",
+    "candidate-before-review-fixes.log": "068206f5d3a12bd7fc23ee8f2a686a17791afaa128878868d2f09ae5a4de951d",
+    "real-year.json": "5562f70fe8fd0e65de7117a92076ed6610d2418e3fbe7ffe6d8a1ccd8e4fa393",
+    "harness.log": "8d7a8b03e33f8bed00379230d1af61adf1858b999a0a83a393e5b58e14f415b3",
+    "harness.xml": "709471ac065936d8ab31c58808e91a5a0481531c50f743dcec629515ace1e053",
+    "malformed-red.log": "6dbd7cd64047aace6a603460dd5911f47a19ecb90e74aeacf30faea6ca1bc9a5",
+    "year-command-exit.json": "a847c14ec765a2a7329c0e50cbb713405d94c540c6409cf23df305ad010ad447",
+    "affected.log": "5f4e70ecc67f9ffca10e8e72b8088208d9b1597cfde30b0d8246b8f223e35ebc",
+    "initial-red.log": "69ae44a66a4dbc9bdee5e0426f73f460f369e82a678349be486792692d5c470b",
+    "affected.xml": "606ddbc917f06e729e1d1b52cd305c885f29da350d03392f88bbd9752f139d33",
+    "overlap-red.log": "9d3217e1054516890bd7425225d0edd1faf3c934f0fe2291abd2a6b1d423cae2",
+    "final.xml": "37d84f8ae99c42cc1dd85dc846bb5ab07243959454eccecbbc93b9c6b30b0826",
+    "year.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -36,9 +36,11 @@
 
 **Interfaces:** `prepare(store, request, versions)` updates private request sequence certificates, expected locator roots and tail facts only after exact validation. `certified(request, namespace, typed_key)` identifies exact frozen rows for the existing validators.
 
-- [ ] Reproduce a real native existing-sequence append invoking the full World audit.
-- [ ] Build bounded read-only replay and exact frozen-row equality; compose facts/scopes/source witnesses.
-- [ ] Verify 128-value leaf split, 4,096-value root split, duplicates, multi-call append and extend, mixed fresh owners, checked unsupported fallback and corruption/recovery.
-- [ ] Run affected tests and complete generated-year/fresh-process controls; measure the complete-year workload and preserve explicit limits.
-- [ ] Obtain one independent package review; resolve all findings with targeted validation.
-- [ ] Refresh exact runtime pin, verify harness/source fences, preserve receipts and publish one bundled full/proof validation.
+- [x] Reproduce a real native existing-sequence append invoking the full World audit.
+- [x] Build bounded read-only replay and exact frozen-row equality; compose facts/scopes/source witnesses.
+- [x] Verify 128-value leaf split, 4,096-value root split, duplicates, multi-call append and extend, mixed fresh owners, checked unsupported fallback and corruption/recovery.
+- [x] Run affected tests and complete generated-year/fresh-process controls; measure the complete-year workload and preserve explicit limits.
+- [x] Obtain one independent package review; resolve all findings with targeted validation.
+- [x] Refresh exact runtime pin, verify harness/source fences, preserve receipts and publish one bundled full/proof validation.
+
+Local package complete; publication starts one bundled full/proof workflow. Hosted completion and whole-year/mature targets remain open.

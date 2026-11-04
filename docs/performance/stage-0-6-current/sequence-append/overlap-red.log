@@ -1,0 +1,14 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_overlapping_predecessors_are_rejected_before_body_fetch _________
+simulation/tests/test_stage_0_6_proof_world_sequence.py:222: in test_overlapping_predecessors_are_rejected_before_body_fetch
+    proof._Sources(store, request, 0).source(DESCRIPTOR_NAMESPACE, typed)
+simulation/ate_sim/persistence_proof_world_sequence.py:69: in source
+    row = content._source_version(self.store, self.request.pin.captured_head,
+simulation/tests/test_stage_0_6_proof_world_sequence.py:219: in forbidden
+    def forbidden(*args, **kwargs):raise RuntimeError('body fetch preceded overlap rejection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RuntimeError: body fetch preceded overlap rejection
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_overlapping_predecessors_are_rejected_before_body_fetch
+1 failed in 1.86s
