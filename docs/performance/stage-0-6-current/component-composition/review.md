@@ -11,6 +11,7 @@ recovery, spec and tests. No runtime soundness defect found. No second review.
 |---|---|---|---|---|
 | R1 / independent | Minor | Missing retained lineage-policy, mixed scalar/sequence/list frontier, and fresh-process scalar tests | Two member-class fallback cases plus native lineage-pair set/map growth + sequence128→129 + list128→129 + fresh Person + fresh-process digest/sharing; 3 passed11.12s | Closed |
 | A1 / author test run | Test defect | Unrelated-body sentinel rejected legitimate frozen parent-map source | Permit exactly parent `(parent_inc,'values')` and fresh growth entry; still reject every unrelated old entry/page beside10000 history values; complete corrected23cases80.53s pass | Closed |
+| A2 / broader affected run | Compatibility defect | Minimal classifier requests without scalar proof state raised AttributeError instead of remaining uncertified | Treat missing scalar_rows as no authority; two existing map-key/map-ordinal cases reproduced RED in 7.04s; final40component/backing cases132.96s verify correction | Closed |
 | Boundary / exact-year diagnostic | Explicit remaining scope | Ordinary Event/data and action append identities plus motive-record replacements are not yet certified by insertion composition | Keep exact allocator completeness and checked fallback; scratch trace identifies missing IDs and12 existing motive root replacements, no annual speedup claim | Documented next integration gate |
 
 ## Raw independent review notes

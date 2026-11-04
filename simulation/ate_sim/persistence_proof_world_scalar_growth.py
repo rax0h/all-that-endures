@@ -17,7 +17,7 @@ MAX_BYTES = 4 * 1048576
 
 
 def certified(request, namespace, typed):
-    return (namespace, typed) in (request.scalar_rows or ())
+    return (namespace, typed) in (getattr(request, 'scalar_rows', None) or ())
 
 
 def prepare(store, request, versions):
