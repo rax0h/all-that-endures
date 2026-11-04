@@ -1,0 +1,143 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_sequence_append_with_new_sequence_retains_checked_fallback ________
+
+tmp_path = PosixPath('/tmp/ate-seq-repair-mixed-red/test_sequence_append_with_new_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5703b383b0>
+sequences = <function sequences.<locals>.create at 0x7f5703b2ab60>
+
+    def test_sequence_append_with_new_sequence_retains_checked_fallback(tmp_path, monkeypatch, sequences):
+        from ate_sim import persistence_proof_world as world
+        path, pair = sequences(tmp_path)
+        with opened(path, pair) as session:
+            session.world.households[1].members.append(7)
+            session.world.households[99] = Household(99, 1, members=[1, 2])
+            original, calls = world._audit_world, []
+            def audit(*args, **kwargs):
+                calls.append(True)
+                return original(*args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_audit_world', audit)
+>               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_sequence.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:232: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2810: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:190: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:154: in _guard
+    prepare_sequence(store,r,semantic)
+simulation/ate_sim/persistence_proof_world_sequence.py:117: in prepare
+    result = _prepare(store, request, versions)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f5703a08da0>
+request = _Request(store=<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f5703a08da0>, pin=GenerationPin(token='366..._roots=(Root(digest=b'v`\xb40\x8e\x95\x919\xb9\xed)A< 8\xafR\xca\x86\xe7\xce\x87\xfei|*\x8f\xb03\xc7\xa3f', count=2),))
+versions = ({'change': VersionChange(namespace='world.households', key=99, value=Household(id=99, settlement=1, members=HistoryRe...4"],["int","1"],["str","e2b7aa6ed23fe3ee29f028b26710c13e897f79888d747913b37e9616edb3253e"],["int","0"]]]]]', ...}, ...)
+
+    def _prepare(store, request, versions):
+        codec, sa = store.codec, request.pairs[1][0]
+        by_key = {(i['namespace'], i['typed_key']): i for i in versions}
+        descriptors = [i for i in versions if i['namespace'] == sequence.DESCRIPTOR_NAMESPACE]
+        if not descriptors:
+            return None
+        if len(descriptors) > MAX_BACKINGS:
+            raise Unsupported()
+        consumed = sum(len(i['namespace'].encode()) + len(i['typed_key']) +
+                       len(i['payload'] or b'') + len(i['memberships_blob']) for i in versions)
+        if consumed > MAX_BYTES:
+            raise Unsupported()
+        sources = _Sources(store, request, consumed)
+        approved, new_rows, changes, backing_changes = {}, {}, [], []
+        appended_count = added = 0
+        for item in descriptors:
+            incarnation = codec.decode(item['typed_key'])
+            if type(incarnation) is not int or not 0 < incarnation < sa.next_incarnation_id:
+>               raise StoreIntegrityError('invalid existing sequence incarnation')
+E               ate_sim.incremental_store.StoreIntegrityError: invalid existing sequence incarnation
+
+simulation/ate_sim/persistence_proof_world_sequence.py:148: StoreIntegrityError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-seq-repair-mixed-red/test_sequence_append_with_new_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5703b383b0>
+sequences = <function sequences.<locals>.create at 0x7f5703b2ab60>
+
+    def test_sequence_append_with_new_sequence_retains_checked_fallback(tmp_path, monkeypatch, sequences):
+        from ate_sim import persistence_proof_world as world
+        path, pair = sequences(tmp_path)
+>       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_sequence.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f570393a4e0>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_with_new_sequence_retains_checked_fallback
+1 failed in 3.17s

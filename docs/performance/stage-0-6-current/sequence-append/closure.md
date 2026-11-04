@@ -92,3 +92,15 @@ hosted completion on the new runtime remains pending at publication. Mature
 10s open / 2s save / 1s warm year, default integration and final Stage 0.6
 acceptance remain open. No mature benchmark, main merge, default activation or
 endurance run was launched.
+
+## Hosted regression and correction
+
+The first published candidate's proof-map job failed in run 41878768574:
+the final descriptor-key guard rejected valid fresh sequence incarnations
+before checked fallback. This is a code defect, separate from the earlier
+runner queue delay. The original failure and a new mixed existing-append/new
+sequence case both reproduced locally before correction. Corrected source
+checkpoint `8e58a5f0465dbb67bbd916f7e8a5d49e994757d6` passed 84 combined
+native tests and 29 clean-source launcher tests. Details, raw RED/GREEN logs,
+exact source mapping and remaining hosted gate are in `ci-repair/closure.md`.
+The work group remains open pending corrected hosted validation.

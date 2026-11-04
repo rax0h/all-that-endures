@@ -1,0 +1,10 @@
+{
+  "failed_source": "5efb299fdbae963e8f5cb9e683a0ed24a287842f",
+  "run_id": 41878768574,
+  "job_id": 126745436185,
+  "test": "simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_new_sequence_backing_retains_checked_fallback",
+  "cause": "The final descriptor-key integrity guard treated a valid fresh sequence incarnation at or beyond the accepted parent allocator as corrupt, raising StoreIntegrityError before unsupported-shape fallback.",
+  "repair": "Reject malformed incarnation keys, then return Unsupported for valid fresh incarnations. The checked World fallback retains authority over new sequence publication.",
+  "new_regression": "Mixed existing sequence append and a separate new Household sequence must save and restore independent/shared identities correctly through checked fallback.",
+  "runtime_tree": "339cf658adbac54352bba4124eca59dbfda81479"
+}

@@ -14,6 +14,7 @@ suite or duplicate large fixture run. No unsafe certificate acceptance found.
 | R2 / independent | Minor | Unvalidated key/leaf entries leaked Python indexing/unpacking/comparison errors | Reuse canonical scope-key validation and validate bounded leaf/occurrence shapes before extraction; two real frozen-save corruptions reproduced TypeError RED, now produce StoreError and recover/retry correctly | Closed |
 | A1 / author | Implementation defect | Replay tried opening a nested transaction | Private read context inherits the manifest's owned transaction; all predecessor bytes still join accepted content; native append regression passes | Closed |
 | A2 / author | Implementation defect | Scope update lacked the existing seek workspace | Initialize existing OrderedSeekMap workspace after complete replay validation; split/root/mixed cases pass | Closed |
+| C1 / hosted proof-map 41878768574 | Important | Final descriptor-key guard rejected valid fresh sequence IDs before checked fallback | Separate malformed key rejection from valid fresh-ID Unsupported routing; original hosted case and new mixed existing-append/new-sequence case reproduced RED; 84 combined native cases and 29 clean-source launcher checks pass, evidence in ci-repair/ | Closed locally; corrected hosted validation pending |
 
 All 21 final sequence cases passed in 176.29s after both independent findings
 were fixed. The earlier 18-case candidate passed before those fixes; its raw log
@@ -26,3 +27,9 @@ Replay remains a private expected-delta generator. Original publication rows
 and commit ownership stay with the existing transaction. Exhaustion and
 unsupported empty/reference-bearing/nonappend shapes retain full audit.
 Full-year batch composition and mature latency remain separate open gates.
+
+Hosted validation exposed C1 after this review. The original 21-case and
+190-case results above remain historical evidence for their stated source
+boundaries. `ci-repair/closure.md` records the exact cause, corrected source,
+and final local checks. This is an author correction within the same work
+group; no second independent review is claimed.
