@@ -25,6 +25,10 @@ def eligible(store,request,change,old):
     ns=change.namespace;new=change.value;adapter=AUXILIARY_OWNER_FAMILIES.get(ns)
     from .persistence_lazy_sequence import NODE_NAMESPACE
     from .persistence_proof_world_sequence import certified
+    from .persistence_proof_world_scalar_growth import certified as scalar_certified
+    if ns==ENTRY_NAMESPACE and scalar_certified(request,ns,store.codec.encode(change.key)):
+        adapter.validate_source(change,'lazy',store.codec)
+        return True
     if ns==NODE_NAMESPACE and certified(request,ns,store.codec.encode(change.key)):
         if new[0]!='leaf':return False
         adapter.validate_source(change,'lazy',store.codec)

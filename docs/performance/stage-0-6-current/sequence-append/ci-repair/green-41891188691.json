@@ -1,0 +1,13 @@
+{
+  "run_id": 41891188691,
+  "head": "bc96009de7d5071a0376b6f3662babc56a0fc0a8",
+  "runtime_tree": "339cf658adbac54352bba4124eca59dbfda81479",
+  "proof_map": "success",
+  "full_suite": "success",
+  "passed": 4504,
+  "subtests": 2,
+  "warnings": 1,
+  "seconds": 6421.37,
+  "warning": "Deliberate duplicate ZIP-member rejection fixture",
+  "source": "GitHub run metadata and decoded logs for jobs 126801794089 and 126801794836"
+}

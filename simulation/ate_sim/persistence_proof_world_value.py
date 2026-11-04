@@ -102,7 +102,10 @@ def validate_value_transition(store,request,versions,ordinary,segments):
         if old is None:
             expected=(request.tail_new or {}).get((ns,key))
             if expected is None:return False
-            if item['payload']!=expected or item['change'].record_schema!=1 or item['memberships_blob']!=codec.encode(()):raise StoreIntegrityError('new tail source differs from frozen authority')
+            from .persistence_lazy_nested_history import ENTRY_NAMESPACE
+            from .persistence_proof_world_scalar_growth import certified as scalar_certified
+            scalar_entry=ns==ENTRY_NAMESPACE and scalar_certified(request,ns,key)
+            if item['payload']!=expected or item['change'].record_schema!=1 or not scalar_entry and item['memberships_blob']!=codec.encode(()):raise StoreIntegrityError('new tail source differs from frozen authority')
             if content._map(store).get(ca.versions,version_key(ns,key)) is not None:raise StoreIntegrityError('new tail source lacks accepted content absence')
         if old is not None and content._map(store).get(ca.versions,version_key(ns,key))!=content._version_value(ns,key,old,codec.version):raise StoreIntegrityError('value transition old bytes lack accepted content')
         total+=len(item['payload'] or b'')+len(item['memberships_blob'])+(len(old.payload)+len(old.memberships) if old is not None else 0)

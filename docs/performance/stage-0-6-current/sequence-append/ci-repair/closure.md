@@ -45,7 +45,16 @@ locally validated checkpoint `261b6a94b24ad599d7f644c7fbbb4d4532dd3410`.
 Only commit metadata differs. Evidence is published as one child commit and
 one branch update, starting one corrected full/proof validation cycle.
 
-Hosted validation remains required on the corrected published source.
+Hosted validation is now verified green on corrected published source
+`bc96009de7d5071a0376b6f3662babc56a0fc0a8`:
+[41891188691](https://github.com/rax0h/all-that-endures/actions/runs/41891188691),
+both jobs successful, **4,504 passed, two subtests, one deliberate duplicate-ZIP
+warning in 6,421.37s**. The proof job's combined 84 native cases also passed.
+The prior failed full suite had 4,502 passes and the same single fallback test
+failure; it exposed no additional failing test. This closes the hosted gate for
+the sequence package and C1. See `green-41891188691.json`.
+
+Historical prepublication scheduling observation:
 The superseded full-suite was still running at the last prepublication check;
 the connected GitHub API has no cancel operation, so it was not stopped.
 The workflow's existing concurrency rule may hold the corrected run until

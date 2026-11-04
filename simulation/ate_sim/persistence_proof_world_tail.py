@@ -45,7 +45,9 @@ def _same_page(store,request,versions):
 
 def metadata_allowed(request,namespace,key):
     from .persistence_proof_world_sequence import certified
+    from .persistence_proof_world_scalar_growth import certified as scalar_certified
     return (certified(request,namespace,request.store.codec.encode(key))
+            or scalar_certified(request,namespace,request.store.codec.encode(key))
             or namespace in (HISTORY,TYPES) and type(key) is int and key in (request.tail or {}))
 
 

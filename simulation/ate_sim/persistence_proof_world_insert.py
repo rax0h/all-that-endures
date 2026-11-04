@@ -42,7 +42,8 @@ def _prepare(store, request, versions, ordinary, segments):
     from .persistence_session import EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY
     from .incremental_store import _record_checksum
 
-    if segments or not versions or len(versions) + len(ordinary) > MAX_ROWS:
+    from .persistence_proof_world_components import insertion_within_limits
+    if segments or not versions or not insertion_within_limits(versions, ordinary):
         return None
     consumed = sum(len(i['payload'] or b'') + len(i.get('memberships_blob', b'')) + len(i['typed_key'])
                    for i in (*versions, *ordinary))

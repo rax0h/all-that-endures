@@ -103,4 +103,7 @@ sequence case both reproduced locally before correction. Corrected source
 checkpoint `8e58a5f0465dbb67bbd916f7e8a5d49e994757d6` passed 84 combined
 native tests and 29 clean-source launcher tests. Details, raw RED/GREEN logs,
 exact source mapping and remaining hosted gate are in `ci-repair/closure.md`.
-The work group remains open pending corrected hosted validation.
+Corrected hosted run 41891188691 is verified successful in both jobs on
+`bc96009`: 4,504 full-suite passes plus two subtests and one deliberate warning.
+This closes the sequence work group's hosted gate; whole-year composition and
+mature target acceptance remain open.

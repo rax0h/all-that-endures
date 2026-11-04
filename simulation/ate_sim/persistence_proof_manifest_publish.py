@@ -104,6 +104,7 @@ class _Request:
     insertions:object=None
     sequence_rows:object=None
     sequence_roots:object=None
+    scalar_rows:object=None
 
 @dataclass(frozen=True)
 class WorldManifestCommit:
@@ -139,19 +140,22 @@ def _guard(store,r,versions,ordinary,segments):
             if parent is not None:
                 d=codec.decode(parent.payload);frozen=type(d) is tuple and type(d[0]) is str and d[0].startswith('frozen-')
         if frozen and (old is None or old.payload!=item['payload'] or old.memberships!=item['memberships_blob']):raise StoreIntegrityError('manifest transition cannot edit an immutable backing')
-    from .persistence_proof_world_value import validate_value_transition,validate_lease_updates,MAX_ROWS
+    from .persistence_proof_world_value import validate_value_transition,validate_lease_updates
+    from .persistence_proof_world_components import semantic_versions,frontier_versions
     leases=validate_lease_updates(store,r,versions)
     # Keep all frozen rows in the transaction and content/inventory publisher.
     # Already authenticated existing lease bookkeeping has an independent work
     # budget and cannot consume unrelated semantic transition shape budgets.
     # Do not materialize an oversized streamed preparation just to rediscover
     # that the remaining semantic batch exceeds the existing shape budget.
-    semantic=(tuple(i for i in versions if (i['namespace'],i['typed_key']) not in leases)
-              if leases and len(versions)-len(leases)<=MAX_ROWS else versions)
+    semantic=semantic_versions(versions,leases)
+    frontier=frontier_versions(semantic)
     from .persistence_proof_world_tail import prepare
-    r.tail,r.tail_facts=prepare(store,r,semantic)
+    r.tail,r.tail_facts=prepare(store,r,frontier)
     from .persistence_proof_world_sequence import prepare as prepare_sequence
-    prepare_sequence(store,r,semantic)
+    prepare_sequence(store,r,frontier)
+    from .persistence_proof_world_scalar_growth import prepare as prepare_scalar_growth
+    prepare_scalar_growth(store,r,frontier)
     r.value_only=validate_value_transition(store,r,semantic,ordinary,segments)
     if not r.value_only:
         from .persistence_proof_world_insert import prepare as prepare_insertions
