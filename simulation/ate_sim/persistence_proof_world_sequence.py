@@ -144,8 +144,10 @@ def _prepare(store, request, versions):
     appended_count = added = 0
     for item in descriptors:
         incarnation = codec.decode(item['typed_key'])
-        if type(incarnation) is not int or not 0 < incarnation < sa.next_incarnation_id:
+        if type(incarnation) is not int or not 0 < incarnation < 2**63:
             raise StoreIntegrityError('invalid existing sequence incarnation')
+        if incarnation >= sa.next_incarnation_id:
+            raise Unsupported()
         parent = sources.source(sequence.DESCRIPTOR_NAMESPACE, item['typed_key'])
         if parent is None or item['change'].delete:
             raise Unsupported()

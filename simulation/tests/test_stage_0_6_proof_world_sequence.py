@@ -61,6 +61,28 @@ def test_existing_native_sequence_append_avoids_world_audit(tmp_path, monkeypatc
         assert json.loads(fresh.stdout) == [expected, 4099, True]
 
 
+def test_sequence_append_with_new_sequence_retains_checked_fallback(tmp_path, monkeypatch, sequences):
+    from ate_sim import persistence_proof_world as world
+    path, pair = sequences(tmp_path)
+    with opened(path, pair) as session:
+        session.world.households[1].members.append(7)
+        session.world.households[99] = Household(99, 1, members=[1, 2])
+        original, calls = world._audit_world, []
+        def audit(*args, **kwargs):
+            calls.append(True)
+            return original(*args, **kwargs)
+        with monkeypatch.context() as patch:
+            patch.setattr(world, '_audit_world', audit)
+            assert session.save() == 1
+            pair = session.proof_manifest
+        assert calls
+    with opened(path, pair) as restored:
+        assert list(restored.world.households[1].members) == [1, 2, 3, 7]
+        assert restored.world.households[1].members is restored.world.households[2].members
+        assert list(restored.world.households[99].members) == [1, 2]
+        assert restored.world.households[99].members is not restored.world.households[1].members
+
+
 def test_sequence_append_composes_with_fresh_owner_and_integer_tail(tmp_path, monkeypatch, sequences):
     from ate_sim.core import Person
     from ate_sim import persistence_proof_world as world
