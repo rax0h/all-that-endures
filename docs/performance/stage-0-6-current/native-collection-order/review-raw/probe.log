@@ -1,0 +1,6 @@
+caller unregistered length StoreConflictError: generation pin is not registered first key (1, 'craft') full iteration [(1, 'craft'), (2, 'craft')]
+caller foreign length StoreConflictError: native source cannot borrow a different generation snapshot first key (1, 'craft') full iteration StoreConflictError: native source cannot borrow a different generation snapshot
+paused (1, 'craft') held source payload bytes 260 membership bytes 12
+listed at head 0 with additional open order starting at 1 [(1, 'craft'), (2, 'craft')]
+future-only physical namespace declared? False
+bogus 4 MiB checksum StoreIntegrityError: native order metadata differs from accepted collection raw rank materialized True

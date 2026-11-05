@@ -1,0 +1,5 @@
+save 1
+row factory actions ['entered', ('ordinary-source-bypass', True), ('native-point-order', (0, 0, None)), ('native-count', 2), ('durable-write', 1)]
+writer view of world.seed checksum [('poison-from-row-factory',)]
+fresh connection checksum ('poison-from-row-factory',)
+fresh audited open StoreIntegrityError ordinary record checksum mismatch

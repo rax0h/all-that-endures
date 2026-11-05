@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="27" time="47.047" timestamp="2026-11-05T14:59:50.026547-06:00" hostname="7f564e2a1d9e"><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[count]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.935" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[next]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.897" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[missing-order]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.881" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[ordinal]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.897" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[extra-order]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.895" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[count]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.896" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[missing]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.924" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[swap]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.921" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[extra]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.907" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_iteration_preserves_keys_and_releases_before_yield[1]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="73" time="1.126" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_iteration_preserves_keys_and_releases_before_yield[2]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="73" time="1.119" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_iteration_preserves_keys_and_releases_before_yield[128]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="73" time="1.109" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[save]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="1.080" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[local-write]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.897" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[external-write]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.929" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_overlapping_future_closed_order" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="108" time="1.085" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_windows_paginate_and_shrink_without_skipping[12]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="121" time="12.603"><properties><property name="key_width" value="12" /><property name="physical_windows" value="[(129, 129), (5, 4)]" /></properties></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_windows_paginate_and_shrink_without_skipping[3980]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="121" time="7.283"><failure message="ate_sim.incremental_store.StoreError: directory collection key exceeds field path">tmp_path = PosixPath('/tmp/ate-native-order-extended/test_native_key_windows_pagina1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f322e3437d0&gt;
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7f322d58d760&gt;
+width = 3980
+
+    @pytest.mark.parametrize('width',[12,3980])
+    def test_native_key_windows_paginate_and_shrink_without_skipping(tmp_path,monkeypatch,record_property,width):
+        from ate_sim.skills import SkillHistory
+        from ate_sim import persistence_proof_native_order as native
+        keys=[(1,str(i).zfill(4)+'x'*width) for i in range(132)]
+        def configure(w):
+            w.skills.skills.clear()
+            for person,name in keys:w.skills.skills[person,name]=SkillHistory(person,name)
+&gt;       path,pair=fixture(tmp_path,configure=configure)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:9: in fixture
+    s,p,pair=_proof_store(tmp_path,**kw);path=s.path;s.release_pin(p);s.close();return path,pair
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_world.py:74: in _proof_store
+    s,p,a,ra,d=make_world(tmp_path/'source',**kwargs);source=s.path;s.release_pin(p);s.close()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:18: in make_world
+    s=opened(file);p=s.capture_pin();a,ra=authorities(s,p);d=_load(s,p.captured_head)[0]
+                                          ^^^^^^^^^^^^^^^^
+simulation/tests/proof_sequence_event_fixtures.py:20: in authorities
+    sa=bootstrap_scope_proofs(s,p,**opts);ca=bootstrap_content_proofs(s,p);bootstrap_collection_directory(s,p);ia=bootstrap_inventory(s,p)
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f322e1890a0&gt;
+pin = GenerationPin(token='5c4ea6d4-6c6c-4ecf-a8c8-7ddd3c74d423', store_identity='83fed859-2fad-467b-9d63-467cff606593', captured_head=3)
+max_metadata_bytes = 1048576
+
+    def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
+        _budget(max_metadata_bytes);_require_closed_codec(store,allow_typed=True)
+        if store.db.in_transaction or store._active_read_transaction:raise StoreError('directory construction requires owned transaction')
+        store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
+        try:
+            _source_schemas(store.db);_closed_snapshot_preflight(store,max_metadata_bytes);g=store._require_pin(pin)
+            if g!=int(store._checked_head_row()[0]):raise StoreConflictError('directory construction requires current pin')
+            collection._indexes(store);_source_indexes(store.db,create=True);_guard_construction(store,g,MAX_BODY_BYTES,max_metadata_bytes)
+            for table in ('lazy_namespace_state','lazy_order_versions','lazy_record_versions'):
+                if store.db.execute('SELECT 1 FROM '+table+' WHERE length(CAST(namespace AS BLOB))&gt;4096 LIMIT 1').fetchone():raise StoreError('directory namespace exceeds field path')
+&gt;           if store.db.execute("SELECT 1 FROM lazy_order_versions WHERE typeof(typed_key)!='blob' OR length(typed_key)&gt;4096 LIMIT 1").fetchone():raise StoreError('directory collection key exceeds field path')
+                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ate_sim.incremental_store.StoreError: directory collection key exceeds field path
+
+simulation/ate_sim/persistence_proof_collection_directory.py:102: StoreError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[huge-key]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.918" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[huge-checksum]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.936" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[future-state]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.891"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-order-extended/test_native_order_rejects_bad_2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f322d3fed80&gt;
+damage = 'future-state'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a=store.codec.encode((1,'craft'))
+            if damage=='huge-key':
+                k=b'x'*1048576
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',(NS,k,99,0,None,_order_checksum(NS,k,99,0,None)))
+            elif damage=='huge-checksum':store.db.execute('UPDATE lazy_order_versions SET row_checksum=? WHERE namespace=?',('x'*1048576,NS))
+            elif damage=='future-state':
+                count,n,start,_=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET valid_to=1,row_checksum=? WHERE namespace=?',(_namespace_checksum(NS,count,n,start,1),NS))
+            elif damage=='missing-body':store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='seek':
+                domain=collection.domain(store.store_identity,store.codec.version,NS)
+                store.db.execute('UPDATE ate_ordered_seek_nodes SET raw=? WHERE domain=?',(b'bad',domain))
+            else:
+                domain=directory.domain(store.store_identity,store.codec.version)
+                store.db.execute('UPDATE ate_collection_directory_bodies SET raw=? WHERE domain=?',(b'bad',domain))
+            store.db.commit();reset_epoch(store);seen=[]
+            def row(cursor,values):
+                assert not any(isinstance(v,(str,bytes)) and len(v)&gt;=1048576 for v in values),'oversized metadata transferred'
+                return values
+            store.db.row_factory=row
+            decode=store.codec.decode
+            def observed(raw):
+                if raw==a:seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+&gt;           with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:184: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[missing-body]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.883" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[seek]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.917" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[directory]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.899" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_decode_error_releases_snapshot" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="188" time="0.899" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_count_point_and_key_page_fetch_no_unrelated_bodies[1000]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="202" time="1.207"><properties><property name="history_values" value="1000" /><property name="selected_source_bodies" value="2" /><property name="count_and_order_repetitions" value="10" /><property name="seconds" value="0.020722142999147763" /><property name="unexpected_physical_body_selects" value="0" /></properties></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_count_point_and_key_page_fetch_no_unrelated_bodies[10000]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="202" time="3.721"><properties><property name="history_values" value="10000" /><property name="selected_source_bodies" value="2" /><property name="count_and_order_repetitions" value="10" /><property name="seconds" value="0.030851265999444877" /><property name="unexpected_physical_body_selects" value="0" /></properties></testcase></testsuite></testsuites>

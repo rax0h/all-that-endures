@@ -1,0 +1,140 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_____ test_paused_native_iterator_rejects_reaccepted_same_generation_epoch _____
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-red/test_paused_native_iterator_re0')
+
+    def test_paused_native_iterator_rejects_reaccepted_same_generation_epoch(tmp_path):
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;authority=store._world_proof_authority
+            it=store.iter_keys(session.pin,NS);assert next(it)==(1,'craft');epoch=authority.epoch
+            session.world.year=1
+            def fault(phase):
+                if phase=='before_commit':raise RuntimeError('rollback before acknowledgement')
+            store._phase_hook=fault
+            with pytest.raises(RuntimeError):session.save()
+            store._phase_hook=lambda _:None
+            assert session.resolve_save()==0 and authority.epoch!=epoch
+>           with pytest.raises(StoreConflictError):next(it)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:258: Failed
+_ test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[row] __
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-red/test_postcommit_sqlite_customi0')
+kind = 'row'
+
+    @pytest.mark.parametrize('kind',['row','text','scalar'])
+    def test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher(tmp_path,kind):
+        from ate_sim import persistence_proof_native_sources as sources
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+        try:
+            authority=store._world_proof_authority
+            def probe():
+                guard=getattr(store.db,'_native_write_guard',None)
+                if seen or guard is None or not guard.depth or authority.pair[0].generation!=1:return
+                seen.append('entered')
+                try:sources.active(store)
+                except StoreError:seen.append('source-blocked')
+                else:seen.append('source-borrowed')
+                try:store.db.execute("UPDATE records SET payload_checksum='callback-poison' WHERE namespace='world.seed'");store.db.commit()
+                except StoreError:seen.append('write-blocked')
+                else:seen.append('write-published')
+            def row(cursor,values):probe();return values
+            def text(raw):probe();return raw.decode()
+            def length(value):
+                probe()
+                return None if value is None else len(value if type(value) is bytes else str(value).split(chr(0),1)[0])
+            if kind=='row':store.db.row_factory=row
+            elif kind=='text':store.db.text_factory=text
+            else:store.db.create_function('length',1,length)
+            session.world.year=1
+            # A denied callback poisons this operation even if the callback catches it.
+>           with pytest.raises(StoreError):session.save()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:289: Failed
+_ test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[text] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-red/test_postcommit_sqlite_customi1')
+kind = 'text'
+
+    @pytest.mark.parametrize('kind',['row','text','scalar'])
+    def test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher(tmp_path,kind):
+        from ate_sim import persistence_proof_native_sources as sources
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+        try:
+            authority=store._world_proof_authority
+            def probe():
+                guard=getattr(store.db,'_native_write_guard',None)
+                if seen or guard is None or not guard.depth or authority.pair[0].generation!=1:return
+                seen.append('entered')
+                try:sources.active(store)
+                except StoreError:seen.append('source-blocked')
+                else:seen.append('source-borrowed')
+                try:store.db.execute("UPDATE records SET payload_checksum='callback-poison' WHERE namespace='world.seed'");store.db.commit()
+                except StoreError:seen.append('write-blocked')
+                else:seen.append('write-published')
+            def row(cursor,values):probe();return values
+            def text(raw):probe();return raw.decode()
+            def length(value):
+                probe()
+                return None if value is None else len(value if type(value) is bytes else str(value).split(chr(0),1)[0])
+            if kind=='row':store.db.row_factory=row
+            elif kind=='text':store.db.text_factory=text
+            else:store.db.create_function('length',1,length)
+            session.world.year=1
+            # A denied callback poisons this operation even if the callback catches it.
+>           with pytest.raises(StoreError):session.save()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:289: Failed
+_ test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[scalar] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-red/test_postcommit_sqlite_customi2')
+kind = 'scalar'
+
+    @pytest.mark.parametrize('kind',['row','text','scalar'])
+    def test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher(tmp_path,kind):
+        from ate_sim import persistence_proof_native_sources as sources
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+        try:
+            authority=store._world_proof_authority
+            def probe():
+                guard=getattr(store.db,'_native_write_guard',None)
+                if seen or guard is None or not guard.depth or authority.pair[0].generation!=1:return
+                seen.append('entered')
+                try:sources.active(store)
+                except StoreError:seen.append('source-blocked')
+                else:seen.append('source-borrowed')
+                try:store.db.execute("UPDATE records SET payload_checksum='callback-poison' WHERE namespace='world.seed'");store.db.commit()
+                except StoreError:seen.append('write-blocked')
+                else:seen.append('write-published')
+            def row(cursor,values):probe();return values
+            def text(raw):probe();return raw.decode()
+            def length(value):
+                probe()
+                return None if value is None else len(value if type(value) is bytes else str(value).split(chr(0),1)[0])
+            if kind=='row':store.db.row_factory=row
+            elif kind=='text':store.db.text_factory=text
+            else:store.db.create_function('length',1,length)
+            session.world.year=1
+            # A denied callback poisons this operation even if the callback catches it.
+>           with pytest.raises(StoreError):session.save()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:289: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_paused_native_iterator_rejects_reaccepted_same_generation_epoch
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[row]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[text]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[scalar]
+4 failed, 29 deselected in 5.88s

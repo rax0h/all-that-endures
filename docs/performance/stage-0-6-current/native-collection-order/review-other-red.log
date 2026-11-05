@@ -1,0 +1,276 @@
+FFFFFFFFFFF.                                                             [100%]
+=================================== FAILURES ===================================
+_ test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-foreign] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_iterator_requires_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f971c602840>
+kind = 'foreign', namespace = 'world.skills.skills'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            pin=replace(session.pin,store_identity='foreign') if kind=='foreign' else replace(session.pin,token='not-registered')
+            if kind=='released':
+                pin=store.capture_pin();store.release_pin(pin);reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw==store.codec.encode((1,'craft')):seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            with pytest.raises(StoreError):list(store.iter_keys(pin,namespace))
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_order.py:364: AssertionError
+_ test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-unregistered] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_iterator_requires_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f971c42ae40>
+kind = 'unregistered', namespace = 'world.skills.skills'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            pin=replace(session.pin,store_identity='foreign') if kind=='foreign' else replace(session.pin,token='not-registered')
+            if kind=='released':
+                pin=store.capture_pin();store.release_pin(pin);reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw==store.codec.encode((1,'craft')):seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreError):list(store.iter_keys(pin,namespace))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:363: Failed
+_ test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-released] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_iterator_requires_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f971c291bb0>
+kind = 'released', namespace = 'world.skills.skills'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            pin=replace(session.pin,store_identity='foreign') if kind=='foreign' else replace(session.pin,token='not-registered')
+            if kind=='released':
+                pin=store.capture_pin();store.release_pin(pin);reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw==store.codec.encode((1,'craft')):seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreError):list(store.iter_keys(pin,namespace))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:363: Failed
+_ test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-foreign] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_iterator_requires_3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f971c428b00>
+kind = 'foreign', namespace = 'world.not-present'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            pin=replace(session.pin,store_identity='foreign') if kind=='foreign' else replace(session.pin,token='not-registered')
+            if kind=='released':
+                pin=store.capture_pin();store.release_pin(pin);reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw==store.codec.encode((1,'craft')):seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreError):list(store.iter_keys(pin,namespace))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:363: Failed
+_ test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-unregistered] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_iterator_requires_4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f971d109490>
+kind = 'unregistered', namespace = 'world.not-present'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            pin=replace(session.pin,store_identity='foreign') if kind=='foreign' else replace(session.pin,token='not-registered')
+            if kind=='released':
+                pin=store.capture_pin();store.release_pin(pin);reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw==store.codec.encode((1,'craft')):seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreError):list(store.iter_keys(pin,namespace))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:363: Failed
+_ test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-released] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_iterator_requires_5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f971c502900>
+kind = 'released', namespace = 'world.not-present'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            pin=replace(session.pin,store_identity='foreign') if kind=='foreign' else replace(session.pin,token='not-registered')
+            if kind=='released':
+                pin=store.capture_pin();store.release_pin(pin);reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw==store.codec.encode((1,'craft')):seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreError):list(store.iter_keys(pin,namespace))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:363: Failed
+_____ test_native_current_head_rejects_future_starting_open_surplus[point] _____
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_current_head_rejec0')
+kind = 'point'
+
+    @pytest.mark.parametrize('kind',['point','page','namespace'])
+    def test_native_current_head_rejects_future_starting_open_surplus(tmp_path,kind):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            if kind=='namespace':
+                ns='world.not-present'
+                store.db.execute('INSERT INTO lazy_namespace_state VALUES(?,?,?,?,?,?)',(ns,1,None,0,0,_namespace_checksum(ns,0,0,1,None)))
+                read=lambda:store.namespace_size(session.pin,ns)
+            else:
+                key=store.codec.encode((99,'craft'))
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',(NS,key,99,1,None,_order_checksum(NS,key,99,1,None)))
+                read=(lambda:store._visible_order(NS,key,0)) if kind=='point' else lambda:list(store.iter_keys(session.pin,NS))
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:380: Failed
+_____ test_native_current_head_rejects_future_starting_open_surplus[page] ______
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_current_head_rejec1')
+kind = 'page'
+
+    @pytest.mark.parametrize('kind',['point','page','namespace'])
+    def test_native_current_head_rejects_future_starting_open_surplus(tmp_path,kind):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            if kind=='namespace':
+                ns='world.not-present'
+                store.db.execute('INSERT INTO lazy_namespace_state VALUES(?,?,?,?,?,?)',(ns,1,None,0,0,_namespace_checksum(ns,0,0,1,None)))
+                read=lambda:store.namespace_size(session.pin,ns)
+            else:
+                key=store.codec.encode((99,'craft'))
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',(NS,key,99,1,None,_order_checksum(NS,key,99,1,None)))
+                read=(lambda:store._visible_order(NS,key,0)) if kind=='point' else lambda:list(store.iter_keys(session.pin,NS))
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:380: Failed
+___ test_native_current_head_rejects_future_starting_open_surplus[namespace] ___
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_current_head_rejec2')
+kind = 'namespace'
+
+    @pytest.mark.parametrize('kind',['point','page','namespace'])
+    def test_native_current_head_rejects_future_starting_open_surplus(tmp_path,kind):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            if kind=='namespace':
+                ns='world.not-present'
+                store.db.execute('INSERT INTO lazy_namespace_state VALUES(?,?,?,?,?,?)',(ns,1,None,0,0,_namespace_checksum(ns,0,0,1,None)))
+                read=lambda:store.namespace_size(session.pin,ns)
+            else:
+                key=store.codec.encode((99,'craft'))
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',(NS,key,99,1,None,_order_checksum(NS,key,99,1,None)))
+                read=(lambda:store._visible_order(NS,key,0)) if kind=='point' else lambda:list(store.iter_keys(session.pin,NS))
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:380: Failed
+______ test_native_invalid_metadata_never_reaches_sqlite_materialization _______
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_native_invalid_metadata_n0')
+
+    def test_native_invalid_metadata_never_reaches_sqlite_materialization(tmp_path):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            store.db.execute('UPDATE lazy_order_versions SET row_checksum=? WHERE namespace=?',('x'*4194304,NS));store.db.commit();reset_epoch(store)
+            statements=[];store.db.set_trace_callback(statements.append)
+            with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+            store.db.set_trace_callback(None)
+>           assert not any(sql.startswith('WITH physical AS MATERIALIZED') for sql in statements)
+E           assert not True
+E            +  where True = any(<generator object test_native_invalid_metadata_never_reaches_sqlite_materialization.<locals>.<genexpr> at 0x7f971c01ac20>)
+
+simulation/tests/test_stage_0_6_proof_native_order.py:392: AssertionError
+__________ test_paused_native_iterator_retains_no_selected_source_row __________
+
+tmp_path = PosixPath('/tmp/ate-native-order-review-other-red/test_paused_native_iterator_re0')
+
+    def test_paused_native_iterator_retains_no_selected_source_row(tmp_path):
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            it=session.store.iter_keys(session.pin,NS);assert next(it)==(1,'craft')
+>           assert 'record' not in it.gi_frame.f_locals
+E           assert 'record' not in {'after': (0, b'["tuple",[["int","1"],["str","craft"]]]'), 'yielded': 1, 'accepted_epoch': (<ate_sim.persistence_sqlit...est=b'\x98\xc6\x81(\x1b\x95\xa1\xd2&\x18q\xdd\xe0ct@\xe0u\x82\xd7\xd6I\xb7\x16\xbe\xb9\xefT Q\x90\x1f', count=2)), ...}
+E            +  where {'after': (0, b'["tuple",[["int","1"],["str","craft"]]]'), 'yielded': 1, 'accepted_epoch': (<ate_sim.persistence_sqlit...est=b'\x98\xc6\x81(\x1b\x95\xa1\xd2&\x18q\xdd\xe0ct@\xe0u\x82\xd7\xd6I\xb7\x16\xbe\xb9\xefT Q\x90\x1f', count=2)), ...} = <frame at 0x7f971c55d3c0, file '/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_proof_native_order.py', line 196, code iterator>.f_locals
+E            +    where <frame at 0x7f971c55d3c0, file '/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_proof_native_order.py', line 196, code iterator> = <generator object iter_keys.<locals>.iterator at 0x7f971c5be710>.gi_frame
+
+simulation/tests/test_stage_0_6_proof_native_order.py:400: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-unregistered]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-unregistered]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_current_head_rejects_future_starting_open_surplus[point]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_current_head_rejects_future_starting_open_surplus[page]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_current_head_rejects_future_starting_open_surplus[namespace]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_invalid_metadata_never_reaches_sqlite_materialization
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_paused_native_iterator_retains_no_selected_source_row
+11 failed, 1 passed, 37 deselected in 11.14s

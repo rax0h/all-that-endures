@@ -1,0 +1,337 @@
+FFFFFFFFF...                                                             [100%]
+=================================== FAILURES ===================================
+__ test_native_collection_rejects_checksum_consistent_relation_forgery[count] __
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_collection_rejects0')
+damage = 'count'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'))
+            if damage in ('count','next'):
+                count,next_id,start,end=store._namespace_state_at(NS,0)
+                count=0 if damage=='count' else count
+                next_id=99 if damage=='next' else next_id
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=?,next_ordinal=?,row_checksum=? WHERE namespace=?',
+                    (count,next_id,_namespace_checksum(NS,count,next_id,start,end),NS))
+                read=lambda:store.namespace_size(session.pin,NS)
+            else:
+                ordinal,start,end=store._visible_order(NS,key,0)
+                if damage=='missing-order':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,key))
+                elif damage=='ordinal':
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=99,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (_order_checksum(NS,key,99,start,end),NS,key))
+                else:
+                    key=store.codec.encode((99,'craft'))
+                    store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                        (NS,key,0,None,99,_order_checksum(NS,key,99,0,None)))
+                read=lambda:store._visible_order(NS,key,0)
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:39: Failed
+__ test_native_collection_rejects_checksum_consistent_relation_forgery[next] ___
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_collection_rejects1')
+damage = 'next'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'))
+            if damage in ('count','next'):
+                count,next_id,start,end=store._namespace_state_at(NS,0)
+                count=0 if damage=='count' else count
+                next_id=99 if damage=='next' else next_id
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=?,next_ordinal=?,row_checksum=? WHERE namespace=?',
+                    (count,next_id,_namespace_checksum(NS,count,next_id,start,end),NS))
+                read=lambda:store.namespace_size(session.pin,NS)
+            else:
+                ordinal,start,end=store._visible_order(NS,key,0)
+                if damage=='missing-order':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,key))
+                elif damage=='ordinal':
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=99,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (_order_checksum(NS,key,99,start,end),NS,key))
+                else:
+                    key=store.codec.encode((99,'craft'))
+                    store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                        (NS,key,0,None,99,_order_checksum(NS,key,99,0,None)))
+                read=lambda:store._visible_order(NS,key,0)
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:39: Failed
+_ test_native_collection_rejects_checksum_consistent_relation_forgery[missing-order] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_collection_rejects2')
+damage = 'missing-order'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'))
+            if damage in ('count','next'):
+                count,next_id,start,end=store._namespace_state_at(NS,0)
+                count=0 if damage=='count' else count
+                next_id=99 if damage=='next' else next_id
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=?,next_ordinal=?,row_checksum=? WHERE namespace=?',
+                    (count,next_id,_namespace_checksum(NS,count,next_id,start,end),NS))
+                read=lambda:store.namespace_size(session.pin,NS)
+            else:
+                ordinal,start,end=store._visible_order(NS,key,0)
+                if damage=='missing-order':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,key))
+                elif damage=='ordinal':
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=99,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (_order_checksum(NS,key,99,start,end),NS,key))
+                else:
+                    key=store.codec.encode((99,'craft'))
+                    store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                        (NS,key,0,None,99,_order_checksum(NS,key,99,0,None)))
+                read=lambda:store._visible_order(NS,key,0)
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:39: Failed
+_ test_native_collection_rejects_checksum_consistent_relation_forgery[ordinal] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_collection_rejects3')
+damage = 'ordinal'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'))
+            if damage in ('count','next'):
+                count,next_id,start,end=store._namespace_state_at(NS,0)
+                count=0 if damage=='count' else count
+                next_id=99 if damage=='next' else next_id
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=?,next_ordinal=?,row_checksum=? WHERE namespace=?',
+                    (count,next_id,_namespace_checksum(NS,count,next_id,start,end),NS))
+                read=lambda:store.namespace_size(session.pin,NS)
+            else:
+                ordinal,start,end=store._visible_order(NS,key,0)
+                if damage=='missing-order':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,key))
+                elif damage=='ordinal':
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=99,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (_order_checksum(NS,key,99,start,end),NS,key))
+                else:
+                    key=store.codec.encode((99,'craft'))
+                    store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                        (NS,key,0,None,99,_order_checksum(NS,key,99,0,None)))
+                read=lambda:store._visible_order(NS,key,0)
+            store.db.commit();reset_epoch(store)
+>           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:39: Failed
+_ test_native_collection_rejects_checksum_consistent_relation_forgery[extra-order] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_collection_rejects4')
+damage = 'extra-order'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'))
+            if damage in ('count','next'):
+                count,next_id,start,end=store._namespace_state_at(NS,0)
+                count=0 if damage=='count' else count
+                next_id=99 if damage=='next' else next_id
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=?,next_ordinal=?,row_checksum=? WHERE namespace=?',
+                    (count,next_id,_namespace_checksum(NS,count,next_id,start,end),NS))
+                read=lambda:store.namespace_size(session.pin,NS)
+            else:
+                ordinal,start,end=store._visible_order(NS,key,0)
+                if damage=='missing-order':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,key))
+                elif damage=='ordinal':
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=99,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (_order_checksum(NS,key,99,start,end),NS,key))
+                else:
+                    key=store.codec.encode((99,'craft'))
+>                   store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                        (NS,key,0,None,99,_order_checksum(NS,key,99,0,None)))
+
+simulation/tests/test_stage_0_6_proof_native_order.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f1b55aca550>
+args = ('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)', ('world.skills.skills', b'["tuple",[["int","99"],["str","craft"]]]', 0, None, 99, 'ea7a65555f64c3545156d73e1c21c323c23481396fbb23fadb7de725a0e9e9b6'))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.IntegrityError: NOT NULL constraint failed: lazy_order_versions.valid_from
+
+simulation/ate_sim/persistence_sqlite_guard.py:77: IntegrityError
+____ test_native_key_page_rejects_before_decoding_mismatched_window[count] _____
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_key_page_rejects_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1b55802ff0>
+damage = 'count'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a,b=(store.codec.encode((p,'craft')) for p in (1,2))
+            if damage=='count':
+                _,n,s,e=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=0,row_checksum=? WHERE namespace=?',
+                    (_namespace_checksum(NS,0,n,s,e),NS))
+            elif damage=='missing':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='swap':
+                for key,ordinal in ((a,99),(b,0),(a,1)):
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=?,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (ordinal,_order_checksum(NS,key,ordinal,0,None),NS,key))
+            else:
+                k=store.codec.encode((99,'craft'))
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                    (NS,k,0,None,99,_order_checksum(NS,k,99,0,None)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;decoded=[]
+            def observed(raw):
+                if raw in (a,b):decoded.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:68: Failed
+___ test_native_key_page_rejects_before_decoding_mismatched_window[missing] ____
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_key_page_rejects_b1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1b558987d0>
+damage = 'missing'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a,b=(store.codec.encode((p,'craft')) for p in (1,2))
+            if damage=='count':
+                _,n,s,e=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=0,row_checksum=? WHERE namespace=?',
+                    (_namespace_checksum(NS,0,n,s,e),NS))
+            elif damage=='missing':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='swap':
+                for key,ordinal in ((a,99),(b,0),(a,1)):
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=?,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (ordinal,_order_checksum(NS,key,ordinal,0,None),NS,key))
+            else:
+                k=store.codec.encode((99,'craft'))
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                    (NS,k,0,None,99,_order_checksum(NS,k,99,0,None)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;decoded=[]
+            def observed(raw):
+                if raw in (a,b):decoded.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+>           assert not decoded
+E           assert not [b'["tuple",[["int","2"],["str","craft"]]]']
+
+simulation/tests/test_stage_0_6_proof_native_order.py:69: AssertionError
+_____ test_native_key_page_rejects_before_decoding_mismatched_window[swap] _____
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_key_page_rejects_b2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1b5599d400>
+damage = 'swap'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a,b=(store.codec.encode((p,'craft')) for p in (1,2))
+            if damage=='count':
+                _,n,s,e=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=0,row_checksum=? WHERE namespace=?',
+                    (_namespace_checksum(NS,0,n,s,e),NS))
+            elif damage=='missing':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='swap':
+                for key,ordinal in ((a,99),(b,0),(a,1)):
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=?,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (ordinal,_order_checksum(NS,key,ordinal,0,None),NS,key))
+            else:
+                k=store.codec.encode((99,'craft'))
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                    (NS,k,0,None,99,_order_checksum(NS,k,99,0,None)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;decoded=[]
+            def observed(raw):
+                if raw in (a,b):decoded.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:68: Failed
+____ test_native_key_page_rejects_before_decoding_mismatched_window[extra] _____
+
+tmp_path = PosixPath('/tmp/ate-native-order-red/test_native_key_page_rejects_b3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1b557d5580>
+damage = 'extra'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a,b=(store.codec.encode((p,'craft')) for p in (1,2))
+            if damage=='count':
+                _,n,s,e=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET member_count=0,row_checksum=? WHERE namespace=?',
+                    (_namespace_checksum(NS,0,n,s,e),NS))
+            elif damage=='missing':store.db.execute('DELETE FROM lazy_order_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='swap':
+                for key,ordinal in ((a,99),(b,0),(a,1)):
+                    store.db.execute('UPDATE lazy_order_versions SET ordinal=?,row_checksum=? WHERE namespace=? AND typed_key=?',
+                        (ordinal,_order_checksum(NS,key,ordinal,0,None),NS,key))
+            else:
+                k=store.codec.encode((99,'craft'))
+>               store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                    (NS,k,0,None,99,_order_checksum(NS,k,99,0,None)))
+
+simulation/tests/test_stage_0_6_proof_native_order.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f1b55983950>
+args = ('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)', ('world.skills.skills', b'["tuple",[["int","99"],["str","craft"]]]', 0, None, 99, 'ea7a65555f64c3545156d73e1c21c323c23481396fbb23fadb7de725a0e9e9b6'))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.IntegrityError: NOT NULL constraint failed: lazy_order_versions.valid_from
+
+simulation/ate_sim/persistence_sqlite_guard.py:77: IntegrityError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_collection_rejects_checksum_consistent_relation_forgery[count]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_collection_rejects_checksum_consistent_relation_forgery[next]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_collection_rejects_checksum_consistent_relation_forgery[missing-order]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_collection_rejects_checksum_consistent_relation_forgery[ordinal]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_collection_rejects_checksum_consistent_relation_forgery[extra-order]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_page_rejects_before_decoding_mismatched_window[count]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_page_rejects_before_decoding_mismatched_window[missing]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_page_rejects_before_decoding_mismatched_window[swap]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_page_rejects_before_decoding_mismatched_window[extra]
+9 failed, 3 passed in 10.71s

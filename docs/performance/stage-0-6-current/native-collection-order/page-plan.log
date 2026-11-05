@@ -1,0 +1,8 @@
+.                                                                        [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_windows_paginate_and_shrink_without_skipping[12]
+  simulation/tests/test_stage_0_6_proof_native_order.py:122: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('width',[12,3950])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 48 deselected, 1 warning in 11.95s

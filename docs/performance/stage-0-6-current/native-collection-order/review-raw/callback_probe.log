@@ -1,0 +1,2 @@
+save 1
+row factory actions ['entered', ('ordinary-source-bypass', True), ('native-point-order', (0, 0, None)), ('OperationalError', 'cannot start a transaction within a transaction')]

@@ -1,0 +1,67 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[future-state] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-state-red/test_native_order_rejects_bad_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f62a3b7ac00>
+damage = 'future-state'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a=store.codec.encode((1,'craft'))
+            if damage=='huge-key':
+                k=b'x'*1048576
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',(NS,k,99,0,None,_order_checksum(NS,k,99,0,None)))
+            elif damage=='huge-checksum':store.db.execute('UPDATE lazy_order_versions SET row_checksum=? WHERE namespace=?',('x'*1048576,NS))
+            elif damage=='future-state':
+                count,n,start,_=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET valid_to=1,row_checksum=? WHERE namespace=?',(_namespace_checksum(NS,count,n,start,1),NS))
+            elif damage=='missing-body':store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='seek':
+                domain=collection.domain(store.store_identity,store.codec.version,NS)
+                store.db.execute('UPDATE ate_ordered_seek_nodes SET raw=? WHERE domain=?',(b'bad',domain))
+            else:
+                domain=directory.domain(store.store_identity,store.codec.version)
+                store.db.execute('UPDATE ate_collection_directory_bodies SET raw=? WHERE domain=?',(b'bad',domain))
+            store.db.commit();reset_epoch(store);seen=[]
+            def row(cursor,values):
+                assert not any(isinstance(v,(str,bytes)) and len(v)>=1048576 for v in values),'oversized metadata transferred'
+                return values
+            store.db.row_factory=row
+            decode=store.codec.decode
+            def observed(raw):
+                if raw==a:seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:184: Failed
+______ test_native_scoped_summary_never_reuses_physical_state_after_write ______
+
+tmp_path = PosixPath('/tmp/ate-native-order-state-red/test_native_scoped_summary_nev0')
+
+    def test_native_scoped_summary_never_reuses_physical_state_after_write(tmp_path):
+        from ate_sim.persistence_validation_scope import checked_read_operation
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            with checked_read_operation(store,session.pin) as scope:
+                assert store.namespace_size(session.pin,NS)==2 and scope.entries>0
+                assert list(store.iter_keys(session.pin,NS))==[(1,'craft'),(2,'craft')]
+                count,n,start,_=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET valid_to=1,row_checksum=? WHERE namespace=?',
+                    (_namespace_checksum(NS,count,n,start,1),NS))
+                reset_epoch(store)
+>               with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:214: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[future-state]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_scoped_summary_never_reuses_physical_state_after_write
+2 failed, 26 deselected in 2.29s

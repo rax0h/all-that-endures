@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_native_cold_and_scoped_reads_select_physical_state_once _________
+
+tmp_path = PosixPath('/tmp/ate-native-order-state-work-red/test_native_cold_and_scoped_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4d01966090>
+
+    def test_native_cold_and_scoped_reads_select_physical_state_once(tmp_path,monkeypatch):
+        from ate_sim.persistence_validation_scope import checked_read_operation
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;statements=[];store.db.set_trace_callback(statements.append)
+            def selections():return sum('FROM lazy_namespace_state' in sql and 'row_checksum' in sql for sql in statements)
+            try:
+                assert store.namespace_size(session.pin,NS)==2
+>               cold=selections();assert cold==1
+                                  ^^^^^^^^^^^^^^
+E               assert 2 == 1
+
+simulation/tests/test_stage_0_6_proof_native_order.py:413: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_cold_and_scoped_reads_select_physical_state_once
+1 failed, 48 deselected in 1.43s

@@ -1,0 +1,133 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___ test_registered_sqlite_callbacks_cannot_write_from_publisher[aggregate] ____
+
+kind = 'aggregate'
+
+    @pytest.mark.parametrize('kind',['aggregate','window','collation'])
+    def test_registered_sqlite_callbacks_cannot_write_from_publisher(kind):
+        import sqlite3
+        from ate_sim.persistence_sqlite_guard import GuardedConnection
+        from ate_sim.persistence_proof_native_guard import NativeWriteGuard
+        from ate_sim.incremental_store import StoreError
+        db=sqlite3.connect(':memory:',factory=GuardedConnection);seen=[]
+        try:
+            db.execute('CREATE TABLE protected(value)');db.commit()
+            def probe():
+                if seen:return
+                seen.append('entered')
+                try:db.execute('INSERT INTO protected VALUES(1)')
+                except StoreError:seen.append('blocked')
+            class Total:
+                def __init__(self):self.total=0
+                def step(self,value):probe();self.total+=value
+                def inverse(self,value):probe();self.total-=value
+                def value(self):probe();return self.total
+                def finalize(self):probe();return self.total
+            if kind=='aggregate':
+                db.create_aggregate('custom_total',1,Total);sql='SELECT custom_total(1)'
+            elif kind=='window':
+                db.create_window_function('custom_total',1,Total);sql='SELECT custom_total(1) OVER ()'
+            else:
+                def compare(a,b):probe();return (a>b)-(a<b)
+                db.create_collation('custom_order',compare)
+                sql="SELECT x FROM (SELECT 'b' AS x UNION ALL SELECT 'a') ORDER BY x COLLATE custom_order"
+            with NativeWriteGuard(db) as guard:
+                with guard.publisher():rows=db.execute(sql).fetchall()
+                assert rows==([('a',),('b',)] if kind=='collation' else [(1,)])
+>               assert seen==['entered','blocked']
+E               AssertionError: assert ['entered'] == ['entered', 'blocked']
+E                 
+E                 Right contains one more item: 'blocked'
+E                 Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_order.py:329: AssertionError
+_____ test_registered_sqlite_callbacks_cannot_write_from_publisher[window] _____
+
+kind = 'window'
+
+    @pytest.mark.parametrize('kind',['aggregate','window','collation'])
+    def test_registered_sqlite_callbacks_cannot_write_from_publisher(kind):
+        import sqlite3
+        from ate_sim.persistence_sqlite_guard import GuardedConnection
+        from ate_sim.persistence_proof_native_guard import NativeWriteGuard
+        from ate_sim.incremental_store import StoreError
+        db=sqlite3.connect(':memory:',factory=GuardedConnection);seen=[]
+        try:
+            db.execute('CREATE TABLE protected(value)');db.commit()
+            def probe():
+                if seen:return
+                seen.append('entered')
+                try:db.execute('INSERT INTO protected VALUES(1)')
+                except StoreError:seen.append('blocked')
+            class Total:
+                def __init__(self):self.total=0
+                def step(self,value):probe();self.total+=value
+                def inverse(self,value):probe();self.total-=value
+                def value(self):probe();return self.total
+                def finalize(self):probe();return self.total
+            if kind=='aggregate':
+                db.create_aggregate('custom_total',1,Total);sql='SELECT custom_total(1)'
+            elif kind=='window':
+                db.create_window_function('custom_total',1,Total);sql='SELECT custom_total(1) OVER ()'
+            else:
+                def compare(a,b):probe();return (a>b)-(a<b)
+                db.create_collation('custom_order',compare)
+                sql="SELECT x FROM (SELECT 'b' AS x UNION ALL SELECT 'a') ORDER BY x COLLATE custom_order"
+            with NativeWriteGuard(db) as guard:
+                with guard.publisher():rows=db.execute(sql).fetchall()
+                assert rows==([('a',),('b',)] if kind=='collation' else [(1,)])
+>               assert seen==['entered','blocked']
+E               AssertionError: assert ['entered'] == ['entered', 'blocked']
+E                 
+E                 Right contains one more item: 'blocked'
+E                 Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_order.py:329: AssertionError
+___ test_registered_sqlite_callbacks_cannot_write_from_publisher[collation] ____
+
+kind = 'collation'
+
+    @pytest.mark.parametrize('kind',['aggregate','window','collation'])
+    def test_registered_sqlite_callbacks_cannot_write_from_publisher(kind):
+        import sqlite3
+        from ate_sim.persistence_sqlite_guard import GuardedConnection
+        from ate_sim.persistence_proof_native_guard import NativeWriteGuard
+        from ate_sim.incremental_store import StoreError
+        db=sqlite3.connect(':memory:',factory=GuardedConnection);seen=[]
+        try:
+            db.execute('CREATE TABLE protected(value)');db.commit()
+            def probe():
+                if seen:return
+                seen.append('entered')
+                try:db.execute('INSERT INTO protected VALUES(1)')
+                except StoreError:seen.append('blocked')
+            class Total:
+                def __init__(self):self.total=0
+                def step(self,value):probe();self.total+=value
+                def inverse(self,value):probe();self.total-=value
+                def value(self):probe();return self.total
+                def finalize(self):probe();return self.total
+            if kind=='aggregate':
+                db.create_aggregate('custom_total',1,Total);sql='SELECT custom_total(1)'
+            elif kind=='window':
+                db.create_window_function('custom_total',1,Total);sql='SELECT custom_total(1) OVER ()'
+            else:
+                def compare(a,b):probe();return (a>b)-(a<b)
+                db.create_collation('custom_order',compare)
+                sql="SELECT x FROM (SELECT 'b' AS x UNION ALL SELECT 'a') ORDER BY x COLLATE custom_order"
+            with NativeWriteGuard(db) as guard:
+                with guard.publisher():rows=db.execute(sql).fetchall()
+                assert rows==([('a',),('b',)] if kind=='collation' else [(1,)])
+>               assert seen==['entered','blocked']
+E               AssertionError: assert ['entered'] == ['entered', 'blocked']
+E                 
+E                 Right contains one more item: 'blocked'
+E                 Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_order.py:329: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_registered_sqlite_callbacks_cannot_write_from_publisher[aggregate]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_registered_sqlite_callbacks_cannot_write_from_publisher[window]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_registered_sqlite_callbacks_cannot_write_from_publisher[collation]
+3 failed, 46 deselected in 0.52s

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.875" timestamp="2026-11-05T15:05:12.313300-06:00" hostname="7f564e2a1d9e"><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_noop_does_not_accept_a_new_epoch_without_audit" file="simulation/tests/test_stage_0_5_proof_world_session.py" line="190" time="0.996"><failure message="ate_sim.incremental_store.StoreConflictError: native source snapshot epoch differs from accepted authority">tmp_path = PosixPath('/tmp/ate-native-order-noop-red/test_noop_does_not_accept_a_ne0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fd236ec9b80&gt;
+
+    def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
+     import sqlite3
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      authority=s.store._world_proof_authority;original=authority._epoch;calls=[];injected=[]
+      def race():
+       captured=original();calls.append(True)
+       # Inject after a captured epoch at an actual transaction boundary. Additional
+       # in-snapshot checks must not move this external write into a locked reader.
+       if len(calls)&gt;=2 and not injected and not s.store.db.in_transaction:
+        injected.append(True)
+        with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
+       return captured
+      monkeypatch.setattr(authority,'_epoch',race)
+&gt;     assert s.save()==0
+             ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:104: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16744: in _save_native
+    plan = self._prepare_hybrid_save()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:14512: in _prepare_hybrid_save
+    return self._prepare_hybrid_save_inner(token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:14533: in _prepare_hybrid_save_inner
+    scalar_record_plans = tuple(
+simulation/ate_sim/persistence_lazy.py:14534: in &lt;genexpr&gt;
+    ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_minimum.py:262: in prepare_save_changes
+    result = super().prepare_save_changes()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:7409: in prepare_save_changes
+    versions, identities, touched, structural = super().prepare_save_changes()
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:7021: in prepare_save_changes
+    structural_ordinals = self._planned_structural_ordinals()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:3949: in _planned_structural_ordinals
+    state = self._store._namespace_state_at(
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:47: in state_row
+    with sources._snapshot(store,authority,generation):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1306: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1274: in _read_snapshot_start
+    proof_sources.snapshot_preflight(self, authority)
+simulation/ate_sim/persistence_proof_native_sources.py:61: in snapshot_preflight
+    _epoch(store, authority)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fd236dae540&gt;
+authority = &lt;ate_sim.persistence_proof_world_session._WorldProofAuthority object at 0x7fd237334770&gt;
+
+    def _epoch(store, authority):
+        actual, expected = authority._epoch(), authority.epoch
+        guard = getattr(store.db, '_native_write_guard', None)
+        owned = authority.busy and guard is not None and guard is getattr(authority, '_write_guard', None)
+        if (actual[:3] != expected[:3] or actual[4] != expected[4]
+                or not owned and actual != expected):
+&gt;           raise StoreConflictError('native source snapshot epoch differs from accepted authority')
+E           ate_sim.incremental_store.StoreConflictError: native source snapshot epoch differs from accepted authority
+
+simulation/ate_sim/persistence_proof_native_sources.py:54: StoreConflictError</failure></testcase></testsuite></testsuites>

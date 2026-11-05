@@ -1,0 +1,11 @@
+{
+  "status": "pass",
+  "source": "dd4d4006e74efe4d774e4bc4b3c00f4fee296722",
+  "runtime": "619141f1438ca658046187f8bbd65fcfc165cf80",
+  "python_syntax": true,
+  "proof_workflow_includes_new_native_order_tests": true,
+  "runtime_pin": true,
+  "all_launch_fingerprints": true,
+  "product_whitespace": true,
+  "workflow_bash_blocks": 5
+}

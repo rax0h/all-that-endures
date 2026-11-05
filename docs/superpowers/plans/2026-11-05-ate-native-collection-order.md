@@ -21,10 +21,12 @@ Create simulation/ate_sim/persistence_proof_native_order.py and simulation/tests
 Interfaces: authority.read_components is the five accepted component pairs from manifests._load, captured after verification and refreshed with read_pin/pair. Adapter state_row(store,authority,g,ns), order_row(store,authority,g,ns,typed), iter_keys(store,authority,pin,ns,page_size) return existing native types; active/capability rules come from native_sources. Collection summaries may use existing ValidationScope immutable cache only.
 - [x] RED real count/next/ordinal/missing/extra native corruption before output, supported absence and pagination controls.
 - [x] Implement manifest-bound component context, bounded exact physical state/point joins and physical/proof page equality with lookahead before decoding, source checks and closed snapshots before yields.
-- [ ] GREEN extended pagination, large-key/budget/pretransfer, epoch/snapshot, save/fault/alias/recovery and generated-year tests; verify all failure dispositions.
+- [x] GREEN extended pagination, large-key/budget/pretransfer, epoch/snapshot, save/fault/alias/recovery and generated-year tests; verify all failure dispositions.
 
 ## Task2: Review, evidence and publication
 
-- [ ] Retained1k/10k no-unrelated-body controls with physical selection instrumentation and measured page/source work. No mature claim.
-- [ ] One independent whole-package review, author RED→GREEN corrections of every finding including Minor, one register/raw history.
+- [x] Retained1k/10k no-unrelated-body controls with physical selection instrumentation and measured page/source work. No mature claim.
+- [x] One independent whole-package review, author RED→GREEN corrections of every finding including Minor, one register/raw history.
 - [ ] Runtime pin/fingerprints, clean launcher and canonical-year eager/fresh checks; exact local/API source tree mapping; one full/proof CI publication. Record remaining query/identity/raw-consumer gate explicitly.
+
+Final source dd4d400/API5e7495d, identical full tree517200d, runtime619141f.239broader/130exact-source/33launcher checks pass; canonical raw+diagnostic eager/fresh/zero-audit checks pass. Publication prepared as one evidence child; hosted completion remains gated on that exact run. All review findings including Minor are closed in native-collection-order/review.md.

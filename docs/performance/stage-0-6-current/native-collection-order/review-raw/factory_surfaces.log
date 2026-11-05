@@ -1,0 +1,2 @@
+text_factory save 1 actions [('ordinary-source-bypass', True), ('point-order', (0, 0, None))]
+scalar save 1 actions [('ordinary-source-bypass', True), ('point-order', (0, 0, None))]

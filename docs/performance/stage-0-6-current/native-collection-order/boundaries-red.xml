@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="4.283" timestamp="2026-11-05T14:58:43.119395-06:00" hostname="7f564e2a1d9e"><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[save]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="1.105"><failure message="Failed: DID NOT RAISE StoreConflictError">tmp_path = PosixPath('/tmp/ate-native-order-boundaries-red/test_paused_native_key_page_re0')
+change = 'save'
+
+    @pytest.mark.parametrize('change',['save','local-write','external-write'])
+    def test_paused_native_key_page_rechecks_before_each_yield(tmp_path,change):
+        import sqlite3
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            it=store.iter_keys(session.pin,NS,page_size=128)
+            assert next(it)==(1,'craft') and not store.db.in_transaction
+            if change=='save':
+                session.world.year=1;assert session.save()==1
+            else:
+                db=sqlite3.connect(path) if change=='external-write' else store.db
+                db.execute("UPDATE records SET payload_checksum='paused-write' WHERE namespace='world.seed'");db.commit()
+                if db is not store.db:db.close()
+&gt;           with pytest.raises(StoreConflictError):next(it)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:104: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[local-write]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.893"><failure message="Failed: DID NOT RAISE StoreConflictError">tmp_path = PosixPath('/tmp/ate-native-order-boundaries-red/test_paused_native_key_page_re1')
+change = 'local-write'
+
+    @pytest.mark.parametrize('change',['save','local-write','external-write'])
+    def test_paused_native_key_page_rechecks_before_each_yield(tmp_path,change):
+        import sqlite3
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            it=store.iter_keys(session.pin,NS,page_size=128)
+            assert next(it)==(1,'craft') and not store.db.in_transaction
+            if change=='save':
+                session.world.year=1;assert session.save()==1
+            else:
+                db=sqlite3.connect(path) if change=='external-write' else store.db
+                db.execute("UPDATE records SET payload_checksum='paused-write' WHERE namespace='world.seed'");db.commit()
+                if db is not store.db:db.close()
+&gt;           with pytest.raises(StoreConflictError):next(it)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:104: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[external-write]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.910"><failure message="Failed: DID NOT RAISE StoreConflictError">tmp_path = PosixPath('/tmp/ate-native-order-boundaries-red/test_paused_native_key_page_re2')
+change = 'external-write'
+
+    @pytest.mark.parametrize('change',['save','local-write','external-write'])
+    def test_paused_native_key_page_rechecks_before_each_yield(tmp_path,change):
+        import sqlite3
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            it=store.iter_keys(session.pin,NS,page_size=128)
+            assert next(it)==(1,'craft') and not store.db.in_transaction
+            if change=='save':
+                session.world.year=1;assert session.save()==1
+            else:
+                db=sqlite3.connect(path) if change=='external-write' else store.db
+                db.execute("UPDATE records SET payload_checksum='paused-write' WHERE namespace='world.seed'");db.commit()
+                if db is not store.db:db.close()
+&gt;           with pytest.raises(StoreConflictError):next(it)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:104: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_overlapping_future_closed_order" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="108" time="1.079"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-order-boundaries-red/test_native_key_page_rejects_o0')
+
+    def test_native_key_page_rejects_overlapping_future_closed_order(tmp_path):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            session.world.year=1;assert session.save()==1
+            key=store.codec.encode((1,'craft'))
+            store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',
+                (NS,key,0,1,2,_order_checksum(NS,key,0,1,2)))
+            store.db.commit();reset_epoch(store)
+&gt;           with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:117: Failed</failure></testcase></testsuite></testsuites>

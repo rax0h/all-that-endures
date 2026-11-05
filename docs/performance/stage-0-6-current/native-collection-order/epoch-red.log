@@ -1,0 +1,30 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_native_point_fetch_does_not_repeat_identical_epoch_checks[record] ____
+
+tmp_path = PosixPath('/tmp/ate-native-order-epoch-red/test_native_point_fetch_does_n1')
+kind = 'record'
+
+    @pytest.mark.parametrize('kind',['version','record'])
+    def test_native_point_fetch_does_not_repeat_identical_epoch_checks(tmp_path,kind):
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;epochs=[]
+            def trace(sql):
+                if sql.lower()=='pragma data_version':epochs.append(sql)
+            store.db.set_trace_callback(trace)
+            try:
+                if kind=='version':store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+                else:store.read_record('world.year',0)
+            finally:store.db.set_trace_callback(None)
+            # One entry check, one pinned-view check, and at most one compatible
+            # nested-source check. Actual bytes/proof paths are still reread.
+>           assert len(epochs)<=3, len(epochs)
+E           AssertionError: 4
+E           assert 4 <= 3
+E            +  where 4 = len(['PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version'])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:388: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_fetch_does_not_repeat_identical_epoch_checks[record]
+1 failed, 1 passed, 47 deselected in 2.11s

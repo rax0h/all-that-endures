@@ -1,0 +1,2308 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="44" skipped="0" tests="47" time="53.960" timestamp="2026-11-05T15:14:11.568895-06:00" hostname="7f564e2a1d9e"><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[count]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.839"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_collection_rejects0')
+damage = 'count'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f350&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[next]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.777"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_collection_rejects1')
+damage = 'next'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ec50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[missing-order]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.787"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_collection_rejects2')
+damage = 'missing-order'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12fa50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[ordinal]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.774"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_collection_rejects3')
+damage = 'ordinal'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ee50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_collection_rejects_checksum_consistent_relation_forgery[extra-order]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="14" time="0.788"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_collection_rejects4')
+damage = 'extra-order'
+
+    @pytest.mark.parametrize('damage',['count','next','missing-order','ordinal','extra-order'])
+    def test_native_collection_rejects_checksum_consistent_relation_forgery(tmp_path,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12f850&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[count]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.842"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_key_page_rejects_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c61c40&gt;
+damage = 'count'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[missing]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.776"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_key_page_rejects_b1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9fa23c0&gt;
+damage = 'missing'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12d450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[swap]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.762"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_key_page_rejects_b2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c62570&gt;
+damage = 'swap'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_before_decoding_mismatched_window[extra]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="43" time="0.779"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_key_page_rejects_b3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c68fb0&gt;
+damage = 'extra'
+
+    @pytest.mark.parametrize('damage',['count','missing','swap','extra'])
+    def test_native_key_page_rejects_before_decoding_mismatched_window(tmp_path,monkeypatch,damage):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f350&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_iteration_preserves_keys_and_releases_before_yield[1]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="73" time="0.756"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_iteration_pr0')
+page_size = 1
+
+    @pytest.mark.parametrize('page_size',[1,2,128])
+    def test_native_order_iteration_preserves_keys_and_releases_before_yield(tmp_path,page_size):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12d850&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_iteration_preserves_keys_and_releases_before_yield[2]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="73" time="0.762"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_iteration_pr1')
+page_size = 2
+
+    @pytest.mark.parametrize('page_size',[1,2,128])
+    def test_native_order_iteration_preserves_keys_and_releases_before_yield(tmp_path,page_size):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12dc50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_iteration_preserves_keys_and_releases_before_yield[128]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="73" time="0.780"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_iteration_pr2')
+page_size = 128
+
+    @pytest.mark.parametrize('page_size',[1,2,128])
+    def test_native_order_iteration_preserves_keys_and_releases_before_yield(tmp_path,page_size):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[save]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.773"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_paused_native_key_page_re0')
+change = 'save'
+
+    @pytest.mark.parametrize('change',['save','local-write','external-write'])
+    def test_paused_native_key_page_rechecks_before_each_yield(tmp_path,change):
+        import sqlite3
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12d750&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[local-write]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.762"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_paused_native_key_page_re1')
+change = 'local-write'
+
+    @pytest.mark.parametrize('change',['save','local-write','external-write'])
+    def test_paused_native_key_page_rechecks_before_each_yield(tmp_path,change):
+        import sqlite3
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ce50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_key_page_rechecks_before_each_yield[external-write]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="90" time="0.775"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_paused_native_key_page_re2')
+change = 'external-write'
+
+    @pytest.mark.parametrize('change',['save','local-write','external-write'])
+    def test_paused_native_key_page_rechecks_before_each_yield(tmp_path,change):
+        import sqlite3
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12d750&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_page_rejects_overlapping_future_closed_order" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="108" time="0.748"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_key_page_rejects_o0')
+
+    def test_native_key_page_rejects_overlapping_future_closed_order(tmp_path):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12da50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[huge-key]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.775"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_rejects_bad_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9fa08c0&gt;
+damage = 'huge-key'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27c850&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[huge-checksum]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.751"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_rejects_bad_1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed8c74ef0&gt;
+damage = 'huge-checksum'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12f750&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[future-state]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.760"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_rejects_bad_2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9ff7830&gt;
+damage = 'future-state'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12dd50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[missing-body]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.778"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_rejects_bad_3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c6b350&gt;
+damage = 'missing-body'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[seek]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.759"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_rejects_bad_4')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9fe4b90&gt;
+damage = 'seek'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12d950&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[directory]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="153" time="0.763"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_order_rejects_bad_5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c6b890&gt;
+damage = 'directory'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ea50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_key_decode_error_releases_snapshot" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="188" time="1.034"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_key_decode_error_r0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed8ca3d70&gt;
+
+    def test_native_key_decode_error_releases_snapshot(tmp_path,monkeypatch):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27c850&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_scoped_summary_never_reuses_physical_state_after_write" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="202" time="0.765"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_scoped_summary_nev0')
+
+    def test_native_scoped_summary_never_reuses_physical_state_after_write(tmp_path):
+        from ate_sim.persistence_validation_scope import checked_read_operation
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12fa50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_component_refresh_failure_requires_original_parent_recovery" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="219" time="0.757"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_component_refresh_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efedac35730&gt;
+
+    def test_native_component_refresh_failure_requires_original_parent_recovery(tmp_path,monkeypatch):
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:224: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12f550&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_iterator_rejects_reaccepted_same_generation_epoch" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="245" time="0.801"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_paused_native_iterator_re0')
+
+    def test_paused_native_iterator_rejects_reaccepted_same_generation_epoch(tmp_path):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:248: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12e350&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[row]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="261" time="0.806"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_postcommit_sqlite_customi0')
+kind = 'row'
+
+    @pytest.mark.parametrize('kind',['row','text','scalar'])
+    def test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher(tmp_path,kind):
+        from ate_sim import persistence_proof_native_sources as sources
+        from ate_sim.incremental_store import StoreError
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:266: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ed50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[text]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="261" time="1.094"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_postcommit_sqlite_customi1')
+kind = 'text'
+
+    @pytest.mark.parametrize('kind',['row','text','scalar'])
+    def test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher(tmp_path,kind):
+        from ate_sim import persistence_proof_native_sources as sources
+        from ate_sim.incremental_store import StoreError
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:266: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27c850&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher[scalar]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="261" time="0.898"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_postcommit_sqlite_customi2')
+kind = 'scalar'
+
+    @pytest.mark.parametrize('kind',['row','text','scalar'])
+    def test_postcommit_sqlite_customization_callbacks_cannot_borrow_publisher(tmp_path,kind):
+        from ate_sim import persistence_proof_native_sources as sources
+        from ate_sim.incremental_store import StoreError
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:266: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ce50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_registered_sqlite_callbacks_cannot_write_from_publisher[aggregate]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="297" time="0.001" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_registered_sqlite_callbacks_cannot_write_from_publisher[window]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="297" time="0.001" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_registered_sqlite_callbacks_cannot_write_from_publisher[collation]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="297" time="0.000" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_benign_sqlite_factories_preserve_native_save_and_cursor_shapes" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="334" time="0.767"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_benign_sqlite_factories_p0')
+
+    def test_benign_sqlite_factories_preserve_native_save_and_cursor_shapes(tmp_path):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:337: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12dd50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-foreign]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="346" time="0.791"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_iterator_requires_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c68d70&gt;
+kind = 'foreign', namespace = 'world.skills.skills'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-unregistered]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="346" time="0.982"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_iterator_requires_1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efeda070e90&gt;
+kind = 'unregistered', namespace = 'world.skills.skills'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12f550&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_iterator_requires_callers_registered_pin_before_decode[world.skills.skills-released]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="346" time="0.867"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_iterator_requires_2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efeda1836b0&gt;
+kind = 'released', namespace = 'world.skills.skills'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12dc50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-foreign]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="346" time="0.795"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_iterator_requires_3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c68bc0&gt;
+kind = 'foreign', namespace = 'world.not-present'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f350&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-unregistered]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="346" time="0.760"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_iterator_requires_4')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed8c53050&gt;
+kind = 'unregistered', namespace = 'world.not-present'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12e750&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_iterator_requires_callers_registered_pin_before_decode[world.not-present-released]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="346" time="0.764"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_iterator_requires_5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed8c50890&gt;
+kind = 'released', namespace = 'world.not-present'
+
+    @pytest.mark.parametrize('kind',['foreign','unregistered','released'])
+    @pytest.mark.parametrize('namespace',[NS,'world.not-present'])
+    def test_native_iterator_requires_callers_registered_pin_before_decode(tmp_path,monkeypatch,kind,namespace):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12d450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_current_head_rejects_future_starting_open_surplus[point]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="366" time="0.777"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_current_head_rejec0')
+kind = 'point'
+
+    @pytest.mark.parametrize('kind',['point','page','namespace'])
+    def test_native_current_head_rejects_future_starting_open_surplus(tmp_path,kind):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:369: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12c050&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_current_head_rejects_future_starting_open_surplus[page]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="366" time="0.763"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_current_head_rejec1')
+kind = 'page'
+
+    @pytest.mark.parametrize('kind',['point','page','namespace'])
+    def test_native_current_head_rejects_future_starting_open_surplus(tmp_path,kind):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:369: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12f650&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_current_head_rejects_future_starting_open_surplus[namespace]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="366" time="0.781"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_current_head_rejec2')
+kind = 'namespace'
+
+    @pytest.mark.parametrize('kind',['point','page','namespace'])
+    def test_native_current_head_rejects_future_starting_open_surplus(tmp_path,kind):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:369: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f350&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_invalid_metadata_never_reaches_sqlite_materialization" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="384" time="0.768"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_invalid_metadata_n0')
+
+    def test_native_invalid_metadata_never_reaches_sqlite_materialization(tmp_path):
+&gt;       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:386: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12ea50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_paused_native_iterator_retains_no_selected_source_row" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="395" time="0.776"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_paused_native_iterator_re1')
+
+    def test_paused_native_iterator_retains_no_selected_source_row(tmp_path):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:398: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda12dc50&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_cold_and_scoped_reads_select_physical_state_once" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="404" time="0.781"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_cold_and_scoped_re0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9ff7fe0&gt;
+
+    def test_native_cold_and_scoped_reads_select_physical_state_once(tmp_path,monkeypatch):
+        from ate_sim.persistence_validation_scope import checked_read_operation
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f350&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_count_point_and_key_page_fetch_no_unrelated_bodies[1000]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="420" time="1.023"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_count_point_and_ke0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed9c4efc0&gt;
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7efed9c75440&gt;
+size = 1000
+
+    @pytest.mark.parametrize('size',[1000,10000])
+    def test_native_count_point_and_key_page_fetch_no_unrelated_bodies(tmp_path,monkeypatch,record_property,size):
+        import sqlite3,time
+        from ate_sim import persistence_proof_publication as content
+        path,pair=fixture(tmp_path,size=size)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_order" name="test_native_count_point_and_key_page_fetch_no_unrelated_bodies[10000]" file="simulation/tests/test_stage_0_6_proof_native_order.py" line="420" time="3.688"><failure message="TypeError: execute expected at most 2 arguments, got 3">tmp_path = PosixPath('/tmp/ate-native-order-review-closed/test_native_count_point_and_ke1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efed8bc5e80&gt;
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7efed8be32e0&gt;
+size = 10000
+
+    @pytest.mark.parametrize('size',[1000,10000])
+    def test_native_count_point_and_key_page_fetch_no_unrelated_bodies(tmp_path,monkeypatch,record_property,size):
+        import sqlite3,time
+        from ate_sim import persistence_proof_publication as content
+        path,pair=fixture(tmp_path,size=size)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18144: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:41: in check_open
+    return _check_fixed_contract(store,pin,head,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:51: in _check_fixed_contract
+    IdentityCatalog(store)._descriptor(pin)
+simulation/ate_sim/persistence_lazy_identity_catalog.py:523: in _descriptor
+    if self.store._namespace_state_at(ns, pin.captured_head) is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2062: in _namespace_state_at
+    return state_row(self, authority, generation, namespace)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:56: in state_row
+    _child,row=_collection(store,authority,namespace)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:44: in _collection
+    state=_state(store,certificate.generation,namespace,child)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_order.py:63: in _state
+    rows=store.db.execute('SELECT '+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7efeda27f450&gt;
+args = ("SELECT CASE WHEN typeof(member_count)='integer' THEN member_count END,CASE WHEN typeof(next_ordinal)='integer' THEN ...ate INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2', ('aux.lazy.identity.catalog',))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: execute expected at most 2 arguments, got 3
+
+simulation/ate_sim/persistence_sqlite_guard.py:133: TypeError</failure></testcase></testsuite></testsuites>

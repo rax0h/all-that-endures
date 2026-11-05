@@ -1,0 +1,100 @@
+.................F..F......                                              [100%]
+=================================== FAILURES ===================================
+______ test_native_key_windows_paginate_and_shrink_without_skipping[3980] ______
+
+tmp_path = PosixPath('/tmp/ate-native-order-extended/test_native_key_windows_pagina1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f322e3437d0>
+record_property = <function record_property.<locals>.append_property at 0x7f322d58d760>
+width = 3980
+
+    @pytest.mark.parametrize('width',[12,3980])
+    def test_native_key_windows_paginate_and_shrink_without_skipping(tmp_path,monkeypatch,record_property,width):
+        from ate_sim.skills import SkillHistory
+        from ate_sim import persistence_proof_native_order as native
+        keys=[(1,str(i).zfill(4)+'x'*width) for i in range(132)]
+        def configure(w):
+            w.skills.skills.clear()
+            for person,name in keys:w.skills.skills[person,name]=SkillHistory(person,name)
+>       path,pair=fixture(tmp_path,configure=configure)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_order.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:9: in fixture
+    s,p,pair=_proof_store(tmp_path,**kw);path=s.path;s.release_pin(p);s.close();return path,pair
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_world.py:74: in _proof_store
+    s,p,a,ra,d=make_world(tmp_path/'source',**kwargs);source=s.path;s.release_pin(p);s.close()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:18: in make_world
+    s=opened(file);p=s.capture_pin();a,ra=authorities(s,p);d=_load(s,p.captured_head)[0]
+                                          ^^^^^^^^^^^^^^^^
+simulation/tests/proof_sequence_event_fixtures.py:20: in authorities
+    sa=bootstrap_scope_proofs(s,p,**opts);ca=bootstrap_content_proofs(s,p);bootstrap_collection_directory(s,p);ia=bootstrap_inventory(s,p)
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f322e1890a0>
+pin = GenerationPin(token='5c4ea6d4-6c6c-4ecf-a8c8-7ddd3c74d423', store_identity='83fed859-2fad-467b-9d63-467cff606593', captured_head=3)
+max_metadata_bytes = 1048576
+
+    def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
+        _budget(max_metadata_bytes);_require_closed_codec(store,allow_typed=True)
+        if store.db.in_transaction or store._active_read_transaction:raise StoreError('directory construction requires owned transaction')
+        store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
+        try:
+            _source_schemas(store.db);_closed_snapshot_preflight(store,max_metadata_bytes);g=store._require_pin(pin)
+            if g!=int(store._checked_head_row()[0]):raise StoreConflictError('directory construction requires current pin')
+            collection._indexes(store);_source_indexes(store.db,create=True);_guard_construction(store,g,MAX_BODY_BYTES,max_metadata_bytes)
+            for table in ('lazy_namespace_state','lazy_order_versions','lazy_record_versions'):
+                if store.db.execute('SELECT 1 FROM '+table+' WHERE length(CAST(namespace AS BLOB))>4096 LIMIT 1').fetchone():raise StoreError('directory namespace exceeds field path')
+>           if store.db.execute("SELECT 1 FROM lazy_order_versions WHERE typeof(typed_key)!='blob' OR length(typed_key)>4096 LIMIT 1").fetchone():raise StoreError('directory collection key exceeds field path')
+                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ate_sim.incremental_store.StoreError: directory collection key exceeds field path
+
+simulation/ate_sim/persistence_proof_collection_directory.py:102: StoreError
+_ test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[future-state] _
+
+tmp_path = PosixPath('/tmp/ate-native-order-extended/test_native_order_rejects_bad_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f322d3fed80>
+damage = 'future-state'
+
+    @pytest.mark.parametrize('damage',['huge-key','huge-checksum','future-state','missing-body','seek','directory'])
+    def test_native_order_rejects_bad_metadata_and_proofs_before_key_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_collection as collection,persistence_proof_collection_directory as directory
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            a=store.codec.encode((1,'craft'))
+            if damage=='huge-key':
+                k=b'x'*1048576
+                store.db.execute('INSERT INTO lazy_order_versions VALUES(?,?,?,?,?,?)',(NS,k,99,0,None,_order_checksum(NS,k,99,0,None)))
+            elif damage=='huge-checksum':store.db.execute('UPDATE lazy_order_versions SET row_checksum=? WHERE namespace=?',('x'*1048576,NS))
+            elif damage=='future-state':
+                count,n,start,_=store._namespace_state_at(NS,0)
+                store.db.execute('UPDATE lazy_namespace_state SET valid_to=1,row_checksum=? WHERE namespace=?',(_namespace_checksum(NS,count,n,start,1),NS))
+            elif damage=='missing-body':store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(NS,a))
+            elif damage=='seek':
+                domain=collection.domain(store.store_identity,store.codec.version,NS)
+                store.db.execute('UPDATE ate_ordered_seek_nodes SET raw=? WHERE domain=?',(b'bad',domain))
+            else:
+                domain=directory.domain(store.store_identity,store.codec.version)
+                store.db.execute('UPDATE ate_collection_directory_bodies SET raw=? WHERE domain=?',(b'bad',domain))
+            store.db.commit();reset_epoch(store);seen=[]
+            def row(cursor,values):
+                assert not any(isinstance(v,(str,bytes)) and len(v)>=1048576 for v in values),'oversized metadata transferred'
+                return values
+            store.db.row_factory=row
+            decode=store.codec.decode
+            def observed(raw):
+                if raw==a:seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+>           with pytest.raises(StoreIntegrityError):list(store.iter_keys(session.pin,NS))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_order.py:184: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_windows_paginate_and_shrink_without_skipping[3980]
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_order_rejects_bad_metadata_and_proofs_before_key_decode[future-state]
+2 failed, 25 passed in 47.05s
