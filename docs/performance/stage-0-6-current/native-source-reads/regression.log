@@ -1,0 +1,18 @@
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 59%]
+........................................................................ [ 78%]
+........................................................................ [ 98%]
+.....                                                                    [100%]
+============================= slowest 10 durations =============================
+116.79s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_generated_world_continues_through_two_proof_saves
+3.64s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_consecutive_mixed_saves_compose_retirement_without_world_audit
+3.56s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_budget_exhaustion_keeps_checked_fallback[events]
+3.54s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_budget_exhaustion_keeps_checked_fallback[bytes]
+3.50s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_budget_exhaustion_keeps_checked_fallback[actions]
+3.26s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[True]
+3.14s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_scalar_query_projection_cannot_be_forged
+3.00s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_packed_action_append_projects_only_new_suffix
+2.90s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_catalog_retirement_cannot_delete_a_live_unrelated_group
+2.89s setup    simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_sealed_segment_reads_join_accepted_root[forged]
+365 passed in 401.35s (0:06:41)

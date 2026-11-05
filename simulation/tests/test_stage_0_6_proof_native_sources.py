@@ -212,6 +212,7 @@ def test_native_source_rejects_unaccepted_generation_and_wrong_schema(tmp_path):
 @pytest.mark.parametrize('size',[1000,10000])
 def test_native_point_reads_do_not_fetch_unrelated_history_bodies(tmp_path,monkeypatch,record_property,size):
     import time
+    import sqlite3
     from ate_sim import persistence_proof_publication as content
     from ate_sim.persistence_lazy_nested_history import PAGE_NAMESPACE,ENTRY_NAMESPACE
     path,pair=fixture(tmp_path,size=size)
@@ -228,14 +229,22 @@ def test_native_point_reads_do_not_fetch_unrelated_history_bodies(tmp_path,monke
                     unexpected.append(sql)
                 elif 'from lazy_record_versions' in normalized and "namespace='world.skills.skills'" not in normalized:
                     unexpected.append(sql)
-        store.db.set_trace_callback(trace)
-        with monkeypatch.context() as patch:
-            patch.setattr(content,'_source_version',source)
-            start=time.perf_counter()
-            for _ in range(20):
-                assert store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1).value.person==1
-            elapsed=time.perf_counter()-start
-        store.db.set_trace_callback(None)
+        def authorize(action,table,column,database,source):
+            # Column authorization also sees quoted/schema-qualified SQL and
+            # statements served from the prepared-statement cache.
+            if action==sqlite3.SQLITE_READ and table in ('records','segments') and column=='payload':
+                unexpected.append((table,column,database))
+            return sqlite3.SQLITE_OK
+        store.db.set_trace_callback(trace);store.db.set_authorizer(authorize)
+        try:
+            with monkeypatch.context() as patch:
+                patch.setattr(content,'_source_version',source)
+                start=time.perf_counter()
+                for _ in range(20):
+                    assert store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1).value.person==1
+                elapsed=time.perf_counter()-start
+        finally:
+            store.db.set_trace_callback(None);store.db.set_authorizer(None)
         assert not unexpected, unexpected
         assert calls==[('world.skills.skills',store.codec.encode((1,'craft')))]*20
         record_property('history_values',size);record_property('point_read_count',20)

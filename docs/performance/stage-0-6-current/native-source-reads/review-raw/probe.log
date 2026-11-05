@@ -1,0 +1,8 @@
+before_commit callback_guard/accepted_generation/read True 0 (0, 1)
+rolled_back_generation 0 stored_year (0, 0)
+unowned_guard_bypasses True returned (0, 999)
+head0_forged_valid_to 13
+epoch_changed_before_snapshot (0, 0) mutation_applied True
+later_call StoreConflictError
+invalid_metadata_transferred_body [4194304] error StoreIntegrityError
+untracked_sql_version_pre_epoch_head_body [4194304] error StoreIntegrityError save head checksum mismatch

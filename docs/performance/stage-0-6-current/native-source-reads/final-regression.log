@@ -1,0 +1,101 @@
+........................................................................ [ 16%]
+F....................................................................... [ 33%]
+........................................................................ [ 49%]
+........................................................................ [ 66%]
+........................................................................ [ 83%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_noop_does_not_accept_a_new_epoch_without_audit ______________
+
+tmp_path = PosixPath('/tmp/ate-native-source-final-regression/test_noop_does_not_accept_a_ne0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6ce9ed9940>
+
+    def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
+     import sqlite3
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      authority=s.store._world_proof_authority;original=authority._epoch;calls=[]
+      def race():
+       captured=original();calls.append(True)
+       if len(calls)==2:
+        with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
+       return captured
+      monkeypatch.setattr(authority,'_epoch',race)
+>     assert s.save()==0
+             ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:102: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16744: in _save_native
+    plan = self._prepare_hybrid_save()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:14512: in _prepare_hybrid_save
+    return self._prepare_hybrid_save_inner(token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:14820: in _prepare_hybrid_save_inner
+    cold_plan = prepare_cold_save(
+simulation/ate_sim/persistence_cold_save.py:363: in prepare_cold_save
+    _check_captured_store_baseline(session)
+simulation/ate_sim/persistence_cold_save.py:235: in _check_captured_store_baseline
+    prefix, tail, commit = _read_event_descriptors(session.store)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_session.py:236: in _read_event_descriptors
+    rows = store.read_records(
+simulation/ate_sim/persistence_lazy_store.py:1050: in read_records
+    with rows as captured:
+         ^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:160: in record_rows
+    with _snapshot(store, authority) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:82: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1302: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1255: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:44: in before_snapshot
+    _epoch(store, authority)
+simulation/ate_sim/persistence_proof_native_sources.py:48: in _epoch
+    actual, expected = authority._epoch(), authority.epoch
+                       ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def race():
+     captured=original();calls.append(True)
+     if len(calls)==2:
+>     with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
+E     sqlite3.OperationalError: database is locked
+
+simulation/tests/test_stage_0_5_proof_world_session.py:199: OperationalError
+============================= slowest 10 durations =============================
+118.83s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_generated_world_continues_through_two_proof_saves
+6.55s call     simulation/tests/test_stage_0_5_proof_world_session.py::test_noop_does_not_accept_a_new_epoch_without_audit
+4.52s call     simulation/tests/test_stage_0_6_proof_world_continuation.py::test_native_new_relationships_keep_insertion_and_query_order[True]
+4.27s call     simulation/tests/test_persistence_lazy_store.py::test_generation_specific_query_paths_bound_history_and_measure_actual_body_checks[10000]
+4.25s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_consecutive_mixed_saves_compose_retirement_without_world_audit
+4.05s call     simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[10000]
+3.32s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_adoption_counter_delta_requires_all_and_only_derived_updates[wrong]
+3.22s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_scalar_query_projection_cannot_be_forged
+3.19s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_adoption_counter_delta_requires_all_and_only_derived_updates[missing]
+2.99s call     simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[tail-count]
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_noop_does_not_accept_a_new_epoch_without_audit
+1 failed, 432 passed in 443.35s (0:07:23)

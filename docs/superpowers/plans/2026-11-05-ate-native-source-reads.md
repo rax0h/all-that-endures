@@ -28,4 +28,4 @@ Interfaces: adapter active(store) returns an admitted authority or None only bef
 Files: current native-source-reads evidence/register/closure, runtime launch pin and proof workflow.
 - [x] Native point-read history scaling1k/10k, no unrelated page/segment fetch; preserve separate operation measurements and no mature claim.
 - [x] One fresh whole-package review. Reproduce/fix every actionable finding, including Minor, retain raw evidence in one register.
-- [ ] Exact source/pin/fingerprints, clean-source relevant harness and year continuation; publish one bundled full/proof CI candidate. Keep admission relation coverage and mature targets open.
+- [x] Exact source/pin/fingerprints, clean-source relevant harness and year continuation; publish one bundled full/proof CI candidate. Keep admission relation coverage and mature targets open.

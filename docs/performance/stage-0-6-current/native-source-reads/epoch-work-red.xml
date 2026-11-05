@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="3.161" timestamp="2026-11-05T07:57:45.599438-06:00" hostname="147ef6157628"><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_point_fetch_does_not_repeat_identical_epoch_checks[version]" time="1.386"><failure message="AssertionError: 8&#10;assert 8 &lt;= 3&#10; +  where 8 = len(['PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', ...])">tmp_path = PosixPath('/tmp/ate-native-source-epoch-work-red/test_native_point_fetch_does_n0')
+kind = 'version'
+
+    @pytest.mark.parametrize('kind',['version','record'])
+    def test_native_point_fetch_does_not_repeat_identical_epoch_checks(tmp_path,kind):
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;epochs=[]
+            def trace(sql):
+                if sql.lower()=='pragma data_version':epochs.append(sql)
+            store.db.set_trace_callback(trace)
+            try:
+                if kind=='version':store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+                else:store.read_record('world.year',0)
+            finally:store.db.set_trace_callback(None)
+            # One entry check, one pinned-view check, and at most one compatible
+            # nested-source check. Actual bytes/proof paths are still reread.
+&gt;           assert len(epochs)&lt;=3, len(epochs)
+E           AssertionError: 8
+E           assert 8 &lt;= 3
+E            +  where 8 = len(['PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', ...])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:379: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_point_fetch_does_not_repeat_identical_epoch_checks[record]" time="1.319"><failure message="AssertionError: 6&#10;assert 6 &lt;= 3&#10; +  where 6 = len(['PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version'])">tmp_path = PosixPath('/tmp/ate-native-source-epoch-work-red/test_native_point_fetch_does_n1')
+kind = 'record'
+
+    @pytest.mark.parametrize('kind',['version','record'])
+    def test_native_point_fetch_does_not_repeat_identical_epoch_checks(tmp_path,kind):
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;epochs=[]
+            def trace(sql):
+                if sql.lower()=='pragma data_version':epochs.append(sql)
+            store.db.set_trace_callback(trace)
+            try:
+                if kind=='version':store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+                else:store.read_record('world.year',0)
+            finally:store.db.set_trace_callback(None)
+            # One entry check, one pinned-view check, and at most one compatible
+            # nested-source check. Actual bytes/proof paths are still reread.
+&gt;           assert len(epochs)&lt;=3, len(epochs)
+E           AssertionError: 6
+E           assert 6 &lt;= 3
+E            +  where 6 = len(['PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version', 'PRAGMA data_version'])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:379: AssertionError</failure></testcase></testsuite></testsuites>

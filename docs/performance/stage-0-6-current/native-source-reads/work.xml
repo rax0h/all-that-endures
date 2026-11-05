@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="16.961" timestamp="2026-11-05T07:27:10.969507-06:00" hostname="147ef6157628"><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_overlapping_versions_reject_before_source_body_fetch" time="2.072"><failure message="sqlite3.IntegrityError: CHECK constraint failed: valid_from &gt;= 0">tmp_path = PosixPath('/tmp/ate-native-source-work/test_native_overlapping_versio0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f5314e40860&gt;
+
+    def test_native_overlapping_versions_reject_before_source_body_fetch(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_publication as content
+        path, pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            ns,typed='world.skills.skills',store.codec.encode((1,'craft'))
+&gt;           store.db.execute('INSERT INTO lazy_record_versions SELECT namespace,typed_key,-1,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(ns,typed));store.db.commit()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f5314eaea50&gt;
+args = ('INSERT INTO lazy_record_versions SELECT namespace,typed_key,-1,valid_to,payload,payload_checksum,codec_version,recor...ecord_versions WHERE namespace=? AND typed_key=?', ('world.skills.skills', b'["tuple",[["int","1"],["str","craft"]]]'))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.IntegrityError: CHECK constraint failed: valid_from &gt;= 0
+
+simulation/ate_sim/persistence_sqlite_guard.py:77: IntegrityError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_source_rejects_proof_node_corruption_before_decode" time="2.014" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_source_rejects_unaccepted_generation_and_wrong_schema" time="2.657" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_point_reads_do_not_fetch_unrelated_history_bodies[1000]" time="2.523"><properties><property name="history_values" value="1000" /><property name="point_read_count" value="20" /><property name="point_read_seconds" value="0.013645465999957196" /><property name="unrelated_body_reads" value="0" /></properties></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_sources" name="test_native_point_reads_do_not_fetch_unrelated_history_bodies[10000]" time="7.153"><properties><property name="history_values" value="10000" /><property name="point_read_count" value="20" /><property name="point_read_seconds" value="0.016349069999932908" /><property name="unrelated_body_reads" value="0" /></properties></testcase></testsuite></testsuites>

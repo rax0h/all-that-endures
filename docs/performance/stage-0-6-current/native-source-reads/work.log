@@ -1,0 +1,40 @@
+F....                                                                    [100%]
+=================================== FAILURES ===================================
+_______ test_native_overlapping_versions_reject_before_source_body_fetch _______
+
+tmp_path = PosixPath('/tmp/ate-native-source-work/test_native_overlapping_versio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5314e40860>
+
+    def test_native_overlapping_versions_reject_before_source_body_fetch(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_publication as content
+        path, pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            ns,typed='world.skills.skills',store.codec.encode((1,'craft'))
+>           store.db.execute('INSERT INTO lazy_record_versions SELECT namespace,typed_key,-1,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions WHERE namespace=? AND typed_key=?',(ns,typed));store.db.commit()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f5314eaea50>
+args = ('INSERT INTO lazy_record_versions SELECT namespace,typed_key,-1,valid_to,payload,payload_checksum,codec_version,recor...ecord_versions WHERE namespace=? AND typed_key=?', ('world.skills.skills', b'["tuple",[["int","1"],["str","craft"]]]'))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.IntegrityError: CHECK constraint failed: valid_from >= 0
+
+simulation/ate_sim/persistence_sqlite_guard.py:77: IntegrityError
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_sources.py:210: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_overlapping_versions_reject_before_source_body_fetch
+1 failed, 4 passed, 30 deselected, 2 warnings in 16.95s

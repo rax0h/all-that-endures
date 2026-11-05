@@ -1,0 +1,25 @@
+.....................................F.........                          [100%]
+=================================== FAILURES ===================================
+___________ test_native_epoch_checked_inside_actual_sqlite_snapshot ____________
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-green/test_native_epoch_checked_insi0')
+
+    def test_native_epoch_checked_inside_actual_sqlite_snapshot(tmp_path):
+        import sqlite3
+        from ate_sim.incremental_store import StoreConflictError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        other=sqlite3.connect(path);written=[]
+        try:
+            def trace(sql):
+                if sql=='BEGIN' and not written:
+                    written.append(True)
+                    other.execute("UPDATE records SET record_schema=record_schema WHERE namespace='world.year'");other.commit()
+            store.db.set_trace_callback(trace)
+>           with pytest.raises(StoreConflictError):store.read_record('world.year',0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:288: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_epoch_checked_inside_actual_sqlite_snapshot
+1 failed, 46 passed in 58.14s

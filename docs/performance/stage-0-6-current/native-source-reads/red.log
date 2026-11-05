@@ -1,0 +1,511 @@
+FFFFF.FFF..                                                              [100%]
+=================================== FAILURES ===================================
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[forged-version] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b54371dc0>
+kind = 'version', damage = 'forged'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[forged-record] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b543c2060>
+kind = 'record', damage = 'forged'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[forged-records] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b5405e270>
+kind = 'records', damage = 'forged'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[missing-version] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b5405e660>
+kind = 'version', damage = 'missing'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: Regex pattern did not match.
+E                 Expected regex: 'accepted.*source|source.*accepted'
+E                 Actual message: 'membership/order points to absent lazy record'
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: AssertionError
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[missing-record] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b5413ef60>
+kind = 'record', damage = 'missing'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                                                                                                   ^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_native_sources.py:41: in <lambda>
+    lambda:store.read_record(ns, key, expected_record_schema=1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f7b543c21e0>
+namespace = 'world.year', key = 0, expected_record_schema = 1
+
+    def read_record(
+        self,
+        namespace: str,
+        key: Any,
+        *,
+        expected_record_schema: int | None = None,
+    ) -> Any:
+        self._ensure_open()
+        namespace = _validate_namespace(namespace)
+        if self._ordinary_namespace_is_lazy(namespace):
+            raise StoreError(
+                f"{namespace!r} is lazy authority; use read_version"
+            )
+        typed_key = self.codec.encode(key)
+        row = self.db.execute(
+            "SELECT payload,payload_checksum,codec_version,record_schema,"
+            "last_changed_generation FROM records "
+            "WHERE namespace=? AND typed_key=?",
+            (namespace, typed_key),
+        ).fetchone()
+        if row is None:
+>           raise KeyError((namespace, key))
+E           KeyError: ('world.year', 0)
+
+simulation/ate_sim/persistence_lazy_store.py:1004: KeyError
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[extra-version] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b5413c530>
+kind = 'version', damage = 'extra'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[extra-record] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b542425d0>
+kind = 'record', damage = 'extra'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[extra-records] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-red/test_native_byte_reads_reject_8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b542c7b60>
+kind = 'records', damage = 'extra'
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            monkeypatch.setattr(store._world_proof_authority, 'guard', lambda:None)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+            if kind == 'records' and damage == 'missing':
+                # Roster completeness is a separate admission gate; this adapter
+                # certifies fetched bodies, not a whole ordinary namespace listing.
+                assert read() == ()
+            else:
+>               with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:57: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[forged-version]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[forged-record]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[forged-records]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[missing-version]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[missing-record]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[extra-version]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[extra-record]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[extra-records]
+8 failed, 3 passed in 15.93s

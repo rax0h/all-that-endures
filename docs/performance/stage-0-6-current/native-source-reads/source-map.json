@@ -1,0 +1,8 @@
+{
+  "parent": "df624e9cec2c3cdddda9829ffd90dca4754b5b14",
+  "local_validated_source": "70aaf3dc0c9d0223c66888f53ceb916d97466c5c",
+  "api_validated_source": "6a6cfc9a5c51a6c164acd8b1f0465cf0ad86f04b",
+  "identical_complete_source_tree": "9b9eaf59bc21cc60e19205d858e458695c41cd4e",
+  "runtime_tree": "b2a02f301e08bfda3bea51d76624a8e17e9c2aac",
+  "evidence_child": "No runtime change; documentation/raw evidence plus a test-only physical-column authorization refinement verified by two scaling cases"
+}

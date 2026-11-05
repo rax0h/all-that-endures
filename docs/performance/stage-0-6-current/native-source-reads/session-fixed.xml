@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="28" time="52.937" timestamp="2026-11-05T07:48:58.012050-06:00" hostname="147ef6157628"><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_proof_session_saves_and_reopens_canonical_shared_history" time="2.212" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_manifest_fault_resolves_original_parent_once[before_head]" time="2.206" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_manifest_fault_resolves_original_parent_once[before_commit]" time="2.164" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_manifest_fault_resolves_original_parent_once[after_commit]" time="2.123" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_noop_preserves_manifest_and_generation" time="1.472" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_admission_rejects_wrong_external_authority[digest]" time="1.309" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_admission_rejects_wrong_external_authority[old-generation]" time="1.607" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_admission_rejects_wrong_external_authority[other-store]" time="2.596" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_epoch_rejects_untracked_sql_before_fetch_or_save[False]" time="1.531" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_epoch_rejects_untracked_sql_before_fetch_or_save[True]" time="1.461" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_partial_participant_acknowledgement_recovers_original_manifest" time="2.169" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack" time="1.964" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_proof_save_matches_old_checked_world_digest_with_events" time="2.043" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_open_requires_exact_external_commitment[None]" time="1.216" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_open_requires_exact_external_commitment[False]" time="1.204" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_open_requires_exact_external_commitment[1]" time="1.379" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_open_requires_exact_external_commitment[bad]" time="1.291" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_open_requires_exact_external_commitment[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]" time="1.234" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_frozen_commit_descriptor_cannot_be_silently_replaced" time="1.605" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_closed_native_session_does_not_expose_manifest" time="1.343" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_manifest_is_not_exposed_during_uncertain_publication" time="1.580" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_epoch_rejects_untracked_schema_changes[CREATE TRIGGER untracked AFTER UPDATE ON records BEGIN SELECT 1; END]" time="1.449" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_native_epoch_rejects_untracked_schema_changes[CREATE TEMP VIEW untracked AS SELECT 1]" time="1.610" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt[token]" time="1.541" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt[generation]" time="1.590" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_noop_does_not_accept_a_new_epoch_without_audit" time="6.671"><failure message="sqlite3.OperationalError: database is locked">tmp_path = PosixPath('/tmp/ate-native-source-session-fixed/test_noop_does_not_accept_a_ne0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fe50777d610&gt;
+
+    def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
+     import sqlite3
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      authority=s.store._world_proof_authority;original=authority._epoch;calls=[];injected=[]
+      def race():
+       captured=original();calls.append(True)
+       # Inject after a captured epoch at an actual transaction boundary. Additional
+       # in-snapshot checks must not move this external write into a locked reader.
+       if len(calls)&gt;=2 and not injected and not s.store.db.in_transaction:
+        injected.append(True)
+        with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
+       return captured
+&gt;     monkeypatch.setattr(authority,'_epoch',race)
+                 ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:204: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:102: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16744: in _save_native
+    plan = self._prepare_hybrid_save()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:14512: in _prepare_hybrid_save
+    return self._prepare_hybrid_save_inner(token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:14820: in _prepare_hybrid_save_inner
+    cold_plan = prepare_cold_save(
+simulation/ate_sim/persistence_cold_save.py:363: in prepare_cold_save
+    _check_captured_store_baseline(session)
+simulation/ate_sim/persistence_cold_save.py:235: in _check_captured_store_baseline
+    prefix, tail, commit = _read_event_descriptors(session.store)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_session.py:236: in _read_event_descriptors
+    rows = store.read_records(
+simulation/ate_sim/persistence_lazy_store.py:1050: in read_records
+    with rows as captured:
+         ^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:160: in record_rows
+    with _snapshot(store, authority) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:82: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1302: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1255: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:44: in before_snapshot
+    _epoch(store, authority)
+simulation/ate_sim/persistence_proof_native_sources.py:48: in _epoch
+    actual, expected = authority._epoch(), authority.epoch
+                       ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+&gt;   ???
+E   sqlite3.OperationalError: database is locked
+
+simulation/tests/test_stage_0_5_proof_world_session.py:199: OperationalError</failure></testcase><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_closed_proof_session_uses_store_error_without_publication[save]" time="1.897" /><testcase classname="simulation.tests.test_stage_0_5_proof_world_session" name="test_closed_proof_session_uses_store_error_without_publication[resolve_save]" time="1.681" /></testsuite></testsuites>

@@ -1,0 +1,432 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+_____________ test_phase_callback_cannot_read_staged_native_source _____________
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_phase_callback_cannot_rea0')
+
+    def test_phase_callback_cannot_read_staged_native_source(tmp_path):
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as session:
+            session.world.year=1;seen=[]
+            def phase(at):
+                if at=='before_commit':
+                    with pytest.raises(StoreError):session.store.read_record('world.year',0)
+                    seen.append(True)
+                    raise RuntimeError('callback rollback')
+            session.store._phase_hook=phase
+>           with pytest.raises(RuntimeError,match='callback rollback'):session.save()
+                                                                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:102: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:139: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2939: in commit
+    phase_hook("before_commit")
+simulation/ate_sim/persistence_lazy_store.py:2668: in phase_hook
+    return _checked_phase_hook(self, phase)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:252: in _checked_phase_hook
+    with db.readonly_callback():store._phase_hook(phase)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+at = 'before_commit'
+
+    def phase(at):
+        if at=='before_commit':
+>           with pytest.raises(StoreError):session.store.read_record('world.year',0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:242: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_phase_callback_cannot_rea0')
+
+    def test_phase_callback_cannot_read_staged_native_source(tmp_path):
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:238: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18022: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f35d8c69c10>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+__________ test_unowned_native_guard_does_not_bypass_source_authority __________
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_unowned_native_guard_does0')
+
+    def test_unowned_native_guard_does_not_bypass_source_authority(tmp_path):
+        from ate_sim.persistence_proof_native_guard import NativeWriteGuard
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            p=store.codec.encode((0,999));k=store.codec.encode(0)
+            store.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?',
+                (p,_record_checksum('world.year',k,1,store.codec.version,0,p),'world.year',k));store.db.commit()
+            with NativeWriteGuard(store.db) as foreign:
+                with foreign.publisher():
+>                   with pytest.raises(StoreError):store.read_record('world.year',0)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:262: Failed
+___________ test_native_epoch_checked_inside_actual_sqlite_snapshot ____________
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_epoch_checked_insi0')
+
+    def test_native_epoch_checked_inside_actual_sqlite_snapshot(tmp_path):
+        import sqlite3
+        from ate_sim.incremental_store import StoreConflictError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        other=sqlite3.connect(path);written=[]
+        try:
+            def trace(sql):
+                if sql=='BEGIN' and not written:
+                    written.append(True)
+                    other.execute("UPDATE records SET record_schema=record_schema WHERE namespace='world.year'");other.commit()
+            store.db.set_trace_callback(trace)
+>           with pytest.raises(StoreConflictError):store.read_record('world.year',0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:277: Failed
+_ test_native_operational_metadata_guard_precedes_lazy_snapshot_transfer[False] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_operational_metada0')
+isolate_epoch = False
+
+    @pytest.mark.parametrize('isolate_epoch',[False,True])
+    def test_native_operational_metadata_guard_precedes_lazy_snapshot_transfer(tmp_path,isolate_epoch):
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+        try:
+            store.db.execute('UPDATE save_head SET namespace_inventory=zeroblob(4194304)');store.db.commit()
+            if isolate_epoch:store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:294: AssertionError
+_ test_native_operational_metadata_guard_precedes_lazy_snapshot_transfer[True] _
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_operational_metada1')
+isolate_epoch = True
+
+    @pytest.mark.parametrize('isolate_epoch',[False,True])
+    def test_native_operational_metadata_guard_precedes_lazy_snapshot_transfer(tmp_path,isolate_epoch):
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store;seen=[]
+        try:
+            store.db.execute('UPDATE save_head SET namespace_inventory=zeroblob(4194304)');store.db.commit()
+            if isolate_epoch:store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:294: AssertionError
+__________ test_native_future_interval_is_not_part_of_accepted_source __________
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_future_interval_is0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35d89fa1e0>
+
+    def test_native_future_interval_is_not_part_of_accepted_source(tmp_path,monkeypatch):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            ns='world.skills.skills';typed=store.codec.encode((1,'craft'))
+            start,end,p,checksum,c,s,m,r=store._visible_record_row(0,ns,typed)
+            store.db.execute('UPDATE lazy_record_versions SET valid_to=13,row_checksum=? WHERE namespace=? AND typed_key=?',
+                (_version_checksum(ns,typed,s,c,start,13,m,p),ns,typed));store.db.commit()
+            store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+>           with pytest.raises(StoreIntegrityError):store.read_version(session.pin,ns,(1,'craft'),expected_record_schema=1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:306: Failed
+_______ test_native_source_cannot_borrow_a_different_generation_snapshot _______
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_source_cannot_borr0')
+
+    def test_native_source_cannot_borrow_a_different_generation_snapshot(tmp_path):
+        from ate_sim.incremental_store import StoreConflictError
+        from simulation.tests.test_stage_0_5_final_catalog_copy import opened as raw_open
+        path,pair=fixture(tmp_path)
+        with raw_open(path) as raw:old=raw.capture_pin()
+        with opened(path,pair) as session:
+            store=session.store;session.world.year=1;assert session.save()==1
+>           with pytest.raises(StoreConflictError):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:317: Failed
+______ test_native_invalid_metadata_prevents_large_body_transfer[version] ______
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_invalid_metadata_p0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35d8b8fc50>
+sealed_fixture = (PosixPath('/tmp/ate-native-source-review-red/native-sealed-source0/proof.sqlite'), (GenerationManifest(store_identity...=89)), receipt=None), b'\xe6j\x7fjw4\x0c\x02y\xad\xc1F\x81\xdb\xe0\x81\xea\xe5zr\xcd\x1d\x18\x18!\x10\xcd^N\xc3\x98D'))
+kind = 'version'
+
+    @pytest.mark.parametrize('kind',['version','record','records','segment','segment-ids'])
+    def test_native_invalid_metadata_prevents_large_body_transfer(tmp_path,monkeypatch,sealed_fixture,kind):
+        import shutil
+        from ate_sim.incremental_store import StoreError
+        path,pair=sealed_fixture;target=tmp_path/'proof.sqlite';shutil.copyfile(path,target)
+        session=opened(target,pair);store=session.store;seen=[]
+        try:
+            if kind=='version':
+                store.db.execute("UPDATE lazy_record_versions SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.skills.skills'")
+                read=lambda:store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+            elif kind in ('record','records'):
+                if kind=='record':store.db.execute("UPDATE records SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.year'")
+                else:store.db.execute("UPDATE records SET payload=zeroblob(4194304),typed_key=zeroblob(2097152) WHERE namespace='world.year'")
+                read=(lambda:store.read_record('world.year',0)) if kind=='record' else (lambda:store.read_records('world.year'))
+            else:
+                ns,ordinal=store.db.execute('SELECT namespace,ordinal FROM segments LIMIT 1').fetchone()
+                if kind=='segment':store.db.execute("UPDATE segments SET payload=zeroblob(4194304),codec_version='bad'")
+                else:store.db.execute("UPDATE segments SET payload=zeroblob(4194304),first_id=zeroblob(2097152)")
+                read=lambda:store.read_segment_checked(ns,ordinal)
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):read()
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:348: AssertionError
+______ test_native_invalid_metadata_prevents_large_body_transfer[record] _______
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_invalid_metadata_p1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35d89fa990>
+sealed_fixture = (PosixPath('/tmp/ate-native-source-review-red/native-sealed-source0/proof.sqlite'), (GenerationManifest(store_identity...=89)), receipt=None), b'\xe6j\x7fjw4\x0c\x02y\xad\xc1F\x81\xdb\xe0\x81\xea\xe5zr\xcd\x1d\x18\x18!\x10\xcd^N\xc3\x98D'))
+kind = 'record'
+
+    @pytest.mark.parametrize('kind',['version','record','records','segment','segment-ids'])
+    def test_native_invalid_metadata_prevents_large_body_transfer(tmp_path,monkeypatch,sealed_fixture,kind):
+        import shutil
+        from ate_sim.incremental_store import StoreError
+        path,pair=sealed_fixture;target=tmp_path/'proof.sqlite';shutil.copyfile(path,target)
+        session=opened(target,pair);store=session.store;seen=[]
+        try:
+            if kind=='version':
+                store.db.execute("UPDATE lazy_record_versions SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.skills.skills'")
+                read=lambda:store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+            elif kind in ('record','records'):
+                if kind=='record':store.db.execute("UPDATE records SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.year'")
+                else:store.db.execute("UPDATE records SET payload=zeroblob(4194304),typed_key=zeroblob(2097152) WHERE namespace='world.year'")
+                read=(lambda:store.read_record('world.year',0)) if kind=='record' else (lambda:store.read_records('world.year'))
+            else:
+                ns,ordinal=store.db.execute('SELECT namespace,ordinal FROM segments LIMIT 1').fetchone()
+                if kind=='segment':store.db.execute("UPDATE segments SET payload=zeroblob(4194304),codec_version='bad'")
+                else:store.db.execute("UPDATE segments SET payload=zeroblob(4194304),first_id=zeroblob(2097152)")
+                read=lambda:store.read_segment_checked(ns,ordinal)
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):read()
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:348: AssertionError
+______ test_native_invalid_metadata_prevents_large_body_transfer[records] ______
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_invalid_metadata_p2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35d8780b60>
+sealed_fixture = (PosixPath('/tmp/ate-native-source-review-red/native-sealed-source0/proof.sqlite'), (GenerationManifest(store_identity...=89)), receipt=None), b'\xe6j\x7fjw4\x0c\x02y\xad\xc1F\x81\xdb\xe0\x81\xea\xe5zr\xcd\x1d\x18\x18!\x10\xcd^N\xc3\x98D'))
+kind = 'records'
+
+    @pytest.mark.parametrize('kind',['version','record','records','segment','segment-ids'])
+    def test_native_invalid_metadata_prevents_large_body_transfer(tmp_path,monkeypatch,sealed_fixture,kind):
+        import shutil
+        from ate_sim.incremental_store import StoreError
+        path,pair=sealed_fixture;target=tmp_path/'proof.sqlite';shutil.copyfile(path,target)
+        session=opened(target,pair);store=session.store;seen=[]
+        try:
+            if kind=='version':
+                store.db.execute("UPDATE lazy_record_versions SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.skills.skills'")
+                read=lambda:store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+            elif kind in ('record','records'):
+                if kind=='record':store.db.execute("UPDATE records SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.year'")
+                else:store.db.execute("UPDATE records SET payload=zeroblob(4194304),typed_key=zeroblob(2097152) WHERE namespace='world.year'")
+                read=(lambda:store.read_record('world.year',0)) if kind=='record' else (lambda:store.read_records('world.year'))
+            else:
+                ns,ordinal=store.db.execute('SELECT namespace,ordinal FROM segments LIMIT 1').fetchone()
+                if kind=='segment':store.db.execute("UPDATE segments SET payload=zeroblob(4194304),codec_version='bad'")
+                else:store.db.execute("UPDATE segments SET payload=zeroblob(4194304),first_id=zeroblob(2097152)")
+                read=lambda:store.read_segment_checked(ns,ordinal)
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):read()
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:348: AssertionError
+______ test_native_invalid_metadata_prevents_large_body_transfer[segment] ______
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_invalid_metadata_p3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35d8bd9640>
+sealed_fixture = (PosixPath('/tmp/ate-native-source-review-red/native-sealed-source0/proof.sqlite'), (GenerationManifest(store_identity...=89)), receipt=None), b'\xe6j\x7fjw4\x0c\x02y\xad\xc1F\x81\xdb\xe0\x81\xea\xe5zr\xcd\x1d\x18\x18!\x10\xcd^N\xc3\x98D'))
+kind = 'segment'
+
+    @pytest.mark.parametrize('kind',['version','record','records','segment','segment-ids'])
+    def test_native_invalid_metadata_prevents_large_body_transfer(tmp_path,monkeypatch,sealed_fixture,kind):
+        import shutil
+        from ate_sim.incremental_store import StoreError
+        path,pair=sealed_fixture;target=tmp_path/'proof.sqlite';shutil.copyfile(path,target)
+        session=opened(target,pair);store=session.store;seen=[]
+        try:
+            if kind=='version':
+                store.db.execute("UPDATE lazy_record_versions SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.skills.skills'")
+                read=lambda:store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+            elif kind in ('record','records'):
+                if kind=='record':store.db.execute("UPDATE records SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.year'")
+                else:store.db.execute("UPDATE records SET payload=zeroblob(4194304),typed_key=zeroblob(2097152) WHERE namespace='world.year'")
+                read=(lambda:store.read_record('world.year',0)) if kind=='record' else (lambda:store.read_records('world.year'))
+            else:
+                ns,ordinal=store.db.execute('SELECT namespace,ordinal FROM segments LIMIT 1').fetchone()
+                if kind=='segment':store.db.execute("UPDATE segments SET payload=zeroblob(4194304),codec_version='bad'")
+                else:store.db.execute("UPDATE segments SET payload=zeroblob(4194304),first_id=zeroblob(2097152)")
+                read=lambda:store.read_segment_checked(ns,ordinal)
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):read()
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:348: AssertionError
+____ test_native_invalid_metadata_prevents_large_body_transfer[segment-ids] ____
+
+tmp_path = PosixPath('/tmp/ate-native-source-review-red/test_native_invalid_metadata_p4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35d83ad880>
+sealed_fixture = (PosixPath('/tmp/ate-native-source-review-red/native-sealed-source0/proof.sqlite'), (GenerationManifest(store_identity...=89)), receipt=None), b'\xe6j\x7fjw4\x0c\x02y\xad\xc1F\x81\xdb\xe0\x81\xea\xe5zr\xcd\x1d\x18\x18!\x10\xcd^N\xc3\x98D'))
+kind = 'segment-ids'
+
+    @pytest.mark.parametrize('kind',['version','record','records','segment','segment-ids'])
+    def test_native_invalid_metadata_prevents_large_body_transfer(tmp_path,monkeypatch,sealed_fixture,kind):
+        import shutil
+        from ate_sim.incremental_store import StoreError
+        path,pair=sealed_fixture;target=tmp_path/'proof.sqlite';shutil.copyfile(path,target)
+        session=opened(target,pair);store=session.store;seen=[]
+        try:
+            if kind=='version':
+                store.db.execute("UPDATE lazy_record_versions SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.skills.skills'")
+                read=lambda:store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+            elif kind in ('record','records'):
+                if kind=='record':store.db.execute("UPDATE records SET payload=zeroblob(4194304),record_schema='bad' WHERE namespace='world.year'")
+                else:store.db.execute("UPDATE records SET payload=zeroblob(4194304),typed_key=zeroblob(2097152) WHERE namespace='world.year'")
+                read=(lambda:store.read_record('world.year',0)) if kind=='record' else (lambda:store.read_records('world.year'))
+            else:
+                ns,ordinal=store.db.execute('SELECT namespace,ordinal FROM segments LIMIT 1').fetchone()
+                if kind=='segment':store.db.execute("UPDATE segments SET payload=zeroblob(4194304),codec_version='bad'")
+                else:store.db.execute("UPDATE segments SET payload=zeroblob(4194304),first_id=zeroblob(2097152)")
+                read=lambda:store.read_segment_checked(ns,ordinal)
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            def observe(cursor,row):
+                if any(type(v) is bytes and len(v)==4194304 for v in row):seen.append(True)
+                return row
+            store.db.row_factory=observe
+            with pytest.raises(StoreError):read()
+>           assert not seen and not store.db.in_transaction
+E           assert (not [True])
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:348: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_phase_callback_cannot_read_staged_native_source
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_unowned_native_guard_does_not_bypass_source_authority
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_epoch_checked_inside_actual_sqlite_snapshot
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_operational_metadata_guard_precedes_lazy_snapshot_transfer[False]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_operational_metadata_guard_precedes_lazy_snapshot_transfer[True]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_future_interval_is_not_part_of_accepted_source
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_source_cannot_borrow_a_different_generation_snapshot
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_invalid_metadata_prevents_large_body_transfer[version]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_invalid_metadata_prevents_large_body_transfer[record]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_invalid_metadata_prevents_large_body_transfer[records]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_invalid_metadata_prevents_large_body_transfer[segment]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_invalid_metadata_prevents_large_body_transfer[segment-ids]
+12 failed, 35 deselected in 14.71s
