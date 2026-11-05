@@ -13,6 +13,7 @@ class _WorldProofAuthority:
         if type(expected) is not bytes or len(expected)!=32:raise StoreIntegrityError('invalid external World commitment')
         self.expected=expected;self.store=None;self.pair=None;self.epoch=None
         self.busy=False;self.uncertain=False;self.pending=None;self._postcommit_verified_epoch=None
+        self.read_pin=None
 
     def bind(self,store):
         if self.store is not None:raise StoreError('native proof admission is single-use')
@@ -62,6 +63,7 @@ class _WorldProofAuthority:
                 self.pair=value,self.expected
                 verified_epoch=self._audit(pin)
             self.epoch=verified_epoch
+            self.read_pin=pin
         finally:self.busy=False
 
     def finish_admission(self):
@@ -135,7 +137,9 @@ class _WorldProofAuthority:
         self.pending=plan.publication.parent_pin,self.pair,args['commit_token']
         with self._write_guard.publisher():
             result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
-        if result.manifest:self.pair=result.manifest
+        if result.manifest:
+            self.pair=result.manifest
+            self.read_pin=result.commit.pin
         self._can_settle=not result.reaudited
         if result.commit.outcome=='committed' and result.reaudited:
             # Reuse only this committed attempt's fully verified postcommit epoch.
@@ -152,6 +156,7 @@ class _WorldProofAuthority:
             result=manifests.resolve_world_manifest(self.store,pin,*parent,commit_token=token)
         if result.manifest:
             self.pair=result.manifest
+            self.read_pin=result.commit.pin
             self._audit(result.commit.pin)
         return result.commit
 

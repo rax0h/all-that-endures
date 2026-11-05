@@ -29,4 +29,4 @@ Files: canonical real-year probe and affected tests, runtime launch pin/workflow
 - [x] Require zero save-time audits on canonical complete generated year and eager/fresh equality; trace/fix actual unsupported shapes within this spec, never omit rows.
 - [x] Run affected persistence tests, final clean canonical probe, launcher/pin/YAML/bash/fingerprints.
 - [x] One independent whole-package review; reproduce/fix/verify every actionable finding in one register.
-- [ ] Commit source/evidence with exact API/local tree mapping; one branch publication and bundled full/proof CI. Hosted and mature gates explicit until verified.
+- [x] Commit source/evidence with exact API/local tree mapping; one branch publication and bundled full/proof CI. Hosted and mature gates explicit until verified.

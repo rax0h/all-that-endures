@@ -192,14 +192,18 @@ def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
  import sqlite3
  path,pair=fixture(tmp_path);s=opened(path,pair)
  try:
-  authority=s.store._world_proof_authority;original=authority._epoch;calls=[]
+  authority=s.store._world_proof_authority;original=authority._epoch;calls=[];injected=[]
   def race():
    captured=original();calls.append(True)
-   if len(calls)==2:
+   # Inject after a captured epoch at an actual transaction boundary. Additional
+   # in-snapshot checks must not move this external write into a locked reader.
+   if len(calls)>=2 and not injected and not s.store.db.in_transaction:
+    injected.append(True)
     with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
    return captured
   monkeypatch.setattr(authority,'_epoch',race)
   assert s.save()==0
+  assert injected and s.store.generation==0
   with pytest.raises(StoreError):s.proof_manifest
  finally:s.store.close()
 

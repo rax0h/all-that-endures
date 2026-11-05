@@ -87,3 +87,10 @@ Explicit proof admission still runs a full World audit. This small generated
 world does not establish mature10s open/2s save/1s warm-year targets, cold-cache
 performance or final Stage0.6 acceptance. No mature fixture, default activation,
 main merge or endurance run was launched.
+
+## Hosted gate closed
+
+Verified df624e9/run41977203078: proof-map and full-suite both successful.
+Full suite:4,592 passed, one intentional duplicate-ZIP warning, two subtests
+passed in7,792.94s. Receipt: `green-41977203078.json`. Next admission work
+requires proof-backed native source and relation reads before removing its audit.

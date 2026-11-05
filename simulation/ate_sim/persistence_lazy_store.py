@@ -994,7 +994,9 @@ class LazyRecordStore:
                 f"{namespace!r} is lazy authority; use read_version"
             )
         typed_key = self.codec.encode(key)
-        row = self.db.execute(
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        row = proof_sources.record_row(self, authority, namespace, typed_key) if authority is not None else self.db.execute(
             "SELECT payload,payload_checksum,codec_version,record_schema,"
             "last_changed_generation FROM records "
             "WHERE namespace=? AND typed_key=?",
@@ -1040,41 +1042,42 @@ class LazyRecordStore:
                 f"{namespace!r} is lazy authority; use iter_keys/read_version"
             )
         out = []
-        for typed_key, payload, checksum, codec_version, record_schema, generation in self.db.execute(
-            "SELECT typed_key,payload,payload_checksum,codec_version,"
-            "record_schema,last_changed_generation FROM records "
-            "WHERE namespace=?",
-            (namespace,),
-        ):
-            if (
-                expected_record_schema is not None
-                and record_schema != expected_record_schema
-            ):
-                raise StoreFormatError(
-                    f"record schema mismatch in {namespace!r}: "
-                    f"expected {expected_record_schema}, found {record_schema}"
-                )
-            expected = _record_checksum(
-                namespace,
-                typed_key,
-                record_schema,
-                codec_version,
-                generation,
-                payload,
-            )
-            self._payload_check_reads += 1
-            self._payload_check_bytes += len(payload)
-            if checksum != expected or codec_version != self.codec.version:
-                raise StoreIntegrityError("ordinary record checksum mismatch")
-            self._payload_reads += 1
-            self._payload_read_bytes += len(payload)
-            out.append(
-                (
-                    self.codec.decode(typed_key),
-                    self.codec.decode(payload),
+        from contextlib import closing
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        rows = proof_sources.record_rows(self, authority, namespace) if authority is not None else closing(self.db.execute(
+            "SELECT typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=?", (namespace,)))
+        with rows as captured:
+            for typed_key, payload, checksum, codec_version, record_schema, generation in captured:
+                if (
+                    expected_record_schema is not None
+                    and record_schema != expected_record_schema
+                ):
+                    raise StoreFormatError(
+                        f"record schema mismatch in {namespace!r}: "
+                        f"expected {expected_record_schema}, found {record_schema}"
+                    )
+                expected = _record_checksum(
+                    namespace,
+                    typed_key,
                     record_schema,
+                    codec_version,
+                    generation,
+                    payload,
                 )
-            )
+                self._payload_check_reads += 1
+                self._payload_check_bytes += len(payload)
+                if checksum != expected or codec_version != self.codec.version:
+                    raise StoreIntegrityError("ordinary record checksum mismatch")
+                self._payload_reads += 1
+                self._payload_read_bytes += len(payload)
+                out.append(
+                    (
+                        self.codec.decode(typed_key),
+                        self.codec.decode(payload),
+                        record_schema,
+                    )
+                )
         return tuple(out)
 
     def read_segment_checked(
@@ -1084,7 +1087,9 @@ class LazyRecordStore:
         namespace = _validate_namespace(namespace)
         if type(ordinal) is not int or ordinal < 0:
             raise ValueError("segment ordinal must be a nonnegative int")
-        row = self.db.execute(
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        row = proof_sources.segment_row(self, authority, namespace, ordinal) if authority is not None else self.db.execute(
             "SELECT payload,payload_checksum,codec_version,element_count,"
             "first_id,last_id,created_generation FROM segments "
             "WHERE namespace=? AND ordinal=?",
@@ -1244,6 +1249,10 @@ class LazyRecordStore:
             raise
 
     def _read_snapshot_start(self, pin: GenerationPin, *, _preflight=None) -> int:
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            proof_sources.before_snapshot(self, authority, pin)
         nested = getattr(self, "_checked_snapshot_depth", 0)
         scope = getattr(self, '_validation_scope', None)
         if nested and scope is not None and scope.can_reuse(self, pin):
@@ -1257,6 +1266,8 @@ class LazyRecordStore:
                 self.db.execute("BEGIN")
             self._checked_snapshot_owns_transaction = owns_transaction
         try:
+            if authority is not None and not nested:
+                proof_sources.snapshot_preflight(self, authority)
             if _preflight is not None:
                 _preflight()
             generation = self._require_pin(pin)
@@ -1265,6 +1276,8 @@ class LazyRecordStore:
             if generation < floor or generation > head:
                 raise StoreConflictError("generation pin is outside retained visibility")
             self._checked_snapshot_depth = nested + 1
+            if not nested:
+                self._checked_snapshot_generation = generation
             return generation
         except Exception:
             if not nested and owns_transaction:
@@ -1275,6 +1288,8 @@ class LazyRecordStore:
         depth = getattr(self, "_checked_snapshot_depth", 0)
         if depth:
             self._checked_snapshot_depth = depth - 1
+        if depth <= 1:
+            self._checked_snapshot_generation = None
         if depth <= 1 and getattr(self, '_checked_snapshot_owns_transaction', True) and self.db.in_transaction:
             self.db.rollback()
 
@@ -1324,6 +1339,10 @@ class LazyRecordStore:
         return cursor if stream else cursor.fetchall()
 
     def _visible_record_row(self, generation: int, namespace: str, typed_key: bytes) -> tuple[Any, ...] | None:
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            return proof_sources.version_row(self, authority, generation, namespace, typed_key)
         rows = self._interval_rows('lazy_record_versions',
             'valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum',
             ('namespace', 'typed_key'), (namespace, typed_key), generation, 'lazy_record_interval', limit=2)
