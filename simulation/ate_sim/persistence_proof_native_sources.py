@@ -35,7 +35,8 @@ def active(store):
 
 def before_snapshot(store, authority, pin):
     """Reject context drift before any inherited variable-sized metadata read."""
-    authority.guard()
+    if authority.uncertain and not authority.busy:
+        raise StoreError('native source publication requires exact recovery')
     if (pin.store_identity != authority.pair[0].store_identity
             or pin.captured_head != authority.pair[0].generation
             or getattr(store, '_checked_snapshot_depth', 0) and
@@ -56,7 +57,6 @@ def _epoch(store, authority):
 def snapshot_preflight(store, authority):
     # A tiny SELECT establishes SQLite's actual read view. Recheck the epoch
     # there, closing the gap between a pre-BEGIN guard and concurrent commit.
-    _epoch(store, authority)
     row = store.db.execute("SELECT CASE WHEN typeof(generation)='integer' THEN generation END FROM main.save_head WHERE singleton=1").fetchone()
     _epoch(store, authority)
     if row != (authority.pair[0].generation,):
@@ -74,7 +74,6 @@ def _locator(namespace, typed=b''):
 
 @contextmanager
 def _snapshot(store, authority, generation=None):
-    authority.guard()
     pin, manifest = authority.read_pin, authority.pair[0]
     if (pin is None or pin.captured_head != manifest.generation
             or generation is not None and generation != manifest.generation):

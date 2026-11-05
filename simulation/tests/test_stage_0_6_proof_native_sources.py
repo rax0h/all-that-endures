@@ -360,3 +360,20 @@ def test_native_invalid_metadata_prevents_large_body_transfer(tmp_path,monkeypat
         with pytest.raises(StoreError):read()
         assert not seen and not store.db.in_transaction
     finally:store.close()
+
+
+@pytest.mark.parametrize('kind',['version','record'])
+def test_native_point_fetch_does_not_repeat_identical_epoch_checks(tmp_path,kind):
+    path,pair=fixture(tmp_path)
+    with opened(path,pair) as session:
+        store=session.store;epochs=[]
+        def trace(sql):
+            if sql.lower()=='pragma data_version':epochs.append(sql)
+        store.db.set_trace_callback(trace)
+        try:
+            if kind=='version':store.read_version(session.pin,'world.skills.skills',(1,'craft'),expected_record_schema=1)
+            else:store.read_record('world.year',0)
+        finally:store.db.set_trace_callback(None)
+        # One entry check, one pinned-view check, and at most one compatible
+        # nested-source check. Actual bytes/proof paths are still reread.
+        assert len(epochs)<=3, len(epochs)

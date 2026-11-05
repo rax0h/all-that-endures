@@ -1297,8 +1297,8 @@ class LazyRecordStore:
     def read_snapshot(self, pin: GenerationPin, *, _preflight=None):
         """Compose checked reads in one bounded, generation-matched snapshot."""
         self._ensure_open()
-        authority=getattr(self,'_world_proof_authority',None)
-        if authority is not None:authority.guard()
+        # Admitted proof entry/epoch checks live in _read_snapshot_start, also
+        # covering callers of that legacy seam directly. Do not repeat them.
         generation = self._read_snapshot_start(pin, _preflight=_preflight)
         try:
             yield generation
