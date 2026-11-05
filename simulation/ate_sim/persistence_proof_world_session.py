@@ -156,8 +156,59 @@ class _WorldProofAuthority:
         return result.commit
 
 
+def _event_occurrences_by_depth(occurrences):
+    if type(occurrences) is tuple:
+        yield from sorted(occurrences,key=lambda item:len(item[0]))
+        return
+    # The catalog transfers ownership of a spill above its residency limit.
+    # Stream each depth instead of rebuilding that whole roster in Python.
+    depth=max((len(path) for path,_number in occurrences),default=0)
+    for level in range(depth+1):
+        for path,number in occurrences:
+            if len(path)==level:
+                yield path,number
+
+
+def _restore_current_event_aliases(session):
+    """Stitch resident inline copies using the existing checked catalog.
+
+    Ordinary codecs encode values independently at each path. The catalog is
+    their identity authority, including two paths inside one mutable event.
+    Only the current mutable tail is visited; sealed event bodies stay cold.
+    """
+    from .persistence_identity import iter_mutable_event_owners
+    from .persistence_lazy_identity import IncarnationId,Occurrence
+    registry,bindings=session._registry,session._family_bindings
+    coordinator=session._identity_coordinator
+    for owner,_event,_absolute in iter_mutable_event_owners(session.world.events):
+        accepted=coordinator.catalog.read_owner_identity(session.pin,owner)
+        try:
+            for path,number in _event_occurrences_by_depth(accepted.occurrences):
+                incarnation=IncarnationId(session.store.store_identity,number)
+                value=bindings.load_owner(owner)
+                current=bindings.resolve_path(value,path)
+                canonical=registry.object_for_incarnation(incarnation)
+                if canonical is None:
+                    registry.bind(current,incarnation=incarnation)
+                    canonical=current
+                elif current is not canonical:
+                    if bindings.encode_placement(owner,path,current)!=bindings.encode_placement(owner,path,canonical):
+                        raise StoreIntegrityError('checked current event alias payload copies disagree')
+                    bindings.install_path(owner,path,canonical)
+                registry.attach_occurrence(canonical,Occurrence(*owner,path))
+        finally:
+            if hasattr(accepted.occurrences,'close'):accepted.occurrences.close()
+
+
 def open_audited_proof_world_session(path,*,rules_id,expected_commitment,paged_household_members=None):
     """Full audit + existing canonical restoration; deliberately explicit/slow."""
     from .persistence_lazy import open_lazy_world_session
     admission=_WorldProofAuthority(expected_commitment)
-    return open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+    try:
+        admission.execute(session,lambda:_restore_current_event_aliases(session))
+        return session
+    except BaseException:
+        try:session.close()
+        except BaseException:session.store.close()
+        raise

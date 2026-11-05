@@ -118,7 +118,7 @@ def test_partnership_query_projection_uses_key_and_rejects_corruption(pair, dama
         _check_queries(store, SimpleNamespace(captured_head=0), change)
 
 
-def test_generated_world_continues_through_two_proof_saves(tmp_path):
+def test_generated_world_continues_through_two_proof_saves(tmp_path, monkeypatch):
     rules = 'stage-0-6-proof-real-years'
     world = generate_world(843000, width=8, height=6, settlements=1, mature=True)
     Simulation(world).run(2)
@@ -143,7 +143,10 @@ def test_generated_world_continues_through_two_proof_saves(tmp_path):
             Simulation(session.world).run(1)
             assert not session.store.db.in_transaction
             assert session.world.year == year
-            assert session.save() == before + 1
+            from ate_sim import persistence_proof_world as world_proof
+            with monkeypatch.context() as patch:
+                patch.setattr(world_proof, '_audit_world', lambda *a, **k: pytest.fail('complete year save scanned World'))
+                assert session.save() == before + 1
             assert session.proof_manifest[0].parent_commitment == commitment
             commitment = session.proof_manifest[1]
         # A fresh interpreter must restore using only the externally held

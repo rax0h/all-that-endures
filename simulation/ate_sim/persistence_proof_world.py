@@ -117,6 +117,8 @@ def _check_family_value(store,namespace,key,value,record_header=None):
     hint=_family_value_hint(namespace);origin=get_origin(hint)
     if namespace in SCALAR_MAP_SPECS:
         valid=_valid_scalar_map_key(namespace,key) and type(value) in SCALAR_MAP_SPECS[namespace][1]
+    elif namespace=='world.genealogy.parents':
+        valid=type(key) is int and type(value) is tuple and all(type(parent) is int for parent in value)
     elif type(value) is HistoryReference:
         expected=BUCKET_SPECS[namespace][0] if namespace in BUCKET_SPECS else {dict:'map',list:'list',set:'set'}.get(origin)
         valid=expected is not None and value.kind==expected
@@ -358,6 +360,8 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
     _check_head(store,pin,ra);_check_events(store,pin,manifest)
     if store.db.execute('SELECT 1 FROM query_membership LIMIT 1').fetchone():raise StoreError('ordinary World query projection has no declared source contract')
     store.verify_all();checked_copy._verify_catalog(store,pin)
+    from .persistence_proof_world_adoption import audit as audit_adoption
+    audit_adoption(store,pin)
     store.db.execute('CREATE TEMP TABLE ate_world_backings(inc INTEGER PRIMARY KEY,kind TEXT,namespace TEXT,key BLOB,descriptor BLOB) WITHOUT ROWID')
     store.db.execute('CREATE TEMP TABLE ate_world_projection(namespace TEXT,key BLOB,path BLOB,inc INTEGER,kind TEXT,fingerprint BLOB,PRIMARY KEY(namespace,key,path)) WITHOUT ROWID')
     store.db.execute('CREATE TEMP TABLE ate_world_orders(namespace TEXT,ordinal INTEGER,typed_key BLOB,PRIMARY KEY(namespace,ordinal),UNIQUE(namespace,typed_key)) WITHOUT ROWID')

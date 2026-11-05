@@ -80,16 +80,19 @@ def validate_value_transition(store,request,versions,ordinary,segments):
     from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES
     from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
     from .core import Event
+    from .persistence_lazy import SCALAR_MAP_SPECS
     from .persistence_proof_world_tail import metadata_allowed
     if segments or len(versions)>MAX_ROWS:return False
     codec=store.codec;g=request.pin.captured_head;ca=request.pairs[0][0];ra=request.pairs[3][0]
-    rows=[];owners={};source_only=set();total=0
+    rows=[];owners={};source_only=set();scalar_values=set();total=0
     for item in versions:
         if item['change'].reinsertion:return False
         ns,key=item['namespace'],item['typed_key']
         total+=len(ns.encode())+len(key)
         sizes=store._interval_rows('lazy_record_versions','length(payload)+length(memberships)',('namespace','typed_key'),(ns,key),g,'lazy_record_interval',limit=2)
-        if len(sizes)==1 and type(sizes[0][0]) is int and sizes[0][0]+len(item['payload'] or b'')+len(item['memberships_blob'])+total>MAX_BYTES:return False
+        if len(sizes)>1:raise StoreIntegrityError('overlapping value predecessor versions')
+        if sizes and (type(sizes[0][0]) is not int or sizes[0][0]<0):raise StoreIntegrityError('invalid value predecessor size')
+        if sizes and sizes[0][0]+len(item['payload'] or b'')+len(item['memberships_blob'])+total>MAX_BYTES:return False
         old=content._source_version(store,g,ns,key,max_bytes=MAX_BYTES)
         if item['change'].delete:
             approved=(request.tail_removed or {}).get((ns,key))
@@ -119,6 +122,15 @@ def validate_value_transition(store,request,versions,ordinary,segments):
                 owners[(ns,key)]=frozen
                 if old is None:source_only.add((ns,key))
         if ns in world.FAMILIES and world._record_class(ns) not in (None,Event):owners[(ns,key)]=frozen
+        if ns in SCALAR_MAP_SPECS and old is not None:
+            # Primitive native values have no identity placements. Their exact
+            # declared key/value type and new query projection still apply.
+            before=tuple(world._project(store,ns,frozen.key,value,False))
+            after=tuple(world._project(store,ns,frozen.key,frozen.value,False))
+            if not before and not after:
+                scalar_values.add((ns,key))
+                if ns in catalog.IDENTITY_OWNER_FAMILIES:
+                    owners[(ns,key)]=frozen;source_only.add((ns,key))
         if ((ns,key) not in owners and ns in catalog.IDENTITY_OWNER_FAMILIES and old is not None
                 and item['payload']==old.payload and item['memberships_blob']==old.memberships):
             from .persistence_lazy_sequence import NODE_NAMESPACE
@@ -135,6 +147,10 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             if ns not in world.AUXILIARY_OWNER_FAMILIES:world._check_queries(store,request.pin,change)
         elif ns==catalog.OWNER_NAMESPACE:
             headers.append((item,old,value))
+        elif (ns,key) in scalar_values:
+            world._check_queries(store,request.pin,change)
+        elif (ns,key) in (getattr(request,'adoption_rows',None) or ()):
+            pass  # Exact derived counters were certified with their source edits.
         elif metadata_allowed(request,ns,change.key):
             pass
         elif ns==DEPENDENCIES:
@@ -146,9 +162,16 @@ def validate_value_transition(store,request,versions,ordinary,segments):
         count+=1;ns,key=item['namespace'],item['typed_key'];total+=len(ns.encode())+len(key)
         change=replace(item['change'],key=codec.decode(key),value=None if item['change'].delete else codec.decode(item['payload']))
         if count+len(versions)>MAX_ROWS or change.delete or change.memberships:return False
-        row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",(MAX_BYTES,ns,key)).fetchone()
+        row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,"
+            "CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END,"
+            "CASE WHEN typeof(codec_version)='integer' THEN codec_version END,"
+            "CASE WHEN typeof(record_schema)='integer' THEN record_schema END,"
+            "CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END "
+            "FROM records WHERE namespace=? AND typed_key=?",(max(0,MAX_BYTES-total-len(item['payload'] or b'')),ns,key)).fetchone()
         if row is None:return False
         payload,checksum,version,schema,revision=row
+        if (type(schema) is not int or schema<1 or version!=codec.version
+                or type(revision) is not int or not 0<=revision<=g or checksum is None):raise StoreIntegrityError('invalid ordinary value predecessor metadata')
         if type(payload) is not bytes:return False
         total+=len(payload)+len(item['payload'] or b'')
         if total>MAX_BYTES or schema!=change.record_schema:return False
@@ -163,6 +186,12 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             before=codec.decode(payload);after=change.value
             if (type(before) is not tuple or type(after) is not tuple or len(before)!=2 or len(after)!=2
                     or type(before[0]) is not int or type(after[0]) is not int or before[0]!=after[0]):return False
+            from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE,PACKED_LIST_KEY,PACKED_LIST_PAYLOAD
+            if ns==AGENCY_ACTIONS_NAMESPACE and change.key==PACKED_LIST_KEY:
+                a,b=before[1],after[1]
+                if (type(a) is not tuple or len(a)!=2 or a[0]!=PACKED_LIST_PAYLOAD or type(a[1]) is not tuple
+                        or type(b) is not tuple or len(b)!=2 or b[0]!=PACKED_LIST_PAYLOAD or type(b[1]) is not tuple
+                        or len(a[1])!=len(b[1])):return False
             if not _projection(store,request,ns,change.key,before,after,ordinary=True):return False
             owners[(ns,key)]=change;ordinary_owners.add((ns,key))
         elif ns in catalog.IDENTITY_OWNER_FAMILIES:

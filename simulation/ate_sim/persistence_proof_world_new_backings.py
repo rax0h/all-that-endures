@@ -145,10 +145,23 @@ class Forest:
                 raise StoreIntegrityError('fresh backing dependency kind disagreement')
             self.children[incarnation] = tuple(child_rows)
 
-    def project(self, change):
+    def collect(self, iterator, *, limit=None):
+        """Consume at most the remaining projection budget plus one sentinel."""
+        remaining = MAX_PROJECTIONS - self.projections
+        if limit is not None:
+            remaining = min(remaining, limit)
+        result = []
+        for item in iterator:
+            if len(result) >= remaining:
+                raise Unsupported()
+            result.append(item)
+        return tuple(result)
+
+    def project(self, change, *, ordinary=False, limit=None):
         ns = change.namespace
         if ns not in world.AUXILIARY_OWNER_FAMILIES:
-            return tuple(world._project(self.store, ns, change.key, change.value, False, record_header=self.header))
+            return self.collect(world._project(self.store, ns, change.key, change.value, ordinary,
+                record_header=self.header), limit=limit)
         adapter = world.AUXILIARY_OWNER_FAMILIES[ns]
         adapter.validate_source(change, 'lazy', self.codec)
         if ns == RECORDS:
@@ -161,8 +174,8 @@ class Forest:
                     # A generic backed record can use a different concrete
                     # container representation than its optimized World family.
                     raise Unsupported() from None
-        return tuple((path, incarnation, world.target._reference(adapter.resolve_path(change.value, path))[0], None)
-                     for path, incarnation in adapter.reference_placements(change.value))
+        return self.collect(((path, incarnation, world.target._reference(adapter.resolve_path(change.value, path))[0], None)
+                     for path, incarnation in adapter.reference_placements(change.value)), limit=limit)
 
     def _target(self, kind, incarnation):
         if incarnation in self.backings:

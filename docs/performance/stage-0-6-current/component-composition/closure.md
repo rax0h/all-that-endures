@@ -96,3 +96,5 @@ One evidence child and one branch update publish this package. The full/proof
 hosted gate remains open until that exact published source passes. No mature,
 default, merge or endurance action was launched. The next integration work is
 ordinary event/action/motive replacement composition described above.
+
+Hosted completion is now verified on eefcd63/run41931309437: both jobs green,4532passes plus two subtests6439.56s and one deliberate ZIP warning. This closes the component-composition hosted gate; ordinary annual ownership work continues in annual-ordinary/.

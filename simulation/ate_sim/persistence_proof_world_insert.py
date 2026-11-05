@@ -6,11 +6,9 @@ This does not construct another identity authority.
 from collections import Counter
 from dataclasses import replace
 
-from .incremental_store import StoreIntegrityError, Membership
+from .incremental_store import StoreIntegrityError, Membership, RecordChange
 from .persistence_lazy_store import IdentityOccurrenceChange
 from .persistence_proof_content import version_key, record_key, record_commitment
-from .persistence_proof_nodes import _digest
-from .persistence_proof_seek import OrderedSeekMap
 from . import persistence_lazy_identity_catalog as catalog
 from . import persistence_proof_scope as scope
 from . import persistence_proof_world as world
@@ -18,7 +16,6 @@ from . import persistence_proof_publication as content
 from . import persistence_proof_record as records
 from . import persistence_proof_collection_directory as directory
 
-MAX_ROWS = 512
 MAX_BYTES = 4 * 1048576
 
 
@@ -45,7 +42,7 @@ def _prepare(store, request, versions, ordinary, segments):
     from .persistence_proof_world_components import insertion_within_limits
     if segments or not versions or not insertion_within_limits(versions, ordinary):
         return None
-    consumed = sum(len(i['payload'] or b'') + len(i.get('memberships_blob', b'')) + len(i['typed_key'])
+    consumed = sum(len(i['namespace'].encode()) + len(i['payload'] or b'') + len(i.get('memberships_blob', b'')) + len(i['typed_key'])
                    for i in (*versions, *ordinary))
     if consumed > MAX_BYTES:
         return None
@@ -60,10 +57,15 @@ def _prepare(store, request, versions, ordinary, segments):
             return True, predecessors[ns, typed]
         sizes = store._interval_rows('lazy_record_versions', 'length(payload)+length(memberships)',
             ('namespace', 'typed_key'), (ns, typed), request.pin.captured_head, 'lazy_record_interval', limit=2)
+        if len(sizes) > 1:
+            raise StoreIntegrityError('overlapping insertion predecessor versions')
+        consumed += len(ns.encode()) + len(typed)
         if len(sizes) == 1:
+            if type(sizes[0][0]) is not int or sizes[0][0] < 0:
+                raise StoreIntegrityError('invalid insertion predecessor size')
             consumed += sizes[0][0]
-            if consumed > MAX_BYTES:
-                return False, None
+        if consumed > MAX_BYTES:
+            return False, None
         old = content._source_version(store, request.pin.captured_head, ns, typed, max_bytes=MAX_BYTES)
         expected = None if old is None else content._version_value(ns, typed, old, codec.version)
         if content._map(store).get(ca[0].versions, version_key(ns, typed)) != expected:
@@ -71,12 +73,78 @@ def _prepare(store, request, versions, ordinary, segments):
         predecessors[ns, typed] = old
         return True, old
 
+    ordinary_cache = {}
+    def ordinary_predecessor(ns, typed):
+        nonlocal consumed
+        marker = ns, typed
+        if marker in ordinary_cache:
+            return ordinary_cache[marker]
+        consumed += len(ns.encode()) + len(typed)
+        if consumed > MAX_BYTES:
+            from .persistence_proof_world_new_backings import Unsupported
+            raise Unsupported()
+        row = store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,"
+            "CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END,"
+            "CASE WHEN typeof(codec_version)='integer' THEN codec_version END,"
+            "CASE WHEN typeof(record_schema)='integer' THEN record_schema END,"
+            "CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END "
+            "FROM records WHERE namespace=? AND typed_key=?",
+            (MAX_BYTES-consumed, ns, typed)).fetchone()
+        mapping = records._map(store)
+        if row is None:
+            if mapping.get(ra[0].root, record_key(ns, typed)) is not None:
+                raise StoreIntegrityError('insertion ordinary absence lacks accepted content')
+            ordinary_cache[marker] = None
+            return None
+        payload, checksum, version, schema, revision = row
+        if type(payload) is not bytes:
+            from .persistence_proof_world_new_backings import Unsupported
+            raise Unsupported()
+        consumed += len(payload)
+        if (schema != 1 or version != codec.version or type(revision) is not int
+                or not 0 <= revision <= request.pin.captured_head
+                or checksum != _record_checksum(ns, typed, schema, version, revision, payload)
+                or mapping.get(ra[0].root, record_key(ns, typed)) != record_commitment(ns, typed,
+                    last_changed_generation=revision, codec_version=version, record_schema=schema, payload=payload)):
+            raise StoreIntegrityError('insertion ordinary predecessor lacks accepted content')
+        ordinary_cache[marker] = payload
+        return payload
+
     from .persistence_proof_world_new_backings import Forest
     forest = Forest(store, request, by_key, predecessor)
     owners, placements, incarnations, sources = [], [], set(forest.backings), []
     identities = {}
     catalog_rows, added = {}, 0
     declared = set()
+    replacements = set()
+    request.owner_previous = {}
+    def add_owner(change, projection, old_root=None):
+        forest.check(change, projection)
+        ns, typed = change.namespace, codec.encode(change.key)
+        for path, inc, kind, fingerprint in projection:
+            if inc is None:
+                leaf = by_key.get((catalog.OWNER_TREE_NAMESPACE,
+                    codec.encode((ns, change.key, catalog.path_hash(codec, path)))))
+                value = None if leaf is None or leaf['change'].delete else codec.decode(leaf['payload'])
+                if (type(value) is not tuple or len(value) != 3 or value[:2] != ('owner-leaf/v1', path)
+                        or type(value[2]) is not int):
+                    from .persistence_proof_world_new_backings import Unsupported
+                    raise Unsupported()
+                inc = value[2]
+            if fingerprint is not None:
+                if not sa[0].next_incarnation_id <= inc < 2**63:
+                    from .persistence_proof_world_new_backings import Unsupported
+                    raise Unsupported()
+                incarnations.add(inc)
+            identity = kind, fingerprint
+            if inc in identities and identities[inc] != identity:
+                raise StoreIntegrityError('fresh aliases disagree on kind or inline value')
+            identities[inc] = identity
+            placements.append(IdentityOccurrenceChange(ns, change.key, path, incarnation_id=inc))
+            if old_root is not None:
+                request.owner_previous[ns, typed, codec.encode(path)] = old_root
+        owners.append((change, projection))
+
     for item in versions:
         change = item['change']
         ns, typed = item['namespace'], item['typed_key']
@@ -104,9 +172,16 @@ def _prepare(store, request, versions, ordinary, segments):
         branch = ns == NODE_NAMESPACE and type(frozen.value) is tuple and frozen.value and frozen.value[0] == 'branch'
         if ns in catalog.IDENTITY_OWNER_FAMILIES and not branch:
             sources.append(frozen)
-        if old is not None or (ns, typed) in (request.tail_new or {}):
-            # The complete remaining transition is checked by the existing
-            # value/tail validator below, including deletions and witnesses.
+        if old is not None:
+            if not change.delete:
+                from .persistence_proof_world_owner_edits import scalar_replacement
+                replacement = scalar_replacement(store, request, frozen, codec.decode(old.payload), by_key, forest)
+                if replacement is not None:
+                    projection, root = replacement
+                    add_owner(frozen, projection, root)
+                    replacements.add((ns, typed))
+            continue
+        if (ns, typed) in (request.tail_new or {}):
             continue
         concrete = ns in world.AUXILIARY_OWNER_FAMILIES and (ns, typed) in forest.new_rows
         if (ns, typed) in forest.new_rows and not concrete:
@@ -121,34 +196,19 @@ def _prepare(store, request, versions, ordinary, segments):
                 return None
             declared.add(ns)
         projection = forest.project(frozen)
-        forest.check(frozen, projection)
         if scope._resolve(store, sa[0], scope.OwnerScope(ns, typed)).count:
             raise StoreIntegrityError('fresh insertion has accepted predecessor placements')
-        for path, inc, kind, fingerprint in projection:
-            if inc is None:
-                tree_key = (ns, frozen.key, catalog.path_hash(codec, path))
-                leaf = by_key.get((catalog.OWNER_TREE_NAMESPACE, codec.encode(tree_key)))
-                value = None if leaf is None or leaf['change'].delete else codec.decode(leaf['payload'])
-                if (type(value) is not tuple or len(value) != 3 or value[:2] != ('owner-leaf/v1', path)
-                        or type(value[2]) is not int):
-                    return None
-                inc = value[2]
-            if fingerprint is not None:
-                if inc < sa[0].next_incarnation_id:
-                    return None
-                incarnations.add(inc)
-            identity = kind, fingerprint
-            if inc in identities and identities[inc] != identity:
-                raise StoreIntegrityError('fresh aliases disagree on kind or inline value')
-            identities[inc] = identity
-            placements.append(IdentityOccurrenceChange(ns, frozen.key, path, incarnation_id=inc))
-        owners.append((frozen, projection))
+        add_owner(frozen, projection)
+    from .persistence_proof_world_ordinary import prepare as prepare_ordinary
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+    for change, projection in ordinary_plan.owners:
+        add_owner(change, projection)
     if (not owners or set(forest.backings) & {i for i, (_kind, fingerprint) in identities.items() if fingerprint is not None}
             or sorted(incarnations) != list(range(sa[0].next_incarnation_id,
                                                   sa[0].next_incarnation_id + len(incarnations)))
             or not set(forest.backings) <= set(identities)):
         return None
-    forest.guard_alias_work(p.incarnation_id for p in placements)
+    forest.guard_alias_work([p.incarnation_id for p in placements] + list(request.owner_previous.values()))
 
     fresh = {(c.namespace, codec.encode(c.key)) for c, _p in owners}
     remaining = []
@@ -161,15 +221,18 @@ def _prepare(store, request, versions, ordinary, segments):
             owner = codec.decode(typed)
             if type(owner) is not tuple or len(owner) != 2 or type(owner[0]) is not str:
                 raise StoreIntegrityError('invalid catalog owner key in mixed transition')
-            if (owner[0], codec.encode(owner[1])) not in fresh:
+            if ((owner[0], codec.encode(owner[1])) not in fresh
+                    and (owner[0], codec.encode(owner[1])) not in ordinary_plan.handled_sources):
                 remaining.append(item)
     other_records = tuple(i for i in ordinary if (i['namespace'], i['typed_key']) !=
-                          (META, codec.encode(COLLECTION_LAYOUT)))
+                          (META, codec.encode(COLLECTION_LAYOUT)) and (i['namespace'], i['typed_key']) not in ordinary_plan.handled)
     from .persistence_proof_world_value import validate_value_transition
     if not validate_value_transition(store, request, tuple(remaining), other_records, segments):
         return None
 
-    counts = Counter(c.namespace for c, _p in owners if c.namespace in world.FAMILIES)
+    counts = Counter(c.namespace for c, _p in owners if c.namespace in world.FAMILIES
+        and not isinstance(c, RecordChange) and (c.namespace, codec.encode(c.key)) not in replacements)
+    counts.update(ordinary_plan.counts)
     saw_layout = False
     scalars = {r + '.' + f for r, fs in ROOT_FIELDS.items() for f, k in fs.items() if k == 'int'}
     ordinary_sources = []
@@ -178,27 +241,16 @@ def _prepare(store, request, versions, ordinary, segments):
         c = item['change']
         if c.delete or c.record_schema != 1 or item['memberships']:
             return None
-        row = store.db.execute('SELECT CASE WHEN typeof(payload)=\'blob\' AND length(payload)<=? THEN payload END,'
-                               'payload_checksum,codec_version,record_schema,last_changed_generation '
-                               'FROM records WHERE namespace=? AND typed_key=?', (MAX_BYTES-consumed, ns, key)).fetchone()
-        new_layout = row is None and ns == META and c.key == COLLECTION_LAYOUT
+        if ns in catalog.IDENTITY_OWNER_FAMILIES:
+            ordinary_sources.append(replace(c, key=codec.decode(key), value=codec.decode(item['payload'])))
+        payload = ordinary_predecessor(ns, key)
+        if (ns, key) in ordinary_plan.handled:
+            continue
+        new_layout = payload is None and ns == META and c.key == COLLECTION_LAYOUT
         if new_layout:
-            if records._map(store).get(ra[0].root, record_key(ns, key)) is not None:
-                raise StoreIntegrityError('new layout lacks accepted absence')
-            # The first layout overlay inherits the authenticated original
-            # manifest; later overlays inherit the previous layout record.
-            key = codec.encode('manifest')
-            row = store.db.execute('SELECT CASE WHEN typeof(payload)=\'blob\' AND length(payload)<=? THEN payload END,'
-                                   'payload_checksum,codec_version,record_schema,last_changed_generation '
-                                   'FROM records WHERE namespace=? AND typed_key=?', (MAX_BYTES-consumed, ns, key)).fetchone()
-        if row is None or type(row[0]) is not bytes:
+            payload = ordinary_predecessor(META, codec.encode('manifest'))
+        if payload is None:
             return None
-        payload, checksum, version, schema, revision = row
-        consumed += len(payload)
-        if (checksum != _record_checksum(ns, key, schema, version, revision, payload)
-                or records._map(store).get(ra[0].root, record_key(ns, key)) != record_commitment(
-                    ns, key, last_changed_generation=revision, codec_version=version, record_schema=schema, payload=payload)):
-            raise StoreIntegrityError('insertion ordinary predecessor lacks accepted content')
         if ns == META and c.key == COLLECTION_LAYOUT:
             before = codec.decode(payload)['collections'] if new_layout else codec.decode(payload)
             expected = dict(before)
@@ -208,11 +260,8 @@ def _prepare(store, request, versions, ordinary, segments):
             if codec.encode(expected) != item['payload']:
                 raise StoreIntegrityError('insertion layout does not match new owners')
             saw_layout = True
-        elif ns in world.FAMILIES:
-            # Existing value proof above requires its exact updated catalog
-            # source witness even for a byte-identical ordinary owner rewrite.
-            ordinary_sources.append(replace(c, key=codec.decode(item['typed_key']),
-                                            value=codec.decode(item['payload'])))
+        elif ns in catalog.IDENTITY_OWNER_FAMILIES:
+            pass  # Existing value proof above or the ordinary slice checked it.
         elif ns == EVENT_STORAGE and c.key == COMMIT_DESCRIPTOR_KEY:
             if item['payload'] != codec.encode((1, request.pin.captured_head + 1, codec.decode(request.token))):
                 raise StoreIntegrityError('insertion commit descriptor disagreement')
@@ -223,8 +272,12 @@ def _prepare(store, request, versions, ordinary, segments):
                 return None
         elif item['payload'] != payload:
             return None
-    if not saw_layout:
+    if counts and not saw_layout:
         return None
+
+    from .persistence_proof_world_catalog_retirement import candidates as retirement_candidates, ROW_BUDGET
+    proposed_retirements = retirement_candidates(store, request, catalog_rows, predecessor,
+        {p.incarnation_id for p in placements} | set(request.owner_previous.values()))
 
     # Existing catalog logic may read unchanged owner-tree metadata while
     # checking fixed-shape backings. Every such dependency must be authenticated
@@ -286,6 +339,9 @@ def _prepare(store, request, versions, ordinary, segments):
                 if not within_budget: raise _BudgetExceeded()
             return store.iter_query_memberships(pin, namespace, index_name, value)
         def query_memberships(self, pin, namespace, index_name, value, **kwargs):
+            if namespace == catalog.GROUP_NAMESPACE and index_name == 'retired' and value is True:
+                excluded = set(kwargs.get('exclude_keys', ()))
+                return tuple(p for p in proposed_retirements if p[0] not in excluded)[:kwargs.get('limit', ROW_BUDGET)]
             rows = tuple(self.iter_query_memberships(pin, namespace, index_name, value))
             return rows[:kwargs['limit']] if 'limit' in kwargs else rows
     active = store._active_read_transaction
@@ -294,7 +350,8 @@ def _prepare(store, request, versions, ordinary, segments):
         try:
             delta = CheckedCatalog(CatalogStore()).prepare_delta(
                 request.pin, tuple(sources), tuple(placements), ordinary_changes=tuple(ordinary_sources),
-                next_incarnation_id=sa[0].next_incarnation_id + len(incarnations))
+                next_incarnation_id=sa[0].next_incarnation_id + len(incarnations),
+                retirement_row_budget=ROW_BUDGET if proposed_retirements else 0)
         except _BudgetExceeded:
             return None
     finally:
@@ -314,46 +371,10 @@ def stage(store, request, pin, ca, sa, ia):
     """Certify changed owner/group paths against the actual written roots."""
     owners, placements, added, allocator = request.insertions
     oldca, oldsa, oldia, _ra, _da = request.pairs
-    codec = store.codec
     roots = list(oldsa[0].roots)
     facts = list(request.tail_facts or request.facts)
-    by_path = {(p.owner_namespace, codec.encode(p.owner_key), codec.encode(p.occurrence_path)): p.incarnation_id for p in placements}
-    groups = {}
-    for change, projections in owners:
-        ns, key = change.namespace, codec.encode(change.key)
-        if ns in world.FAMILIES:
-            world._check_queries(store, pin, change)
-        owner = scope.OwnerScope(ns, key)
-        if scope._map(store, 0).get(roots[0], scope._scope_key(owner)) is not None:
-            raise StoreIntegrityError('fresh insertion scope is not absent in parent')
-        seek = OrderedSeekMap(store.db, scope._seek_domain(store, owner)); owner_root = seek.empty
-        for projected_path, _inc, kind, fingerprint in projections:
-            path = codec.encode(projected_path)
-            inc = by_path[ns, key, path]
-            raw = scope.RawOccurrence(ns, key, path, inc)
-            owner_root = seek.set(owner_root, path, scope.occurrence_member(
-                scope.occurrence_domain(store.store_identity, codec.version, owner), raw))
-            group = scope.GroupScope(inc)
-            group_seek = OrderedSeekMap(store.db, scope._seek_domain(store, group))
-            root = groups.get(inc)
-            if root is None:
-                root = group_seek.empty if inc >= oldsa[0].next_incarnation_id else scope._resolve(store, oldsa[0], group)
-            position = scope.group_order_key(ns, key, path)
-            if group_seek.get(root, position) is not None:
-                raise StoreIntegrityError('fresh placement already exists in parent group')
-            groups[inc] = group_seek.set(root, position, scope.occurrence_member(
-                scope.occurrence_domain(store.store_identity, codec.version, group), raw))
-            semantic = world._map(store, b'owner-projections')
-            position = codec.encode((ns, key, path))
-            if (semantic.get(facts[1], position) is not None or fingerprint is not None and
-                    world._map(store, b'backing-inventory').get(facts[0], inc.to_bytes(8, 'big')) is not None):
-                raise StoreIntegrityError('fresh identity has competing semantic authority')
-            facts[1] = semantic.set(facts[1], position, _digest(b'ate-world-placement/1', inc.to_bytes(8, 'big'), kind.encode()))
-        roots[0] = scope._map(store, 0).set(roots[0], scope._scope_key(owner),
-                    scope._write_descriptor(store, owner, owner_root) if owner_root.count else None)
-    for inc, root in groups.items():
-        group = scope.GroupScope(inc)
-        roots[1] = scope._map(store, 1).set(roots[1], scope._scope_key(group), scope._write_descriptor(store, group, root))
+    from .persistence_proof_world_owner_edits import stage as stage_owner_edits
+    stage_owner_edits(store, request, pin, owners, placements, roots, facts)
     if (sa[0].next_incarnation_id != allocator or sa[0].roots[:2] != tuple(roots[:2])
             or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:] != request.sequence_roots
             or ca[0].versions.count != oldca[0].versions.count + added

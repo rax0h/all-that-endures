@@ -91,6 +91,7 @@ def run(output):
 
     try:
         commitment, expected = phase('construction_and_eager_control', setup)
+        receipt['accepted_commitment'] = commitment.hex()
         accepted = output/'accepted.sqlite'
         original_hash = hashlib.sha256(accepted.read_bytes()).hexdigest()
         receipt['accepted_database_sha256'] = original_hash

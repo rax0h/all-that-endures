@@ -105,6 +105,8 @@ class _Request:
     sequence_rows:object=None
     sequence_roots:object=None
     scalar_rows:object=None
+    owner_previous:object=None
+    adoption_rows:object=None
 
 @dataclass(frozen=True)
 class WorldManifestCommit:
@@ -156,6 +158,15 @@ def _guard(store,r,versions,ordinary,segments):
     prepare_sequence(store,r,frontier)
     from .persistence_proof_world_scalar_growth import prepare as prepare_scalar_growth
     prepare_scalar_growth(store,r,frontier)
+    from .persistence_proof_world_adoption import prepare as prepare_adoption
+    prepare_adoption(store,r,frontier)
+    from .persistence_proof_world_components import MAX_SOURCE_ROWS,MAX_CATALOG_ROWS
+    from .persistence_lazy_adoption import ADOPTION_NAMESPACE,BUCKET_NAMESPACE,SCOPE_NAMESPACE
+    if (len(semantic)>MAX_SOURCE_ROWS+MAX_CATALOG_ROWS or any(
+            (i['namespace'],i['typed_key']) not in r.adoption_rows for i in semantic
+            if i['namespace'] in (ADOPTION_NAMESPACE,BUCKET_NAMESPACE,SCOPE_NAMESPACE))):
+        r.guarded=True
+        return  # No partial adoption certificate may authorize either reuse path.
     r.value_only=validate_value_transition(store,r,semantic,ordinary,segments)
     if not r.value_only:
         from .persistence_proof_world_insert import prepare as prepare_insertions
