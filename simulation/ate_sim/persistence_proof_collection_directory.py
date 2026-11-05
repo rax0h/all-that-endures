@@ -134,7 +134,7 @@ def _snapshot(store,g):
     if g not in (head,head-1):raise StoreConflictError('directory outside retained generations')
     _schemas(store.db);collection._indexes(store)
 
-def _selected(store,c,key,value):
+def _descriptor(store,c,key,value):
     if type(key) is not bytes or len(key)>4096:raise StoreIntegrityError('invalid selected namespace bytes')
     try:ns=key.decode('utf-8')
     except UnicodeError as exc:raise StoreIntegrityError('invalid namespace encoding') from exc
@@ -147,7 +147,11 @@ def _selected(store,c,key,value):
     count,next_id,root_count=(int.from_bytes(raw[i:i+8],'big') for i in (5,13,21))
     child=collection.CollectionCertificate(c.store_identity,c.generation,c.codec_version,ns,True,count,next_id,Root(raw[29:],root_count))
     expected=collection.certificate_commitment(child)
-    if collection._state(store,c.generation,ns)!=(True,count,next_id):raise StoreIntegrityError('directory selected namespace state disagreement')
+    return child,expected
+
+def _selected(store,c,key,value):
+    child,expected=_descriptor(store,c,key,value)
+    if collection._state(store,c.generation,child.namespace)!=(True,child.member_count,child.next_ordinal):raise StoreIntegrityError('directory selected namespace state disagreement')
     return child,expected
 
 def read_collection_namespace(store,pin,certificate,expected,namespace,*,max_metadata_bytes=1048576):

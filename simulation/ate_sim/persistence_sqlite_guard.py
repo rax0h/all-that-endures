@@ -32,6 +32,12 @@ def require_persistent_sources(db):
 
 
 class _NativeGuardCursor(sqlite3.Cursor):
+    def __setattr__(self,name,value):
+        if name=='row_factory':
+            self.connection._reject_callback_factory_change()
+            value=self.connection._wrap_sql_callback(value)
+        return super().__setattr__(name,value)
+
     def execute(self,*args,**kwargs):
         self.connection._reject_callback_sql()
         return super().execute(*args,**kwargs)
@@ -48,6 +54,56 @@ class GuardedConnection(sqlite3.Connection):
         super().__init__(*args,**kwargs)
         self._known_authorizer=None
         self._callback_guard=False
+
+    def __setattr__(self,name,value):
+        if name in ('row_factory','text_factory'):
+            self._reject_callback_factory_change()
+            if name=='row_factory' or value not in (str,bytes):value=self._wrap_sql_callback(value)
+        return super().__setattr__(name,value)
+
+    def _reject_callback_factory_change(self):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None and (getattr(self,'_native_sql_callback_depth',0) or self._callback_guard):
+            guard.reject('native callback cannot replace SQLite factory')
+
+    def _wrap_sql_callback(self,callback):
+        if callback is None or not callable(callback):return callback
+        def guarded(*args):return self._invoke_sql_callback(callback,*args)
+        return guarded
+
+    def _reject_callback_registration(self):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None:guard.reject('native proof operation cannot register SQLite callbacks')
+
+    def create_function(self,name,narg,func,*,deterministic=False):
+        self._reject_callback_registration()
+        return super().create_function(name,narg,self._wrap_sql_callback(func),deterministic=deterministic)
+
+    def _aggregate_callback(self,aggregate_class,*,window=False):
+        if aggregate_class is None:return None
+        db=self
+        class GuardedAggregate:
+            def __init__(self):self.inner=db._invoke_sql_callback(aggregate_class)
+            def step(self,*args):return db._invoke_sql_callback(self.inner.step,*args)
+            def finalize(self):return db._invoke_sql_callback(self.inner.finalize)
+        if window:
+            class GuardedWindow(GuardedAggregate):
+                def value(self):return db._invoke_sql_callback(self.inner.value)
+                def inverse(self,*args):return db._invoke_sql_callback(self.inner.inverse,*args)
+            return GuardedWindow
+        return GuardedAggregate
+
+    def create_aggregate(self,name,n_arg,aggregate_class):
+        self._reject_callback_registration()
+        return super().create_aggregate(name,n_arg,self._aggregate_callback(aggregate_class))
+
+    def create_window_function(self,name,num_params,aggregate_class):
+        self._reject_callback_registration()
+        return super().create_window_function(name,num_params,self._aggregate_callback(aggregate_class,window=True))
+
+    def create_collation(self,name,callback):
+        self._reject_callback_registration()
+        return super().create_collation(name,self._wrap_sql_callback(callback))
 
     def _reject_callback_sql(self):
         guard=getattr(self,'_native_write_guard',None)
@@ -68,22 +124,22 @@ class GuardedConnection(sqlite3.Connection):
         return super().set_progress_handler(None if callback is None else lambda:self._invoke_sql_callback(callback),n)
 
     def cursor(self,factory=None):
-        if getattr(self,'_native_write_guard',None) is not None and factory is None:factory=_NativeGuardCursor
-        return super().cursor() if factory is None else super().cursor(factory)
+        if factory is None or factory is sqlite3.Cursor:factory=_NativeGuardCursor
+        elif getattr(self,'_native_write_guard',None) is not None and factory is not _NativeGuardCursor:
+            self._native_write_guard.reject('native proof operation requires guarded cursors')
+        return super().cursor(factory)
 
     def execute(self,*args,**kwargs):
         self._reject_callback_sql()
-        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
-        return super().execute(*args,**kwargs)
+        return self.cursor().execute(*args,**kwargs)
 
     def executemany(self,*args,**kwargs):
         self._reject_callback_sql()
-        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().executemany(*args,**kwargs)
-        return super().executemany(*args,**kwargs)
+        return self.cursor().executemany(*args,**kwargs)
 
     def executescript(self,*args,**kwargs):
         self._reject_callback_sql()
-        return super().executescript(*args,**kwargs)
+        return self.cursor().executescript(*args,**kwargs)
 
     def commit(self):
         self._reject_callback_sql()

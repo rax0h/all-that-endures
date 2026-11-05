@@ -975,6 +975,10 @@ class LazyRecordStore:
                 self.db.rollback()
 
     def _ordinary_namespace_is_lazy(self, namespace: str) -> bool:
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            return self._namespace_state_at(namespace, authority.read_pin.captured_head) is not None
         return self.db.execute(
             "SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1",
             (namespace,),
@@ -989,13 +993,13 @@ class LazyRecordStore:
     ) -> Any:
         self._ensure_open()
         namespace = _validate_namespace(namespace)
-        if self._ordinary_namespace_is_lazy(namespace):
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is None and self._ordinary_namespace_is_lazy(namespace):
             raise StoreError(
                 f"{namespace!r} is lazy authority; use read_version"
             )
         typed_key = self.codec.encode(key)
-        from . import persistence_proof_native_sources as proof_sources
-        authority = proof_sources.active(self)
         row = proof_sources.record_row(self, authority, namespace, typed_key) if authority is not None else self.db.execute(
             "SELECT payload,payload_checksum,codec_version,record_schema,"
             "last_changed_generation FROM records "
@@ -1037,14 +1041,14 @@ class LazyRecordStore:
     ) -> tuple[tuple[Any, Any, int], ...]:
         self._ensure_open()
         namespace = _validate_namespace(namespace)
-        if self._ordinary_namespace_is_lazy(namespace):
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is None and self._ordinary_namespace_is_lazy(namespace):
             raise StoreError(
                 f"{namespace!r} is lazy authority; use iter_keys/read_version"
             )
         out = []
         from contextlib import closing
-        from . import persistence_proof_native_sources as proof_sources
-        authority = proof_sources.active(self)
         rows = proof_sources.record_rows(self, authority, namespace) if authority is not None else closing(self.db.execute(
             "SELECT typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=?", (namespace,)))
         with rows as captured:
@@ -1418,6 +1422,12 @@ class LazyRecordStore:
         _validate_namespace(namespace)
         if type(page_size) is not int or page_size <= 0 or page_size > MAX_PAGE_SIZE:
             raise ValueError("page_size must be in 1..128")
+
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_order import iter_keys as proof_iter_keys
+            return proof_iter_keys(self, authority, pin, namespace, page_size)
 
         def iterator() -> Iterator[Any]:
             last_ordinal = -1
@@ -2045,6 +2055,11 @@ class LazyRecordStore:
         return tuple(prepared)
 
     def _namespace_state_at(self, namespace: str, generation: int) -> tuple[int, int, int, int | None] | None:
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_order import state_row
+            return state_row(self, authority, generation, namespace)
         rows = self._interval_rows('lazy_namespace_state',
             'member_count,next_ordinal,valid_from,valid_to,row_checksum', ('namespace',), (namespace,),
             generation, 'lazy_namespace_interval', limit=2)
@@ -2074,6 +2089,11 @@ class LazyRecordStore:
         return row
 
     def _visible_order(self, namespace: str, typed_key: bytes, generation: int) -> tuple[Any, ...] | None:
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_order import order_row
+            return order_row(self, authority, generation, namespace, typed_key)
         rows = self._interval_rows('lazy_order_versions', 'ordinal,valid_from,valid_to,row_checksum',
             ('namespace', 'typed_key'), (namespace, typed_key), generation, 'lazy_order_interval', limit=2)
         self._metadata_rows += len(rows)

@@ -73,8 +73,8 @@ def _locator(namespace, typed=b''):
 
 
 @contextmanager
-def _snapshot(store, authority, generation=None):
-    pin, manifest = authority.read_pin, authority.pair[0]
+def _snapshot(store, authority, generation=None, *, pin=None):
+    pin, manifest = authority.read_pin if pin is None else pin, authority.pair[0]
     if (pin is None or pin.captured_head != manifest.generation
             or generation is not None and generation != manifest.generation):
         raise StoreConflictError('native source generation differs from accepted manifest')
@@ -148,6 +148,8 @@ def _record(store, manifest, namespace, typed, row):
 def record_row(store, authority, namespace, typed):
     _locator(namespace, typed)
     with _snapshot(store, authority) as manifest:
+        if store._ordinary_namespace_is_lazy(namespace):
+            raise StoreError(f'{namespace!r} is lazy authority; use read_version')
         row = store.db.execute('SELECT '+_record_columns(store, manifest)+' FROM records WHERE namespace=? AND typed_key=?',
             (namespace, typed)).fetchone()
         return _record(store, manifest, namespace, typed, row)
@@ -157,6 +159,8 @@ def record_row(store, authority, namespace, typed):
 def record_rows(store, authority, namespace):
     _locator(namespace)
     with _snapshot(store, authority) as manifest:
+        if store._ordinary_namespace_is_lazy(namespace):
+            raise StoreError(f'{namespace!r} is lazy authority; use iter_keys/read_version')
         cursor = store.db.execute("SELECT CASE WHEN typeof(typed_key)='blob' AND length(typed_key)<=? THEN typed_key END,"
             +_record_columns(store, manifest)+' FROM records WHERE namespace=?', (MAX_METADATA_BYTES-len(namespace.encode()), namespace))
         def checked():

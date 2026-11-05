@@ -192,12 +192,18 @@ def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
  import sqlite3
  path,pair=fixture(tmp_path);s=opened(path,pair)
  try:
-  authority=s.store._world_proof_authority;original=authority._epoch;calls=[];injected=[]
+  authority=s.store._world_proof_authority;original=authority._epoch;completed=[];injected=[]
+  native=type(s)._save_native
+  def finished(session):
+   result=native(session)
+   if session is s:completed.append(True)
+   return result
+  monkeypatch.setattr(type(s),'_save_native',finished)
   def race():
-   captured=original();calls.append(True)
-   # Inject after a captured epoch at an actual transaction boundary. Additional
-   # in-snapshot checks must not move this external write into a locked reader.
-   if len(calls)>=2 and not injected and not s.store.db.in_transaction:
+   captured=original()
+   # Inject after the native no-op callback, at acknowledgement's epoch capture.
+   # Internal proof reads may add checks without moving the intended race.
+   if completed and not injected and not s.store.db.in_transaction:
     injected.append(True)
     with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
    return captured

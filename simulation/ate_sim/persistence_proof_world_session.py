@@ -14,6 +14,7 @@ class _WorldProofAuthority:
         self.expected=expected;self.store=None;self.pair=None;self.epoch=None
         self.busy=False;self.uncertain=False;self.pending=None;self._postcommit_verified_epoch=None
         self.read_pin=None
+        self.read_components=None
 
     def bind(self,store):
         if self.store is not None:raise StoreError('native proof admission is single-use')
@@ -45,6 +46,7 @@ class _WorldProofAuthority:
                 pairs,facts=manifests._load(store,pin,self.pair)
                 proof=world._audit_world(store,pin,*pairs)
                 if proof.roots!=self.pair[0].roots or proof.facts!=facts:raise StoreIntegrityError('native World audit disagrees with accepted manifest')
+                self.read_components=pairs
             verified_epoch=self._epoch()
             if owned:store.db.commit()
             return verified_epoch
@@ -140,6 +142,10 @@ class _WorldProofAuthority:
         if result.manifest:
             self.pair=result.manifest
             self.read_pin=result.commit.pin
+            if result.commit.outcome=='committed' and not result.reaudited:
+                with self._write_guard.publisher():
+                    with self.store.read_snapshot(self.read_pin,_preflight=lambda:manifests._schemas(self.store)):
+                        self.read_components,_facts=manifests._load(self.store,self.read_pin,self.pair)
         self._can_settle=not result.reaudited
         if result.commit.outcome=='committed' and result.reaudited:
             # Reuse only this committed attempt's fully verified postcommit epoch.

@@ -88,3 +88,9 @@ Runtime `b2a02f301e08bfda3bea51d76624a8e17e9c2aac`. Local validated source
 `9b9eaf59bc21cc60e19205d858e458695c41cd4e`. Source-map retains the mapping.
 The evidence child changes no runtime. One branch update publishes the whole
 package; full/proof hosted success remains open until that exact commit passes.
+
+## Hosted gate closed
+
+Verified e3d5df9/run42042165724: both jobs successful,4,641 tests plus two
+subtests passed in6,575.83s, one intentional duplicate-ZIP warning. Receipt:
+`green-42042165724.json`. Continue native collection state/order proof integration.
