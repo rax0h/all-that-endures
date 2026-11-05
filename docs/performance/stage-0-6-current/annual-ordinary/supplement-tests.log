@@ -1,0 +1,38 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+____ test_ordinary_mixed_save_preserves_event_data_aliases_in_fresh_process ____
+
+tmp_path = PosixPath('/tmp/ate-ordinary-supplement/test_ordinary_mixed_save_prese0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6dd9f5e720>
+
+    def test_ordinary_mixed_save_preserves_event_data_aliases_in_fresh_process(tmp_path, monkeypatch):
+        import json
+        import subprocess
+        import sys
+        from ate_sim import persistence_proof_world as world
+        def configure(w):w.agency.motives[1] = w.agency.motives[2] = MotiveState(curiosity=.1)
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            shared = [1, 2]
+            session.world.emit('proof-test', Layer.REALITY, a=shared, b=shared)
+            session.world.agency.motives[1] = MotiveState(curiosity=.9)
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_audit_world', lambda *a, **k:pytest.fail('mixed alias save audited World'))
+                assert session.save() == 1
+            pair, expected = session.proof_manifest, session.world.digest()
+        result = subprocess.run([sys.executable, '-c',
+            "import json,sys;from ate_sim.persistence_proof_world_session import open_audited_proof_world_session;"
+            "s=open_audited_proof_world_session(sys.argv[1],rules_id='private-catalog-copy',expected_commitment=bytes.fromhex(sys.argv[2]));"
+            "d=s.world.events[-1].data;m=s.world.agency.motives;"
+            "print(json.dumps([s.world.digest(),d['a'] is d['b'],list(d['a']),m[1] is m[2],m[1].curiosity,m[2].curiosity]));s.close()",
+            str(path), pair[1].hex()], check=True, capture_output=True, text=True, timeout=60)
+>       assert json.loads(result.stdout) == [expected, True, [1, 2], False, .9, .1]
+E       AssertionError: assert ['38fc89d147c...lse, 0.9, 0.1] == ['38fc89d147c...lse, 0.9, 0.1]
+E         
+E         At index 1 diff: False != True
+E         Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:604: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_mixed_save_preserves_event_data_aliases_in_fresh_process
+1 failed, 3 passed, 53 deselected in 8.95s

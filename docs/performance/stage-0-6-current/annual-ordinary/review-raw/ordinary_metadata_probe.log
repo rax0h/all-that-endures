@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/docs/performance/stage-0-6-current/annual-ordinary/review-raw/ordinary_metadata_probe.py", line 30, in <module>
+    insert.prepare(store, request, (row,), (), ())
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_proof_world_insert.py", line 32, in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_proof_world_insert.py", line 200, in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/docs/performance/stage-0-6-current/annual-ordinary/review-raw/ordinary_metadata_probe.py", line 27, in read_year
+    return read('world.year', zero)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_proof_world_insert.py", line 91, in ordinary_predecessor
+    (MAX_BYTES-consumed, ns, typed)).fetchone()
+                                     ^^^^^^^^^^
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/docs/performance/stage-0-6-current/annual-ordinary/review-raw/ordinary_metadata_probe.py", line 24, in guarded_text
+    raise AssertionError(f"SQLite transferred {len(value)} bytes of malformed text to Python")
+AssertionError: SQLite transferred 1048576 bytes of malformed text to Python

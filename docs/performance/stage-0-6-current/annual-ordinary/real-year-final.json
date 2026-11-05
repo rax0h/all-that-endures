@@ -1,0 +1,227 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "2f364b983e4b4947e743d7f22a8753f1a2a8fd72",
+    "runtime_tree": "ae9a583342a416e9e0820fc9e4e5aef98d07ee33",
+    "python": "3.12.3",
+    "sqlite": "3.45.1",
+    "driver_sha256": "892311cddadc2265525a52f9a2920220c4165eb0086bca05af9505706c4114a9"
+  },
+  "fixture": {
+    "seed": 843000,
+    "width": 8,
+    "height": 6,
+    "settlements": 1,
+    "initial_year": 2,
+    "saved_year": 3
+  },
+  "limitation": "Small real generated world; not mature-world or cold-cache acceptance",
+  "phases": [
+    {
+      "name": "construction_and_eager_control",
+      "status": "complete",
+      "wall_seconds": 32.25892541999974,
+      "parent_cpu_seconds": 31.840201884000003,
+      "child_cpu_seconds": -8.673617379884035e-19,
+      "parent_peak_rss_high_water_kib": 44812,
+      "child_peak_rss_high_water_kib": 25076
+    },
+    {
+      "name": "raw.copy",
+      "status": "complete",
+      "wall_seconds": 0.008570579000206635,
+      "parent_cpu_seconds": 0.008558790000002148,
+      "child_cpu_seconds": -8.673617379884035e-19,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 25076
+    },
+    {
+      "name": "raw.open_and_full_admission",
+      "status": "complete",
+      "wall_seconds": 9.252154678999887,
+      "parent_cpu_seconds": 9.237615292000001,
+      "child_cpu_seconds": -8.673617379884035e-19,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 25076
+    },
+    {
+      "name": "raw.simulation_year",
+      "status": "complete",
+      "wall_seconds": 1.8703527919997214,
+      "parent_cpu_seconds": 1.8699421749999985,
+      "child_cpu_seconds": -8.673617379884035e-19,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 25076
+    },
+    {
+      "name": "raw.save",
+      "status": "complete",
+      "wall_seconds": 4.6364997689997836,
+      "parent_cpu_seconds": 4.616408861999993,
+      "child_cpu_seconds": -8.673617379884035e-19,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 25076
+    },
+    {
+      "name": "raw.close",
+      "status": "complete",
+      "wall_seconds": 0.01096300200015321,
+      "parent_cpu_seconds": 0.008787812999997868,
+      "child_cpu_seconds": -8.673617379884035e-19,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 25076
+    },
+    {
+      "name": "raw.fresh_process_restore_and_digest_verification",
+      "status": "complete",
+      "wall_seconds": 10.951027563000025,
+      "parent_cpu_seconds": 0.0010445350000054532,
+      "child_cpu_seconds": 10.936244,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    },
+    {
+      "name": "diagnostic.copy",
+      "status": "complete",
+      "wall_seconds": 0.07284555499973067,
+      "parent_cpu_seconds": 0.07283993899999786,
+      "child_cpu_seconds": -6.106226635438361e-16,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    },
+    {
+      "name": "diagnostic.open_and_full_admission",
+      "status": "complete",
+      "wall_seconds": 9.276719965999746,
+      "parent_cpu_seconds": 9.261150816000004,
+      "child_cpu_seconds": -6.106226635438361e-16,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    },
+    {
+      "name": "diagnostic.simulation_year",
+      "status": "complete",
+      "wall_seconds": 1.8898599200001627,
+      "parent_cpu_seconds": 1.8898213169999991,
+      "child_cpu_seconds": -6.106226635438361e-16,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    },
+    {
+      "name": "diagnostic.save",
+      "status": "complete",
+      "wall_seconds": 12.1004957680002,
+      "parent_cpu_seconds": 12.077241688,
+      "child_cpu_seconds": -6.106226635438361e-16,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    },
+    {
+      "name": "diagnostic.close",
+      "status": "complete",
+      "wall_seconds": 0.010929987000054098,
+      "parent_cpu_seconds": 0.009011940000007712,
+      "child_cpu_seconds": -6.106226635438361e-16,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    },
+    {
+      "name": "diagnostic.fresh_process_restore_and_digest_verification",
+      "status": "complete",
+      "wall_seconds": 10.630368886999804,
+      "parent_cpu_seconds": 0.0009784349999932829,
+      "child_cpu_seconds": 10.610434999999999,
+      "parent_peak_rss_high_water_kib": 72076,
+      "child_peak_rss_high_water_kib": 72076
+    }
+  ],
+  "accepted_commitment": "cffa02a57a7072db413c51f0ea3c52ecd3fcffd3e5a66dd2d36082491f5ba61a",
+  "accepted_database_sha256": "bd8b3e978cb5ae6ca507bf08e2e2f884ec63365ddc892046d41c661a9d48b2af",
+  "expected_digest": "de2e839eefbf248bc8e86d811e3341aa1a914156756f3019ea8e9f076a6b5486",
+  "raw_storage_bytes": {
+    "raw.sqlite": 31449088
+  },
+  "diagnostic": {
+    "shape": {
+      "version_rows": 1202,
+      "ordinary_rows": 17,
+      "event_segments": 0,
+      "namespaces": {
+        "world.people": 24,
+        "world.magic_resources.aspirations": 10,
+        "world.materials.lots": 2,
+        "world.metaphysics.souls": 2,
+        "world.institutions.applications": 2,
+        "world.transmission.records": 2,
+        "world.agency.motives": 12,
+        "world.culture.adoption": 5,
+        "world.infrastructure.assets": 1,
+        "world.social.edges": 4,
+        "world.social.adjacency": 6,
+        "world.skills.skills": 14,
+        "world.lineage.nodes": 2,
+        "world.genealogy.parents": 2,
+        "world.communities.memberships": 2,
+        "aux.lazy.records.headers": 31,
+        "aux.lazy.nested.entries": 19,
+        "aux.lazy.history.member_types": 34,
+        "aux.lazy.nested.descriptors": 32,
+        "aux.lazy.nested.list_pages": 9,
+        "aux.lazy.sequence.nodes": 2,
+        "aux.lazy.sequence.occurrences": 2,
+        "aux.lazy.sequence.members": 2,
+        "aux.lazy.sequence.member_directory": 4,
+        "aux.lazy.sequence.descriptors": 2,
+        "world.culture.practices": 5,
+        "world.genealogy.children": 4,
+        "world.households": 2,
+        "world.lineage.children": 4,
+        "world.materials.active_lot_index": 1,
+        "world.materials.lot_index": 1,
+        "aux.lazy.identity.owners": 178,
+        "aux.lazy.identity.owner_tree": 85,
+        "aux.lazy.identity.groups": 79,
+        "aux.lazy.identity.catalog": 1,
+        "aux.lazy.history.dependencies": 615
+      },
+      "identity_rows": 67,
+      "manifest_owned_control_rows": 1,
+      "new_version_rows_by_namespace": {
+        "world.people": 2,
+        "world.materials.lots": 2,
+        "world.metaphysics.souls": 2,
+        "world.transmission.records": 2,
+        "world.social.edges": 4,
+        "world.social.adjacency": 2,
+        "world.skills.skills": 1,
+        "world.lineage.nodes": 2,
+        "world.genealogy.parents": 2,
+        "world.communities.memberships": 2,
+        "aux.lazy.sequence.occurrences": 2,
+        "aux.lazy.sequence.members": 2,
+        "aux.lazy.sequence.member_directory": 2,
+        "aux.lazy.nested.entries": 14,
+        "aux.lazy.history.member_types": 18,
+        "aux.lazy.nested.descriptors": 18,
+        "aux.lazy.nested.list_pages": 4,
+        "aux.lazy.identity.owner_tree": 72,
+        "aux.lazy.identity.owners": 44,
+        "aux.lazy.identity.groups": 67,
+        "aux.lazy.history.dependencies": 18
+      }
+    },
+    "fallback_returns": [
+      {
+        "module": "persistence_proof_world_value.py",
+        "function": "validate_value_transition",
+        "line": 85,
+        "namespace": null
+      }
+    ],
+    "full_world_audit_seconds": [],
+    "warning": "Instrumented pass; timings are not substituted for raw pass"
+  },
+  "diagnostic_storage_bytes": {
+    "diagnostic.sqlite": 31440896
+  }
+}

@@ -1,0 +1,111 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+__________ test_failed_event_alias_admission_releases_its_durable_pin __________
+
+tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-red/test_failed_event_alias_admiss0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fca08842450>
+
+    def test_failed_event_alias_admission_releases_its_durable_pin(tmp_path, monkeypatch):
+        import sqlite3
+        from ate_sim import persistence_proof_world_session as native
+        path, pair = configured(tmp_path)
+        def pins():
+            with sqlite3.connect(path) as db:return db.execute('SELECT count(*) FROM generation_pins').fetchone()[0]
+        assert pins() == 0
+        def fail(*args):raise ValueError('injected alias admission failure')
+        with monkeypatch.context() as patch:
+            patch.setattr(native, '_restore_current_event_aliases', fail)
+            with pytest.raises(ValueError, match='injected alias admission failure'):opened(path, pair)
+>       assert pins() == 0
+E       assert 1 == 0
+E        +  where 1 = <function test_failed_event_alias_admission_releases_its_durable_pin.<locals>.pins at 0x7fca0882db20>()
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:667: AssertionError
+_____ test_current_event_alias_admission_closes_spilled_occurrences[False] _____
+
+tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-red/test_current_event_alias_admis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fca08780620>
+fail = False
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_current_event_alias_admission_closes_spilled_occurrences(tmp_path, monkeypatch, fail):
+        from dataclasses import replace
+        from pathlib import Path
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        from ate_sim.core import Event
+        def configure(w):
+            shared = [1, 2]
+            w.events.append(Event(1, 0, 'proof-test', Layer.REALITY, data={'a':shared, 'b':shared}))
+            w.event_ids.add(1);w.next_event=2
+        path, pair = fixture(tmp_path, configure=configure)
+        original = catalog.IdentityCatalog.read_owner_identity
+        spilled = []
+        def read(self, pin, owner):
+            accepted = original(self, pin, owner)
+            if owner[0] != 'world.events':return accepted
+            spool = CheckedSpool(self.codec, entry_limit=1)
+            # Reverse depth order so restoration must visit parents first.
+            for row in sorted(accepted.occurrences, key=lambda row:len(row[0]), reverse=True):spool.add(row)
+            spool.freeze();assert spool.spilled
+            spilled.append((spool, Path(spool.path)))
+            return replace(accepted, occurrences=spool)
+        with monkeypatch.context() as patch:
+            patch.setattr(catalog.IdentityCatalog, 'read_owner_identity', read)
+            if fail:
+                from ate_sim.persistence_lazy_families import FamilyBindings
+                def install(*args):raise ValueError('injected alias install failure')
+                patch.setattr(FamilyBindings, 'install_path', install)
+                with pytest.raises(ValueError, match='injected alias install failure'):opened(path, pair)
+            else:
+                with opened(path, pair) as session:
+                    data = session.world.events[0].data
+                    assert data['a'] is data['b']
+                    assert session.save() == 0
+        assert spilled
+>       assert all(spool._closed and not file.exists() for spool, file in spilled)
+E       assert False
+E        +  where False = all(<generator object test_current_event_alias_admission_closes_spilled_occurrences.<locals>.<genexpr> at 0x7fca087239f0>)
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:707: AssertionError
+_____ test_current_event_alias_admission_closes_spilled_occurrences[True] ______
+
+tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-red/test_current_event_alias_admis1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fca084eb890>
+fail = True
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_current_event_alias_admission_closes_spilled_occurrences(tmp_path, monkeypatch, fail):
+        from dataclasses import replace
+        from pathlib import Path
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        from ate_sim.core import Event
+        def configure(w):
+            shared = [1, 2]
+            w.events.append(Event(1, 0, 'proof-test', Layer.REALITY, data={'a':shared, 'b':shared}))
+            w.event_ids.add(1);w.next_event=2
+        path, pair = fixture(tmp_path, configure=configure)
+        original = catalog.IdentityCatalog.read_owner_identity
+        spilled = []
+        def read(self, pin, owner):
+            accepted = original(self, pin, owner)
+            if owner[0] != 'world.events':return accepted
+            spool = CheckedSpool(self.codec, entry_limit=1)
+            # Reverse depth order so restoration must visit parents first.
+            for row in sorted(accepted.occurrences, key=lambda row:len(row[0]), reverse=True):spool.add(row)
+            spool.freeze();assert spool.spilled
+            spilled.append((spool, Path(spool.path)))
+            return replace(accepted, occurrences=spool)
+        with monkeypatch.context() as patch:
+            patch.setattr(catalog.IdentityCatalog, 'read_owner_identity', read)
+            if fail:
+>               from ate_sim.persistence_lazy_families import FamilyBindings
+E               ImportError: cannot import name 'FamilyBindings' from 'ate_sim.persistence_lazy_families' (/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_lazy_families.py)
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:697: ImportError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_failed_event_alias_admission_releases_its_durable_pin
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_current_event_alias_admission_closes_spilled_occurrences[False]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_current_event_alias_admission_closes_spilled_occurrences[True]
+3 failed, 57 deselected in 6.11s

@@ -1,0 +1,229 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_packed_action_append_projects_only_new_suffix ______________
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-red/test_packed_action_append_proj0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcfe39acce0>
+
+    def test_packed_action_append_projects_only_new_suffix(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_world as world
+        from ate_sim.persistence_adapters import AGENCY_ACTIONS_NAMESPACE
+        def configure(w):
+            for i in range(40):w.agency.actions.append(ActionRecord(0, 1, 'learn', 'curiosity', .1))
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            session.world.agency.actions.append(ActionRecord(1, 1, 'work', 'wealth', .7))
+            original = world._project
+            projected = []
+            def project(store, ns, *args, **kwargs):
+                for item in original(store, ns, *args, **kwargs):
+                    if ns == AGENCY_ACTIONS_NAMESPACE:projected.append(item[0])
+                    yield item
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_project', project)
+                patch.setattr(world, '_audit_world', lambda *a, **k:pytest.fail('action append audited World'))
+                assert session.save() == 1
+>           assert len(projected) == 1
+E           AssertionError: assert 41 == 1
+E            +  where 41 = len([(('index', 0),), (('index', 1),), (('index', 2),), (('index', 3),), (('index', 4),), (('index', 5),), ...])
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:527: AssertionError
+_________ test_ordinary_projection_stops_at_cumulative_budget_sentinel _________
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-red/test_ordinary_projection_stops0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcfe36d5b20>
+
+    def test_ordinary_projection_stops_at_cumulative_budget_sentinel(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_world as world, persistence_proof_world_insert as insert
+        from ate_sim import persistence_proof_world_new_backings as backing
+        path, pair = configured(tmp_path)
+        with opened(path, pair) as session:
+            for i in range(5):session.world.emit('proof-test', Layer.REALITY, answer=i)
+            original, original_prepare = world._project, insert.prepare
+            active, consumed = [], []
+            def prepare(*args, **kwargs):
+                active.append(1)
+                try:return original_prepare(*args, **kwargs)
+                finally:active.clear()
+            def project(store, ns, *args, **kwargs):
+                for item in original(store, ns, *args, **kwargs):
+                    if active:
+                        consumed.append(item)
+                        assert len(consumed) <= 4, 'projection exceeded remaining budget plus one sentinel'
+                    yield item
+            with monkeypatch.context() as patch:
+                patch.setattr(backing, 'MAX_PROJECTIONS', 3)
+                patch.setattr(world, '_project', project)
+                patch.setattr(insert, 'prepare', prepare)
+>               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:556: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2810: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:190: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:173: in _guard
+    r.insertions=prepare_insertions(store,r,semantic,ordinary,segments)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:544: in prepare
+    try:return original_prepare(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:29: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:203: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_ordinary.py:114: in prepare
+    plan.owners.append((change, forest.project(change, ordinary=True)))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_new_backings.py:151: in project
+    return tuple(world._project(self.store, ns, change.key, change.value, ordinary, record_header=self.header))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fcfe38f9c70>
+ns = 'world.events'
+args = (2, (2, Event(id=3, year=0, kind='proof-test', layer=<Layer.REALITY: 'reality'>, actors=(), location=None, causes=(), data={'answer': 2})), True)
+kwargs = {'record_header': <bound method Forest.header of <ate_sim.persistence_proof_world_new_backings.Forest object at 0x7fcfe380f4d0>>}
+
+    def project(store, ns, *args, **kwargs):
+        for item in original(store, ns, *args, **kwargs):
+            if active:
+                consumed.append(item)
+>               assert len(consumed) <= 4, 'projection exceeded remaining budget plus one sentinel'
+E               AssertionError: projection exceeded remaining budget plus one sentinel
+E               assert 5 <= 4
+E                +  where 5 = len([((), None, 'record:core.Event', b'\x0c#v\xfa\xd8\xc1\xf0\xd2\x11\x07\xb0a\xe3\xe6n\xce\x92_\xee\x88\x89\xce\x88`\xb7\... ((), None, 'record:core.Event', b'#\x16 \x87\x8c8#z\xc2\xffBY}\x81\x83\xee(\x08\xc4\xfe\x96\x029\x15\xad\x0b$4q<\n~')])
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:550: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-red/test_ordinary_projection_stops0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcfe36d5b20>
+
+    def test_ordinary_projection_stops_at_cumulative_budget_sentinel(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_world as world, persistence_proof_world_insert as insert
+        from ate_sim import persistence_proof_world_new_backings as backing
+        path, pair = configured(tmp_path)
+>       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:538: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fcfe36d4cb0>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError
+____________ test_scalar_replacement_stops_after_second_projection _____________
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-red/test_scalar_replacement_stops_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcfe36d6720>
+
+    def test_scalar_replacement_stops_after_second_projection(tmp_path, monkeypatch):
+        from types import SimpleNamespace
+        from ate_sim import persistence_proof_world as world, persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_proof_world_owner_edits import scalar_replacement
+        from ate_sim.persistence_proof_world_new_backings import Unsupported
+        from ate_sim.persistence_lazy_store import VersionChange
+        path, pair = configured(tmp_path)
+        with opened(path, pair) as session:
+            c = VersionChange('world.agency.motives', 1, MotiveState(curiosity=.2))
+            typed = session.store.codec.encode((c.namespace, c.key, catalog.path_hash(session.store.codec, ())))
+            consumed = []
+            def many(*args, **kwargs):
+                for i in range(100):
+                    consumed.append(i)
+                    assert len(consumed) <= 2, 'singleton recognition consumed a whole owner'
+                    yield (), None, 'record:agency.MotiveState', b'fingerprint'
+            monkeypatch.setattr(world, '_project', many)
+            with pytest.raises(Unsupported):
+>               scalar_replacement(session.store, None, c, MotiveState(),
+                    {(catalog.OWNER_TREE_NAMESPACE, typed):object()}, SimpleNamespace(header=None))
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:578: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_owner_edits.py:88: in scalar_replacement
+    old_projection = tuple(world._project(store, ns, change.key, before, False, record_header=forest.header))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fcfe38bb0e0>, 'world.agency.motives', 1, MotiveState(hunger=0.0, safety=0.0, belonging=0.0, wealth=0.0, curiosity=0.0, legacy=0.0, obligation=0.0, status=0.0), False)
+kwargs = {'record_header': None}
+
+    def many(*args, **kwargs):
+        for i in range(100):
+            consumed.append(i)
+>           assert len(consumed) <= 2, 'singleton recognition consumed a whole owner'
+E           AssertionError: singleton recognition consumed a whole owner
+E           assert 3 <= 2
+E            +  where 3 = len([0, 1, 2])
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:574: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_packed_action_append_projects_only_new_suffix
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_projection_stops_at_cumulative_budget_sentinel
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_scalar_replacement_stops_after_second_projection
+3 failed, 50 deselected in 7.07s

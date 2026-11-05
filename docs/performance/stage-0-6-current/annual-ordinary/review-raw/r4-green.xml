@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="7" time="15.388" timestamp="2026-11-04T23:35:12.306195-06:00" hostname="6407e361a189"><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_native_transition_avoids_world_audit[event]" time="2.442" /><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_native_transition_avoids_world_audit[action]" time="1.649"><failure message="ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session">tmp_path = PosixPath('/tmp/ate-ordinary-r4-green/test_ordinary_native_transitio1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f755cc3e930&gt;
+mode = 'action'
+
+    @pytest.mark.parametrize('mode', ['event', 'action', 'replacement', 'mixed'])
+    def test_ordinary_native_transition_avoids_world_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world as world
+        path, pair = configured(tmp_path)
+        with opened(path, pair) as session:
+            session.world.year = 1
+            if mode in ('event', 'mixed'):
+                session.world.emit('proof-test', Layer.REALITY, answer=42)
+            if mode in ('action', 'mixed'):
+                session.world.agency.actions.append(ActionRecord(1, 1, 'work', 'wealth', .7))
+            if mode in ('replacement', 'mixed'):
+                session.world.agency.motives[1] = MotiveState(curiosity=.9)
+            if mode == 'mixed':session.world.people[99] = Person(99, 0, 1, 1)
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_audit_world', lambda *a, **k: pytest.fail('ordinary native save scanned World'))
+&gt;               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2810: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:190: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:173: in _guard
+    r.insertions=prepare_insertions(store,r,semantic,ordinary,segments)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:29: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:203: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f755bc9d220&gt;
+request = _Request(store=&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f755bc9d220&gt;, pin=GenerationPin(token='ab9...\x82&lt;\x17bb\xdb%x\xc2%\x94n\rj\xc5', count=1),), scalar_rows=frozenset(), owner_previous={}, adoption_rows=frozenset())
+ordinary = ({'change': RecordChange(namespace='world.agency.actions', key='__packed__', value=(0, ('packed-list/v1', (ActionRecor...ssion-commit/v1"]', 'payload': b'["tuple",[["int","1"],["int","1"],["str","27ec68d8d2cb43f3a4e599bd2c5755a8"]]]', ...})
+read = &lt;function _prepare.&lt;locals&gt;.ordinary_predecessor at 0x7f755ba88040&gt;
+forest = &lt;ate_sim.persistence_proof_world_new_backings.Forest object at 0x7f755ba54cb0&gt;
+
+    def prepare(store, request, ordinary, read, forest):
+        from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE as ACTIONS, PACKED_LIST_KEY, PACKED_LIST_PAYLOAD
+        from .persistence_session import EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, _decode_tail_descriptor, _validate_suffix_event
+        from .persistence_event_ids import RANGE_TAG
+        codec, sa = store.codec, request.pairs[1][0]
+        rows = {(i['namespace'], i['typed_key']): i for i in ordinary}
+        plan = OrdinaryPlan([], set(), set(), Counter())
+        facts = list(request.tail_facts or request.facts)
+        reserved = 0
+    
+        def remaining():
+            from .persistence_proof_world_new_backings import MAX_PROJECTIONS
+            return MAX_PROJECTIONS - forest.projections - reserved
+    
+        def owner(change, projection):
+            nonlocal reserved
+            reserved += len(projection)
+            plan.owners.append((change, projection))
+    
+        def source(item):
+            if item['change'].delete or item['change'].record_schema != 1 or item['memberships']:
+                raise Unsupported()
+            return replace(item['change'], key=codec.decode(item['typed_key']), value=codec.decode(item['payload']))
+    
+        def control(ns, key):
+            marker = ns, codec.encode(key)
+            item = rows.get(marker)
+            if item is None:
+                raise Unsupported()
+            change = source(item)
+            old = read(*marker)
+            if old is None:
+                raise StoreIntegrityError('ordinary append control lacks accepted predecessor')
+            plan.handled.add(marker)
+            return codec.decode(old), change.value, old, item['payload']
+    
+        actions = rows.get((ACTIONS, codec.encode(PACKED_LIST_KEY)))
+        if actions is not None:
+            change = source(actions)
+            old = read(ACTIONS, actions['typed_key'])
+            if old is None:
+                raise Unsupported()
+            before, after = codec.decode(old), change.value
+            if old != actions['payload']:
+                if (type(before) is not tuple or len(before) != 2 or type(before[0]) is not int
+                        or before[0] != 0 or type(after) is not tuple or len(after) != 2 or after[0] != 0
+                        or type(after[0]) is not int):
+                    raise Unsupported()
+                a, b = before[1], after[1]
+                if (type(a) is not tuple or len(a) != 2 or a[0] != PACKED_LIST_PAYLOAD or type(a[1]) is not tuple
+                        or type(b) is not tuple or len(b) != 2 or b[0] != PACKED_LIST_PAYLOAD or type(b[1]) is not tuple
+                        or not len(a[1]) &lt; len(b[1]) &lt;= MAX_ACTIONS or codec.encode(a[1]) != codec.encode(b[1][:len(a[1])])):
+                    raise Unsupported()
+                owner = scope.OwnerScope(ACTIONS, actions['typed_key'])
+                if scope._resolve(store, sa, owner).count != len(a[1]):
+                    raise Unsupported()
+                def suffix():
+                    for i in range(len(a[1]), len(b[1])):
+                        # Project only this new action, retaining its absolute path
+                        # in the packed owner. The old prefix has accepted authority.
+                        for path, inc, kind, fingerprint in world._project(store, ACTIONS, i,
+                                (i, b[1][i]), True, record_header=forest.header):
+                            yield (('index', i),)+path, inc, kind, fingerprint
+                projected = forest.collect(suffix(), limit=remaining())
+                if len(projected) != len(b[1])-len(a[1]) or any(p[0] != (('index', i),) or p[1] is not None or p[3] is None for i, p in enumerate(projected, len(a[1]))):
+                    raise Unsupported()
+&gt;               owner(change, projected)
+E               TypeError: 'OwnerScope' object is not callable
+
+simulation/ate_sim/persistence_proof_world_ordinary.py:92: TypeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-green/test_ordinary_native_transitio1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f755cc3e930&gt;
+mode = 'action'
+
+    @pytest.mark.parametrize('mode', ['event', 'action', 'replacement', 'mixed'])
+    def test_ordinary_native_transition_avoids_world_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world as world
+        path, pair = configured(tmp_path)
+&gt;       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f755bd12000&gt;
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+&gt;           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_native_transition_avoids_world_audit[replacement]" time="2.345" /><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_native_transition_avoids_world_audit[mixed]" time="1.470"><failure message="ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session">tmp_path = PosixPath('/tmp/ate-ordinary-r4-green/test_ordinary_native_transitio3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f755bd10ec0&gt;
+mode = 'mixed'
+
+    @pytest.mark.parametrize('mode', ['event', 'action', 'replacement', 'mixed'])
+    def test_ordinary_native_transition_avoids_world_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world as world
+        path, pair = configured(tmp_path)
+        with opened(path, pair) as session:
+            session.world.year = 1
+            if mode in ('event', 'mixed'):
+                session.world.emit('proof-test', Layer.REALITY, answer=42)
+            if mode in ('action', 'mixed'):
+                session.world.agency.actions.append(ActionRecord(1, 1, 'work', 'wealth', .7))
+            if mode in ('replacement', 'mixed'):
+                session.world.agency.motives[1] = MotiveState(curiosity=.9)
+            if mode == 'mixed':session.world.people[99] = Person(99, 0, 1, 1)
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_audit_world', lambda *a, **k: pytest.fail('ordinary native save scanned World'))
+&gt;               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2810: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:190: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:173: in _guard
+    r.insertions=prepare_insertions(store,r,semantic,ordinary,segments)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:29: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:203: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f755bc6d400&gt;
+request = _Request(store=&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f755bc6d400&gt;, pin=GenerationPin(token='4d9...=frozenset(), owner_previous={('world.agency.motives', b'["int","1"]', b'["tuple",[]]'): 2}, adoption_rows=frozenset())
+ordinary = ({'change': RecordChange(namespace='world.agency.actions', key='__packed__', value=(0, ('packed-list/v1', (ActionRecor...,"session-tail/v1"]', 'payload': b'["tuple",[["int","1"],["int","0"],["int","0"],["int","1"],["int","1"]]]', ...}, ...)
+read = &lt;function _prepare.&lt;locals&gt;.ordinary_predecessor at 0x7f755bb5f100&gt;
+forest = &lt;ate_sim.persistence_proof_world_new_backings.Forest object at 0x7f755bba2cc0&gt;
+
+    def prepare(store, request, ordinary, read, forest):
+        from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE as ACTIONS, PACKED_LIST_KEY, PACKED_LIST_PAYLOAD
+        from .persistence_session import EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, _decode_tail_descriptor, _validate_suffix_event
+        from .persistence_event_ids import RANGE_TAG
+        codec, sa = store.codec, request.pairs[1][0]
+        rows = {(i['namespace'], i['typed_key']): i for i in ordinary}
+        plan = OrdinaryPlan([], set(), set(), Counter())
+        facts = list(request.tail_facts or request.facts)
+        reserved = 0
+    
+        def remaining():
+            from .persistence_proof_world_new_backings import MAX_PROJECTIONS
+            return MAX_PROJECTIONS - forest.projections - reserved
+    
+        def owner(change, projection):
+            nonlocal reserved
+            reserved += len(projection)
+            plan.owners.append((change, projection))
+    
+        def source(item):
+            if item['change'].delete or item['change'].record_schema != 1 or item['memberships']:
+                raise Unsupported()
+            return replace(item['change'], key=codec.decode(item['typed_key']), value=codec.decode(item['payload']))
+    
+        def control(ns, key):
+            marker = ns, codec.encode(key)
+            item = rows.get(marker)
+            if item is None:
+                raise Unsupported()
+            change = source(item)
+            old = read(*marker)
+            if old is None:
+                raise StoreIntegrityError('ordinary append control lacks accepted predecessor')
+            plan.handled.add(marker)
+            return codec.decode(old), change.value, old, item['payload']
+    
+        actions = rows.get((ACTIONS, codec.encode(PACKED_LIST_KEY)))
+        if actions is not None:
+            change = source(actions)
+            old = read(ACTIONS, actions['typed_key'])
+            if old is None:
+                raise Unsupported()
+            before, after = codec.decode(old), change.value
+            if old != actions['payload']:
+                if (type(before) is not tuple or len(before) != 2 or type(before[0]) is not int
+                        or before[0] != 0 or type(after) is not tuple or len(after) != 2 or after[0] != 0
+                        or type(after[0]) is not int):
+                    raise Unsupported()
+                a, b = before[1], after[1]
+                if (type(a) is not tuple or len(a) != 2 or a[0] != PACKED_LIST_PAYLOAD or type(a[1]) is not tuple
+                        or type(b) is not tuple or len(b) != 2 or b[0] != PACKED_LIST_PAYLOAD or type(b[1]) is not tuple
+                        or not len(a[1]) &lt; len(b[1]) &lt;= MAX_ACTIONS or codec.encode(a[1]) != codec.encode(b[1][:len(a[1])])):
+                    raise Unsupported()
+                owner = scope.OwnerScope(ACTIONS, actions['typed_key'])
+                if scope._resolve(store, sa, owner).count != len(a[1]):
+                    raise Unsupported()
+                def suffix():
+                    for i in range(len(a[1]), len(b[1])):
+                        # Project only this new action, retaining its absolute path
+                        # in the packed owner. The old prefix has accepted authority.
+                        for path, inc, kind, fingerprint in world._project(store, ACTIONS, i,
+                                (i, b[1][i]), True, record_header=forest.header):
+                            yield (('index', i),)+path, inc, kind, fingerprint
+                projected = forest.collect(suffix(), limit=remaining())
+                if len(projected) != len(b[1])-len(a[1]) or any(p[0] != (('index', i),) or p[1] is not None or p[3] is None for i, p in enumerate(projected, len(a[1]))):
+                    raise Unsupported()
+&gt;               owner(change, projected)
+E               TypeError: 'OwnerScope' object is not callable
+
+simulation/ate_sim/persistence_proof_world_ordinary.py:92: TypeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-green/test_ordinary_native_transitio3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f755bd10ec0&gt;
+mode = 'mixed'
+
+    @pytest.mark.parametrize('mode', ['event', 'action', 'replacement', 'mixed'])
+    def test_ordinary_native_transition_avoids_world_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world as world
+        path, pair = configured(tmp_path)
+&gt;       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f755bd5d100&gt;
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+&gt;           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_packed_action_append_projects_only_new_suffix" time="2.298"><failure message="ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session">tmp_path = PosixPath('/tmp/ate-ordinary-r4-green/test_packed_action_append_proj0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f755bda3290&gt;
+
+    def test_packed_action_append_projects_only_new_suffix(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_world as world
+        from ate_sim.persistence_adapters import AGENCY_ACTIONS_NAMESPACE
+        def configure(w):
+            for i in range(40):w.agency.actions.append(ActionRecord(0, 1, 'learn', 'curiosity', .1))
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            session.world.agency.actions.append(ActionRecord(1, 1, 'work', 'wealth', .7))
+            original = world._project
+            projected = []
+            def project(store, ns, *args, **kwargs):
+                for item in original(store, ns, *args, **kwargs):
+                    if ns == AGENCY_ACTIONS_NAMESPACE:projected.append(item[0])
+                    yield item
+            with monkeypatch.context() as patch:
+                patch.setattr(world, '_project', project)
+                patch.setattr(world, '_audit_world', lambda *a, **k:pytest.fail('action append audited World'))
+&gt;               assert session.save() == 1
+                       ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:526: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16729: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:100: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16760: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:137: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2810: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:190: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:173: in _guard
+    r.insertions=prepare_insertions(store,r,semantic,ordinary,segments)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:29: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:203: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f755ca32420&gt;
+request = _Request(store=&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f755ca32420&gt;, pin=GenerationPin(token='77a...\xb4K\x16h\xfar+\x1f-:O:\x85\xa6^l', count=1),), scalar_rows=frozenset(), owner_previous={}, adoption_rows=frozenset())
+ordinary = ({'change': RecordChange(namespace='world.agency.actions', key='__packed__', value=(0, ('packed-list/v1', (ActionRecor...ssion-commit/v1"]', 'payload': b'["tuple",[["int","1"],["int","1"],["str","f5f49f2df2db42c9af8de02d8a5da6aa"]]]', ...})
+read = &lt;function _prepare.&lt;locals&gt;.ordinary_predecessor at 0x7f755bca5300&gt;
+forest = &lt;ate_sim.persistence_proof_world_new_backings.Forest object at 0x7f755bca9040&gt;
+
+    def prepare(store, request, ordinary, read, forest):
+        from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE as ACTIONS, PACKED_LIST_KEY, PACKED_LIST_PAYLOAD
+        from .persistence_session import EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, _decode_tail_descriptor, _validate_suffix_event
+        from .persistence_event_ids import RANGE_TAG
+        codec, sa = store.codec, request.pairs[1][0]
+        rows = {(i['namespace'], i['typed_key']): i for i in ordinary}
+        plan = OrdinaryPlan([], set(), set(), Counter())
+        facts = list(request.tail_facts or request.facts)
+        reserved = 0
+    
+        def remaining():
+            from .persistence_proof_world_new_backings import MAX_PROJECTIONS
+            return MAX_PROJECTIONS - forest.projections - reserved
+    
+        def append_owner(change, projection):
+            nonlocal reserved
+            reserved += len(projection)
+            plan.owners.append((change, projection))
+    
+        def source(item):
+            if item['change'].delete or item['change'].record_schema != 1 or item['memberships']:
+                raise Unsupported()
+            return replace(item['change'], key=codec.decode(item['typed_key']), value=codec.decode(item['payload']))
+    
+        def control(ns, key):
+            marker = ns, codec.encode(key)
+            item = rows.get(marker)
+            if item is None:
+                raise Unsupported()
+            change = source(item)
+            old = read(*marker)
+            if old is None:
+                raise StoreIntegrityError('ordinary append control lacks accepted predecessor')
+            plan.handled.add(marker)
+            return codec.decode(old), change.value, old, item['payload']
+    
+        actions = rows.get((ACTIONS, codec.encode(PACKED_LIST_KEY)))
+        if actions is not None:
+            change = source(actions)
+            old = read(ACTIONS, actions['typed_key'])
+            if old is None:
+                raise Unsupported()
+            before, after = codec.decode(old), change.value
+            if old != actions['payload']:
+                if (type(before) is not tuple or len(before) != 2 or type(before[0]) is not int
+                        or before[0] != 0 or type(after) is not tuple or len(after) != 2 or after[0] != 0
+                        or type(after[0]) is not int):
+                    raise Unsupported()
+                a, b = before[1], after[1]
+                if (type(a) is not tuple or len(a) != 2 or a[0] != PACKED_LIST_PAYLOAD or type(a[1]) is not tuple
+                        or type(b) is not tuple or len(b) != 2 or b[0] != PACKED_LIST_PAYLOAD or type(b[1]) is not tuple
+                        or not len(a[1]) &lt; len(b[1]) &lt;= MAX_ACTIONS or codec.encode(a[1]) != codec.encode(b[1][:len(a[1])])):
+                    raise Unsupported()
+                owner = scope.OwnerScope(ACTIONS, actions['typed_key'])
+                if scope._resolve(store, sa, owner).count != len(a[1]):
+                    raise Unsupported()
+                def suffix():
+                    for i in range(len(a[1]), len(b[1])):
+                        # Project only this new action, retaining its absolute path
+                        # in the packed owner. The old prefix has accepted authority.
+                        for path, inc, kind, fingerprint in world._project(store, ACTIONS, i,
+                                (i, b[1][i]), True, record_header=forest.header):
+                            yield (('index', i),)+path, inc, kind, fingerprint
+                projected = forest.collect(suffix(), limit=remaining())
+                if len(projected) != len(b[1])-len(a[1]) or any(p[0] != (('index', i),) or p[1] is not None or p[3] is None for i, p in enumerate(projected, len(a[1]))):
+                    raise Unsupported()
+&gt;               append_owner(change, projected)
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+E               TypeError: 'OwnerScope' object is not callable
+
+simulation/ate_sim/persistence_proof_world_ordinary.py:92: TypeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r4-green/test_packed_action_append_proj0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f755bda3290&gt;
+
+    def test_packed_action_append_projects_only_new_suffix(tmp_path, monkeypatch):
+        from ate_sim import persistence_proof_world as world
+        from ate_sim.persistence_adapters import AGENCY_ACTIONS_NAMESPACE
+        def configure(w):
+            for i in range(40):w.agency.actions.append(ActionRecord(0, 1, 'learn', 'curiosity', .1))
+        path, pair = fixture(tmp_path, configure=configure)
+&gt;       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:515: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f755bc6cb60&gt;
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+&gt;           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_projection_stops_at_cumulative_budget_sentinel" time="1.841" /><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_scalar_replacement_stops_after_second_projection" time="1.419" /></testsuite></testsuites>

@@ -1,0 +1,44 @@
+...........................................................F             [100%]
+=================================== FAILURES ===================================
+_____ test_current_event_alias_admission_closes_spilled_occurrences[True] ______
+
+tmp_path = PosixPath('/tmp/ate-ordinary-final/test_current_event_alias_admis1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdb05184830>
+fail = True
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_current_event_alias_admission_closes_spilled_occurrences(tmp_path, monkeypatch, fail):
+        from dataclasses import replace
+        from pathlib import Path
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        from ate_sim.core import Event
+        def configure(w):
+            shared = [1, 2]
+            w.events.append(Event(1, 0, 'proof-test', Layer.REALITY, data={'a':shared, 'b':shared}))
+            w.event_ids.add(1);w.next_event=2
+        path, pair = fixture(tmp_path, configure=configure)
+        original = catalog.IdentityCatalog.read_owner_identity
+        spilled = []
+        def read(self, pin, owner):
+            accepted = original(self, pin, owner)
+            if owner[0] != 'world.events':return accepted
+            spool = CheckedSpool(self.codec, entry_limit=1)
+            # Reverse depth order so restoration must visit parents first.
+            for row in sorted(accepted.occurrences, key=lambda row:len(row[0]), reverse=True):spool.add(row)
+            spool.freeze();assert spool.spilled
+            spilled.append((spool, Path(spool.path)))
+            return replace(accepted, occurrences=spool)
+        with monkeypatch.context() as patch:
+            patch.setattr(catalog.IdentityCatalog, 'read_owner_identity', read)
+            if fail:
+                from ate_sim import persistence_proof_world_session as native
+                original_walk = native._event_occurrences_by_depth
+                def partial(rows):
+>                   for row in original_walk(rows):
+E                   Failed: DID NOT RAISE ValueError
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:700: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_current_event_alias_admission_closes_spilled_occurrences[True]
+1 failed, 59 passed in 126.16s (0:02:06)

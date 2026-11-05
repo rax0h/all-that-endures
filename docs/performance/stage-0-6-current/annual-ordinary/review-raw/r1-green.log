@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+___ ERROR collecting simulation/tests/test_stage_0_6_proof_world_ordinary.py ___
+ImportError while importing test module '/workspace/scratch/2c32dac1599d/all-that-endures/simulation/tests/test_stage_0_6_proof_world_ordinary.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:3: in <module>
+    from ate_sim.agency import MotiveState, ActionRecord
+E   ModuleNotFoundError: No module named 'ate_sim'
+=========================== short test summary info ============================
+ERROR simulation/tests/test_stage_0_6_proof_world_ordinary.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.13s

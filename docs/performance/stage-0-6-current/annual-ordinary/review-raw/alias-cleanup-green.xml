@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="5.737" timestamp="2026-11-04T23:45:13.844608-06:00" hostname="6407e361a189"><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_failed_event_alias_admission_releases_its_durable_pin" time="2.053" /><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_current_event_alias_admission_closes_spilled_occurrences[False]" time="1.573" /><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_current_event_alias_admission_closes_spilled_occurrences[True]" time="1.774"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-green/test_current_event_alias_admis1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb7abb929c0&gt;
+fail = True
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_current_event_alias_admission_closes_spilled_occurrences(tmp_path, monkeypatch, fail):
+        from dataclasses import replace
+        from pathlib import Path
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        from ate_sim.core import Event
+        def configure(w):
+            shared = [1, 2]
+            w.events.append(Event(1, 0, 'proof-test', Layer.REALITY, data={'a':shared, 'b':shared}))
+            w.event_ids.add(1);w.next_event=2
+        path, pair = fixture(tmp_path, configure=configure)
+        original = catalog.IdentityCatalog.read_owner_identity
+        spilled = []
+        def read(self, pin, owner):
+            accepted = original(self, pin, owner)
+            if owner[0] != 'world.events':return accepted
+            spool = CheckedSpool(self.codec, entry_limit=1)
+            # Reverse depth order so restoration must visit parents first.
+            for row in sorted(accepted.occurrences, key=lambda row:len(row[0]), reverse=True):spool.add(row)
+            spool.freeze();assert spool.spilled
+            spilled.append((spool, Path(spool.path)))
+            return replace(accepted, occurrences=spool)
+        with monkeypatch.context() as patch:
+            patch.setattr(catalog.IdentityCatalog, 'read_owner_identity', read)
+            if fail:
+                from ate_sim.persistence_lazy_families import RuntimeFamilyBindings
+                def install(*args):raise ValueError('injected alias install failure')
+                patch.setattr(RuntimeFamilyBindings, 'install_path', install)
+&gt;               with pytest.raises(ValueError, match='injected alias install failure'):opened(path, pair)
+E               Failed: DID NOT RAISE ValueError
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:700: Failed</failure></testcase></testsuite></testsuites>

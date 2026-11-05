@@ -1,0 +1,11 @@
+{
+  "status": "complete",
+  "same_input_sha256": "bd8b3e978cb5ae6ca507bf08e2e2f884ec63365ddc892046d41c661a9d48b2af",
+  "baseline_save_seconds": 23.76239800600024,
+  "candidate_save_seconds": 4.558218123999723,
+  "save_speed_ratio": 5.213089272952416,
+  "baseline_world_audits": 2,
+  "candidate_world_audits": 0,
+  "fresh_process_eager_matches": true,
+  "limitation": "One sequential baseline/candidate measurement on the same small world, warm local filesystem; not mature-world or cold-cache acceptance"
+}

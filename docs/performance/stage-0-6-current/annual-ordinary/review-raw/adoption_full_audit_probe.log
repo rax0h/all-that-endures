@@ -1,0 +1,11 @@
+removed counters [(1, 0.35), (None, 0.35)]
+committed manifest generation 1 reaudited True
+participant validation after commit StoreIntegrityError family version publication differs from frozen plan
+restored value 0.5
+Traceback (most recent call last):
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/docs/performance/stage-0-6-current/annual-ordinary/review-raw/adoption_budget_probe.py", line 55, in <module>
+    print("restored query", restored.world.culture.adoption.items_above(.35))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_lazy_adoption.py", line 131, in items_above
+    raise StoreIntegrityError('adoption query cardinality mismatch')
+ate_sim.incremental_store.StoreIntegrityError: adoption query cardinality mismatch

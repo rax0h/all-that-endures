@@ -1,0 +1,5 @@
+before True <class 'ate_sim.persistence_tracking.TrackedList'> True
+after True
+Traceback (most recent call last):
+  File "<stdin>", line 12, in <module>
+AttributeError: 'tuple' object has no attribute 'occurrence_path'

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="9.635" timestamp="2026-11-04T23:32:09.933039-06:00" hostname="6407e361a189"><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_valid_uncertified_adoption_uses_reconciled_full_audit[budget]" time="1.814"><failure message="assert [1, 1] == [1]&#10;  &#10;  Left contains one more item: 1&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_valid_uncertified_adoptio0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a772bc650&gt;
+mode = 'budget'
+
+    @pytest.mark.parametrize('mode', ['budget', 'new-scope', 'delete'])
+    def test_valid_uncertified_adoption_uses_reconciled_full_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world as world
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            if mode == 'delete':del session.world.culture.adoption[1, 1]
+            else:session.world.culture.adoption[2 if mode == 'new-scope' else 1, 1] = .5
+            calls = []
+            original = world._audit_world
+            def audit(*args, **kwargs):
+                calls.append(1)
+                return original(*args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(adoption, 'MAX_READS', 1)
+                patch.setattr(world, '_audit_world', audit)
+                assert session.save() == 1
+&gt;           assert calls == [1]
+E           assert [1, 1] == [1]
+E             
+E             Left contains one more item: 1
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:425: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_valid_uncertified_adoption_uses_reconciled_full_audit[new-scope]" time="1.952"><failure message="assert [1, 1] == [1]&#10;  &#10;  Left contains one more item: 1&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_valid_uncertified_adoptio1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a771f2d80&gt;
+mode = 'new-scope'
+
+    @pytest.mark.parametrize('mode', ['budget', 'new-scope', 'delete'])
+    def test_valid_uncertified_adoption_uses_reconciled_full_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world as world
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            if mode == 'delete':del session.world.culture.adoption[1, 1]
+            else:session.world.culture.adoption[2 if mode == 'new-scope' else 1, 1] = .5
+            calls = []
+            original = world._audit_world
+            def audit(*args, **kwargs):
+                calls.append(1)
+                return original(*args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(adoption, 'MAX_READS', 1)
+                patch.setattr(world, '_audit_world', audit)
+                assert session.save() == 1
+&gt;           assert calls == [1]
+E           assert [1, 1] == [1]
+E             
+E             Left contains one more item: 1
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:425: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_valid_uncertified_adoption_uses_reconciled_full_audit[delete]" time="1.862"><failure message="assert [1, 1] == [1]&#10;  &#10;  Left contains one more item: 1&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_valid_uncertified_adoptio2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a770fc2c0&gt;
+mode = 'delete'
+
+    @pytest.mark.parametrize('mode', ['budget', 'new-scope', 'delete'])
+    def test_valid_uncertified_adoption_uses_reconciled_full_audit(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world as world
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            if mode == 'delete':del session.world.culture.adoption[1, 1]
+            else:session.world.culture.adoption[2 if mode == 'new-scope' else 1, 1] = .5
+            calls = []
+            original = world._audit_world
+            def audit(*args, **kwargs):
+                calls.append(1)
+                return original(*args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(adoption, 'MAX_READS', 1)
+                patch.setattr(world, '_audit_world', audit)
+                assert session.save() == 1
+&gt;           assert calls == [1]
+E           assert [1, 1] == [1]
+E             
+E             Left contains one more item: 1
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:425: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_genealogy_invalid_tuple_cannot_publish_with_matching_owner[False]" time="1.353"><failure message="ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session">tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_genealogy_invalid_tuple_c0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a771337a0&gt;
+full_audit = False
+
+    @pytest.mark.parametrize('full_audit', [False, True])
+    def test_genealogy_invalid_tuple_cannot_publish_with_matching_owner(tmp_path, monkeypatch, full_audit):
+        from dataclasses import replace
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.incremental_store import StoreError
+        ns = 'world.genealogy.parents'
+        def configure(w):w.genealogy.parents[1] = (12,)
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            session.world.genealogy.parents[1] = (13,)
+            original = manifests.commit_world_manifest
+            def corrupt(store, pin, *args, **kwargs):
+                source, = [c for c in kwargs['version_changes'] if c.namespace == ns and c.key == 1]
+                bad = replace(source, value=('invalid-parent',))
+                digest = catalog._source_commitment(store.codec, bad, 'lazy', pin.captured_head+1)
+                kwargs['version_changes'] = tuple(bad if c is source else
+                    replace(c, value=c.value[:5]+(digest,)+c.value[6:])
+                    if c.namespace == catalog.OWNER_NAMESPACE and c.key == (ns, 1) else c
+                    for c in kwargs['version_changes'])
+                return original(store, pin, *args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(manifests, 'commit_world_manifest', corrupt)
+                if full_audit:
+                    patch.setattr(value, 'validate_value_transition', lambda *a, **k:False)
+                    patch.setattr(insert, 'prepare', lambda *a, **k:None)
+                with pytest.raises(StoreError):session.save()
+&gt;           assert session.store.generation == 0
+E           assert 1 == 0
+E            +  where 1 = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f4a770cd250&gt;.generation
+E            +    where &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f4a770cd250&gt; = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f4a770558b0&gt;.store
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:460: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_genealogy_invalid_tuple_c0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a771337a0&gt;
+full_audit = False
+
+    @pytest.mark.parametrize('full_audit', [False, True])
+    def test_genealogy_invalid_tuple_cannot_publish_with_matching_owner(tmp_path, monkeypatch, full_audit):
+        from dataclasses import replace
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.incremental_store import StoreError
+        ns = 'world.genealogy.parents'
+        def configure(w):w.genealogy.parents[1] = (12,)
+        path, pair = fixture(tmp_path, configure=configure)
+&gt;       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:442: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f4a770558b0&gt;
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+&gt;           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_genealogy_invalid_tuple_cannot_publish_with_matching_owner[True]" time="1.643"><failure message="ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session">tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_genealogy_invalid_tuple_c1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a771a67e0&gt;
+full_audit = True
+
+    @pytest.mark.parametrize('full_audit', [False, True])
+    def test_genealogy_invalid_tuple_cannot_publish_with_matching_owner(tmp_path, monkeypatch, full_audit):
+        from dataclasses import replace
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.incremental_store import StoreError
+        ns = 'world.genealogy.parents'
+        def configure(w):w.genealogy.parents[1] = (12,)
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            session.world.genealogy.parents[1] = (13,)
+            original = manifests.commit_world_manifest
+            def corrupt(store, pin, *args, **kwargs):
+                source, = [c for c in kwargs['version_changes'] if c.namespace == ns and c.key == 1]
+                bad = replace(source, value=('invalid-parent',))
+                digest = catalog._source_commitment(store.codec, bad, 'lazy', pin.captured_head+1)
+                kwargs['version_changes'] = tuple(bad if c is source else
+                    replace(c, value=c.value[:5]+(digest,)+c.value[6:])
+                    if c.namespace == catalog.OWNER_NAMESPACE and c.key == (ns, 1) else c
+                    for c in kwargs['version_changes'])
+                return original(store, pin, *args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(manifests, 'commit_world_manifest', corrupt)
+                if full_audit:
+                    patch.setattr(value, 'validate_value_transition', lambda *a, **k:False)
+                    patch.setattr(insert, 'prepare', lambda *a, **k:None)
+                with pytest.raises(StoreError):session.save()
+&gt;           assert session.store.generation == 0
+E           assert 1 == 0
+E            +  where 1 = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f4a77206bd0&gt;.generation
+E            +    where &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f4a77206bd0&gt; = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f4a77f871a0&gt;.store
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:460: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-ordinary-r2-red/test_genealogy_invalid_tuple_c1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a771a67e0&gt;
+full_audit = True
+
+    @pytest.mark.parametrize('full_audit', [False, True])
+    def test_genealogy_invalid_tuple_cannot_publish_with_matching_owner(tmp_path, monkeypatch, full_audit):
+        from dataclasses import replace
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.incremental_store import StoreError
+        ns = 'world.genealogy.parents'
+        def configure(w):w.genealogy.parents[1] = (12,)
+        path, pair = fixture(tmp_path, configure=configure)
+&gt;       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:442: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7f4a77f871a0&gt;
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+&gt;           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError</failure></testcase></testsuite></testsuites>

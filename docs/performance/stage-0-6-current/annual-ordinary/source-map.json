@@ -1,0 +1,8 @@
+{
+  "parent": "eefcd63062298478a15bedf41cc77ed2d723bb20",
+  "local_validated_checkpoint": "2f364b983e4b4947e743d7f22a8753f1a2a8fd72",
+  "api_source_checkpoint": "08c773729432563ece45addd3c3784b159a8e13f",
+  "identical_complete_source_tree": "38627e99aa6f0be02aa57ddeb2242cd838dd9aef",
+  "runtime_tree": "ae9a583342a416e9e0820fc9e4e5aef98d07ee33",
+  "publication": "One evidence child of the API source checkpoint, then one branch ref update; hosted full/proof result remains a separate gate"
+}

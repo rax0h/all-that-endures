@@ -1,0 +1,9 @@
+committed 1 reaudited False
+publication StoreIntegrityError family version publication differs from frozen plan
+Traceback (most recent call last):
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/docs/performance/stage-0-6-current/annual-ordinary/review-raw/genealogy_scalar_probe.py", line 44, in <module>
+    print('restored parents', restored.world.genealogy.parents[1])
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_lazy.py", line 7682, in __getitem__
+    raise StoreFormatError(
+ate_sim.incremental_store.StoreFormatError: lazy genealogy parent payload is not an integer tuple

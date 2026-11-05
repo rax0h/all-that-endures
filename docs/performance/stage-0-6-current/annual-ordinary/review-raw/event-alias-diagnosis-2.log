@@ -1,0 +1,4 @@
+before True
+occurrences (((('field', 'data'), ('key', 'a')), 12), ((('field', 'data'), ('key', 'b')), 12), ((('field', 'data'),), 11), ((), 10))
+reopened False
+types <class 'ate_sim.persistence_tracking.TrackedDict'> <class 'ate_sim.persistence_tracking.TrackedList'>

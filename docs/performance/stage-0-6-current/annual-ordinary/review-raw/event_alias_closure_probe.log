@@ -1,0 +1,6 @@
+pins before 0
+ValueError injected admission failure
+pins after 1
+cross/same on open True True
+on mutation [1, 2, 42]
+on reopen [1, 2, 42] [1, 2, 42] [1, 2, 42] True

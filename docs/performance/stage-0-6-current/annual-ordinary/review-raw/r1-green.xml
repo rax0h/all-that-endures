@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="0.138" timestamp="2026-11-04T23:31:16.853351-06:00" hostname="6407e361a189"><testcase classname="" name="simulation.tests.test_stage_0_6_proof_world_ordinary" time="0.000"><error message="collection failure">ImportError while importing test module '/workspace/scratch/2c32dac1599d/all-that-endures/simulation/tests/test_stage_0_6_proof_world_ordinary.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:3: in &lt;module&gt;
+    from ate_sim.agency import MotiveState, ActionRecord
+E   ModuleNotFoundError: No module named 'ate_sim'</error></testcase></testsuite></testsuites>

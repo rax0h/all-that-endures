@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="6.114" timestamp="2026-11-04T23:44:33.313612-06:00" hostname="6407e361a189"><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_failed_event_alias_admission_releases_its_durable_pin" time="1.908"><failure message="assert 1 == 0&#10; +  where 1 = &lt;function test_failed_event_alias_admission_releases_its_durable_pin.&lt;locals&gt;.pins at 0x7fca0882db20&gt;()">tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-red/test_failed_event_alias_admiss0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fca08842450&gt;
+
+    def test_failed_event_alias_admission_releases_its_durable_pin(tmp_path, monkeypatch):
+        import sqlite3
+        from ate_sim import persistence_proof_world_session as native
+        path, pair = configured(tmp_path)
+        def pins():
+            with sqlite3.connect(path) as db:return db.execute('SELECT count(*) FROM generation_pins').fetchone()[0]
+        assert pins() == 0
+        def fail(*args):raise ValueError('injected alias admission failure')
+        with monkeypatch.context() as patch:
+            patch.setattr(native, '_restore_current_event_aliases', fail)
+            with pytest.raises(ValueError, match='injected alias admission failure'):opened(path, pair)
+&gt;       assert pins() == 0
+E       assert 1 == 0
+E        +  where 1 = &lt;function test_failed_event_alias_admission_releases_its_durable_pin.&lt;locals&gt;.pins at 0x7fca0882db20&gt;()
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:667: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_current_event_alias_admission_closes_spilled_occurrences[False]" time="1.915"><failure message="assert False&#10; +  where False = all(&lt;generator object test_current_event_alias_admission_closes_spilled_occurrences.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fca087239f0&gt;)">tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-red/test_current_event_alias_admis0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fca08780620&gt;
+fail = False
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_current_event_alias_admission_closes_spilled_occurrences(tmp_path, monkeypatch, fail):
+        from dataclasses import replace
+        from pathlib import Path
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        from ate_sim.core import Event
+        def configure(w):
+            shared = [1, 2]
+            w.events.append(Event(1, 0, 'proof-test', Layer.REALITY, data={'a':shared, 'b':shared}))
+            w.event_ids.add(1);w.next_event=2
+        path, pair = fixture(tmp_path, configure=configure)
+        original = catalog.IdentityCatalog.read_owner_identity
+        spilled = []
+        def read(self, pin, owner):
+            accepted = original(self, pin, owner)
+            if owner[0] != 'world.events':return accepted
+            spool = CheckedSpool(self.codec, entry_limit=1)
+            # Reverse depth order so restoration must visit parents first.
+            for row in sorted(accepted.occurrences, key=lambda row:len(row[0]), reverse=True):spool.add(row)
+            spool.freeze();assert spool.spilled
+            spilled.append((spool, Path(spool.path)))
+            return replace(accepted, occurrences=spool)
+        with monkeypatch.context() as patch:
+            patch.setattr(catalog.IdentityCatalog, 'read_owner_identity', read)
+            if fail:
+                from ate_sim.persistence_lazy_families import FamilyBindings
+                def install(*args):raise ValueError('injected alias install failure')
+                patch.setattr(FamilyBindings, 'install_path', install)
+                with pytest.raises(ValueError, match='injected alias install failure'):opened(path, pair)
+            else:
+                with opened(path, pair) as session:
+                    data = session.world.events[0].data
+                    assert data['a'] is data['b']
+                    assert session.save() == 0
+        assert spilled
+&gt;       assert all(spool._closed and not file.exists() for spool, file in spilled)
+E       assert False
+E        +  where False = all(&lt;generator object test_current_event_alias_admission_closes_spilled_occurrences.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fca087239f0&gt;)
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:707: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_current_event_alias_admission_closes_spilled_occurrences[True]" time="1.691"><failure message="ImportError: cannot import name 'FamilyBindings' from 'ate_sim.persistence_lazy_families' (/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_lazy_families.py)">tmp_path = PosixPath('/tmp/ate-ordinary-alias-clean-red/test_current_event_alias_admis1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fca084eb890&gt;
+fail = True
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_current_event_alias_admission_closes_spilled_occurrences(tmp_path, monkeypatch, fail):
+        from dataclasses import replace
+        from pathlib import Path
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        from ate_sim.core import Event
+        def configure(w):
+            shared = [1, 2]
+            w.events.append(Event(1, 0, 'proof-test', Layer.REALITY, data={'a':shared, 'b':shared}))
+            w.event_ids.add(1);w.next_event=2
+        path, pair = fixture(tmp_path, configure=configure)
+        original = catalog.IdentityCatalog.read_owner_identity
+        spilled = []
+        def read(self, pin, owner):
+            accepted = original(self, pin, owner)
+            if owner[0] != 'world.events':return accepted
+            spool = CheckedSpool(self.codec, entry_limit=1)
+            # Reverse depth order so restoration must visit parents first.
+            for row in sorted(accepted.occurrences, key=lambda row:len(row[0]), reverse=True):spool.add(row)
+            spool.freeze();assert spool.spilled
+            spilled.append((spool, Path(spool.path)))
+            return replace(accepted, occurrences=spool)
+        with monkeypatch.context() as patch:
+            patch.setattr(catalog.IdentityCatalog, 'read_owner_identity', read)
+            if fail:
+&gt;               from ate_sim.persistence_lazy_families import FamilyBindings
+E               ImportError: cannot import name 'FamilyBindings' from 'ate_sim.persistence_lazy_families' (/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim/persistence_lazy_families.py)
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:697: ImportError</failure></testcase></testsuite></testsuites>

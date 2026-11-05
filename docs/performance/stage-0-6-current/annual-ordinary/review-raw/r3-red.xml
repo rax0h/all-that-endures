@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="10" time="15.219" timestamp="2026-11-04T23:33:08.565344-06:00" hostname="6407e361a189"><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_composed_reader_rejects_overlapping_predecessors_before_transfer[insertion]" time="1.651" /><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_composed_reader_rejects_overlapping_predecessors_before_transfer[value]" time="1.910"><failure message="RuntimeError: body fetched before overlap rejection">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_composed_reader_rejects_o1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7da2d670&gt;
+reader = 'value'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    def test_composed_reader_rejects_overlapping_predecessors_before_transfer(tmp_path, monkeypatch, reader):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import StoreIntegrityError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_publication as content
+        from ate_sim import persistence_proof_world_new_backings as backing
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        def configure(w):w.agency.motives[1] = MotiveState(curiosity=.1)
+        store, pin, pair = _proof_store(tmp_path, configure=configure)
+        try:
+            result = manifest_api().commit_world_manifest(store, pin, *pair, commit_token='a'*32,
+                version_changes=(), changes=(), new_segments=(), metadata=store.head_metadata(), checkpoint=True)
+            pin = result.commit.pin
+            ns, typed = 'world.agency.motives', store.codec.encode(1)
+            store.db.execute('INSERT INTO lazy_record_versions SELECT namespace,typed_key,1,NULL,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            c = VersionChange('world.people', 99, Person(99, 0, 1, 1))
+            row = dict(namespace=c.namespace, typed_key=store.codec.encode(c.key), payload=store.codec.encode(c.value), memberships_blob=store.codec.encode(()), change=c)
+            def probe(forest):forest.predecessor(ns, typed)
+            def forbidden(*a, **k):raise RuntimeError('body fetched before overlap rejection')
+            monkeypatch.setattr(backing.Forest, '_collect', probe)
+            monkeypatch.setattr(content, '_source_version', forbidden)
+            with store.read_snapshot(pin), pytest.raises(StoreIntegrityError, match='overlap'):
+                if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                else:
+                    from ate_sim.persistence_proof_world_value import validate_value_transition
+                    row = dict(row, namespace=ns, typed_key=typed,
+                        change=VersionChange(ns, 1, MotiveState(curiosity=.2)))
+&gt;                   validate_value_transition(store, request, (row,), (), ())
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_value.py:94: in validate_value_transition
+    old=content._source_version(store,g,ns,key,max_bytes=MAX_BYTES)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fdd7d95fd10&gt;, 1, 'world.agency.motives', b'["int","1"]')
+k = {'max_bytes': 4194304}
+
+&gt;   def forbidden(*a, **k):raise RuntimeError('body fetched before overlap rejection')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RuntimeError: body fetched before overlap rejection
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:273: RuntimeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[payload_checksum-insertion]" time="1.667"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7d94ed80&gt;
+reader = 'insertion', column = 'payload_checksum'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+&gt;               if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_insert.py:32: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:200: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:497: in read_year
+    def read_year(store, request, rows, read, forest):return read('world.year', zero)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:91: in ordinary_predecessor
+    (MAX_BYTES-consumed, ns, typed)).fetchone()
+                                     ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[payload_checksum-value]" time="1.415"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7d8b7b90&gt;
+reader = 'value', column = 'payload_checksum'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+                if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                else:
+                    c = RecordChange('world.year', 0, (0, 1))
+                    row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(c.value), change=c)
+&gt;                   validate_value_transition(store, request, (), (row,), ())
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_value.py:163: in validate_value_transition
+    row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)&lt;=? THEN payload END,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",(MAX_BYTES,ns,key)).fetchone()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[codec_version-insertion]" time="1.240"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7d94cc20&gt;
+reader = 'insertion', column = 'codec_version'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+&gt;               if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_insert.py:32: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:200: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:497: in read_year
+    def read_year(store, request, rows, read, forest):return read('world.year', zero)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:91: in ordinary_predecessor
+    (MAX_BYTES-consumed, ns, typed)).fetchone()
+                                     ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[codec_version-value]" time="1.359"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7d94e2a0&gt;
+reader = 'value', column = 'codec_version'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+                if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                else:
+                    c = RecordChange('world.year', 0, (0, 1))
+                    row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(c.value), change=c)
+&gt;                   validate_value_transition(store, request, (), (row,), ())
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_value.py:163: in validate_value_transition
+    row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)&lt;=? THEN payload END,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",(MAX_BYTES,ns,key)).fetchone()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[record_schema-insertion]" time="1.395"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph4')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7d8da450&gt;
+reader = 'insertion', column = 'record_schema'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+&gt;               if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_insert.py:32: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:200: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:497: in read_year
+    def read_year(store, request, rows, read, forest):return read('world.year', zero)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:91: in ordinary_predecessor
+    (MAX_BYTES-consumed, ns, typed)).fetchone()
+                                     ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[record_schema-value]" time="1.253"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7e871550&gt;
+reader = 'value', column = 'record_schema'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+                if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                else:
+                    c = RecordChange('world.year', 0, (0, 1))
+                    row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(c.value), change=c)
+&gt;                   validate_value_transition(store, request, (), (row,), ())
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_value.py:163: in validate_value_transition
+    row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)&lt;=? THEN payload END,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",(MAX_BYTES,ns,key)).fetchone()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[last_changed_generation-insertion]" time="1.329"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph6')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7e8726c0&gt;
+reader = 'insertion', column = 'last_changed_generation'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+&gt;               if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_insert.py:32: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:200: in _prepare
+    ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:497: in read_year
+    def read_year(store, request, rows, read, forest):return read('world.year', zero)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:91: in ordinary_predecessor
+    (MAX_BYTES-consumed, ns, typed)).fetchone()
+                                     ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_world_ordinary" name="test_ordinary_reader_bounds_physical_metadata_before_transfer[last_changed_generation-value]" time="1.238"><failure message="AssertionError: oversized physical metadata transferred&#10;assert 1048576 &lt;= 8192&#10; +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')">tmp_path = PosixPath('/tmp/ate-ordinary-r3-red/test_ordinary_reader_bounds_ph7')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdd7d821d60&gt;
+reader = 'value', column = 'last_changed_generation'
+
+    @pytest.mark.parametrize('reader', ['insertion', 'value'])
+    @pytest.mark.parametrize('column', ['payload_checksum', 'codec_version', 'record_schema', 'last_changed_generation'])
+    def test_ordinary_reader_bounds_physical_metadata_before_transfer(tmp_path, monkeypatch, reader, column):
+        from types import SimpleNamespace
+        from ate_sim.incremental_store import RecordChange, StoreError
+        from ate_sim.persistence_lazy_store import VersionChange
+        from ate_sim import persistence_lazy_identity_catalog as catalog
+        from ate_sim import persistence_proof_world_insert as insert, persistence_proof_world_ordinary as ordinary
+        from ate_sim.persistence_proof_world_value import validate_value_transition
+        from simulation.tests.test_stage_0_5_proof_world import _proof_store, manifest_api
+        store, pin, pair = _proof_store(tmp_path)
+        try:
+            store.db.execute('UPDATE records SET '+column+'=? WHERE namespace=?', ('x'*1048576, 'world.year'))
+            store.db.commit()
+            request = SimpleNamespace(pin=pin, pairs=manifest_api()._pairs(store, pin.captured_head))
+            def text(value):
+                assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+                return value.decode()
+            store.db.text_factory = text
+            zero = store.codec.encode(0)
+            c = VersionChange(catalog.CATALOG_NAMESPACE, 0, ())
+            row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(()),
+                memberships_blob=store.codec.encode(()), change=c)
+            def read_year(store, request, rows, read, forest):return read('world.year', zero)
+            monkeypatch.setattr(ordinary, 'prepare', read_year)
+            monkeypatch.setattr(insert, 'MAX_BYTES', 65536)
+            with store.read_snapshot(pin), pytest.raises(StoreError):
+                if reader == 'insertion':insert.prepare(store, request, (row,), (), ())
+                else:
+                    c = RecordChange('world.year', 0, (0, 1))
+                    row = dict(namespace=c.namespace, typed_key=zero, payload=store.codec.encode(c.value), change=c)
+&gt;                   validate_value_transition(store, request, (), (row,), ())
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_value.py:163: in validate_value_transition
+    row=store.db.execute("SELECT CASE WHEN typeof(payload)='blob' AND length(payload)&lt;=? THEN payload END,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",(MAX_BYTES,ns,key)).fetchone()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    def text(value):
+&gt;       assert len(value) &lt;= 8192, 'oversized physical metadata transferred'
+E       AssertionError: oversized physical metadata transferred
+E       assert 1048576 &lt;= 8192
+E        +  where 1048576 = len(b'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:490: AssertionError</failure></testcase></testsuite></testsuites>

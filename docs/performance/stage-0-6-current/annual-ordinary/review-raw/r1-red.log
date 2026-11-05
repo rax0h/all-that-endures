@@ -1,0 +1,168 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_uncertified_adoption_cannot_commit_omitted_counters[budget] _______
+
+tmp_path = PosixPath('/tmp/ate-adoption-r1-red/test_uncertified_adoption_cann0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f917b287410>
+mode = 'budget'
+
+    @pytest.mark.parametrize('mode', ['budget', 'full-audit'])
+    def test_uncertified_adoption_cannot_commit_omitted_counters(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.persistence_lazy_adoption import BUCKET_NAMESPACE
+        from ate_sim.incremental_store import StoreError
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            session.world.culture.adoption[1, 1] = .5
+            original = manifests.commit_world_manifest
+            def omit(*args, **kwargs):
+                kwargs['version_changes'] = tuple(c for c in kwargs['version_changes'] if c.namespace != BUCKET_NAMESPACE)
+                return original(*args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(manifests, 'commit_world_manifest', omit)
+                patch.setattr(adoption, 'MAX_READS', 1)
+                if mode == 'full-audit':
+                    patch.setattr(value, 'validate_value_transition', lambda *a, **k:False)
+                    patch.setattr(insert, 'prepare', lambda *a, **k:None)
+                with pytest.raises(StoreError):session.save()
+>           assert session.store.generation == 0
+E           assert 1 == 0
+E            +  where 1 = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f917b1ba8d0>.generation
+E            +    where <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f917b1ba8d0> = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f917b0b3950>.store
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:398: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-adoption-r1-red/test_uncertified_adoption_cann0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f917b287410>
+mode = 'budget'
+
+    @pytest.mark.parametrize('mode', ['budget', 'full-audit'])
+    def test_uncertified_adoption_cannot_commit_omitted_counters(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.persistence_lazy_adoption import BUCKET_NAMESPACE
+        from ate_sim.incremental_store import StoreError
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+>       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:385: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f917b0b3950>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError
+_____ test_uncertified_adoption_cannot_commit_omitted_counters[full-audit] _____
+
+tmp_path = PosixPath('/tmp/ate-adoption-r1-red/test_uncertified_adoption_cann1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f917b169490>
+mode = 'full-audit'
+
+    @pytest.mark.parametrize('mode', ['budget', 'full-audit'])
+    def test_uncertified_adoption_cannot_commit_omitted_counters(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.persistence_lazy_adoption import BUCKET_NAMESPACE
+        from ate_sim.incremental_store import StoreError
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+        with opened(path, pair) as session:
+            session.world.culture.adoption[1, 1] = .5
+            original = manifests.commit_world_manifest
+            def omit(*args, **kwargs):
+                kwargs['version_changes'] = tuple(c for c in kwargs['version_changes'] if c.namespace != BUCKET_NAMESPACE)
+                return original(*args, **kwargs)
+            with monkeypatch.context() as patch:
+                patch.setattr(manifests, 'commit_world_manifest', omit)
+                patch.setattr(adoption, 'MAX_READS', 1)
+                if mode == 'full-audit':
+                    patch.setattr(value, 'validate_value_transition', lambda *a, **k:False)
+                    patch.setattr(insert, 'prepare', lambda *a, **k:None)
+                with pytest.raises(StoreError):session.save()
+>           assert session.store.generation == 0
+E           assert 1 == 0
+E            +  where 1 = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f917b15ed80>.generation
+E            +    where <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f917b15ed80> = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f917aff28d0>.store
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:398: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-adoption-r1-red/test_uncertified_adoption_cann1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f917b169490>
+mode = 'full-audit'
+
+    @pytest.mark.parametrize('mode', ['budget', 'full-audit'])
+    def test_uncertified_adoption_cannot_commit_omitted_counters(tmp_path, monkeypatch, mode):
+        from ate_sim import persistence_proof_manifest_publish as manifests
+        from ate_sim import persistence_proof_world_adoption as adoption
+        from ate_sim import persistence_proof_world_value as value, persistence_proof_world_insert as insert
+        from ate_sim.persistence_lazy_adoption import BUCKET_NAMESPACE
+        from ate_sim.incremental_store import StoreError
+        def configure(w):w.culture.adoption[1, 1] = .25
+        path, pair = fixture(tmp_path, configure=configure)
+>       with opened(path, pair) as session:
+
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:385: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f917aff28d0>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18016: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_uncertified_adoption_cannot_commit_omitted_counters[budget]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_uncertified_adoption_cannot_commit_omitted_counters[full-audit]
+2 failed, 34 deselected in 4.29s

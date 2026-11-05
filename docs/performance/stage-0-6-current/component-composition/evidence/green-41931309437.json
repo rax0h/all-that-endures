@@ -1,0 +1,11 @@
+{
+  "run_id": 41931309437,
+  "head": "eefcd63062298478a15bedf41cc77ed2d723bb20",
+  "full_suite": "success",
+  "proof_map": "success",
+  "passed": 4532,
+  "subtests_passed": 2,
+  "warnings": 1,
+  "seconds": 6439.56,
+  "warning": "Deliberate duplicate ZIP-member rejection fixture"
+}

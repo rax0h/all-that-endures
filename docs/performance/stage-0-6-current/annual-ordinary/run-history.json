@@ -1,0 +1,51 @@
+{
+  "note": "Temporary test logs/databases/interpreter were cleared by automated workspace maintenance at a user steering boundary. These results are retained tool-output observations, not reconstructed raw logs. Final verification will be rerun and preserved with this package.",
+  "observations": [
+    {
+      "tests": "event/action/replacement/mixed native no-audit",
+      "red": {
+        "failed": 4,
+        "seconds": 8.16
+      },
+      "green": {
+        "passed": 4,
+        "seconds": 6.49
+      }
+    },
+    {
+      "tests": "ordinary tamper/recovery/alias",
+      "passed": 18,
+      "seconds": 36.02
+    },
+    {
+      "tests": "native scalar score",
+      "red_failed": 1,
+      "seconds": 2.39
+    },
+    {
+      "tests": "ordinary plus scalar counters",
+      "passed": 27,
+      "seconds": 52.16
+    },
+    {
+      "tests": "consecutive mixed retirement",
+      "red_failed": 1,
+      "seconds": 2.92
+    },
+    {
+      "tests": "ordinary plus catalog retirement",
+      "passed": 28,
+      "seconds": 58.05
+    },
+    {
+      "tests": "complete generated years3and4, zero save audits plus eager/fresh equality",
+      "passed": 1,
+      "seconds": 87.53
+    },
+    {
+      "tests": "overlap-before-source-transfer",
+      "red_failed": 1,
+      "seconds": 1.6
+    }
+  ]
+}

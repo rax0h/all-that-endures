@@ -1,0 +1,20 @@
+{
+  "label": "candidate",
+  "runtime_package": "/workspace/scratch/2c32dac1599d/all-that-endures/simulation/ate_sim",
+  "source_commit": "2f364b983e4b4947e743d7f22a8753f1a2a8fd72",
+  "runtime_tree": "ae9a583342a416e9e0820fc9e4e5aef98d07ee33",
+  "driver_sha256": "21a37f445088934f1fef62f705ff30b13625e52aa819f5e19ec81b9b4380644b",
+  "accepted_database_sha256": "bd8b3e978cb5ae6ca507bf08e2e2f884ec63365ddc892046d41c661a9d48b2af",
+  "expected_digest": "de2e839eefbf248bc8e86d811e3341aa1a914156756f3019ea8e9f076a6b5486",
+  "limitation": "Small generated year only; warm local filesystem; not mature-world acceptance",
+  "open_seconds": 8.740646619000017,
+  "step_seconds": 1.9698983279999993,
+  "save_seconds": 4.558218123999723,
+  "generation": 1,
+  "save_world_audits": 0,
+  "save_world_audit_seconds": [],
+  "saved_commitment": "0448f5b99a2fbf678937e443bdf0303dfa814380e700410852fe70444774dbdd",
+  "status": "complete",
+  "fresh_process_eager_match": true,
+  "accepted_input_unchanged": true
+}
