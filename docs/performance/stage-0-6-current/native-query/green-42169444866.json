@@ -1,0 +1,19 @@
+{
+  "source": "f08d2e1fe1f026ea2dca3f9b976ba1c9169262c4",
+  "run_id": 42169444866,
+  "jobs": [
+    {
+      "id": 127733548924,
+      "name": "proof-map",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 127733549273,
+      "name": "full-suite",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "full_suite_summary": "2026-11-06T07:25:59.0582024Z ======= 4744 passed, 1 warning, 2 subtests passed in 6547.26s (1:49:07) ========"
+}

@@ -25,3 +25,5 @@ Retain the full audited opener. Query API selection is now certified; identity, 
 Final canonical raw open9.128s/step7.053s/save7.141s/fresh restore+digest16.475s; diagnostic save17.088s/fresh16.702s. Shared-host small-world values only, no controlled improvement or mature-target claim. Python3.12.14/SQLite3.53.1; raw and diagnostic expected eager/fresh digests match and diagnostic full-save audit count remains0.
 
 Final exact committed source:180query/order/source/session tests274.23s pass, including all50native-query cases and promoted review probes. No runtime changes followed. One evidence-child publication will launch full/proof jobs; hosted completion remains pending until that exact child is green.
+
+Hosted gate closed:f08d2e1/run42169444866 both jobs verified green,4,744tests+2subtests6,547.26s, one deliberate ZIP warning. Receipt green-42169444866.json.

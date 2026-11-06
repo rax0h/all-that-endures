@@ -31,6 +31,8 @@ Interfaces: shared physical_window(store,generation,namespace,after,limit,positi
 
 - [x] Retained1k/10k body-selection/work controls; exact canonical generated-year eager/fresh continuation and source immutability; no timing win claim.
 - [x] One independent whole-package review with all findings closed in one register; retain raw RED/GREEN evidence.
-- [ ] Runtime pin/fingerprints, workflow inclusion, clean-source launcher/current-source verification and exact local/API tree mapping; publish one bundled full/proof run and verify both start.
+- [x] Runtime pin/fingerprints, workflow inclusion, clean-source launcher/current-source verification and exact local/API tree mapping; publish one bundled full/proof run and verify both start.
 
 Final local verification:324broader/180exact-source/33launcher all pass; canonical raw+diagnostic eager/fresh/source hash and zero-save-audit checks pass. One independent Minor corrected; no finding deferred. Runtime53ac95d; local85df179/API5d0b68f full tree34ed8e950378efb3cc07ed4fa9f29161db82499c. Publication prepared; hosted gate remains pending.
+
+All package gates closed by verified hosted green42169444866.

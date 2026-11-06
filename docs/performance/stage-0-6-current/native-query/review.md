@@ -17,3 +17,5 @@ Independent final report has no Critical/Important findings, one Minor corrected
 Review rulings: hosted CI/fingerprint/tree publication and author broad/generated-year completion are author gates, not waived; final evidence below must close them before publication. Performance, maturity, audit removal, main/default/endurance remain outside authorized claims. Removing the retained full admission gate early could expose unverified relations, so it stays enabled.
 
 Final gates verified:324broader401.80s,180exact-source274.23s,33clean launcher23.52s, raw/diagnostic canonical year eager+fresh/source immutability/zero save-audit checks pass. Runtime53ac95d58478a50b54b8d8c3ca86a5ce7f5baa36 and local/API full source tree34ed8e950378efb3cc07ed4fa9f29161db82499c are bound in source-map.json. The single independent Minor and author fixture finding are closed; nothing deferred. Hosted completion remains pending for the bundled publication.
+
+Hosted gate closed:f08d2e1/run42169444866 both jobs verified green,4,744tests+2subtests6,547.26s, one deliberate ZIP warning. Receipt green-42169444866.json.

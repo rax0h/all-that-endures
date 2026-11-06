@@ -1755,6 +1755,11 @@ class LazyRecordStore:
     def _identity_state_at(
         self, generation: int
     ) -> tuple[int, int, int | None]:
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_identity import state_row
+            return state_row(self,authority,generation)
         rows = self._interval_rows('lazy_identity_state', 'next_incarnation_id,valid_from,valid_to,row_checksum',
             (), (), generation, 'lazy_identity_state_interval', limit=2)
         self._metadata_rows += len(rows)
@@ -1779,6 +1784,11 @@ class LazyRecordStore:
         owner_key: bytes,
         occurrence_path: bytes,
     ) -> tuple[int, int, int | None, str] | None:
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_identity import point_row
+            return point_row(self,authority,generation,owner_namespace,owner_key,occurrence_path)
         rows = self._interval_rows('lazy_identity_occurrence_versions',
             'incarnation_id,valid_from,valid_to,row_checksum',
             ('owner_namespace', 'owner_key', 'occurrence_path'), (owner_namespace, owner_key, occurrence_path),
@@ -1852,6 +1862,12 @@ class LazyRecordStore:
         self._ensure_open()
         namespace = _validate_namespace(owner_namespace)
         encoded_key = self.codec.encode(owner_key)
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_identity import iter_occurrences,OwnerScope
+            yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+            return
         generation = self._read_snapshot_start(pin)
         rows = None
         try:
@@ -1898,6 +1914,12 @@ class LazyRecordStore:
         self._ensure_open()
         if type(incarnation_id) is not int or incarnation_id <= 0:
             raise ValueError("incarnation_id must be a positive int")
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_identity import iter_occurrences,GroupScope
+            yield from iter_occurrences(self,authority,pin,GroupScope(incarnation_id))
+            return
         generation = self._read_snapshot_start(pin)
         rows = None
         try:
