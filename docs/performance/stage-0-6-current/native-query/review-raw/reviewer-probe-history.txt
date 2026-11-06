@@ -1,0 +1,27 @@
+Independent whole-package review probe history
+
+Command:
+PYTHONPATH=.:simulation /tmp/ate-query-venv/bin/python -m pytest -q -p no:cacheprovider docs/performance/stage-0-6-current/native-query/review-raw/test_independent_probes.py --basetemp=/tmp/ate-query-independent-probes
+Result:
+..                                                                       [100%]
+2 passed in 12.33s
+
+Expanded exploratory command:
+PYTHONPATH=.:simulation /tmp/ate-query-venv/bin/python -m pytest -q -p no:cacheprovider docs/performance/stage-0-6-current/native-query/review-raw/test_independent_probes.py --basetemp=/tmp/ate-query-independent-probes-final
+Result:
+..F                                                                      [100%]
+FAILED test_same_owner_membership_multiplicity_is_preserved
+actual = store.query_memberships(session.pin, PAGE_NAMESPACE, 'member', 1)
+assert len(actual) == 2
+E assert 0 == 2
+E where 0 = len(())
+1 failed, 2 passed in 14.59s
+
+Disposition: reviewer fixture mismatch, not a product defect. A read-only SQLite
+inspection showed that complete-format normalization did not retain any old
+aux.lazy.household.member_pages/member rows. The query correctly returned the
+authenticated empty scope. The attempted probe remains in the Python file as
+exploratory_unsupported_old_household_projection, explicitly not collected.
+It supplies no positive same-owner multiplicity evidence and was not counted
+among the two valid independent probes. No runtime/test product file was edited
+by the reviewer.

@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="18" time="22.037" timestamp="2026-11-05T23:14:56.257491-06:00" hostname="4e084dd83e0d"><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[missing-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.317"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122ab4cd10&gt;
+api = 'tuple', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[missing-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.239"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a9132f0&gt;
+api = 'stream', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[extra-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.158"><failure message="assert (not [b'[&quot;int&quot;,&quot;1&quot;]', b'[&quot;int&quot;,&quot;2&quot;]'])">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a8872c0&gt;
+api = 'tuple', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+            with pytest.raises(StoreIntegrityError):read()
+&gt;           assert not seen and not store.db.in_transaction
+E           assert (not [b'["int","1"]', b'["int","2"]'])
+
+simulation/tests/test_stage_0_6_proof_native_query.py:47: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[extra-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.169"><failure message="assert (not [b'[&quot;int&quot;,&quot;1&quot;]', b'[&quot;int&quot;,&quot;2&quot;]'])">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a8c33e0&gt;
+api = 'stream', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+            with pytest.raises(StoreIntegrityError):read()
+&gt;           assert not seen and not store.db.in_transaction
+E           assert (not [b'["int","1"]', b'["int","2"]'])
+
+simulation/tests/test_stage_0_6_proof_native_query.py:47: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[empty-extra-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.174" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[empty-extra-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.164" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[ordinal-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.134"><failure message="assert (not [b'[&quot;int&quot;,&quot;2&quot;]'])">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe6')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a5f8710&gt;
+api = 'tuple', damage = 'ordinal'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+            with pytest.raises(StoreIntegrityError):read()
+&gt;           assert not seen and not store.db.in_transaction
+E           assert (not [b'["int","2"]'])
+
+simulation/tests/test_stage_0_6_proof_native_query.py:47: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[ordinal-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.117" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-start-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.157"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe8')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122ab4cc50&gt;
+api = 'tuple', damage = 'future-start'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-start-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.112"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe9')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a98f3e0&gt;
+api = 'stream', damage = 'future-start'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-close-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.116"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe10')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a9fe450&gt;
+api = 'tuple', damage = 'future-close'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-close-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.201"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_rejects_cohe11')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f122a8c2600&gt;
+api = 'stream', damage = 'future-close'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(True);name='alive'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,True) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,True))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[None-excluded0-expected0]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.221" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[1-excluded1-expected1]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.208" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[1-excluded2-expected2]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.256" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[0-excluded3-expected3]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.247" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[None-excluded4-expected4]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.227" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_stream_releases_snapshot_and_rejects_paused_generation" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="61" time="1.196"><failure message="sqlite3.OperationalError: cannot start a transaction within a transaction">tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_stream_relea0')
+
+    def test_native_query_stream_releases_snapshot_and_rejects_paused_generation(tmp_path):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;it=store.iter_query_memberships(session.pin,NS,'alive',True)
+            assert next(it)==(1,0)
+&gt;           assert not store.db.in_transaction
+E           assert not True
+E            +  where True = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f122aa7b850&gt;.in_transaction
+E            +    where &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f122aa7b850&gt; = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f122a98df10&gt;.db
+
+simulation/tests/test_stage_0_6_proof_native_query.py:67: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-native-query-red-corrected/test_native_query_stream_relea0')
+
+    def test_native_query_stream_releases_snapshot_and_rejects_paused_generation(tmp_path):
+        path,pair=query_fixture(tmp_path)
+&gt;       with opened(path,pair) as session:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_query.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18024: in close
+    self._release_publisher_pin()
+simulation/ate_sim/persistence_lazy.py:17997: in _release_publisher_pin
+    self._backing_dependencies.close(abandon_stale=self._state == 'stale')
+simulation/ate_sim/persistence_history_dependencies.py:229: in close
+    self.store.release_pin(self.pin)
+simulation/ate_sim/persistence_lazy_store.py:1202: in release_pin
+    self.release_pins((pin,), cleanup_budget=cleanup_budget)
+simulation/ate_sim/persistence_lazy_store.py:1220: in release_pins
+    self.db.execute("BEGIN IMMEDIATE")
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7f122a30d880&gt;
+args = ('BEGIN IMMEDIATE',), kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: cannot start a transaction within a transaction
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError</failure></testcase></testsuite></testsuites>

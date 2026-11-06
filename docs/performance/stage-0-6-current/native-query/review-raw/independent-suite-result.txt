@@ -1,0 +1,8 @@
+Command:
+PYTHONPATH=.:simulation /tmp/ate-query-venv/bin/python -m pytest -q -p no:cacheprovider simulation/tests/test_stage_0_6_proof_native_query.py simulation/tests/test_stage_0_6_proof_native_order.py --basetemp=/tmp/ate-query-independent-review
+
+Final tool-output chunk (earlier progress dots were delivered separately):
+.....                                            [100%]
+101 passed in 180.64s (0:03:00)
+
+Process exit code: 0

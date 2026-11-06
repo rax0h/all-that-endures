@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="18" time="22.019" timestamp="2026-11-05T23:14:09.497684-06:00" hostname="4e084dd83e0d"><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[missing-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.240"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_rejects_cohe0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f72cf871700&gt;
+api = 'tuple', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(0);name='insertion'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,0) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,0))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[missing-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.222"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_rejects_cohe1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f72cf63c3b0&gt;
+api = 'stream', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(0);name='insertion'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,0) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,0))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[extra-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.181" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[extra-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.355" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[empty-extra-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.169" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[empty-extra-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.238" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[ordinal-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.194" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[ordinal-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.137" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-start-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.217" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-start-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.139"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_rejects_cohe9')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f72cf3a7140&gt;
+api = 'stream', damage = 'future-start'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(0);name='insertion'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,0) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,0))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-close-tuple]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.128"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_rejects_cohe10')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f72cf4339e0&gt;
+api = 'tuple', damage = 'future-close'
+
+    @pytest.mark.parametrize('api',['tuple','stream'])
+    @pytest.mark.parametrize('damage',['missing','extra','empty-extra','ordinal','future-start','future-close'])
+    def test_native_query_rejects_coherent_scope_disagreement_before_key_decode(tmp_path,monkeypatch,api,damage):
+        path,pair=query_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode(1);value=store.codec.encode(0);name='insertion'
+            if damage=='missing':
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+            else:
+                if damage=='extra':key=store.codec.encode(99)
+                if damage=='empty-extra':name='absent'
+                ordinal=99 if damage in ('extra','ordinal') else 0
+                start,end=(1,None) if damage=='future-start' else (0,1) if damage=='future-close' else (0,None)
+                if damage in ('ordinal','future-start','future-close'):
+                    store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND index_value=? AND record_key=?',(NS,name,value,key))
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,name,value,key,ordinal,start,end,_query_checksum(NS,name,value,key,ordinal,start,end)))
+            store.db.commit();reset_epoch(store)
+            decode=store.codec.decode;seen=[]
+            def observed(raw):
+                if raw in (store.codec.encode(1),store.codec.encode(2)):seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',observed)
+            read=lambda:store.query_memberships(session.pin,NS,name,0) if api=='tuple' else list(store.iter_query_memberships(session.pin,NS,name,0))
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_query.py:46: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_rejects_coherent_scope_disagreement_before_key_decode[future-close-stream]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="21" time="1.183" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[None-excluded0-expected0]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.150"><failure message="assert () == ((1, 0), (2, 1))&#10;  &#10;  Right contains 2 more items, first extra item: (1, 0)&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_preserves_or0')
+limit = None, excluded = (), expected = ((1, 0), (2, 1))
+
+    @pytest.mark.parametrize('limit,excluded,expected',[(None,(),((1,0),(2,1))),(1,(),((1,0),)),(1,(1,),((2,1),)),(0,(),()),(None,(1,2),())])
+    def test_native_query_preserves_order_limit_exclusions_and_absence(tmp_path,limit,excluded,expected):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+&gt;           assert store.query_memberships(session.pin,NS,'insertion',0,limit=limit,exclude_keys=excluded)==expected
+E           assert () == ((1, 0), (2, 1))
+E             
+E             Right contains 2 more items, first extra item: (1, 0)
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_query.py:56: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[1-excluded1-expected1]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.102"><failure message="assert () == ((1, 0),)&#10;  &#10;  Right contains one more item: (1, 0)&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_preserves_or1')
+limit = 1, excluded = (), expected = ((1, 0),)
+
+    @pytest.mark.parametrize('limit,excluded,expected',[(None,(),((1,0),(2,1))),(1,(),((1,0),)),(1,(1,),((2,1),)),(0,(),()),(None,(1,2),())])
+    def test_native_query_preserves_order_limit_exclusions_and_absence(tmp_path,limit,excluded,expected):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+&gt;           assert store.query_memberships(session.pin,NS,'insertion',0,limit=limit,exclude_keys=excluded)==expected
+E           assert () == ((1, 0),)
+E             
+E             Right contains one more item: (1, 0)
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_query.py:56: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[1-excluded2-expected2]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.191"><failure message="assert () == ((2, 1),)&#10;  &#10;  Right contains one more item: (2, 1)&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_preserves_or2')
+limit = 1, excluded = (1,), expected = ((2, 1),)
+
+    @pytest.mark.parametrize('limit,excluded,expected',[(None,(),((1,0),(2,1))),(1,(),((1,0),)),(1,(1,),((2,1),)),(0,(),()),(None,(1,2),())])
+    def test_native_query_preserves_order_limit_exclusions_and_absence(tmp_path,limit,excluded,expected):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+&gt;           assert store.query_memberships(session.pin,NS,'insertion',0,limit=limit,exclude_keys=excluded)==expected
+E           assert () == ((2, 1),)
+E             
+E             Right contains one more item: (2, 1)
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_query.py:56: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[0-excluded3-expected3]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.206"><failure message="assert () == (1, 2)&#10;  &#10;  Right contains 2 more items, first extra item: 1&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_preserves_or3')
+limit = 0, excluded = (), expected = ()
+
+    @pytest.mark.parametrize('limit,excluded,expected',[(None,(),((1,0),(2,1))),(1,(),((1,0),)),(1,(1,),((2,1),)),(0,(),()),(None,(1,2),())])
+    def test_native_query_preserves_order_limit_exclusions_and_absence(tmp_path,limit,excluded,expected):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            assert store.query_memberships(session.pin,NS,'insertion',0,limit=limit,exclude_keys=excluded)==expected
+&gt;           assert store.query_keys(session.pin,NS,'insertion',0)==(1,2)
+E           assert () == (1, 2)
+E             
+E             Right contains 2 more items, first extra item: 1
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_query.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_preserves_order_limit_exclusions_and_absence[None-excluded4-expected4]" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="50" time="1.268"><failure message="assert () == (1, 2)&#10;  &#10;  Right contains 2 more items, first extra item: 1&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_preserves_or4')
+limit = None, excluded = (1, 2), expected = ()
+
+    @pytest.mark.parametrize('limit,excluded,expected',[(None,(),((1,0),(2,1))),(1,(),((1,0),)),(1,(1,),((2,1),)),(0,(),()),(None,(1,2),())])
+    def test_native_query_preserves_order_limit_exclusions_and_absence(tmp_path,limit,excluded,expected):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store
+            assert store.query_memberships(session.pin,NS,'insertion',0,limit=limit,exclude_keys=excluded)==expected
+&gt;           assert store.query_keys(session.pin,NS,'insertion',0)==(1,2)
+E           assert () == (1, 2)
+E             
+E             Right contains 2 more items, first extra item: 1
+E             Use -v to get more diff
+
+simulation/tests/test_stage_0_6_proof_native_query.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_query" name="test_native_query_stream_releases_snapshot_and_rejects_paused_generation" file="simulation/tests/test_stage_0_6_proof_native_query.py" line="61" time="1.439"><failure message="StopIteration">tmp_path = PosixPath('/tmp/ate-native-query-red/test_native_query_stream_relea0')
+
+    def test_native_query_stream_releases_snapshot_and_rejects_paused_generation(tmp_path):
+        path,pair=query_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;it=store.iter_query_memberships(session.pin,NS,'insertion',0)
+&gt;           assert next(it)==(1,0)
+                   ^^^^^^^^
+E           StopIteration
+
+simulation/tests/test_stage_0_6_proof_native_query.py:66: StopIteration</failure></testcase></testsuite></testsuites>
