@@ -161,12 +161,18 @@ def record_rows(store, authority, namespace):
     with _snapshot(store, authority) as manifest:
         if store._ordinary_namespace_is_lazy(namespace):
             raise StoreError(f'{namespace!r} is lazy authority; use iter_keys/read_version')
+        from .persistence_proof_native_roster import check_count
+        expected=check_count(store,authority,manifest,namespace)
         cursor = store.db.execute("SELECT CASE WHEN typeof(typed_key)='blob' AND length(typed_key)<=? THEN typed_key END,"
             +_record_columns(store, manifest)+' FROM records WHERE namespace=?', (MAX_METADATA_BYTES-len(namespace.encode()), namespace))
         def checked():
+            seen=0
             for typed, *row in cursor:
+                seen+=1
+                if seen>expected:raise StoreIntegrityError('native ordinary source roster exceeds accepted count')
                 _locator(namespace, typed)
                 yield typed, *_record(store, manifest, namespace, typed, tuple(row))
+            if seen!=expected:raise StoreIntegrityError('native ordinary source roster ended before accepted count')
         try:
             yield checked()
         finally:

@@ -51,12 +51,7 @@ def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path
             if raw == payload:decoded_forgery.append(True)
             return decode(raw)
         monkeypatch.setattr(store.codec, 'decode', checked)
-        if kind == 'records' and damage == 'missing':
-            # Roster completeness is a separate admission gate; this adapter
-            # certifies fetched bodies, not a whole ordinary namespace listing.
-            assert read() == ()
-        else:
-            with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+        with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
         assert not decoded_forgery
         assert not store.db.in_transaction
     finally:store.close()

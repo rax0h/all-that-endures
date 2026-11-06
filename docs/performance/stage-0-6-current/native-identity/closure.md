@@ -17,3 +17,5 @@ Both canonical raw/diagnostic passes match independent eager successor and fresh
 Local60d471aee3fadf2d3efa5e9d5fdc942e81b2791c equals API2f015340d25ae61bd304eba40e9831f3a10868b9 complete tree4a181250e2d44b6f416d74bb4e7b2354feea91a5; runtimefddeb83060f4df3c9071786e4d5e4d4ad2bf737f. Runtime pin/fingerprints, Python syntax, workflow YAML/5Bash blocks and new test inclusion pass. One evidence child changes no runtime.
 
 Review rulings retained: current-group first-page count is linear in selected group, never claimed constant/archive-sized; full admission/catalog/ordinary-roster/raw-consumer gate stays enabled. Author remaining source/canonical/launcher/tree gates verified here; hosted gate awaits the exact published child's full/proof run. No main/default/mature/endurance action.
+
+Hosted gate closed:e423c94/run42226884633 verified both jobs green,4,790tests+2subtests8,916.04s (one deliberate ZIP warning). Receipt green-42226884633.json.
