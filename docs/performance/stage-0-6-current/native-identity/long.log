@@ -1,0 +1,51 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope __
+
+tmp_path = PosixPath('/tmp/ate-native-identity-long/test_native_long_identity_grou0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f41e12f7140>
+record_property = <function record_property.<locals>.append_property at 0x7f41e1cb09a0>
+
+    def test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope(tmp_path,monkeypatch,record_property):
+        from ate_sim.skills import SkillHistory
+        from ate_sim import persistence_proof_native_identity as native
+        def configure(w):
+            shared=list(range(8));w.skills.skills.clear()
+            for i in range(132):w.skills.skills[i,'x'*3920]=SkillHistory(i,'x'*3920,provenance=shared)
+>       path,pair=fixture(tmp_path,configure=configure)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:9: in fixture
+    s,p,pair=_proof_store(tmp_path,**kw);path=s.path;s.release_pin(p);s.close();return path,pair
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_world.py:74: in _proof_store
+    s,p,a,ra,d=make_world(tmp_path/'source',**kwargs);source=s.path;s.release_pin(p);s.close()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:18: in make_world
+    s=opened(file);p=s.capture_pin();a,ra=authorities(s,p);d=_load(s,p.captured_head)[0]
+                                          ^^^^^^^^^^^^^^^^
+simulation/tests/proof_sequence_event_fixtures.py:20: in authorities
+    sa=bootstrap_scope_proofs(s,p,**opts);ca=bootstrap_content_proofs(s,p);bootstrap_collection_directory(s,p);ia=bootstrap_inventory(s,p)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:205: in bootstrap_scope_proofs
+    _guard_construction(store.db);store.verify_all()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f41e12c2f50>
+
+    def _guard_construction(db):
+        for table,texts,blobs,integers in (
+            ('lazy_query_versions',('namespace','index_name'),('index_value','record_key'),('ordinal',)),
+            ('lazy_identity_occurrence_versions',('owner_namespace',),('owner_key','occurrence_path'),('incarnation_id',))):
+            valid=' AND '.join([f"typeof({f})='text' AND length(CAST({f} AS BLOB)) BETWEEN 1 AND {MAX_FIELD_BYTES} AND instr({f},char(0))=0" for f in texts]+[f"typeof({f})='blob' AND length({f})<={MAX_FIELD_BYTES}" for f in blobs]+[f"typeof({f})='integer' AND {f}>={'1' if f=='incarnation_id' else '0'}" for f in integers]+["typeof(valid_from)='integer' AND valid_from>=0","typeof(valid_to) IN ('null','integer')","typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64"])
+>           if db.execute('SELECT 1 FROM '+table+' WHERE NOT('+valid+') LIMIT 1').fetchone() is not None:raise ScopeProofBudgetError('invalid or oversized scope construction source metadata')
+                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ate_sim.persistence_proof_scope.ScopeProofBudgetError: invalid or oversized scope construction source metadata
+
+simulation/ate_sim/persistence_proof_scope.py:189: ScopeProofBudgetError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope
+1 failed, 45 deselected in 7.09s

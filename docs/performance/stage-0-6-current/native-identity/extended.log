@@ -1,0 +1,2509 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                            [100%]
+=================================== FAILURES ===================================
+___ test_native_identity_rejects_coherent_placement_forgeries[missing-point] ___
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad49751d90>
+api = 'point', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4953d250>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+___ test_native_identity_rejects_coherent_placement_forgeries[missing-owner] ___
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad49540d40>
+api = 'owner', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914deb0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+___ test_native_identity_rejects_coherent_placement_forgeries[missing-group] ___
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad49147470>
+api = 'group', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad486104d0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____ test_native_identity_rejects_coherent_placement_forgeries[moved-point] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad49542c60>
+api = 'point', damage = 'moved'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914ff50>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____ test_native_identity_rejects_coherent_placement_forgeries[moved-owner] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad494e1940>
+api = 'owner', damage = 'moved'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad493188c0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____ test_native_identity_rejects_coherent_placement_forgeries[moved-group] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad494e1a00>
+api = 'group', damage = 'moved'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4a2089e0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____ test_native_identity_rejects_coherent_placement_forgeries[extra-point] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad49563320>
+api = 'point', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914cef0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____ test_native_identity_rejects_coherent_placement_forgeries[extra-owner] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad492d1e20>
+api = 'owner', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4975ce60>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____ test_native_identity_rejects_coherent_placement_forgeries[extra-group] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad494e75c0>
+api = 'group', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe1e20>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+___ test_native_identity_rejects_coherent_placement_forgeries[future-point] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad46c177d0>
+api = 'point', damage = 'future'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad494343b0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+___ test_native_identity_rejects_coherent_placement_forgeries[future-owner] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad493e75c0>
+api = 'owner', damage = 'future'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49319e20>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+___ test_native_identity_rejects_coherent_placement_forgeries[future-group] ____
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_rejects_c11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad493e7170>
+api = 'group', damage = 'future'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe1250>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_______ test_native_allocator_rejects_checksum_consistent_number_change ________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_allocator_rejects_0')
+
+    def test_native_allocator_rejects_checksum_consistent_number_change(tmp_path):
+>       path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+                                            ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4a112690>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_______ test_native_identity_shapes_aliases_absence_and_snapshot_release _______
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_shapes_al0')
+
+    def test_native_identity_shapes_aliases_absence_and_snapshot_release(tmp_path):
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914f6e0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[state-foreign] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac0')
+kind = 'foreign', api = 'state'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49435880>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[state-unknown] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac1')
+kind = 'unknown', api = 'state'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4a208ef0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+________ test_native_identity_checks_actual_caller_pin[state-released] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac2')
+kind = 'released', api = 'state'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad495f7da0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[point-foreign] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac3')
+kind = 'foreign', api = 'point'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914cc20>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[point-unknown] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac4')
+kind = 'unknown', api = 'point'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49318cb0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+________ test_native_identity_checks_actual_caller_pin[point-released] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac5')
+kind = 'released', api = 'point'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe3410>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[owner-foreign] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac6')
+kind = 'foreign', api = 'owner'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad46c5f920>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[owner-unknown] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac7')
+kind = 'unknown', api = 'owner'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49319520>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+________ test_native_identity_checks_actual_caller_pin[owner-released] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac8')
+kind = 'released', api = 'owner'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fa3b60>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[group-foreign] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac9')
+kind = 'foreign', api = 'group'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4931b5c0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[group-unknown] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac10')
+kind = 'unknown', api = 'group'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad46c5fec0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+________ test_native_identity_checks_actual_caller_pin[group-released] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac11')
+kind = 'released', api = 'group'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4a20ab10>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[empty-foreign] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac12')
+kind = 'foreign', api = 'empty'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe17f0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_checks_actual_caller_pin[empty-unknown] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac13')
+kind = 'unknown', api = 'empty'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49434c20>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+________ test_native_identity_checks_actual_caller_pin[empty-released] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_checks_ac14')
+kind = 'released', api = 'empty'
+
+    @pytest.mark.parametrize('kind',['foreign','unknown','released'])
+    @pytest.mark.parametrize('api',['state','point','owner','group','empty'])
+    def test_native_identity_checks_actual_caller_pin(tmp_path,kind,api):
+        from dataclasses import replace
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad495f5d00>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_paused_page_binds_original_epoch[local] _________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_paused_pa0')
+change = 'local'
+
+    @pytest.mark.parametrize('change',['local','external','recovery'])
+    def test_native_identity_paused_page_binds_original_epoch(tmp_path,change):
+        import sqlite3
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914d760>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_______ test_native_identity_paused_page_binds_original_epoch[external] ________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_paused_pa1')
+change = 'external'
+
+    @pytest.mark.parametrize('change',['local','external','recovery'])
+    def test_native_identity_paused_page_binds_original_epoch(tmp_path,change):
+        import sqlite3
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fdd010>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_______ test_native_identity_paused_page_binds_original_epoch[recovery] ________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_paused_pa2')
+change = 'recovery'
+
+    @pytest.mark.parametrize('change',['local','external','recovery'])
+    def test_native_identity_paused_page_binds_original_epoch(tmp_path,change):
+        import sqlite3
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4931b410>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[overlap] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad46e039e0>
+damage = 'overlap'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49434710>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[future-start] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad4893a0f0>
+damage = 'future-start'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe0710>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[huge-path] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad48938ce0>
+damage = 'huge-path'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad495f6c30>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[huge-checksum] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad47ffd1f0>
+damage = 'huge-checksum'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4975da30>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[descriptor] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad4806d5b0>
+damage = 'descriptor'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914dac0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[owner-node] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad48689e80>
+damage = 'owner-node'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad49437890>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[group-node] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad488c2f30>
+damage = 'group-node'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4a20bec0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_ test_native_identity_invalid_metadata_and_proofs_reject_before_decode[future-allocator] _
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_invalid_m7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad494e28a0>
+damage = 'future-allocator'
+
+    @pytest.mark.parametrize('damage',['overlap','future-start','huge-path','huge-checksum','descriptor','owner-node','group-node','future-allocator'])
+    def test_native_identity_invalid_metadata_and_proofs_reject_before_decode(tmp_path,monkeypatch,damage):
+        from ate_sim import persistence_proof_scope as scopes
+        from ate_sim.persistence_proof_occurrence import OwnerScope,GroupScope
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe0170>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+____________ test_native_identity_scope_cache_cannot_hide_omission _____________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_scope_cac0')
+
+    def test_native_identity_scope_cache_cannot_hide_omission(tmp_path):
+        from ate_sim.persistence_validation_scope import checked_read_operation
+>       path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+                                      ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48610050>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+______ test_native_identity_reads_fetch_no_owner_or_archive_bodies[1000] _______
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_reads_fet0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad4806c7d0>
+record_property = <function record_property.<locals>.append_property at 0x7fad48f23060>
+size = 1000
+
+    @pytest.mark.parametrize('size',[1000,10000])
+    def test_native_identity_reads_fetch_no_owner_or_archive_bodies(tmp_path,monkeypatch,record_property,size):
+        import sqlite3,time
+        from ate_sim import persistence_proof_publication as content
+        path,pair=fixture(tmp_path,size=size)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4a112600>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+______ test_native_identity_reads_fetch_no_owner_or_archive_bodies[10000] ______
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_reads_fet1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fad49019310>
+record_property = <function record_property.<locals>.append_property at 0x7fad4902a2a0>
+size = 10000
+
+    @pytest.mark.parametrize('size',[1000,10000])
+    def test_native_identity_reads_fetch_no_owner_or_archive_bodies(tmp_path,monkeypatch,record_property,size):
+        import sqlite3,time
+        from ate_sim import persistence_proof_publication as content
+        path,pair=fixture(tmp_path,size=size)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad48fe0dd0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+___ test_native_identity_group_pagination_and_owner_deletion_restore_aliases ___
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_group_pag0')
+
+    def test_native_identity_group_pagination_and_owner_deletion_restore_aliases(tmp_path):
+        from ate_sim.skills import SkillHistory
+        def configure(w):
+            shared=list(range(8));w.skills.skills.clear()
+            for i in range(132):w.skills.skills[i,'craft']=SkillHistory(i,'craft',provenance=shared)
+        path,pair=fixture(tmp_path,configure=configure)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914f260>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+_________ test_native_identity_publisher_callback_cannot_read_staging __________
+
+tmp_path = PosixPath('/tmp/ate-native-identity-extended/test_native_identity_publisher0')
+
+    def test_native_identity_publisher_callback_cannot_read_staging(tmp_path):
+        from ate_sim.incremental_store import StoreError
+        path,pair=fixture(tmp_path)
+>       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world_session.py:11: in opened
+    def opened(path,pair):return api().open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1])
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:218: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18327: in open_lazy_world_session
+    session._activate_checked_identity_catalog()
+simulation/ate_sim/persistence_lazy.py:11037: in _activate_checked_identity_catalog
+    bridge.synchronize_packed_actions()
+simulation/ate_sim/persistence_lazy_world_identity.py:260: in synchronize_packed_actions
+    changes = coord._owner_changes(owner, ())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:687: in read_owner_identity
+    for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1869: in iter_identity_occurrences_for_owner
+    yield from iter_occurrences(self,authority,pin,OwnerScope(namespace,encoded_key))
+simulation/ate_sim/persistence_proof_native_identity.py:168: in iterator
+    if store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1',(*args,pin.captured_head)).fetchone():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fad4914c8c0>
+args = ('SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY ate_occurrence_owner_closed WHERE owner_namespace=? AND owner_key=? AND valid_to>? LIMIT 1', ('world.agency.actions', b'["str","__packed__"]', 0))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: ate_occurrence_owner_closed
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[missing-point]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[missing-owner]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[missing-group]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[moved-point]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[moved-owner]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[moved-group]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[extra-point]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[extra-owner]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[extra-group]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[future-point]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[future-owner]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_rejects_coherent_placement_forgeries[future-group]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_allocator_rejects_checksum_consistent_number_change
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_shapes_aliases_absence_and_snapshot_release
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[state-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[state-unknown]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[state-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[point-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[point-unknown]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[point-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[owner-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[owner-unknown]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[owner-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[group-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[group-unknown]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[group-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[empty-foreign]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[empty-unknown]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_checks_actual_caller_pin[empty-released]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_paused_page_binds_original_epoch[local]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_paused_page_binds_original_epoch[external]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_paused_page_binds_original_epoch[recovery]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[overlap]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[future-start]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[huge-path]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[huge-checksum]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[descriptor]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[owner-node]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[group-node]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_invalid_metadata_and_proofs_reject_before_decode[future-allocator]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_scope_cache_cannot_hide_omission
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_reads_fetch_no_owner_or_archive_bodies[1000]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_reads_fetch_no_owner_or_archive_bodies[10000]
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_group_pagination_and_owner_deletion_restore_aliases
+FAILED simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_publisher_callback_cannot_read_staging
+45 failed in 85.68s (0:01:25)

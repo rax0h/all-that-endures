@@ -28,6 +28,8 @@ Create simulation/ate_sim/persistence_proof_native_identity.py and tests/test_st
 
 ## Task2: Review and publication
 
-- [ ]1k/10k physical no-body instrumentation; long pages and exact generated-year eager/fresh/source-immutability checks.
+- [x]1k/10k physical no-body instrumentation; long pages and exact generated-year eager/fresh/source-immutability checks.
 - [x] One independent final review; all findings closed in consolidated register, preserve raw history.
 - [ ] Final source pin/fingerprints/workflow tests/clean launcher, exact local/API tree mapping and one bundled full/proof publication; verify both start.
+
+Final runtime342regression/33launcher and canonical raw+diagnostic eager/fresh/hash/zero-save-audit pass. Independent46product+13probes, no actionable finding or deferred Minor. Reviewed sources match; runtimefddeb830, local60d471a/API2f01534 equal complete source tree4a181250. One bundled publication prepared; hosted completion remains pending.

@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="14" skipped="0" tests="14" time="18.190" timestamp="2026-11-06T07:13:27.623738-06:00" hostname="3c11f4fcee17"><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[missing-point]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.443"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266d7e510&gt;
+api = 'point', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[missing-owner]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.149"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb267842f30&gt;
+api = 'owner', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[missing-group]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.215"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266b76ba0&gt;
+api = 'group', damage = 'missing'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[moved-point]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.191"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266ac88c0&gt;
+api = 'point', damage = 'moved'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[moved-owner]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.186"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c4')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266abfda0&gt;
+api = 'owner', damage = 'moved'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[moved-group]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.076"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266a04bc0&gt;
+api = 'group', damage = 'moved'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[extra-point]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.129"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c6')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266e6be90&gt;
+api = 'point', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[extra-owner]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.085"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c7')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266abf4a0&gt;
+api = 'owner', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[extra-group]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.106"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c8')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266915910&gt;
+api = 'group', damage = 'extra'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[future-point]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.120"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c9')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266a41790&gt;
+api = 'point', damage = 'future'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[future-owner]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.254"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c10')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266b6b1a0&gt;
+api = 'owner', damage = 'future'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_rejects_coherent_placement_forgeries[future-group]" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="12" time="1.409"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_rejects_c11')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb266b763c0&gt;
+api = 'group', damage = 'future'
+
+    @pytest.mark.parametrize('api',['point','owner','group'])
+    @pytest.mark.parametrize('damage',['missing','moved','extra','future'])
+    def test_native_identity_rejects_coherent_placement_forgeries(tmp_path,monkeypatch,api,damage):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            key=store.codec.encode((1,'craft'));encoded=store.codec.encode(PATH)
+            inc,start,end,_=store._visible_identity_occurrence(0,NS,key,encoded)
+            original_inc=inc
+            if damage=='missing':store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',(NS,key,encoded))
+            elif damage in ('moved','future'):
+                if damage=='moved':inc=inc+1 if inc+1&lt;store.read_identity_state(session.pin) else 1
+                else:end=1
+                store.db.execute('UPDATE lazy_identity_occurrence_versions SET incarnation_id=?,valid_to=?,row_checksum=? WHERE owner_namespace=? AND owner_key=? AND occurrence_path=?',
+                    (inc,end,_identity_occurrence_checksum(NS,key,encoded,inc,start,end),NS,key,encoded))
+            else:
+                encoded=store.codec.encode((('field','forged'),))
+                store.db.execute('INSERT INTO lazy_identity_occurrence_versions VALUES(?,?,?,?,?,?,?)',
+                    (NS,key,encoded,inc,0,None,_identity_occurrence_checksum(NS,key,encoded,inc,0,None)))
+            store.db.commit();reset_epoch(store)
+            if api=='point':read=lambda:store._visible_identity_occurrence(0,NS,key,encoded)
+            elif api=='owner':read=lambda:store.identity_occurrences_for_owner(session.pin,NS,(1,'craft'))
+            else:read=lambda:store.identity_occurrences_for_incarnation(session.pin,original_inc)
+&gt;           with pytest.raises(StoreIntegrityError):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:35: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_allocator_rejects_checksum_consistent_number_change" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="39" time="1.444"><failure message="Failed: DID NOT RAISE StoreIntegrityError">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_allocator_rejects_0')
+
+    def test_native_allocator_rejects_checksum_consistent_number_change(tmp_path):
+        path,pair=fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            n,start,end=store._identity_state_at(0)
+            store.db.execute('UPDATE lazy_identity_state SET next_incarnation_id=?,row_checksum=?',(n+1,_identity_state_checksum(n+1,start,end)));store.db.commit();reset_epoch(store)
+&gt;           with pytest.raises(StoreIntegrityError):store.read_identity_state(session.pin)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:45: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_native_identity" name="test_native_identity_shapes_aliases_absence_and_snapshot_release" file="simulation/tests/test_stage_0_6_proof_native_identity.py" line="48" time="1.693"><failure message="sqlite3.OperationalError: cannot start a transaction within a transaction">tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_shapes_al0')
+
+    def test_native_identity_shapes_aliases_absence_and_snapshot_release(tmp_path):
+        path,pair=fixture(tmp_path)
+        with opened(path,pair) as s:
+            st=s.store;row=st.read_identity_occurrence(s.pin,NS,(1,'craft'),PATH);inc=row.incarnation_id
+            assert s.skills[1,'craft'].provenance is s.skills[2,'craft'].provenance
+            assert (PATH,inc) in st.identity_occurrences_for_owner(s.pin,NS,(1,'craft'))
+            assert (NS,(1,'craft'),PATH) in st.identity_occurrences_for_incarnation(s.pin,inc)
+            assert st.identity_occurrences_for_owner(s.pin,NS,(99,'craft'))==()
+            assert st.identity_occurrences_for_incarnation(s.pin,st.read_identity_state(s.pin)+99)==()
+            it=st.iter_identity_occurrences_for_incarnation(s.pin,inc);next(it)
+&gt;           assert not st.db.in_transaction
+E           assert not True
+E            +  where True = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7fb266c90d50&gt;.in_transaction
+E            +    where &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7fb266c90d50&gt; = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb2666622a0&gt;.db
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:59: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/ate-native-identity-red/test_native_identity_shapes_al0')
+
+    def test_native_identity_shapes_aliases_absence_and_snapshot_release(tmp_path):
+        path,pair=fixture(tmp_path)
+&gt;       with opened(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_identity.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18024: in close
+    self._release_publisher_pin()
+simulation/ate_sim/persistence_lazy.py:17997: in _release_publisher_pin
+    self._backing_dependencies.close(abandon_stale=self._state == 'stale')
+simulation/ate_sim/persistence_history_dependencies.py:229: in close
+    self.store.release_pin(self.pin)
+simulation/ate_sim/persistence_lazy_store.py:1202: in release_pin
+    self.release_pins((pin,), cleanup_budget=cleanup_budget)
+simulation/ate_sim/persistence_lazy_store.py:1220: in release_pins
+    self.db.execute("BEGIN IMMEDIATE")
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fb26683ca70&gt;
+args = ('BEGIN IMMEDIATE',), kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: cannot start a transaction within a transaction
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError</failure></testcase></testsuite></testsuites>

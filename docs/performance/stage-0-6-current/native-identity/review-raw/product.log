@@ -1,0 +1,13 @@
+..............................................                           [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_reads_fetch_no_owner_or_archive_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_reads_fetch_no_owner_or_archive_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_identity.py:155: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope
+  simulation/tests/test_stage_0_6_proof_native_identity.py:214: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope(tmp_path,monkeypatch,record_property):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+46 passed, 3 warnings in 109.01s (0:01:49)
