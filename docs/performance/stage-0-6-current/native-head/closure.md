@@ -26,3 +26,11 @@ rank-neighbor global sorted selection, event/retirement prefix enumeration,
 and raw metadata-reader consumers still require separate coverage. Current
 full audited opening remains mandatory. No mature timing, default promotion,
 main merge or endurance claim. Hosted CI must pass for completion.
+
+Follow-up review correction: the shared `_read_snapshot_start` opener
+previously called `_checked_head_row` before the specific `head_metadata`
+comparison. It now passes the existing accepted manifest to that same row
+check before decoding, including all native snapshot entrypoints. This
+prevents a checksum-consistent forged row from reaching a codec before the
+accepted comparison, while non-proof and admission reads retain their
+original behavior. The new coherent-tamper tests cover this exact order.

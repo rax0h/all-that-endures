@@ -1297,7 +1297,11 @@ class LazyRecordStore:
             if _preflight is not None:
                 _preflight()
             generation = self._require_pin(pin)
-            head = int(self._checked_head_row()[0])
+            # Read-head validation must precede codec decoding even during the
+            # shared snapshot opener; head_metadata alone would be too late.
+            head = int(self._checked_head_row(
+                expected_manifest=authority.pair[0] if authority is not None else None
+            )[0])
             floor = self._validated_retention_floor(head)
             if generation < floor or generation > head:
                 raise StoreConflictError("generation pin is outside retained visibility")
