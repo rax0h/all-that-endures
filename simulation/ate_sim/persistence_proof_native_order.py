@@ -10,6 +10,7 @@ from .persistence_proof_nodes import Root
 from .persistence_proof_order import query_order_key
 from .persistence_proof_seek import OrderedSeekMap,MAX_KEY_BYTES as SEEK_KEY_BYTES
 from .persistence_sqlite_guard import require_persistent_sources
+from .persistence_proof_native_window import scalar_fields as _order_fields,physical_window
 from . import persistence_proof_native_sources as sources
 from . import persistence_proof_collection_directory as directory
 from . import persistence_proof_collection as collection
@@ -79,14 +80,6 @@ def _state(store,generation,namespace,child):
         raise StoreIntegrityError('native state differs from accepted collection')
     return count,next_id,start,end
 
-def _order_fields(prefix=''):
-    ordinal,start,end,checksum=(prefix+n for n in ('ordinal','valid_from','valid_to','row_checksum'))
-    return (f"CASE WHEN typeof({ordinal})='integer' THEN {ordinal} END,"
-        f"CASE WHEN typeof({start})='integer' THEN {start} END,"
-        f"CASE WHEN typeof({end})='integer' THEN {end} END,typeof({end}),"
-        f"CASE WHEN typeof({checksum})='text' AND length(CAST({checksum} AS BLOB))=64 THEN {checksum} END")
-
-
 def _check_order(namespace,typed,row,generation,child):
     ordinal,start,end,end_type,checksum=row
     if (child is None or type(ordinal) is not int or not 0<=ordinal<child.next_ordinal
@@ -124,7 +117,7 @@ def order_row(store,authority,generation,namespace,typed):
 def _positions(store,child,after,limit):
     if child is None:return (),True
     d=collection.domain(store.store_identity,store.codec.version,child.namespace)
-    m=OrderedSeekMap(store.db,d);positions=[];consumed=0;cursor=after
+    m=OrderedSeekMap(store.db,d);positions=[];consumed=len(child.namespace.encode());cursor=after
     for _ in range(limit+1):
         page=m.page(child.root,after=cursor,limit=1)
         if not page:return tuple(positions),True
@@ -148,45 +141,7 @@ def _physical_window(store,generation,namespace,after,limit,positions):
     if store.db.execute('SELECT 1 FROM lazy_order_versions INDEXED BY lazy_order_closed_generation WHERE namespace=? AND valid_to>? LIMIT 1',
             (namespace,generation)).fetchone():
         raise StoreIntegrityError('native current order has future closure')
-    where='namespace=? AND valid_to IS NULL'
-    args=[namespace]
-    if after is not None:
-        ordinal,typed=after
-        where+=' AND (ordinal,typed_key)>(?,?)';args.extend((ordinal,typed))
-    suffix=' FROM lazy_order_versions INDEXED BY lazy_order_current WHERE '+where+' ORDER BY lazy_order_versions.ordinal,lazy_order_versions.typed_key LIMIT ?'
-    args.append(limit)
-    sizes=store.db.execute("SELECT CASE WHEN typeof(typed_key)='blob' THEN length(typed_key) END,"+_order_fields()+suffix,args).fetchall()
-    store._metadata_rows+=len(sizes)
-    if any(type(row[0]) is not int or not 0<=row[0]<=MAX_KEY_BYTES for row in sizes):
-        raise StoreIntegrityError('invalid native order key metadata')
-    for _size,ordinal,start,end,end_type,checksum in sizes:
-        if (type(ordinal) is not int or ordinal<0 or type(start) is not int or not 0<=start<=generation
-                or end is not None or end_type!='null' or type(checksum) is not str):
-            raise StoreIntegrityError('invalid native order scalar metadata before materialization')
-    if sum(row[0]+128 for row in sizes)+sum(len(k)+128 for k,_o in positions)>MAX_METADATA_BYTES:
-        raise StoreError('native physical order window exceeds metadata budget')
-    # Materialize only this bounded indexed window before ranking it. Compare
-    # actual keys inside SQLite so even malformed/racing keys never enter Python.
-    expected_sql='VALUES '+','.join('(?,?,?)' for _ in positions) if positions else 'SELECT 0,NULL,NULL WHERE 0'
-    expected_args=[v for i,(key,ordinal) in enumerate(positions,1) for v in (i,key,ordinal)]
-    bounded=("CASE WHEN typeof(typed_key)='blob' AND length(typed_key)<=32760 THEN typed_key END AS typed_key,"
-        "CASE WHEN typeof(ordinal)='integer' THEN ordinal END AS ordinal,"
-        "CASE WHEN typeof(valid_from)='integer' THEN valid_from END AS valid_from,"
-        "CASE WHEN typeof(valid_to)='integer' THEN valid_to END AS valid_to,"
-        "CASE WHEN typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64 THEN row_checksum END AS row_checksum")
-    sql=('WITH physical AS MATERIALIZED (SELECT '+bounded+suffix+'),'
-        'ranked AS (SELECT row_number() OVER (ORDER BY ordinal,typed_key) AS slot,* FROM physical),'
-        'wanted(slot,typed,wanted_ordinal) AS ('+expected_sql+') '
-        'SELECT CASE WHEN r.typed_key=w.typed AND r.ordinal=w.wanted_ordinal THEN 1 ELSE 0 END,'+_order_fields('r.')+
-        ' FROM ranked AS r LEFT JOIN wanted AS w ON r.slot=w.slot ORDER BY r.slot')
-    captured=store.db.execute(sql,(*args,*expected_args)).fetchall()
-    rows=[]
-    for index,(matches,*row) in enumerate(captured):
-        if matches!=1 or index>=len(positions):
-            raise StoreIntegrityError('native physical order window differs from accepted collection')
-        rows.append((positions[index][0],*row))
-    store._query_rows+=len(rows)
-    return rows
+    return physical_window(store,generation,namespace,after,limit,positions,max_key_bytes=MAX_KEY_BYTES)
 
 
 def _checked_key(store,generation,namespace,typed):

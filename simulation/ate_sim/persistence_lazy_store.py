@@ -1537,13 +1537,18 @@ class LazyRecordStore:
         self, pin: GenerationPin, namespace: str, index_name: str, value: Any,
         *, limit: int | None = None, exclude_keys=(),
     ) -> tuple[tuple[Any, int], ...]:
-        """Checked ordered occurrence positions, with SQL-side limit/exclusion."""
+        """Checked ordered occurrence positions, with optional limit/exclusions."""
         self._ensure_open()
         _validate_namespace(namespace)
         if not isinstance(index_name, str) or not index_name or "\x00" in index_name:
             raise ValueError("index_name must be non-empty text")
         if limit is not None and (type(limit) is not int or limit < 0):
             raise ValueError('limit must be an exact nonnegative int or None')
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_query import memberships
+            return memberships(self,authority,pin,namespace,index_name,value,limit=limit,exclude_keys=exclude_keys)
         excluded = tuple(sorted({self.codec.encode(key) for key in exclude_keys}))
         exclusion_sql = (' AND record_key NOT IN (' + ','.join('?' for _ in excluded) + ')'
                          if excluded else '')
@@ -1637,6 +1642,12 @@ class LazyRecordStore:
         _validate_namespace(namespace)
         if type(index_name) is not str or not index_name or '\x00' in index_name:
             raise ValueError('invalid membership index name')
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_query import iter_memberships
+            yield from iter_memberships(self,authority,pin,namespace,index_name,value)
+            return
         encoded = self.codec.encode(value)
         generation = self._read_snapshot_start(pin)
         rows = None

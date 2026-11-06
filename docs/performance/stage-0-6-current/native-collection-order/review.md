@@ -27,3 +27,5 @@ One rerun (final-regression.log) was interrupted at17cases with no result/XML wh
 Final verification:239broader cases312.69s; exact committed source130source/order/session cases172.98s;33clean launcher/probe-driver cases15.68s; raw/diagnostic canonical year passes eager/fresh equality, source immutability and zero diagnostic save audits. All seven independent findings and six author/test findings are closed; no deferred findings. Runtime619141f1438ca658046187f8bbd65fcfc165cf80.
 
 | C1 hosted run42112687083 | Proof job passed; full suite hit135m timeout at96% with only passing indicators, exit124. Increase CI-only command/job limits to180m/195m and print each test node; preserve all4,694tests and application runtime/targets. | hosted-timeout/ raw logs, collection.log4,694collected3.64s, static.json YAML/bash/script-delta/source/fingerprint assertions | Configuration corrected; hosted full-suite gate pending |
+
+C1 hosted closure:replacement42148312728 both jobs pass,4,694tests+2subtests7,714.92s. The full hosted gate is now closed; no finding remains deferred.

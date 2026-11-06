@@ -35,3 +35,5 @@ Exact committed-source verification:130source/order/session cases passed172.98s 
 ## Hosted run42112687083 disposition
 
 Proof-map passed. The full suite was censored by its135-minute command timeout after96% plus further passing indicators, with no test failure reported. It is not green. The same-runtime correction in hosted-timeout/ allows180command minutes within195job minutes and emits per-test node progress; all4,694tests remain selected. Runtime619141f and mature latency targets are unchanged. YAML/Bash, exact script delta, source/fingerprint equality and collection checks pass; replacement hosted completion remains pending.
+
+Hosted gate closed:2fc836a/run42148312728 verified both jobs successful.4,694tests plus2subtests passed7,714.92s (one deliberate duplicate-ZIP warning). Runtime619141f unchanged by timeout correction. Receipt green-42148312728.json. Continue native query read coverage.

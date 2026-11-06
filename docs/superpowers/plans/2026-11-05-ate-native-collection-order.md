@@ -27,6 +27,8 @@ Interfaces: authority.read_components is the five accepted component pairs from 
 
 - [x] Retained1k/10k no-unrelated-body controls with physical selection instrumentation and measured page/source work. No mature claim.
 - [x] One independent whole-package review, author RED→GREEN corrections of every finding including Minor, one register/raw history.
-- [ ] Runtime pin/fingerprints, clean launcher and canonical-year eager/fresh checks; exact local/API source tree mapping; one full/proof CI publication. Record remaining query/identity/raw-consumer gate explicitly.
+- [x] Runtime pin/fingerprints, clean launcher and canonical-year eager/fresh checks; exact local/API source tree mapping; one full/proof CI publication. Record remaining query/identity/raw-consumer gate explicitly.
 
 Final source dd4d400/API5e7495d, identical full tree517200d, runtime619141f.239broader/130exact-source/33launcher checks pass; canonical raw+diagnostic eager/fresh/zero-audit checks pass. Publication prepared as one evidence child; hosted completion remains gated on that exact run. All review findings including Minor are closed in native-collection-order/review.md.
+
+Hosted closure:2fc836a/run42148312728 both jobs verified green4,694tests+2subtests7,714.92s. All package gates closed.
