@@ -1,0 +1,12 @@
+{
+  "source": "53ed4842965ab250671aa7fc4a1626c7b52bce0a",
+  "sha256": {
+    "simulation/ate_sim/persistence_proof_native_sources.py": "5ceab732806f3df99d6ae28f95ecd15b900594801323eb4484d3c8075cfe9eab",
+    "simulation/ate_sim/persistence_proof_native_roster.py": "68dcd8978f46aa066cc64983e46b0f09a14b127ef81fcfaab43f1ae153343a69",
+    "simulation/tests/test_stage_0_6_proof_native_sources.py": "bf037d7a86c22ed78487c552c4503a9fa468e382d8b95aa4bb0b121fe2ac8d8d",
+    "simulation/tests/test_stage_0_6_proof_native_roster.py": "9ae87b963be073dcff06c8b920f39748cd32d46b04de482bee25f3564d82fae2",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "17dc1aafaa4adef1f18b04f36cd860776a14e45b094f44c27f0cbd2a92b5c94d",
+    "simulation/stage_0_6_benchmark_launch.json": "3859ae3bf6994fb5e24a470088caab75190c449e6c4bcadcdcfe59d70a441870"
+  },
+  "unchanged_from_independent_review": true
+}

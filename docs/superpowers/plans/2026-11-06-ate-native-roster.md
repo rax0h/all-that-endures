@@ -25,10 +25,11 @@ Create persistence_proof_native_roster.py and tests/test_stage_0_6_proof_native_
 Interfaces: expected_count(store,authority,manifest,namespace)->int, check_count(...)->int; consume manifest.head.namespace_counts, _namespace_counts and closed metadata codec; existing record_rows context retains shapes and actual-body _record validation.
 - [x] RED missing/extra/compensated/head-forged native roster reads and positive empty/shape controls.
 - [x] Implement closed accepted count metadata and physical count before body selection; verify final observed count.
-- [ ] GREEN extended metadata/cache/snapshot/recovery/segment and public catalog entrypoint tamper/alias tests; relevant native regression.
+- [x] GREEN extended metadata/cache/snapshot/recovery/segment and public catalog entrypoint tamper/alias tests; relevant native regression.
 
 ## Task2: Review and publication
 
-- [ ] Catalog seam-to-authority coverage table plus explicit remaining raw-consumer gate;1k/10k physical no-unrelated-body controls.
-- [ ] One independent whole-package review, close all findings including Minor and preserve raw history.
-- [ ] Final source pin/fingerprints/workflow tests/clean launcher/canonical eager+fresh checks, exact local/API tree mapping, one full/proof publication and verify start.
+- [x] Catalog seam-to-authority coverage table plus explicit remaining raw-consumer gate;1k/10k physical no-unrelated-body controls.
+- [x] One independent whole-package review, close all findings including Minor and preserve raw history.
+- [x] Final source pin/fingerprints/workflow tests/clean launcher/canonical eager+fresh checks, exact local/API tree mapping, one full/proof publication prepared.
+- [ ] Hosted full/proof completion.

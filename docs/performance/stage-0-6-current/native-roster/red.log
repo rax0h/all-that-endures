@@ -1,0 +1,239 @@
+F..FFF.F......F........F...                                              [100%]
+=================================== FAILURES ===================================
+_ test_native_ordinary_roster_rejects_coherent_missing_extra_and_head_forgery[missing] _
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_ordinary_roster_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f693ff595e0>
+damage = 'missing'
+
+    @pytest.mark.parametrize('damage',['missing','extra','compensated','head-count'])
+    def test_native_ordinary_roster_rejects_coherent_missing_extra_and_head_forgery(tmp_path,monkeypatch,damage):
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            if damage in ('missing','compensated','head-count'):st.db.execute('DELETE FROM records WHERE namespace=?',(NS,))
+            payload=st.codec.encode((0,999));key=st.codec.encode(99)
+            if damage in ('extra','compensated'):
+                st.db.execute('INSERT INTO records VALUES(?,?,?,?,?,?,?)',(NS,key,payload,_record_checksum(NS,key,1,st.codec.version,0,payload),st.codec.version,1,0))
+            if damage=='head-count':
+                row=list(st._checked_head_row());counts=st.codec.decode(row[6]);counts.pop(NS);row[6]=st.codec.encode(counts)
+                st.db.execute('UPDATE save_head SET namespace_counts=?,head_checksum=?',(row[6],_head_checksum(*row[:7])))
+            st.db.commit();reset_epoch(st);decode=st.codec.decode;seen=[]
+            def observed(raw):
+                if raw==payload:seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(st.codec,'decode',observed)
+>           with pytest.raises(StoreIntegrityError):st.read_records(NS)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:27: Failed
+_ test_native_ordinary_roster_rejects_coherent_missing_extra_and_head_forgery[head-count] _
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_ordinary_roster_re3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f693f133f50>
+damage = 'head-count'
+
+    @pytest.mark.parametrize('damage',['missing','extra','compensated','head-count'])
+    def test_native_ordinary_roster_rejects_coherent_missing_extra_and_head_forgery(tmp_path,monkeypatch,damage):
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            if damage in ('missing','compensated','head-count'):st.db.execute('DELETE FROM records WHERE namespace=?',(NS,))
+            payload=st.codec.encode((0,999));key=st.codec.encode(99)
+            if damage in ('extra','compensated'):
+                st.db.execute('INSERT INTO records VALUES(?,?,?,?,?,?,?)',(NS,key,payload,_record_checksum(NS,key,1,st.codec.version,0,payload),st.codec.version,1,0))
+            if damage=='head-count':
+                row=list(st._checked_head_row());counts=st.codec.decode(row[6]);counts.pop(NS);row[6]=st.codec.encode(counts)
+                st.db.execute('UPDATE save_head SET namespace_counts=?,head_checksum=?',(row[6],_head_checksum(*row[:7])))
+            st.db.commit();reset_epoch(st);decode=st.codec.decode;seen=[]
+            def observed(raw):
+                if raw==payload:seen.append(True)
+                return decode(raw)
+            monkeypatch.setattr(st.codec,'decode',observed)
+>           with pytest.raises(StoreIntegrityError):st.read_records(NS)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:27: Failed
+_______ test_native_roster_count_precedes_any_payload_selection[missing] _______
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_roster_count_prece0')
+damage = 'missing'
+
+    @pytest.mark.parametrize('damage',['missing','extra'])
+    def test_native_roster_count_precedes_any_payload_selection(tmp_path,damage):
+        import sqlite3
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            if damage=='missing':st.db.execute('DELETE FROM records WHERE namespace=?',(NS,))
+            else:
+                key=st.codec.encode(99);payload=st.codec.encode((0,0))
+                st.db.execute('INSERT INTO records VALUES(?,?,?,?,?,?,?)',(NS,key,payload,_record_checksum(NS,key,1,st.codec.version,0,payload),st.codec.version,1,0))
+            st.db.commit();reset_epoch(st);reads=[]
+            def authorize(action,table,column,database,source):
+                if action==sqlite3.SQLITE_READ and table=='records' and column=='payload':reads.append(True)
+                return sqlite3.SQLITE_OK
+            st.db.set_authorizer(authorize)
+>           with pytest.raises(StoreIntegrityError):st.read_records(NS)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:46: Failed
+________ test_native_roster_count_precedes_any_payload_selection[extra] ________
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_roster_count_prece1')
+damage = 'extra'
+
+    @pytest.mark.parametrize('damage',['missing','extra'])
+    def test_native_roster_count_precedes_any_payload_selection(tmp_path,damage):
+        import sqlite3
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            if damage=='missing':st.db.execute('DELETE FROM records WHERE namespace=?',(NS,))
+            else:
+                key=st.codec.encode(99);payload=st.codec.encode((0,0))
+                st.db.execute('INSERT INTO records VALUES(?,?,?,?,?,?,?)',(NS,key,payload,_record_checksum(NS,key,1,st.codec.version,0,payload),st.codec.version,1,0))
+            st.db.commit();reset_epoch(st);reads=[]
+            def authorize(action,table,column,database,source):
+                if action==sqlite3.SQLITE_READ and table=='records' and column=='payload':reads.append(True)
+                return sqlite3.SQLITE_OK
+            st.db.set_authorizer(authorize)
+            with pytest.raises(StoreIntegrityError):st.read_records(NS)
+>           assert not reads and not st.db.in_transaction
+E           assert (not [True, True, True])
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:47: AssertionError
+_________ test_native_roster_scope_cache_never_hides_physical_deletion _________
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_roster_scope_cache0')
+
+    def test_native_roster_scope_cache_never_hides_physical_deletion(tmp_path):
+        from ate_sim.persistence_validation_scope import checked_read_operation
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            with checked_read_operation(st,s.pin) as cache:
+                assert st.read_records(NS)==((0,(0,0),1),)
+                st.db.execute('DELETE FROM records WHERE namespace=?',(NS,));reset_epoch(st)
+>               with pytest.raises(StoreIntegrityError):st.read_records(NS)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:69: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[False-missing-records] _
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_byte_reads_reject_5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f693ef8d1f0>
+kind = 'records', damage = 'missing', busy = False
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    @pytest.mark.parametrize('busy', [False, True])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage, busy):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            store._world_proof_authority.epoch = store._world_proof_authority._epoch()
+            monkeypatch.setattr(store._world_proof_authority, 'busy', busy)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+>           with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:54: Failed
+_ test_native_byte_reads_reject_checksum_consistent_root_disagreement[True-missing-records] _
+
+tmp_path = PosixPath('/tmp/ate-native-roster-red/test_native_byte_reads_reject_14')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f693f11dd00>
+kind = 'records', damage = 'missing', busy = True
+
+    @pytest.mark.parametrize('kind', ['version', 'record', 'records'])
+    @pytest.mark.parametrize('damage', ['forged', 'missing', 'extra'])
+    @pytest.mark.parametrize('busy', [False, True])
+    def test_native_byte_reads_reject_checksum_consistent_root_disagreement(tmp_path, monkeypatch, kind, damage, busy):
+        path, pair = fixture(tmp_path)
+        session = opened(path, pair)
+        store = session.store
+        try:
+            ns = 'world.skills.skills' if kind == 'version' else 'world.year'
+            key = (1, 'craft') if kind == 'version' else 0
+            typed = store.codec.encode(key)
+            if kind == 'version':
+                old = store._visible_record_row(0, ns, typed)
+                start, end, payload, _, codec, schema, members, _ = old
+                value = replace(store.codec.decode(payload), level=.999)
+                payload = store.codec.encode(value)
+                if damage == 'extra':key = (99, 'craft');typed = store.codec.encode(key)
+                if damage == 'missing':
+                    store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO lazy_record_versions VALUES(?,?,?,?,?,?,?,?,?,?)',
+                        (ns, typed, start, end, payload, _framed_sha(b'lazy-payload-v1', payload), codec, schema, members,
+                         _version_checksum(ns, typed, schema, codec, start, end, members, payload)))
+                read = lambda:store.read_version(session.pin, ns, key, expected_record_schema=1)
+            else:
+                payload = store.codec.encode((0, 999))
+                if damage == 'extra':key = 99;typed = store.codec.encode(key)
+                if damage == 'missing':store.db.execute('DELETE FROM records WHERE namespace=? AND typed_key=?', (ns, typed))
+                else:
+                    store.db.execute('INSERT OR REPLACE INTO records VALUES(?,?,?,?,?,?,?)',
+                        (ns, typed, payload, _record_checksum(ns, typed, 1, store.codec.version, 0, payload), store.codec.version, 1, 0))
+                read = (lambda:store.read_records(ns, expected_record_schema=1)) if kind == 'records' else (
+                    lambda:store.read_record(ns, key, expected_record_schema=1))
+            store.db.commit()
+            # Isolate the root join from the coarse SQL epoch guard. Real callers
+            # still get the normal epoch rejection; no production bypass is added.
+            store._world_proof_authority.epoch = store._world_proof_authority._epoch()
+            monkeypatch.setattr(store._world_proof_authority, 'busy', busy)
+            decode = store.codec.decode
+            decoded_forgery = []
+            def checked(raw):
+                if raw == payload:decoded_forgery.append(True)
+                return decode(raw)
+            monkeypatch.setattr(store.codec, 'decode', checked)
+>           with pytest.raises(StoreIntegrityError, match='accepted.*source|source.*accepted'):read()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_6_proof_native_sources.py:54: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_ordinary_roster_rejects_coherent_missing_extra_and_head_forgery[missing]
+FAILED simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_ordinary_roster_rejects_coherent_missing_extra_and_head_forgery[head-count]
+FAILED simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_roster_count_precedes_any_payload_selection[missing]
+FAILED simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_roster_count_precedes_any_payload_selection[extra]
+FAILED simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_roster_scope_cache_never_hides_physical_deletion
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[False-missing-records]
+FAILED simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_byte_reads_reject_checksum_consistent_root_disagreement[True-missing-records]
+7 failed, 20 passed, 31 deselected in 82.11s (0:01:22)

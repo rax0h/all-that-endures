@@ -1,0 +1,34 @@
+........F                                                                [100%]
+=================================== FAILURES ===================================
+____ test_native_catalog_missing_header_and_source_cannot_become_new_owner _____
+
+tmp_path = PosixPath('/tmp/ate-native-roster-catalog-final/test_native_catalog_missing_he0')
+
+    def test_native_catalog_missing_header_and_source_cannot_become_new_owner(tmp_path):
+        from ate_sim.persistence_lazy_identity_catalog import IdentityCatalog,OWNER_NAMESPACE
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            owner=(NS,0);cat=IdentityCatalog(st)
+>           assert cat.read_owner_identity(s.pin,owner).exists
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy_identity_catalog.py:672: in read_owner_identity
+    header = self._owner(pin, owner)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:548: in _owner
+    placement_path(*owner, ())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+namespace = 'world.year', key = 0, path = ()
+
+    def placement_path(namespace, key, path):
+        if namespace not in IDENTITY_OWNER_FAMILIES:
+>           raise StoreFormatError(f'identity owner family is not registered: {namespace}')
+E           ate_sim.incremental_store.StoreFormatError: identity owner family is not registered: world.year
+
+simulation/ate_sim/persistence_lazy_identity_catalog.py:47: StoreFormatError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_catalog_missing_header_and_source_cannot_become_new_owner
+1 failed, 8 passed, 17 deselected in 27.52s

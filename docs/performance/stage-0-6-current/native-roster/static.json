@@ -1,0 +1,10 @@
+{
+  "status": "pass",
+  "runtime_tree": "757c3c3f5ea0f876d4a48c75af83e88b5a241bb6",
+  "python_syntax": true,
+  "workflow_yaml": true,
+  "workflow_bash_blocks": 21,
+  "roster_tests_in_proof_job": true,
+  "launcher_pin": true,
+  "all_fingerprints": true
+}

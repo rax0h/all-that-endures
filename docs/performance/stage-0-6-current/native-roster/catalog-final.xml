@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="9" time="27.523" timestamp="2026-11-06T11:57:58.592394-06:00" hostname="4bc302525d12"><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[descriptor]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="3.878" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[retired]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="3.023" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[owner]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="2.932" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[tree]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="2.674" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[group]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="2.670" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[link]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="2.816" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[placement]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="3.398" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_public_catalog_entrypoints_compose_accepted_native_authorities[membership]" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="86" time="2.978" /><testcase classname="simulation.tests.test_stage_0_6_proof_native_roster" name="test_native_catalog_missing_header_and_source_cannot_become_new_owner" file="simulation/tests/test_stage_0_6_proof_native_roster.py" line="122" time="2.711"><failure message="ate_sim.incremental_store.StoreFormatError: identity owner family is not registered: world.year">tmp_path = PosixPath('/tmp/ate-native-roster-catalog-final/test_native_catalog_missing_he0')
+
+    def test_native_catalog_missing_header_and_source_cannot_become_new_owner(tmp_path):
+        from ate_sim.persistence_lazy_identity_catalog import IdentityCatalog,OWNER_NAMESPACE
+        path,pair=fixture(tmp_path);s=opened(path,pair);st=s.store
+        try:
+            owner=(NS,0);cat=IdentityCatalog(st)
+&gt;           assert cat.read_owner_identity(s.pin,owner).exists
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_roster.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy_identity_catalog.py:672: in read_owner_identity
+    header = self._owner(pin, owner)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:548: in _owner
+    placement_path(*owner, ())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+namespace = 'world.year', key = 0, path = ()
+
+    def placement_path(namespace, key, path):
+        if namespace not in IDENTITY_OWNER_FAMILIES:
+&gt;           raise StoreFormatError(f'identity owner family is not registered: {namespace}')
+E           ate_sim.incremental_store.StoreFormatError: identity owner family is not registered: world.year
+
+simulation/ate_sim/persistence_lazy_identity_catalog.py:47: StoreFormatError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,4 @@
+PASS: record/segment pairs, absent namespace, six invalid count schemas and three blob guards
+PASS: accepted count metadata parsed once per scope; three physical COUNT checks for three reads
+PASS: missing link projection rejected through public warmed catalog: native query window misses accepted position
+All independent probes passed
