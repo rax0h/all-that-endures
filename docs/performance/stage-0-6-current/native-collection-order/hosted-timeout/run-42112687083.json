@@ -1,0 +1,26 @@
+{
+  "source": "37b763cc6afd7054842d0d6ed3fd07043af31222",
+  "runtime": "619141f1438ca658046187f8bbd65fcfc165cf80",
+  "run_id": 42112687083,
+  "proof_map": {
+    "job_id": 127544067167,
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "full_suite": {
+    "job_id": 127544066574,
+    "status": "completed",
+    "conclusion": "failure",
+    "cause": "135-minute timeout, exit124",
+    "last_printed_percent": 96,
+    "assertion_failures_reported": 0,
+    "limitation": "Censored run; no completed suite summary or JUnit XML. Do not call the full suite green."
+  },
+  "correction": {
+    "command_minutes": 180,
+    "job_minutes": 195,
+    "progress": "verbose per-test node IDs",
+    "test_selection": "simulation/tests (unchanged)",
+    "runtime_changed": false
+  }
+}

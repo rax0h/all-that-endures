@@ -144,7 +144,9 @@ jobs:
           if-no-files-found: error
   full-suite:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    # The last run passed every reported test but hit the 135m command cap at
+    # 96%. Keep the whole suite bounded, with room for current hosted variance.
+    timeout-minutes: 195
     steps:
       - uses: actions/checkout@v4
         with:
@@ -166,7 +168,7 @@ jobs:
           if git('status','--porcelain','--untracked-files=no'):raise ValueError('tracked execution source is dirty')
           r.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),python=platform.python_version(),sqlite=sqlite3.sqlite_version))
           PY
-          timeout --signal=TERM --kill-after=30s 135m python -m pytest -q simulation/tests --durations=30 -o junit_family=legacy --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
+          timeout --signal=TERM --kill-after=30s 180m python -m pytest -v simulation/tests --durations=30 -o junit_family=legacy --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:

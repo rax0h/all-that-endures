@@ -1,0 +1,484 @@
+﻿2026-11-05T21:26:43.0295698Z Current runner version: '2.338.2'
+2026-11-05T21:26:43.0320342Z ##[group]Runner Image Provisioner
+2026-11-05T21:26:43.0321610Z Hosted Compute Agent
+2026-11-05T21:26:43.0322198Z Version: 20261028.624
+2026-11-05T21:26:43.0322823Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-05T21:26:43.0323585Z Build Date: 2026-10-28T21:51:42Z
+2026-11-05T21:26:43.0324263Z Worker ID: {7c4a491f-3e11-4c35-a6be-3a020f5788a6}
+2026-11-05T21:26:43.0325158Z Region: centralus
+2026-11-05T21:26:43.0325710Z Cloud: Azure
+2026-11-05T21:26:43.0326234Z ##[endgroup]
+2026-11-05T21:26:43.0328071Z ##[group]Operating System
+2026-11-05T21:26:43.0328690Z Ubuntu
+2026-11-05T21:26:43.0329240Z 24.04.5
+2026-11-05T21:26:43.0329752Z LTS
+2026-11-05T21:26:43.0330266Z ##[endgroup]
+2026-11-05T21:26:43.0330837Z ##[group]Runner Image
+2026-11-05T21:26:43.0331442Z Image: ubuntu-24.04
+2026-11-05T21:26:43.0332003Z Version: 20261101.360.1
+2026-11-05T21:26:43.0333246Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-05T21:26:43.0334781Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-05T21:26:43.0336240Z ##[endgroup]
+2026-11-05T21:26:43.0337430Z ##[group]GITHUB_TOKEN Permissions
+2026-11-05T21:26:43.0339808Z Contents: read
+2026-11-05T21:26:43.0340511Z Metadata: read
+2026-11-05T21:26:43.0341121Z ##[endgroup]
+2026-11-05T21:26:43.0343198Z Secret source: Actions
+2026-11-05T21:26:43.0344407Z Cache mode: write
+2026-11-05T21:26:43.0345792Z Prepare workflow directory
+2026-11-05T21:26:43.0733722Z Prepare all required actions
+2026-11-05T21:26:43.0785952Z Getting action download info
+2026-11-05T21:26:43.3933350Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-05T21:26:43.5125584Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-05T21:26:43.5908859Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-05T21:26:43.7983903Z Complete job name: proof-map
+2026-11-05T21:26:43.8846575Z ##[group]Run actions/checkout@v4
+2026-11-05T21:26:43.8847390Z with:
+2026-11-05T21:26:43.8847844Z   ref: 37b763cc6afd7054842d0d6ed3fd07043af31222
+2026-11-05T21:26:43.8848430Z   repository: rax0h/all-that-endures
+2026-11-05T21:26:43.8852197Z   token: ***
+2026-11-05T21:26:43.8852609Z   ssh-strict: true
+2026-11-05T21:26:43.8853027Z   ssh-user: git
+2026-11-05T21:26:43.8853446Z   persist-credentials: true
+2026-11-05T21:26:43.8853907Z   clean: true
+2026-11-05T21:26:43.8854327Z   sparse-checkout-cone-mode: true
+2026-11-05T21:26:43.8854818Z   fetch-depth: 1
+2026-11-05T21:26:43.8855439Z   fetch-tags: false
+2026-11-05T21:26:43.8855855Z   show-progress: true
+2026-11-05T21:26:43.8856263Z   lfs: false
+2026-11-05T21:26:43.8856652Z   submodules: false
+2026-11-05T21:26:43.8857073Z   set-safe-directory: true
+2026-11-05T21:26:43.8857545Z   allow-unsafe-pr-checkout: false
+2026-11-05T21:26:43.8858276Z env:
+2026-11-05T21:26:43.8858703Z   PYTHONPATH: .:simulation
+2026-11-05T21:26:43.8859183Z   PYTHONUNBUFFERED: 1
+2026-11-05T21:26:43.8859614Z ##[endgroup]
+2026-11-05T21:26:44.1935919Z Syncing repository: rax0h/all-that-endures
+2026-11-05T21:26:44.1938176Z ##[group]Getting Git version info
+2026-11-05T21:26:44.1938957Z Working directory is '/home/runner/work/all-that-endures/all-that-endures'
+2026-11-05T21:26:44.1940546Z [command]/usr/bin/git version
+2026-11-05T21:26:44.2057068Z git version 2.56.0
+2026-11-05T21:26:44.2078048Z ##[endgroup]
+2026-11-05T21:26:44.2093567Z Temporarily overriding HOME='/home/runner/work/_temp/e041831b-e294-4ff4-b09e-823deb73ee7e' before making global git config changes
+2026-11-05T21:26:44.2096128Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-05T21:26:44.2098472Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/all-that-endures/all-that-endures
+2026-11-05T21:26:44.2178235Z Deleting the contents of '/home/runner/work/all-that-endures/all-that-endures'
+2026-11-05T21:26:44.2180850Z ##[group]Initializing the repository
+2026-11-05T21:26:44.2182380Z [command]/usr/bin/git init /home/runner/work/all-that-endures/all-that-endures
+2026-11-05T21:26:44.2297394Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-05T21:26:44.2298508Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-05T21:26:44.2299466Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-05T21:26:44.2300246Z hint: call:
+2026-11-05T21:26:44.2300717Z hint:
+2026-11-05T21:26:44.2301308Z hint: 	git config --global init.defaultBranch <name>
+2026-11-05T21:26:44.2301975Z hint:
+2026-11-05T21:26:44.2302598Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-05T21:26:44.2303541Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-05T21:26:44.2304312Z hint:
+2026-11-05T21:26:44.2304784Z hint: 	git branch -m <name>
+2026-11-05T21:26:44.2305704Z hint:
+2026-11-05T21:26:44.2306567Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-05T21:26:44.2316807Z Initialized empty Git repository in /home/runner/work/all-that-endures/all-that-endures/.git/
+2026-11-05T21:26:44.2331515Z [command]/usr/bin/git remote add origin https://github.com/rax0h/all-that-endures
+2026-11-05T21:26:44.2385886Z ##[endgroup]
+2026-11-05T21:26:44.2389506Z ##[group]Disabling automatic garbage collection
+2026-11-05T21:26:44.2390575Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-05T21:26:44.2425677Z ##[endgroup]
+2026-11-05T21:26:44.2427203Z ##[group]Setting up auth
+2026-11-05T21:26:44.2433153Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-05T21:26:44.2470724Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-05T21:26:44.2905925Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-05T21:26:44.2951186Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-05T21:26:44.3219161Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-05T21:26:44.3264828Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-05T21:26:44.3492618Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-05T21:26:44.3540157Z ##[endgroup]
+2026-11-05T21:26:44.3541604Z ##[group]Fetching the repository
+2026-11-05T21:26:44.3553961Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 37b763cc6afd7054842d0d6ed3fd07043af31222
+2026-11-05T21:26:45.4064815Z From https://github.com/rax0h/all-that-endures
+2026-11-05T21:26:45.4066977Z  * branch            37b763cc6afd7054842d0d6ed3fd07043af31222 -> FETCH_HEAD
+2026-11-05T21:26:45.4102766Z ##[endgroup]
+2026-11-05T21:26:45.4104143Z ##[group]Determining the checkout info
+2026-11-05T21:26:45.4106097Z ##[endgroup]
+2026-11-05T21:26:45.4107055Z [command]/usr/bin/git sparse-checkout disable
+2026-11-05T21:26:45.4165926Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-05T21:26:45.4211215Z ##[group]Checking out the ref
+2026-11-05T21:26:45.4213364Z [command]/usr/bin/git checkout --progress --force 37b763cc6afd7054842d0d6ed3fd07043af31222
+2026-11-05T21:26:45.6595683Z Note: switching to '37b763cc6afd7054842d0d6ed3fd07043af31222'.
+2026-11-05T21:26:45.6596589Z 
+2026-11-05T21:26:45.6597181Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-05T21:26:45.6598485Z changes and commit them, and you can discard any commits you make in this
+2026-11-05T21:26:45.6600007Z state without impacting any branches by switching back to a branch.
+2026-11-05T21:26:45.6600701Z 
+2026-11-05T21:26:45.6601227Z If you want to create a new branch to retain commits you create, you may
+2026-11-05T21:26:45.6602451Z do so (now or later) by using -c with the switch command. Example:
+2026-11-05T21:26:45.6603157Z 
+2026-11-05T21:26:45.6603480Z   git switch -c <new-branch-name>
+2026-11-05T21:26:45.6604026Z 
+2026-11-05T21:26:45.6604340Z Or undo this operation with:
+2026-11-05T21:26:45.6604812Z 
+2026-11-05T21:26:45.6605509Z   git switch -
+2026-11-05T21:26:45.6605972Z 
+2026-11-05T21:26:45.6606620Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-05T21:26:45.6607564Z 
+2026-11-05T21:26:45.6608333Z HEAD is now at 37b763c Record native collection-order review closure and source verification
+2026-11-05T21:26:45.6617019Z ##[endgroup]
+2026-11-05T21:26:45.6670372Z [command]/usr/bin/git log -1 --format=%H
+2026-11-05T21:26:45.6701843Z 37b763cc6afd7054842d0d6ed3fd07043af31222
+2026-11-05T21:26:45.7149237Z ##[group]Run actions/setup-python@v5
+2026-11-05T21:26:45.7150366Z with:
+2026-11-05T21:26:45.7151210Z   python-version: 3.12
+2026-11-05T21:26:45.7152149Z   check-latest: false
+2026-11-05T21:26:45.7161316Z   token: ***
+2026-11-05T21:26:45.7162225Z   update-environment: true
+2026-11-05T21:26:45.7163226Z   allow-prereleases: false
+2026-11-05T21:26:45.7164225Z   freethreaded: false
+2026-11-05T21:26:45.7165319Z env:
+2026-11-05T21:26:45.7166152Z   PYTHONPATH: .:simulation
+2026-11-05T21:26:45.7167132Z   PYTHONUNBUFFERED: 1
+2026-11-05T21:26:45.7168031Z ##[endgroup]
+2026-11-05T21:26:45.8490141Z ##[group]Installed versions
+2026-11-05T21:26:45.8599727Z (node:2380) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-05T21:26:45.8603686Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-05T21:26:45.8606418Z Successfully set up CPython (3.12.16)
+2026-11-05T21:26:45.8609264Z ##[endgroup]
+2026-11-05T21:26:45.8798277Z ##[group]Run python -m pip install pytest pyyaml
+2026-11-05T21:26:45.8799822Z [36;1mpython -m pip install pytest pyyaml[0m
+2026-11-05T21:26:45.8846123Z shell: /usr/bin/bash -e {0}
+2026-11-05T21:26:45.8847786Z env:
+2026-11-05T21:26:45.8849029Z   PYTHONPATH: .:simulation
+2026-11-05T21:26:45.8850010Z   PYTHONUNBUFFERED: 1
+2026-11-05T21:26:45.8851112Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:45.8852721Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-05T21:26:45.8854314Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:45.8856052Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:45.8857519Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:45.8859005Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-05T21:26:45.8860257Z ##[endgroup]
+2026-11-05T21:26:47.2269888Z Collecting pytest
+2026-11-05T21:26:47.3054045Z   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+2026-11-05T21:26:47.3624954Z Collecting pyyaml
+2026-11-05T21:26:47.3730075Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-11-05T21:26:47.3953771Z Collecting iniconfig>=2 (from pytest)
+2026-11-05T21:26:47.4060309Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-11-05T21:26:47.4350749Z Collecting packaging>=24 (from pytest)
+2026-11-05T21:26:47.4461377Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-11-05T21:26:47.4723930Z Collecting pluggy<2,>=1.6 (from pytest)
+2026-11-05T21:26:47.4834059Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-11-05T21:26:47.5145568Z Collecting pygments>=2.15 (from pytest)
+2026-11-05T21:26:47.5256531Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-11-05T21:26:47.5407767Z Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+2026-11-05T21:26:47.5850964Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-11-05T21:26:47.5974289Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-11-05T21:26:47.6126871Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 47.4 MB/s  0:00:00
+2026-11-05T21:26:47.6231529Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-11-05T21:26:47.6355008Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-11-05T21:26:47.6485944Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-11-05T21:26:47.6563727Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 190.6 MB/s  0:00:00
+2026-11-05T21:26:47.7196451Z Installing collected packages: pyyaml, pygments, pluggy, packaging, iniconfig, pytest
+2026-11-05T21:26:48.8931526Z 
+2026-11-05T21:26:48.8951219Z Successfully installed iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 pyyaml-6.0.3
+2026-11-05T21:26:48.8963449Z 
+2026-11-05T21:26:48.8963754Z [notice] A new release of pip is available: 26.2.2 -> 26.3
+2026-11-05T21:26:48.8964153Z [notice] To update, run: pip install --upgrade pip
+2026-11-05T21:26:48.9431561Z ##[group]Run set -euo pipefail
+2026-11-05T21:26:48.9431897Z [36;1mset -euo pipefail[0m
+2026-11-05T21:26:48.9432129Z [36;1mmkdir -p evidence[0m
+2026-11-05T21:26:48.9432391Z [36;1mpython - <<'PY'[0m
+2026-11-05T21:26:48.9432649Z [36;1mimport platform, sqlite3, subprocess[0m
+2026-11-05T21:26:48.9432937Z [36;1mfrom pathlib import Path[0m
+2026-11-05T21:26:48.9433276Z [36;1mfrom simulation import continuation_receipts as r[0m
+2026-11-05T21:26:48.9433727Z [36;1mdef git(*args):return subprocess.check_output(['git',*args],text=True).strip()[0m
+2026-11-05T21:26:48.9434350Z [36;1mif git('status','--porcelain','--untracked-files=no'):raise ValueError('tracked execution source is dirty')[0m
+2026-11-05T21:26:48.9435677Z [36;1mr.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),python=platform.python_version(),sqlite=sqlite3.sqlite_version))[0m
+2026-11-05T21:26:48.9436477Z [36;1mPY[0m
+2026-11-05T21:26:48.9458177Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-05T21:26:48.9458517Z env:
+2026-11-05T21:26:48.9458712Z   PYTHONPATH: .:simulation
+2026-11-05T21:26:48.9458935Z   PYTHONUNBUFFERED: 1
+2026-11-05T21:26:48.9459206Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:48.9459611Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-05T21:26:48.9460036Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:48.9460397Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:48.9460764Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:48.9461122Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-05T21:26:48.9461429Z ##[endgroup]
+2026-11-05T21:26:49.1789804Z ##[group]Run set -euo pipefail
+2026-11-05T21:26:49.1790252Z [36;1mset -euo pipefail[0m
+2026-11-05T21:26:49.1790517Z [36;1mmkdir -p evidence[0m
+2026-11-05T21:26:49.1792539Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_nodes.py simulation/tests/test_stage_0_5_proof_map.py simulation/tests/test_stage_0_5_proof_store.py simulation/tests/test_stage_0_5_proof_batch.py simulation/tests/test_stage_0_5_proof_content.py simulation/tests/test_stage_0_5_proof_order.py simulation/tests/test_stage_0_5_proof_order_edit.py simulation/tests/test_stage_0_5_proof_query.py simulation/tests/test_stage_0_5_proof_version.py simulation/tests/test_stage_0_5_proof_occurrence.py --junitxml=evidence/proof-tests.xml 2>&1 | tee evidence/proof-tests.log[0m
+2026-11-05T21:26:49.1795251Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_map_scaling.py --output evidence/scaling 2>&1 | tee evidence/scaling.log[0m
+2026-11-05T21:26:49.1796546Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_batch_scaling.py --output evidence/batch-scaling 2>&1 | tee evidence/batch-scaling.log[0m
+2026-11-05T21:26:49.1797853Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_order_scaling.py --output evidence/order-scaling 2>&1 | tee evidence/order-scaling.log[0m
+2026-11-05T21:26:49.1798947Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_query_scaling.py --output evidence/query-scaling 2>&1 | tee evidence/query-scaling.log[0m
+2026-11-05T21:26:49.1800075Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_version_scaling.py --output evidence/version-scaling 2>&1 | tee evidence/version-scaling.log[0m
+2026-11-05T21:26:49.1801264Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_occurrence_scaling.py --output evidence/occurrence-scaling 2>&1 | tee evidence/occurrence-scaling.log[0m
+2026-11-05T21:26:49.1802558Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_seek.py simulation/tests/test_stage_0_5_proof_occurrence_seek.py --junitxml=evidence/seek-tests.xml 2>&1 | tee evidence/seek-tests.log[0m
+2026-11-05T21:26:49.1803767Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_seek_scaling.py --output evidence/seek-scaling 2>&1 | tee evidence/seek-scaling.log[0m
+2026-11-05T21:26:49.1804874Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_projection.py --junitxml=evidence/projection-tests.xml 2>&1 | tee evidence/projection-tests.log[0m
+2026-11-05T21:26:49.1806358Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_projection_scaling.py --output evidence/projection-scaling 2>&1 | tee evidence/projection-scaling.log[0m
+2026-11-05T21:26:49.1807660Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_query_seek.py simulation/tests/test_stage_0_5_proof_identity_group.py --junitxml=evidence/group-tests.xml 2>&1 | tee evidence/group-tests.log[0m
+2026-11-05T21:26:49.1808870Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_generation.py --junitxml=evidence/generation-tests.xml 2>&1 | tee evidence/generation-tests.log[0m
+2026-11-05T21:26:49.1809895Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_record.py --junitxml=evidence/record-tests.xml 2>&1 | tee evidence/record-tests.log[0m
+2026-11-05T21:26:49.1810957Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_record_scaling.py --output evidence/record-scaling 2>&1 | tee evidence/record-scaling.log[0m
+2026-11-05T21:26:49.1812047Z [36;1mpython -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_scope.py --junitxml=evidence/scope-tests.xml 2>&1 | tee evidence/scope-tests.log[0m
+2026-11-05T21:26:49.1813203Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_scope_scaling.py --output evidence/scope-scaling 2>&1 | tee evidence/scope-scaling.log[0m
+2026-11-05T21:26:49.1814632Z [36;1mpython -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_publication.py --junitxml=evidence/publication-tests.xml 2>&1 | tee evidence/publication-tests.log[0m
+2026-11-05T21:26:49.1816362Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_publication_scaling.py --output evidence/publication-scaling 2>&1 | tee evidence/publication-scaling.log[0m
+2026-11-05T21:26:49.1817618Z [36;1mpython -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_collection.py --junitxml=evidence/collection-tests.xml 2>&1 | tee evidence/collection-tests.log[0m
+2026-11-05T21:26:49.1818809Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_collection_scaling.py --output evidence/collection-scaling 2>&1 | tee evidence/collection-scaling.log[0m
+2026-11-05T21:26:49.1820137Z [36;1mpython -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_collection_publication.py --junitxml=evidence/collection-publication-tests.xml 2>&1 | tee evidence/collection-publication-tests.log[0m
+2026-11-05T21:26:49.1821603Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_collection_publication_scaling.py --output evidence/collection-publication-scaling 2>&1 | tee evidence/collection-publication-scaling.log[0m
+2026-11-05T21:26:49.1823183Z [36;1mpython -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_collection_directory.py --junitxml=evidence/collection-directory-tests.xml 2>&1 | tee evidence/collection-directory-tests.log[0m
+2026-11-05T21:26:49.1824591Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_collection_directory_scaling.py --output evidence/collection-directory-scaling 2>&1 | tee evidence/collection-directory-scaling.log[0m
+2026-11-05T21:26:49.1826219Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_directory_publication.py --junitxml=evidence/directory-publication-tests.xml 2>&1 | tee evidence/directory-publication-tests.log[0m
+2026-11-05T21:26:49.1827629Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_directory_publication_scaling.py --output evidence/directory-publication-scaling 2>&1 | tee evidence/directory-publication-scaling.log[0m
+2026-11-05T21:26:49.1828895Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_inventory.py --junitxml=evidence/inventory-tests.xml 2>&1 | tee evidence/inventory-tests.log[0m
+2026-11-05T21:26:49.1830012Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_inventory_scaling.py --output evidence/inventory-scaling 2>&1 | tee evidence/inventory-scaling.log[0m
+2026-11-05T21:26:49.1831097Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_target.py --junitxml=evidence/target-tests.xml 2>&1 | tee evidence/target-tests.log[0m
+2026-11-05T21:26:49.1832150Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_scaling.py --output evidence/target-scaling 2>&1 | tee evidence/target-scaling.log[0m
+2026-11-05T21:26:49.1833312Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_owner_targets.py --junitxml=evidence/owner-target-tests.xml 2>&1 | tee evidence/owner-target-tests.log[0m
+2026-11-05T21:26:49.1834510Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_owner_targets_scaling.py --output evidence/owner-target-scaling 2>&1 | tee evidence/owner-target-scaling.log[0m
+2026-11-05T21:26:49.1836174Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_target_group.py simulation/tests/test_stage_0_5_proof_target_group_scaling.py --junitxml=evidence/target-group-tests.xml 2>&1 | tee evidence/target-group-tests.log[0m
+2026-11-05T21:26:49.1837581Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_group_scaling.py --output evidence/target-group-scaling 2>&1 | tee evidence/target-group-scaling.log[0m
+2026-11-05T21:26:49.1838956Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_target_incoming.py --junitxml=evidence/target-incoming-tests.xml 2>&1 | tee evidence/target-incoming-tests.log[0m
+2026-11-05T21:26:49.1840216Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_incoming_scaling.py --output evidence/target-incoming-scaling 2>&1 | tee evidence/target-incoming-scaling.log[0m
+2026-11-05T21:26:49.1841460Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_child_extents.py --junitxml=evidence/child-extents-tests.xml 2>&1 | tee evidence/child-extents-tests.log[0m
+2026-11-05T21:26:49.1842657Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_child_extents_scaling.py --output evidence/child-extents-scaling 2>&1 | tee evidence/child-extents-scaling.log[0m
+2026-11-05T21:26:49.1843894Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_frozen_extents.py --junitxml=evidence/frozen-extents-tests.xml 2>&1 | tee evidence/frozen-extents-tests.log[0m
+2026-11-05T21:26:49.1845354Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_frozen_extents_scaling.py --output evidence/frozen-extents-scaling 2>&1 | tee evidence/frozen-extents-scaling.log[0m
+2026-11-05T21:26:49.1846830Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_sequence_event_extents.py --junitxml=evidence/sequence-event-extents-tests.xml 2>&1 | tee evidence/sequence-event-extents-tests.log[0m
+2026-11-05T21:26:49.1848229Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_sequence_event_extents_scaling.py --output evidence/sequence-event-extents-scaling 2>&1 | tee evidence/sequence-event-extents-scaling.log[0m
+2026-11-05T21:26:49.1849578Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_reference_closure.py --junitxml=evidence/reference-closure-tests.xml 2>&1 | tee evidence/reference-closure-tests.log[0m
+2026-11-05T21:26:49.1850873Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_reference_closure_scaling.py --output evidence/reference-closure-scaling 2>&1 | tee evidence/reference-closure-scaling.log[0m
+2026-11-05T21:26:49.1852080Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_reference.py --junitxml=evidence/reference-tests.xml 2>&1 | tee evidence/reference-tests.log[0m
+2026-11-05T21:26:49.1853190Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_reference_scaling.py --output evidence/reference-scaling 2>&1 | tee evidence/reference-scaling.log[0m
+2026-11-05T21:26:49.1855372Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_world_value.py simulation/tests/test_stage_0_5_proof_world_backing_value.py simulation/tests/test_stage_0_5_proof_world_tail.py simulation/tests/test_stage_0_5_proof_world_page_growth.py simulation/tests/test_stage_0_5_proof_world_page_shrink.py --junitxml=evidence/native-value-tests.xml 2>&1 | tee evidence/native-value-tests.log[0m
+2026-11-05T21:26:49.1857330Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_value_scaling.py --output evidence/native-value-scaling 2>&1 | tee evidence/native-value-scaling.log[0m
+2026-11-05T21:26:49.1859894Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_6_proof_world_insert.py simulation/tests/test_stage_0_6_proof_world_mixed.py simulation/tests/test_stage_0_6_proof_world_new_backings.py simulation/tests/test_stage_0_6_proof_world_sequence.py simulation/tests/test_stage_0_6_proof_world_components.py simulation/tests/test_stage_0_6_proof_world_ordinary.py simulation/tests/test_stage_0_6_proof_native_sources.py simulation/tests/test_stage_0_6_proof_native_order.py -o junit_family=legacy --junitxml=evidence/native-insert-tests.xml 2>&1 | tee evidence/native-insert-tests.log[0m
+2026-11-05T21:26:49.1862474Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --output evidence/native-insert-scaling 2>&1 | tee evidence/native-insert-scaling.log[0m
+2026-11-05T21:26:49.1863938Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --scenario mixed --output evidence/native-mixed-scaling 2>&1 | tee evidence/native-mixed-scaling.log[0m
+2026-11-05T21:26:49.1865573Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --scenario fresh --output evidence/native-fresh-scaling 2>&1 | tee evidence/native-fresh-scaling.log[0m
+2026-11-05T21:26:49.1867098Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_world_session.py simulation/tests/test_stage_0_6_proof_world_continuation.py --junitxml=evidence/native-world-session-tests.xml 2>&1 | tee evidence/native-world-session-tests.log[0m
+2026-11-05T21:26:49.1868493Z [36;1mpython -m pytest -q simulation/tests/test_stage_0_5_proof_world.py --junitxml=evidence/world-manifest-tests.xml 2>&1 | tee evidence/world-manifest-tests.log[0m
+2026-11-05T21:26:49.1869689Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_world_manifest_scaling.py --output evidence/world-manifest-scaling 2>&1 | tee evidence/world-manifest-scaling.log[0m
+2026-11-05T21:26:49.1870920Z [36;1mtimeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log[0m
+2026-11-05T21:26:49.1892772Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-05T21:26:49.1893116Z env:
+2026-11-05T21:26:49.1893315Z   PYTHONPATH: .:simulation
+2026-11-05T21:26:49.1893555Z   PYTHONUNBUFFERED: 1
+2026-11-05T21:26:49.1893841Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:49.1894294Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-05T21:26:49.1894770Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:49.1895436Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:49.1895825Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T21:26:49.1896219Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-05T21:26:49.1896542Z ##[endgroup]
+2026-11-05T21:26:53.0020671Z ........................................................................ [ 27%]
+2026-11-05T21:26:55.9719220Z ........................................................................ [ 54%]
+2026-11-05T21:27:00.6253553Z ........................................................................ [ 82%]
+2026-11-05T21:27:04.8353305Z ..............................................                           [100%]
+2026-11-05T21:27:04.8354307Z 262 passed in 15.36s
+2026-11-05T21:27:05.4332801Z {"keys": 1000, "status": "complete", "point": {"wall_seconds": 0.004453458999989834, "node_io": {"read_requests": 4, "read_nodes": 4, "read_bytes": 1654, "write_requests": 4, "written_nodes": 4, "written_bytes": 1654, "clean_cache_bytes": 0}, "sql_selects": {"proof": 4, "other": 0}, "python_peak_bytes": 15337, "process_peak_rss_bytes": 30748672}}
+2026-11-05T21:27:10.7339001Z {"keys": 10000, "status": "complete", "point": {"wall_seconds": 0.005886661999966236, "node_io": {"read_requests": 6, "read_nodes": 6, "read_bytes": 2308, "write_requests": 5, "written_nodes": 4, "written_bytes": 2168, "clean_cache_bytes": 0}, "sql_selects": {"proof": 6, "other": 0}, "python_peak_bytes": 18611, "process_peak_rss_bytes": 32976896}}
+2026-11-05T21:28:21.1237735Z {"keys": 100000, "status": "complete", "point": {"wall_seconds": 0.0069177500000137115, "node_io": {"read_requests": 7, "read_nodes": 7, "read_bytes": 2810, "write_requests": 6, "written_nodes": 5, "written_bytes": 2670, "clean_cache_bytes": 0}, "sql_selects": {"proof": 7, "other": 0}, "python_peak_bytes": 21279, "process_peak_rss_bytes": 33107968}}
+2026-11-05T21:28:21.4934450Z 1000: final nodes=1350, batch=0.149s, heap=77312B, point reads=4
+2026-11-05T21:28:23.4563213Z 10000: final nodes=13850, batch=1.517s, heap=341242B, point reads=5
+2026-11-05T21:28:44.2105689Z 100000: final nodes=137297, batch=15.933s, heap=783050B, point reads=6
+2026-11-05T21:28:44.6633035Z 1000: point reads=23, writes=5, heap=94284B, wall=0.031322s, page/rebuild exact
+2026-11-05T21:28:47.1015779Z 10000: point reads=27, writes=5, heap=98305B, wall=0.033714s, page/rebuild exact
+2026-11-05T21:29:12.9586813Z 100000: point reads=33, writes=6, heap=103248B, wall=0.037543s, page/rebuild exact
+2026-11-05T21:29:13.2724373Z 1000: baseline payload checks=8, proof=0, proof node reads=22, exact
+2026-11-05T21:29:13.6842038Z 10000: baseline payload checks=8, proof=0, proof node reads=21, exact
+2026-11-05T21:29:17.4561870Z 100000: baseline payload checks=8, proof=0, proof node reads=20, exact
+2026-11-05T21:29:17.8661853Z 1000: exact; presence/absence node SELECTs=4/3; payload checks=1/0
+2026-11-05T21:29:19.5031460Z 10000: exact; presence/absence node SELECTs=5/3; payload checks=1/0
+2026-11-05T21:29:37.0597047Z 100000: exact; presence/absence node SELECTs=6/5; payload checks=1/0
+2026-11-05T21:29:37.5693680Z 1000: exact; group/owner proof reads=10/4; payload checks=0/0; old-frontier budget VM<=2599
+2026-11-05T21:29:40.0400471Z 10000: exact; group/owner proof reads=8/4; payload checks=0/0; old-frontier budget VM<=2599
+2026-11-05T21:30:05.3859846Z 100000: exact; group/owner proof reads=11/4; payload checks=0/0; old-frontier budget VM<=2599
+2026-11-05T21:30:16.5597418Z .....................................................                    [100%]
+2026-11-05T21:30:16.5598446Z 53 passed in 10.98s
+2026-11-05T21:30:18.2213446Z 1000: exact; index node reads/writes=4/4; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection
+2026-11-05T21:30:33.9434442Z 10000: exact; index node reads/writes=5/5; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection
+2026-11-05T21:33:30.4519695Z 100000: exact; index node reads/writes=6/6; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection
+2026-11-05T21:33:33.6499262Z ...........................................                              [100%]
+2026-11-05T21:33:33.6499900Z 43 passed in 3.01s
+2026-11-05T21:33:34.3781168Z 1000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3599/2999
+2026-11-05T21:33:38.8050637Z 10000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3599/2999
+2026-11-05T21:34:25.2709878Z 100000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3699/3099
+2026-11-05T21:34:43.6426546Z ........................................................................ [100%]
+2026-11-05T21:34:43.6427602Z 72 passed in 18.18s
+2026-11-05T21:34:46.2030233Z ............................................................             [100%]
+2026-11-05T21:34:46.2030967Z 60 passed in 2.34s
+2026-11-05T21:34:50.4671629Z ............................................................             [100%]
+2026-11-05T21:34:50.4672572Z 60 passed in 4.05s
+2026-11-05T21:34:50.8925285Z 1000: actual point save 23.84ms; unrelated bodies0; exact current/retained/successor
+2026-11-05T21:34:52.0413681Z 10000: actual point save 26.69ms; unrelated bodies0; exact current/retained/successor
+2026-11-05T21:35:04.5782818Z 100000: actual point save 27.36ms; unrelated bodies0; exact current/retained/successor
+2026-11-05T21:35:09.2520739Z .......................................................                  [100%]
+2026-11-05T21:35:09.2521421Z 55 passed in 4.47s
+2026-11-05T21:35:10.4167903Z 1000: scoped point save 99.81ms; unrelated bodies0; allocator root sharing exact
+2026-11-05T21:35:18.3268986Z 10000: scoped point save 112.28ms; unrelated bodies0; allocator root sharing exact
+2026-11-05T21:36:45.3153114Z 100000: scoped point save 116.14ms; unrelated bodies0; allocator root sharing exact
+2026-11-05T21:36:51.1229862Z ...................................................................      [100%]
+2026-11-05T21:36:51.1230824Z 67 passed in 5.62s
+2026-11-05T21:36:52.7843563Z 1000: actual unified save 128.86ms; unrelated bodies0; current/retained exact
+2026-11-05T21:37:04.7987966Z 10000: actual unified save 147.14ms; unrelated bodies0; current/retained exact
+2026-11-05T21:39:15.0879371Z 100000: actual unified save 163.35ms; unrelated bodies0; current/retained exact
+2026-11-05T21:39:16.7568167Z ....................                                                     [100%]
+2026-11-05T21:39:16.7568780Z 20 passed in 1.47s
+2026-11-05T21:39:17.2940909Z 1000 6.38 ms; zero body reads
+2026-11-05T21:39:20.0487943Z 10000 8.05 ms; zero body reads
+2026-11-05T21:39:48.8795371Z 100000 9.96 ms; zero body reads
+2026-11-05T21:39:50.3253699Z ............                                                             [100%]
+2026-11-05T21:39:50.3254382Z 12 passed in 1.25s
+2026-11-05T21:39:52.0115376Z 1000 83.33 ms; zero unrelated bodies
+2026-11-05T21:40:05.9942859Z 10000 90.25 ms; zero unrelated bodies
+2026-11-05T21:42:39.0392663Z 100000 95.07 ms; zero unrelated bodies
+2026-11-05T21:42:41.5766244Z ...............................                                          [100%]
+2026-11-05T21:42:41.5767436Z 31 passed in 2.33s
+2026-11-05T21:42:42.1329346Z 1000 9.6 ms; zero body reads
+2026-11-05T21:42:44.9700811Z 10000 9.43 ms; zero body reads
+2026-11-05T21:43:14.3041494Z 100000 9.82 ms; zero body reads
+2026-11-05T21:43:16.6070924Z ......................                                                   [100%]
+2026-11-05T21:43:16.6071770Z 22 passed in 2.10s
+2026-11-05T21:43:18.2904552Z 1000 97.3 ms; zero unrelated bodies
+2026-11-05T21:43:31.8947811Z 10000 102.79 ms; zero unrelated bodies
+2026-11-05T21:46:00.3491087Z 100000 114.41 ms; zero unrelated bodies
+2026-11-05T21:46:04.1412789Z ..................................                                       [100%]
+2026-11-05T21:46:04.1413396Z 34 passed in 3.59s
+2026-11-05T21:46:05.9490329Z 1000 104.89 ms; zero unrelated bodies
+2026-11-05T21:46:20.7518936Z 10000 106.89 ms; zero unrelated bodies
+2026-11-05T21:49:02.9760901Z 100000 114.12 ms; zero unrelated bodies
+2026-11-05T21:49:06.8656242Z ....................................                                     [100%]
+2026-11-05T21:49:06.8657432Z 36 passed in 3.69s
+2026-11-05T21:49:07.6530698Z 1000 45.77 ms; zero archive bodies
+2026-11-05T21:49:12.0429268Z 10000 46.61 ms; zero archive bodies
+2026-11-05T21:49:58.7636377Z 100000 51.46 ms; zero archive bodies
+2026-11-05T21:50:02.4017887Z ....................                                                     [100%]
+2026-11-05T21:50:02.4019843Z 20 passed in 3.45s
+2026-11-05T21:50:03.6498246Z 1000 56.25 ms; zero archive bodies
+2026-11-05T21:50:12.0829778Z 10000 57.7 ms; zero archive bodies
+2026-11-05T21:51:41.8748305Z 100000 66.42 ms; zero archive bodies
+2026-11-05T21:51:48.3713849Z ......................................                                   [100%]
+2026-11-05T21:51:48.3714645Z 38 passed in 6.30s
+2026-11-05T21:51:49.7511745Z 1000 112.3 ms; zero archive bodies
+2026-11-05T21:51:58.2944638Z 10000 119.89 ms; zero archive bodies
+2026-11-05T21:53:26.3452998Z 100000 133.34 ms; zero archive bodies
+2026-11-05T21:53:32.8530580Z ............................................                             [100%]
+2026-11-05T21:53:32.8531325Z 44 passed in 6.32s
+2026-11-05T21:53:34.2556728Z 1000 130.42 ms; zero archive bodies
+2026-11-05T21:53:42.7803213Z 10000 137.41 ms; zero archive bodies
+2026-11-05T21:55:11.0303172Z 100000 155.34 ms; zero archive bodies
+2026-11-05T21:55:16.5814296Z ..................................                                       [100%]
+2026-11-05T21:55:16.5815165Z 34 passed in 5.35s
+2026-11-05T21:55:17.6888318Z 1000 89.44 ms; zero unrelated child bodies
+2026-11-05T21:55:24.1616450Z 10000 107.56 ms; zero unrelated child bodies
+2026-11-05T21:56:32.4510976Z 100000 110.54 ms; zero unrelated child bodies
+2026-11-05T21:56:41.1321669Z ..............................................                           [100%]
+2026-11-05T21:56:41.1322285Z 46 passed in 8.49s
+2026-11-05T21:56:42.6159160Z 1000 {'frozen-list': 131.16, 'record': 84.08, 'nan-key': 101.17} ms; zero unrelated child bodies
+2026-11-05T21:56:49.5470136Z 10000 {'frozen-list': 145.18, 'record': 94.72, 'nan-key': 112.3} ms; zero unrelated child bodies
+2026-11-05T21:57:58.8666098Z 100000 {'frozen-list': 151.31, 'record': 103.6, 'nan-key': 119.46} ms; zero unrelated child bodies
+2026-11-05T21:58:09.2945147Z ...............................................                          [100%]
+2026-11-05T21:58:09.2945866Z 47 passed in 10.24s
+2026-11-05T21:58:10.8737171Z 1000 {'event-ids': 281.67, 'sequence': 140.1} ms; zero unrelated internal bodies
+2026-11-05T21:58:17.9499387Z 10000 {'event-ids': 317.82, 'sequence': 156.12} ms; zero unrelated internal bodies
+2026-11-05T21:59:26.1679441Z 100000 {'event-ids': 347.47, 'sequence': 177.49} ms; zero unrelated internal bodies
+2026-11-05T21:59:40.0008110Z ......................................                                   [100%]
+2026-11-05T21:59:40.0008760Z 38 passed in 13.63s
+2026-11-05T21:59:41.2501454Z 1000 203.01 ms; zero unrelated internal bodies
+2026-11-05T21:59:47.8428439Z 10000 213.18 ms; zero unrelated internal bodies
+2026-11-05T22:00:55.6976654Z 100000 242.32 ms; zero unrelated internal bodies
+2026-11-05T22:01:06.2700662Z ........................................                                 [100%]
+2026-11-05T22:01:06.2701660Z 40 passed in 10.38s
+2026-11-05T22:01:07.6603636Z 1000 209.26 ms; graph reused, zero graph/unrelated bodies
+2026-11-05T22:01:14.4506432Z 10000 236.79 ms; graph reused, zero graph/unrelated bodies
+2026-11-05T22:02:22.8501953Z 100000 251.35 ms; graph reused, zero graph/unrelated bodies
+2026-11-05T22:04:29.2141943Z ........................................................................ [ 70%]
+2026-11-05T22:06:34.3862627Z ..............................                                           [100%]
+2026-11-05T22:06:34.3863971Z 102 passed in 251.34s (0:04:11)
+2026-11-05T22:06:50.5675220Z 1000 254.85 ms unprofiled native first-access save; 1149.47 ms with allocation profiling; 413.47 ms backing value save; 419.75 ms tail resize; 528.41 ms page growth; zero unrelated history bodies
+2026-11-05T22:07:14.0126143Z 10000 263.19 ms unprofiled native first-access save; 1142.73 ms with allocation profiling; 402.29 ms backing value save; 456.22 ms tail resize; 518.43 ms page growth; zero unrelated history bodies
+2026-11-05T22:08:52.2111688Z 100000 263.9 ms unprofiled native first-access save; 1221.21 ms with allocation profiling; 431.09 ms backing value save; 450.8 ms tail resize; 540.73 ms page growth; zero unrelated history bodies
+2026-11-05T22:14:32.6163397Z ........................................................................ [ 26%]
+2026-11-05T22:19:30.9133441Z ........................................................................ [ 52%]
+2026-11-05T22:21:41.1849633Z ........................................................................ [ 78%]
+2026-11-05T22:23:56.5623017Z ..........................................................               [100%]
+2026-11-05T22:23:56.5624239Z 274 passed in 904.13s (0:15:04)
+2026-11-05T22:24:01.8307396Z 1000 values: 0.32555 s raw save; 608009 VM steps; zero unrelated history bodies
+2026-11-05T22:24:11.1756161Z 10000 values: 0.330333 s raw save; 609928 VM steps; zero unrelated history bodies
+2026-11-05T22:25:07.3050871Z 100000 values: 0.341497 s raw save; 611340 VM steps; zero unrelated history bodies
+2026-11-05T22:25:13.0695210Z 1000 values: 0.48136 s raw save; 806354 VM steps; zero unrelated history bodies
+2026-11-05T22:25:23.0475609Z 10000 values: 0.480703 s raw save; 809255 VM steps; zero unrelated history bodies
+2026-11-05T22:26:19.1765294Z 100000 values: 0.504588 s raw save; 815141 VM steps; zero unrelated history bodies
+2026-11-05T22:26:29.7151119Z 1000 values: 1.227079 s raw save; 1956225 VM steps; zero unrelated history bodies
+2026-11-05T22:26:44.5913377Z 10000 values: 1.249178 s raw save; 1964526 VM steps; zero unrelated history bodies
+2026-11-05T22:27:46.1673381Z 100000 values: 1.327202 s raw save; 1982541 VM steps; zero unrelated history bodies
+2026-11-05T22:31:38.9585675Z .............................................                            [100%]
+2026-11-05T22:31:38.9586618Z 45 passed in 232.57s (0:03:52)
+2026-11-05T22:32:20.0847797Z ...................................                                      [100%]
+2026-11-05T22:32:20.0848597Z 35 passed in 40.88s
+2026-11-05T22:32:22.4519399Z 1000 259.83 ms checkpoint; zero history bodies
+2026-11-05T22:32:27.5219930Z 10000 255.9 ms checkpoint; zero history bodies
+2026-11-05T22:33:04.6333034Z 100000 255.53 ms checkpoint; zero history bodies
+2026-11-05T22:33:06.0890060Z 1000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799
+2026-11-05T22:33:16.4647499Z 10000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799
+2026-11-05T22:35:06.3034443Z 100000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799
+2026-11-05T22:35:06.3442035Z ##[group]Run actions/upload-artifact@v4
+2026-11-05T22:35:06.3442345Z with:
+2026-11-05T22:35:06.3442651Z   name: stage-0-5-proof-map-37b763cc6afd7054842d0d6ed3fd07043af31222
+2026-11-05T22:35:06.3443091Z   path: evidence/**/*.json
+evidence/**/*.xml
+evidence/*.log
+
+2026-11-05T22:35:06.3443418Z   retention-days: 14
+2026-11-05T22:35:06.3443638Z   if-no-files-found: error
+2026-11-05T22:35:06.3444074Z   compression-level: 6
+2026-11-05T22:35:06.3444312Z   overwrite: false
+2026-11-05T22:35:06.3444523Z   include-hidden-files: false
+2026-11-05T22:35:06.3444747Z env:
+2026-11-05T22:35:06.3445225Z   PYTHONPATH: .:simulation
+2026-11-05T22:35:06.3445516Z   PYTHONUNBUFFERED: 1
+2026-11-05T22:35:06.3445801Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T22:35:06.3446237Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-05T22:35:06.3446648Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T22:35:06.3447207Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T22:35:06.3447729Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-05T22:35:06.3448321Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-05T22:35:06.3459234Z ##[endgroup]
+2026-11-05T22:35:06.5158496Z (node:4220) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-05T22:35:06.5159281Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-05T22:35:06.6176302Z With the provided path, there will be 284 files uploaded
+2026-11-05T22:35:06.6178447Z Artifact name is valid!
+2026-11-05T22:35:06.6179074Z Root directory input is valid!
+2026-11-05T22:35:06.9880398Z Beginning upload of artifact content to blob storage
+2026-11-05T22:35:07.2064132Z (node:4220) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-05T22:35:07.4242390Z Uploaded bytes 201554
+2026-11-05T22:35:07.4646555Z Finished uploading artifact content to blob storage!
+2026-11-05T22:35:07.4647552Z SHA256 digest of uploaded artifact zip is 6c78cc4a76da5001a85ae6718c72f37a4abc07bd3bc4913ece724412f538fd4c
+2026-11-05T22:35:07.4649800Z Finalizing artifact upload
+2026-11-05T22:35:08.0258317Z Artifact stage-0-5-proof-map-37b763cc6afd7054842d0d6ed3fd07043af31222.zip successfully finalized. Artifact ID 13459506709
+2026-11-05T22:35:08.0260592Z Artifact stage-0-5-proof-map-37b763cc6afd7054842d0d6ed3fd07043af31222 has been successfully uploaded! Final size is 201554 bytes. Artifact ID is 13459506709
+2026-11-05T22:35:08.0263017Z Artifact download URL: https://github.com/rax0h/all-that-endures/actions/runs/42112687083/artifacts/13459506709
+2026-11-05T22:35:08.0482190Z Post job cleanup.
+2026-11-05T22:35:08.1743969Z (node:4233) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-05T22:35:08.1744671Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-05T22:35:08.1932008Z Post job cleanup.
+2026-11-05T22:35:08.2827883Z [command]/usr/bin/git version
+2026-11-05T22:35:08.2872595Z git version 2.56.0
+2026-11-05T22:35:08.2911423Z Temporarily overriding HOME='/home/runner/work/_temp/83fbb6ad-ce86-47f4-9c4e-faab4d5a2dbe' before making global git config changes
+2026-11-05T22:35:08.2912965Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-05T22:35:08.2917729Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/all-that-endures/all-that-endures
+2026-11-05T22:35:08.2957218Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-05T22:35:08.2999130Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-05T22:35:08.3259118Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-05T22:35:08.3292064Z http.https://github.com/.extraheader
+2026-11-05T22:35:08.3303882Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-05T22:35:08.3339361Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-05T22:35:08.3671518Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-05T22:35:08.3746054Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-05T22:35:08.4219312Z Cleaning up orphan processes
+2026-11-05T22:35:08.4602382Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

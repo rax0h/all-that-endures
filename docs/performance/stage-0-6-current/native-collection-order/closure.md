@@ -31,3 +31,7 @@ The final canonical generated year passes raw and diagnostic eager/fresh-process
 One independent review produced1Critical,1High,3Important and2Minor findings. All are accepted and corrected in review.md, with raw RED and GREEN evidence; no findings or Minors are deferred. The retained full audit and original atomic publisher justify the point-absence relation and keep unrelated query/identity/ordinary-roster/raw-consumer coverage gated. A single bundled publication will launch the full/proof hosted gate; completion remains pending until that exact child is green. No main/default/mature/endurance action.
 
 Exact committed-source verification:130source/order/session cases passed172.98s (final-source.xml), including all53native-order/callback controls. No source changes followed. Hosted green status remains pending.
+
+## Hosted run42112687083 disposition
+
+Proof-map passed. The full suite was censored by its135-minute command timeout after96% plus further passing indicators, with no test failure reported. It is not green. The same-runtime correction in hosted-timeout/ allows180command minutes within195job minutes and emits per-test node progress; all4,694tests remain selected. Runtime619141f and mature latency targets are unchanged. YAML/Bash, exact script delta, source/fingerprint equality and collection checks pass; replacement hosted completion remains pending.

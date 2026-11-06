@@ -1,0 +1,9 @@
+# Hosted full-suite timeout correction
+
+Run42112687083 for37b763cc6afd7054842d0d6ed3fd07043af31222: proof-map job127544067167 passed. Full-suite job127544066574 was terminated with exit124 by its135-minute command limit, after the last printed96% progress marker and additional passing indicators. The raw log contains4,557passing indicators and no failure indicator or FAILED summary. This is a censored run, not a green full suite; it produced no completed JUnit XML. Full and proof logs are retained unedited.
+
+Correct the CI allowance to180command minutes within a195-minute job, preserving15minutes for setup/artifacts/termination. Switch quiet progress to verbose per-test node IDs so any future interruption identifies the active case. Keep the complete simulation/tests selection, existing duration reporting, failure handling, JUnit XML, source receipt and always-upload artifacts. The proof job is byte-for-byte unchanged after YAML parsing. Application source, all53new native-order tests, runtime619141f1438ca658046187f8bbd65fcfc165cf80, launcher pin/fingerprints and mature performance targets are unchanged.
+
+Verification: all4,694tests collect3.64s; YAML parses; all5workflow Bash blocks pass bash-n; the sole run-script changes are135m→180m and-q→-v; all application/test/pin paths are unchanged. Numeric/verbose CI configuration is verified by direct assertions without introducing tests that mirror the configuration. Prior239broader/130final-source/33launcher checks and the hosted proof success remain supporting evidence. A new bounded full-suite run is required before claiming hosted completion.
+
+The scope remains Stage0.6 validation. No mature/default/main/endurance action; no application speed improvement or full-suite-green claim. One bundled workflow/evidence correction, no per-finding CI cycles.
