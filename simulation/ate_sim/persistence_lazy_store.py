@@ -705,7 +705,7 @@ class LazyRecordStore:
             self._maintenance_removed_rows,
         )
 
-    def _checked_head_row(self) -> tuple[Any, ...]:
+    def _checked_head_row(self, *, expected_manifest=None) -> tuple[Any, ...]:
         row = self.db.execute(
             "SELECT generation,parent_generation,simulation_position,seed,next_ids,"
             "namespace_inventory,namespace_counts,head_checksum FROM save_head WHERE singleton=1"
@@ -723,6 +723,17 @@ class LazyRecordStore:
                 raise StoreIntegrityError("initial save head has a parent generation")
         elif type(parent) is not int or parent != generation - 1:
             raise StoreIntegrityError("invalid save head lineage")
+
+        # A local checksum cannot authorize a coherently rewritten head.
+        # Compare the exact encoded row to the already accepted World manifest
+        # before passing any changed bytes to the codec.
+        if expected_manifest is not None:
+            head = expected_manifest.head
+            if (generation != expected_manifest.generation or
+                    row[2:7] != (head.simulation_position, head.seed,
+                                 head.next_ids, head.namespace_inventory,
+                                 head.namespace_counts)):
+                raise StoreIntegrityError("native head metadata differs from accepted manifest")
 
         # The checksum above protects every raw field. Semantic decoding of the
         # same exact row is therefore redundant until a commit changes any
@@ -751,6 +762,17 @@ class LazyRecordStore:
 
     def head_metadata(self) -> dict[str, Any]:
         self._ensure_open()
+        from . import persistence_proof_native_sources as proof_sources
+        authority = proof_sources.active(self)
+        if authority is not None:
+            with proof_sources._snapshot(self, authority) as manifest:
+                row = self._checked_head_row(expected_manifest=manifest)
+                return {
+                    "simulation_position": self.codec.decode(row[2]),
+                    "seed": row[3],
+                    "next_ids": self.codec.decode(row[4]),
+                    "namespaces": self.codec.decode(row[5]),
+                }
         row = self._checked_head_row()
         return {
             "simulation_position": self.codec.decode(row[2]),
