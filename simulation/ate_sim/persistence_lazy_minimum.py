@@ -127,8 +127,8 @@ def rank_neighbor(store, pin, namespace, scope, *, rank=None, ordinal=None, befo
                 'AND valid_to IS NULL AND valid_from<=?' + bound + exclusion + ordering,
                 (namespace, scope, generation) + args + excluded).fetchall()
             rows += store.db.execute(columns + 'INDEXED BY lazy_query_closed_generation WHERE namespace=? AND index_name=? '
-                'AND valid_to=?' + bound + exclusion + ordering,
-                (namespace, scope, generation + 1) + args + excluded).fetchall()
+                'AND valid_to>? AND valid_from<=?' + bound + exclusion + ordering,
+                (namespace, scope, generation, generation) + args + excluded).fetchall()
         store._query_rows += len(rows)
         if not rows:
             return None
