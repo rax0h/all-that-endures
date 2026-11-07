@@ -84,6 +84,7 @@ def test_old_pin_rank_neighbor_respects_generation_pressure(tmp_path):
 
     path = converted(tmp_path)
     old = open_lazy_world_session(path, rules_id=RULES)
+    old_open = True
     namespace = 'world.metaphysics.resurrection_tokens'
     scope = scope_name('person_consumed', (1, None), old.store.codec)
     try:
@@ -101,10 +102,12 @@ def test_old_pin_rank_neighbor_respects_generation_pressure(tmp_path):
                 writer.save()
             assert rank_neighbor(old.store, old.pin, namespace, scope) == original
             old.close()
+            old_open = False
             writer.save()
             assert writer.world.metaphysics.available_token(1) is writer.world.metaphysics.resurrection_tokens[7]
     finally:
-        old.close()
+        if old_open:
+            old.close()
 
 
 
