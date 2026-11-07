@@ -45,6 +45,7 @@ def test_native_head_rejects_checksum_consistent_forgery_before_codec_decode(
             "next_ids,namespace_inventory,namespace_counts,head_checksum "
             "FROM save_head WHERE singleton=1"
         ).fetchone())
+        original_row = tuple(row)
         fields = {
             "simulation_position": (2, store.codec.encode(2000)),
             "seed": (3, row[3] + 1),
@@ -71,8 +72,22 @@ def test_native_head_rejects_checksum_consistent_forgery_before_codec_decode(
             assert payload != forged, "forged accepted-head bytes reached codec"
             return original(payload)
         monkeypatch.setattr(store.codec, "decode", observe)
-        with pytest.raises(StoreIntegrityError, match="accepted manifest"):
-            store.head_metadata()
+        try:
+            with pytest.raises(StoreIntegrityError, match="accepted manifest"):
+                store.head_metadata()
+            assert not store.db.in_transaction
+        finally:
+            # Restore the deliberately forged fixture before context-manager
+            # cleanup releases its pin. A bad head must not leak into teardown.
+            monkeypatch.setattr(store.codec, "decode", original)
+            store.db.execute(
+                "UPDATE save_head SET simulation_position=?,seed=?,next_ids=?,"
+                "namespace_inventory=?,namespace_counts=?,head_checksum=? WHERE singleton=1",
+                (*original_row[2:7], original_row[7]),
+            )
+            store.db.commit()
+            authority.epoch = authority._epoch()
+        _match_manifest(store, pair[0])
         assert not store.db.in_transaction
 
 
