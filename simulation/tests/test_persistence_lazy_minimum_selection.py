@@ -77,30 +77,35 @@ def test_old_pin_retains_prior_minimum_and_node_links(tmp_path):
         old.close()
 
 
-def test_old_pin_rank_neighbor_survives_closure_multiple_generations_later(tmp_path):
-    """A row visible at an old pin may close at any later generation, not only pin+1."""
+def test_old_pin_rank_neighbor_respects_generation_pressure(tmp_path):
+    """An old pin remains readable, but cannot force a second retained save."""
     from ate_sim.persistence_lazy_minimum import rank_neighbor, scope_name
+    from ate_sim.persistence_lazy_store import GenerationPressureError
 
     path = converted(tmp_path)
     old = open_lazy_world_session(path, rules_id=RULES)
+    namespace = 'world.metaphysics.resurrection_tokens'
+    scope = scope_name('person_consumed', (1, None), old.store.codec)
     try:
-        namespace = 'world.metaphysics.resurrection_tokens'
-        scope = scope_name('person_consumed', (1, None), old.store.codec)
         original = rank_neighbor(old.store, old.pin, namespace, scope)
         assert original is not None and original[2] == 6
 
         with open_lazy_world_session(path, rules_id=RULES) as writer:
-            # Advance the accepted generation without closing the original
-            # membership; then close it at a generation later than pin+1.
             writer.world.metaphysics.resurrection_tokens[5].patron_id = 'intermediate'
             writer.save()
+            # The old pin still reads its original rank and owner after one
+            # generation. A second commit must fail while that pin is held.
+            assert rank_neighbor(old.store, old.pin, namespace, scope) == original
             writer.world.metaphysics.resurrection_tokens[6].consumed_year = 2
+            with pytest.raises(GenerationPressureError):
+                writer.save()
+            assert rank_neighbor(old.store, old.pin, namespace, scope) == original
+            old.close()
             writer.save()
-
-        assert rank_neighbor(old.store, old.pin, namespace, scope) == original
-        assert old.world.metaphysics.available_token(1) is old.world.metaphysics.resurrection_tokens[6]
+            assert writer.world.metaphysics.available_token(1) is writer.world.metaphysics.resurrection_tokens[7]
     finally:
         old.close()
+
 
 
 def test_id_ties_reinsertion_and_direct_edits_preserve_native_selection(tmp_path):
