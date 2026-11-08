@@ -1,6 +1,7 @@
 # Fixture construction qualification
 
-The canonical same-process generated-year builder did not pass in this workspace.
+During the original metadata package's local validation, the canonical same-process
+generated-year builder did not pass in this workspace.
 This limitation is preserved independently from the successful native metadata
 and retained-fixture continuation checks. Its cause is unresolved.
 
@@ -32,3 +33,12 @@ Both modes pass, including zero diagnostic save-time World audits. This proves
 the retained fixture's native continuation contract. It does not qualify the
 same-process builder, mature-world performance or proof-only opening. Those
 qualifications remain explicit gates; no completed Stage0.6 claim is made.
+
+Subsequent qualification is preserved in ../fixture-construction/. The unchanged
+original full scenario passes on the fingerprinted system Python3.12.3/SQLite3.45.1
+tuple, using fresh construction rather than the retained setup. The bundled
+Python3.12.14/SQLite3.53.1 tuple remains unqualified: its original-driver C-only
+repeat reaches native saving, then rejects an epoch mismatch and leaves its
+disposable writable copy structurally damaged. The accepted template stays intact.
+This broadens the compatibility limitation beyond construction; no underlying
+repair, categorical engine-version cause or universal application safety is claimed.

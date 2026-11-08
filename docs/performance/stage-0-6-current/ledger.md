@@ -111,3 +111,30 @@ scope limitation are preserved in native-metadata-boundary/. Evidence child and
 one bundled full/proof publication next. Hosted validation, canonical construction,
 proof-only opening, mature10s/2s/1s and final acceptance remain unqualified. No
 main/default/mature/endurance action.
+
+
+Nov8 metadata hosted gate verified green at8d0fea0/run42494896887:4,911tests,
+2subtests,one deliberate ZIP warning,9,304.06s; proof job passed including39new
+metadata cases46.69s. Label-only65cb777 retains identical runtime d91d48cc36dc4fa822b1bf5a52bca6a218437a28.
+
+Local runtime qualification: unchanged original complete generated-year driver
+passes fresh construction and every raw/diagnostic/eager/fresh/source-immutability
+assertion on recorded system Python3.12.3/GCC13.3.0/SQLite3.45.1; all13phases
+complete and diagnostic save has zero full World audits. Fingerprint-matched
+system-derived venv passes123metadata/head/recovery cases231.27s. Runtime tuple
+includes resolved interpreter, extension, actual loaded SQLite library hash and
+source/build options; AGENTS provides a workspace-local acceptance/profiling route
+while retaining hosted CI's separate evidence authority.
+
+Bundled Python3.12.14/Clang22.1.3/SQLite3.53.1 tuple remains unqualified for the
+complete native scenario. Original+C-only08 reaches raw.save, rejects epoch drift,
+then close requires recovery; writable generation0 copy is structurally damaged
+afterward while accepted source stays unchanged/healthy. Root cause remains
+unproven; no safe rollback or blanket engine-version/application-exoneration claim.
+Earlier05hot-recovery trace has a live-raw-copy locking caveat; all raw observations
+are preserved and qualified. Single independent evidence review1Important+3Minor
+actions addressed within the group: observer effects, provenance/stale errno,
+incomplete transaction samples, actual SQLite library identity. Runtime/protocol/
+workflow code unchanged; evidence-only skip-ci publication uses targeted checks.
+Proof-only opening, mature10s/2s/1s and final acceptance remain gates; no main,
+default activation or endurance action. Evidence and dispositions:fixture-construction/.

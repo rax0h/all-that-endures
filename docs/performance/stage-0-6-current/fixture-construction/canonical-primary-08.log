@@ -1,0 +1,64 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/d88f8db353e8/ate/.github/tests/run_proof_real_year_probe.py", line 141, in run
+    phase(mode+'.save', session.save)
+  File "/workspace/scratch/d88f8db353e8/ate/.github/tests/run_proof_real_year_probe.py", line 70, in phase
+    result = action(); entry['status'] = 'complete'
+             ^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py", line 16729, in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_world_session.py", line 104, in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py", line 16802, in _save_native
+    return self._publish_committed_hybrid(plan, result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py", line 16585, in _publish_committed_hybrid
+    participant.validate_publication(participant.delta, result.pin)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_participants.py", line 295, in validate_publication
+    super().validate_publication(delta, successor_pin)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_participants.py", line 138, in validate_publication
+    with self.store.read_snapshot(successor_pin):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 1338, in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 1287, in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_native_sources.py", line 45, in before_snapshot
+    _epoch(store, authority)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_native_sources.py", line 54, in _epoch
+    raise StoreConflictError('native source snapshot epoch differs from accepted authority')
+ate_sim.incremental_store.StoreConflictError: native source snapshot epoch differs from accepted authority
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/d88f8db353e8/ate/.github/tests/run_proof_real_year_probe.py", line 176, in <module>
+    run(args.output,rank_proofs=args.rank_proofs)
+  File "/workspace/scratch/d88f8db353e8/ate/.github/tests/run_proof_real_year_probe.py", line 151, in run
+    phase(mode+'.close', session.close)
+  File "/workspace/scratch/d88f8db353e8/ate/.github/tests/run_proof_real_year_probe.py", line 70, in phase
+    result = action(); entry['status'] = 'complete'
+             ^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py", line 18024, in close
+    self._release_publisher_pin()
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py", line 17997, in _release_publisher_pin
+    self._backing_dependencies.close(abandon_stale=self._state == 'stale')
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_history_dependencies.py", line 224, in close
+    with self.store.read_snapshot(self.pin):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 1338, in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 1287, in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_native_sources.py", line 39, in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+ate_sim.incremental_store.StoreError: native source publication requires exact recovery

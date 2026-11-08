@@ -1,0 +1,13 @@
+{
+  "compile_command": "cc -Wall -Wextra -shared -fPIC -o fixture_truncate_trace.so fixture_truncate_trace.c -ldl",
+  "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "source_sha256": "efb33b9e2445401dfca3756ef9cef613030038a97b64136742592d58bb8cf05c",
+  "binary_sha256": "f9b875281f7953d4c9f3e279a215f4d1047d7ba8c2c4e774827f285d58d16cff",
+  "bundled_python_sha256": "fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7",
+  "library_behavior": "Wrap ftruncate/ftruncate64 through dlsym(RTLD_NEXT); fstat/readlink existing DB descriptor; write own separate log; no database descriptor open/close",
+  "observer_limit": "Allocates memory and an extra log FD; observed executions are not uninstrumented controls.",
+  "errno_contract": "errno is meaningful only when result is negative; errno2 on result0 is stale and is not evidence of failure.",
+  "ptrace_probe": "Denied by OS; diagnostic03 did not execute application; no permission escalation requested",
+  "run_command": "ATE_FIXTURE_IO_LOG=... LD_PRELOAD=fixture_truncate_trace.so[:existing-preloads] PYTHONPATH=.:simulation /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python .github/tests/run_proof_real_year_probe.py --rank-proofs --output ...",
+  "symbolize_command": "addr2line -f -C -e /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python ADDRESS..."
+}

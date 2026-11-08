@@ -1,0 +1,13 @@
+Original workspace truncation:13045760->9818112 bytes, SQLite pager_playback via sqlite3PagerSharedLock (hot-journal recovery path).
+Address resolution from bundled Python binary:
+0x926b9c unixTruncate
+0x1bc360f pager_truncate.cold
+0x192fc6c pager_playback
+0x1bb8552 sqlite3PagerSharedLock.cold
+0x1920315 btreeBeginTrans
+0x191e65f sqlite3VdbeExec
+0x191b7a8 sqlite3_step
+0x194ab9a _pysqlite_query_execute
+0x1949ed8 pysqlite_connection_execute
+
+CAVEAT: diagnostic05 raw-copied the still-open workspace before failure. POSIX close can release same-process SQLite advisory locks; this trace alone does not establish the uninstrumented cause. Original-driver C-observer-only control08 follows.

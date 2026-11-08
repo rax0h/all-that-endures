@@ -1,0 +1,17 @@
+{
+  "run": 42494896887,
+  "head": "8d0fea0de7f0ac311108c30c53246a26c613e236",
+  "runtime_tree": "d91d48cc36dc4fa822b1bf5a52bca6a218437a28",
+  "full_suite": {
+    "passed": 4911,
+    "subtests": 2,
+    "warnings": 1,
+    "seconds": 9304.06
+  },
+  "proof_map": {
+    "conclusion": "success",
+    "new_metadata_cases": 39,
+    "metadata_seconds": 46.69
+  },
+  "display_name_only_child": "65cb7770054e3a917a95e5be91b5b6e16db5f56b"
+}

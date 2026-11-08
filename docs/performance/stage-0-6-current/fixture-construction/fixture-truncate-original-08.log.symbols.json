@@ -1,0 +1,292 @@
+{
+  "trace": "fixture-truncate-original-08.log",
+  "groups": [
+    {
+      "operation": "TRUNCATE fd=4 path=/workspace/scratch/d88f8db353e8/fixture-canonical-primary-08/.ate-proof-genesis-k0v4gqpv/.ate-catalog-copy-lxcpmenz/conversion-njj61v3c.sqlite before=14479360 requested=13049856 after=13049856 result=0 errno=2",
+      "python_addresses": [
+        "0x926b9c",
+        "0x1bc360f",
+        "0x192fc6c",
+        "0x1917617",
+        "0x19178a8",
+        "0x191738b",
+        "0x18f028b",
+        "0x18ef976",
+        "0x18ef746",
+        "0x18efafc",
+        "0x18108aa"
+      ],
+      "functions": [
+        {
+          "address": "0x926b9c",
+          "function": "unixTruncate",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bc360f",
+          "function": "pager_truncate.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x192fc6c",
+          "function": "pager_playback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1917617",
+          "function": "sqlite3PagerRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x19178a8",
+          "function": "sqlite3BtreeRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191738b",
+          "function": "sqlite3RollbackAll",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18f028b",
+          "function": "sqlite3LeaveMutexAndCloseZombie",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef976",
+          "function": "sqlite3Close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef746",
+          "function": "connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18efafc",
+          "function": "pysqlite_connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18108aa",
+          "function": "method_vectorcall.llvm.12408582019548959275",
+          "source": "??:?"
+        }
+      ]
+    },
+    {
+      "operation": "TRUNCATE fd=7 path=/workspace/scratch/d88f8db353e8/fixture-canonical-primary-08/.ate-proof-genesis-k0v4gqpv/conversion-7vl0jpzx.sqlite before=1458176 requested=12288 after=12288 result=0 errno=2",
+      "python_addresses": [
+        "0x926b9c",
+        "0x1bc360f",
+        "0x192fc6c",
+        "0x1917617",
+        "0x19178a8",
+        "0x191738b",
+        "0x18f028b",
+        "0x18ef976",
+        "0x18ef746",
+        "0x18efafc",
+        "0x18108aa"
+      ],
+      "functions": [
+        {
+          "address": "0x926b9c",
+          "function": "unixTruncate",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bc360f",
+          "function": "pager_truncate.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x192fc6c",
+          "function": "pager_playback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1917617",
+          "function": "sqlite3PagerRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x19178a8",
+          "function": "sqlite3BtreeRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191738b",
+          "function": "sqlite3RollbackAll",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18f028b",
+          "function": "sqlite3LeaveMutexAndCloseZombie",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef976",
+          "function": "sqlite3Close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef746",
+          "function": "connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18efafc",
+          "function": "pysqlite_connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18108aa",
+          "function": "method_vectorcall.llvm.12408582019548959275",
+          "source": "??:?"
+        }
+      ]
+    },
+    {
+      "operation": "TRUNCATE fd=5 path=/workspace/scratch/d88f8db353e8/fixture-canonical-primary-08/conversion-igmcyczz.sqlite before=1458176 requested=12288 after=12288 result=0 errno=2",
+      "python_addresses": [
+        "0x926b9c",
+        "0x1bc360f",
+        "0x192fc6c",
+        "0x1917617",
+        "0x19178a8",
+        "0x191738b",
+        "0x18f028b",
+        "0x18ef976",
+        "0x18ef746",
+        "0x18efafc",
+        "0x18108aa"
+      ],
+      "functions": [
+        {
+          "address": "0x926b9c",
+          "function": "unixTruncate",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bc360f",
+          "function": "pager_truncate.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x192fc6c",
+          "function": "pager_playback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1917617",
+          "function": "sqlite3PagerRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x19178a8",
+          "function": "sqlite3BtreeRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191738b",
+          "function": "sqlite3RollbackAll",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18f028b",
+          "function": "sqlite3LeaveMutexAndCloseZombie",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef976",
+          "function": "sqlite3Close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef746",
+          "function": "connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18efafc",
+          "function": "pysqlite_connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18108aa",
+          "function": "method_vectorcall.llvm.12408582019548959275",
+          "source": "??:?"
+        }
+      ]
+    },
+    {
+      "operation": "TRUNCATE fd=4 path=/workspace/scratch/d88f8db353e8/fixture-canonical-primary-08/raw.sqlite before=31416320 requested=28004352 after=28004352 result=0 errno=2",
+      "python_addresses": [
+        "0x926b9c",
+        "0x1bc360f",
+        "0x192fc6c",
+        "0x1bb8552",
+        "0x1920315",
+        "0x191e65f",
+        "0x191b7a8",
+        "0x194ab9a",
+        "0x18041b6",
+        "0x1810824"
+      ],
+      "functions": [
+        {
+          "address": "0x926b9c",
+          "function": "unixTruncate",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bc360f",
+          "function": "pager_truncate.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x192fc6c",
+          "function": "pager_playback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bb8552",
+          "function": "sqlite3PagerSharedLock.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1920315",
+          "function": "btreeBeginTrans",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191e65f",
+          "function": "sqlite3VdbeExec",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191b7a8",
+          "function": "sqlite3_step",
+          "source": "??:?"
+        },
+        {
+          "address": "0x194ab9a",
+          "function": "_pysqlite_query_execute",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18041b6",
+          "function": "cfunction_vectorcall_FASTCALL.llvm.2305966719422422379",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1810824",
+          "function": "method_vectorcall.llvm.12408582019548959275",
+          "source": "??:?"
+        }
+      ]
+    }
+  ],
+  "limits": "No timestamps; successful truncate errno may be stale; trace05 has prior raw-copy locking caveat. No inferred causal ordering."
+}

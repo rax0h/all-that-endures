@@ -57,12 +57,17 @@ compares its starting World with freshly generated eager state under full audite
 admission, and retains every original continuation/audit/immutability assertion.
 retained-year.json and source-mapping.json record provenance. Local6a2a173 and
 API698efdd have identical complete source trees. One evidence child and one
-branch update publish the package; hosted full/proof completion remains pending.
+branch update publish the package. Hosted full/proof subsequently passed in
+run42494896887:4,911tests,2subtests,one deliberate ZIP warning,9,304.06s.
 
 Remaining gates: authenticate the actual opening path, including schema/rules/
 format and restore inventory/selection/absence, with explicit six/seven-root
 compatibility and corruption/recovery/fresh continuation while skipping the full
 audit; obtain current-source mature performance evidence; final architecture
 acceptance. Full audited opening stays mandatory until those opening proofs
-close. Same-process fixture construction remains unqualified. No main merge,
-default activation, mature or endurance run is launched.
+close. Later runtime qualification is recorded in ../fixture-construction/:
+the unchanged original builder and complete native continuation pass on the
+fingerprinted system tuple, without retained-setup substitution. The bundled
+tuple remains unqualified, now including native save/rollback. Its unresolved
+failures are not represented as fixed or attributed to SQLite version alone.
+No main merge, default activation, mature or endurance run is launched.

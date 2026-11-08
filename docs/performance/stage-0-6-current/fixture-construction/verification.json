@@ -1,0 +1,23 @@
+{
+  "runtime_tree": "d91d48cc36dc4fa822b1bf5a52bca6a218437a28",
+  "canonical_driver_unchanged": true,
+  "system_original_driver": {
+    "status": "complete",
+    "phases": 13,
+    "save_world_audits": 0
+  },
+  "qualified_focused": {
+    "passed": 123,
+    "seconds": 231.27
+  },
+  "artifact_formats": "Python AST, C syntax, JSON and JSONL parse pass",
+  "production_changes": false,
+  "workflow_changes": false,
+  "qualification": "Recorded system runtime working route only; bundled tuple complete native scenario remains unqualified and unresolved",
+  "review": {
+    "important": 1,
+    "minor": 3,
+    "all_closed": true,
+    "additional_actionable_findings": 0
+  }
+}

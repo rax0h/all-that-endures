@@ -1,0 +1,35 @@
+{
+  "accepted.sqlite": {
+    "bytes": 28004352,
+    "sha256": "ec73a14390d57b1081e94a7b10ea5d36f91faac040f3b5492443d2e57c0b494e",
+    "journal_exists": false,
+    "matches_accepted_receipt": true,
+    "integrity": [
+      [
+        "ok"
+      ]
+    ],
+    "generation": [
+      [
+        0
+      ]
+    ],
+    "sha256_after": "ec73a14390d57b1081e94a7b10ea5d36f91faac040f3b5492443d2e57c0b494e"
+  },
+  "raw.sqlite": {
+    "bytes": 28004352,
+    "sha256": "09eb4208140a32a04cbef336d4f3392434cb6a8363eb99ee7a98f7fe19399d57",
+    "journal_exists": false,
+    "integrity": [
+      [
+        "*** in database main ***\nTree 5976 page 5976 cell 0: invalid page number 7563"
+      ]
+    ],
+    "generation": [
+      [
+        0
+      ]
+    ],
+    "sha256_after": "09eb4208140a32a04cbef336d4f3392434cb6a8363eb99ee7a98f7fe19399d57"
+  }
+}

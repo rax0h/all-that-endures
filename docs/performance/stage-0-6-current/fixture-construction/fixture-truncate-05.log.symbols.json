@@ -1,0 +1,146 @@
+{
+  "trace": "fixture-truncate-05.log",
+  "groups": [
+    {
+      "operation": "TRUNCATE fd=4 path=/workspace/scratch/d88f8db353e8/fixture-diag-05/.ate-proof-genesis-0uk981i1/.ate-catalog-copy-a0j38ovj/conversion-gm55zghl.sqlite before=13045760 requested=9818112 after=9818112 result=0 errno=2",
+      "python_addresses": [
+        "0x926b9c",
+        "0x1bc360f",
+        "0x192fc6c",
+        "0x1bb8552",
+        "0x1920315",
+        "0x191e65f",
+        "0x191b7a8",
+        "0x194ab9a",
+        "0x1949ed8",
+        "0x181228b",
+        "0x1805cec"
+      ],
+      "functions": [
+        {
+          "address": "0x926b9c",
+          "function": "unixTruncate",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bc360f",
+          "function": "pager_truncate.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x192fc6c",
+          "function": "pager_playback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bb8552",
+          "function": "sqlite3PagerSharedLock.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1920315",
+          "function": "btreeBeginTrans",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191e65f",
+          "function": "sqlite3VdbeExec",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191b7a8",
+          "function": "sqlite3_step",
+          "source": "??:?"
+        },
+        {
+          "address": "0x194ab9a",
+          "function": "_pysqlite_query_execute",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1949ed8",
+          "function": "pysqlite_connection_execute",
+          "source": "??:?"
+        },
+        {
+          "address": "0x181228b",
+          "function": "gen_iternext",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1805cec",
+          "function": "chain_next",
+          "source": "??:?"
+        }
+      ]
+    },
+    {
+      "operation": "TRUNCATE fd=6 path=/workspace/scratch/d88f8db353e8/fixture-diag-05/.ate-proof-genesis-0uk981i1/.ate-catalog-copy-a0j38ovj/conversion-fuw7rbue.sqlite before=3747840 requested=20480 after=20480 result=0 errno=0",
+      "python_addresses": [
+        "0x926b9c",
+        "0x1bc360f",
+        "0x192fc6c",
+        "0x1917617",
+        "0x19178a8",
+        "0x191738b",
+        "0x18f028b",
+        "0x18ef976",
+        "0x18ef746",
+        "0x18efafc"
+      ],
+      "functions": [
+        {
+          "address": "0x926b9c",
+          "function": "unixTruncate",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1bc360f",
+          "function": "pager_truncate.cold",
+          "source": "??:?"
+        },
+        {
+          "address": "0x192fc6c",
+          "function": "pager_playback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x1917617",
+          "function": "sqlite3PagerRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x19178a8",
+          "function": "sqlite3BtreeRollback",
+          "source": "??:?"
+        },
+        {
+          "address": "0x191738b",
+          "function": "sqlite3RollbackAll",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18f028b",
+          "function": "sqlite3LeaveMutexAndCloseZombie",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef976",
+          "function": "sqlite3Close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18ef746",
+          "function": "connection_close",
+          "source": "??:?"
+        },
+        {
+          "address": "0x18efafc",
+          "function": "pysqlite_connection_close",
+          "source": "??:?"
+        }
+      ]
+    }
+  ],
+  "limits": "No timestamps; successful truncate errno may be stale; trace05 has prior raw-copy locking caveat. No inferred causal ordering."
+}
