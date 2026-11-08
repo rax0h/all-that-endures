@@ -107,7 +107,13 @@ def checked_marker(store, generation, namespace, scope, rank, key, ordinal):
 
 
 def rank_neighbor(store, pin, namespace, scope, *, rank=None, ordinal=None, before=False, exclude=()):
-    """One checked rank neighbor; SQL ordering uses the existing covering index."""
+    """One checked neighbor, using rank-root authority when explicitly available."""
+    from . import persistence_proof_native_sources as proof_sources
+    authority=proof_sources.active(store)
+    if authority is not None:
+        from .persistence_proof_native_rank import available,neighbor
+        if available(authority):
+            return neighbor(store,authority,pin,namespace,scope,rank=rank,ordinal=ordinal,before=before,exclude=exclude)
     generation = store._read_snapshot_start(pin)
     try:
         excluded = tuple(store.codec.encode(key) for key in exclude)

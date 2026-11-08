@@ -110,8 +110,8 @@ def certified(request, namespace, typed):
 
 def prepare(store, request, versions):
     request.sequence_rows = frozenset()
-    request.sequence_roots = request.pairs[1][0].roots[5:]
-    if len(versions) > 512 or len(request.pairs[1][0].roots) != 6:
+    request.sequence_roots = request.pairs[1][0].roots[5:6]
+    if len(versions) > 512 or len(request.pairs[1][0].roots) not in (6,7):
         return
     try:
         result = _prepare(store, request, versions)

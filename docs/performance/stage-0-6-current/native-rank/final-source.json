@@ -1,0 +1,24 @@
+{
+  "runtime_tree": "e07f77094ac4679a404ab6f2c3db1818cab7ce33",
+  "source_head": "5505bb4265fd7c383068f1a9a688b3c1b1303577",
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "bash_blocks_checked": 5,
+  "fingerprints": {
+    ".github/tests/run_proof_real_year_probe.py": "4eaf1ce74f5db8a91dccf41c0400580d7804e68e68d264b026bcee8df5e6e8ca",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "6141865980b7a8f64bc896ce278f7a4d02171876a72913819a9fc008e91e6684",
+    "simulation/ate_sim/persistence_lazy_minimum.py": "fe1d3f52bb9297bd82022363748540b5ec42772370d029f5d155c638f22ac8cc",
+    "simulation/ate_sim/persistence_proof_extent_inventory.py": "8400ab64d87743f8a33fe608ef4176d08122f540b1da27335318e1d0edbbec5c",
+    "simulation/ate_sim/persistence_proof_manifest_publish.py": "a865000c2c93819bc33ffde3e08a1686fcc93957bf0c8756f10342400cfe4fa9",
+    "simulation/ate_sim/persistence_proof_native_rank.py": "bf74741cd89950b01af3d6cdf8044515953591c25f416d4df5ecd0d2291db42b",
+    "simulation/ate_sim/persistence_proof_rank.py": "ab2c313f4a66eb59e6f3b1da4f9eb9acf17f00d28cd026d2b1651e425b379934",
+    "simulation/ate_sim/persistence_proof_reference.py": "cf39087d8dabd4a78391614f32ab8318404dfb706bf13b17761f084892cf1880",
+    "simulation/ate_sim/persistence_proof_reference_closure.py": "27261b6ea3b813738c87f70d9c73c2a5d12a54693ab98b41a11f969036d316e4",
+    "simulation/ate_sim/persistence_proof_scope.py": "a4d9003959e9cd57382a87f547c7c0b17539617435c771ef5c7061b1724c033d",
+    "simulation/ate_sim/persistence_proof_seek.py": "9c68538e357893c80c7a1d520cafc3fbbb0afef626f5a772388bd844b42fcfe8",
+    "simulation/ate_sim/persistence_proof_world.py": "d6cd0ea252f64f8486760462d4e4cde88cf33ea5b6d6a74fdcdc711daca6c98b",
+    "simulation/ate_sim/persistence_proof_world_copy.py": "c95c7de1875274dc1d69a0ddd6f3dbb5b74dcd569ffc5c07c55c4a397ade8185",
+    "simulation/ate_sim/persistence_proof_world_insert.py": "e8af0ecb05b84d434f7d3f90358183b674221ba9b55c9777f347043cc34eb511",
+    "simulation/ate_sim/persistence_proof_world_sequence.py": "c84f3f5524f3c5282fcdb651c081c60ea66f3b6a8c80491f4998b6a062ac785b"
+  }
+}

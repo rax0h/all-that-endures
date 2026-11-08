@@ -1,0 +1,28 @@
+......................F..                                                [100%]
+=================================== FAILURES ===================================
+_________ test_native_rank_uses_original_caller_pin_and_callback_guard _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_native_rank_uses_original0')
+
+    def test_native_rank_uses_original_caller_pin_and_callback_guard(tmp_path):
+        from dataclasses import replace
+        path,pair=rank_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;scope=bucket(store)
+            with pytest.raises(StoreError):rank_neighbor(store,replace(session.pin,token='released-pin'),NS,scope)
+            with pytest.raises(StoreConflictError):rank_neighbor(store,replace(session.pin,captured_head=1),NS,scope)
+            caught=[]
+            def callback():
+                try:rank_neighbor(store,session.pin,NS,scope)
+                except StoreError as exc:caught.append(exc)
+                return 1
+            store.db.create_function('rank_callback',0,callback)
+            assert store.db.execute('SELECT rank_callback()').fetchone()==(1,)
+>           assert len(caught)==1 and isinstance(caught[0],StoreConflictError)
+E           assert (0 == 1)
+E            +  where 0 = len([])
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:89: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_uses_original_caller_pin_and_callback_guard
+1 failed, 24 passed in 19.95s

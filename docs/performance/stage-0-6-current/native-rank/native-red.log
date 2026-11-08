@@ -1,0 +1,39 @@
+F
+=================================== FAILURES ===================================
+_ test_native_rank_preserves_strict_bounds_equal_ties_and_exclusions[False-None-None-exclude0-want0] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_native_rank_preserves_str0')
+before = False, rank = None, ordinal = None, exclude = (), want = (0, 11)
+
+    @pytest.mark.parametrize('before,rank,ordinal,exclude,want',[
+        (False,None,None,(),(0,11)),(True,None,None,(),(2,13)),
+        (False,-2,0,(),(1,12)),(True,-2,1,(),(0,11)),
+        (False,-2,1,(),(2,13)),(True,-2,0,(),None),
+        (False,None,None,(11,),(1,12)),(True,None,None,(13,),(1,12)),
+        (False,None,None,(11,12,13),None)])
+    def test_native_rank_preserves_strict_bounds_equal_ties_and_exclusions(tmp_path,before,rank,ordinal,exclude,want):
+>       path,pair=rank_fixture(tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_native_rank_preserves_str0')
+size = 4, ranked = True
+
+    def rank_fixture(tmp_path,*,size=4,ranked=True):
+        def configure(w):
+            for key,ident in ((11,-2),(12,-2),(13,4)):
+                w.metaphysics.resurrection_tokens[key]=ResurrectionToken(ident,1,'god',str(key),0,1)
+        source=legacy_lazy(tmp_path,size=size,configure=configure)
+        before=hashlib.sha256(source.read_bytes()).digest()
+        path=tmp_path/'ranked.sqlite'
+>       value=copy_world_with_proofs(source,path,rules_id='private-catalog-copy',rank_proofs=ranked)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: copy_world_with_proofs() got an unexpected keyword argument 'rank_proofs'
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:23: TypeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_preserves_strict_bounds_equal_ties_and_exclusions[False-None-None-exclude0-want0]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.67s

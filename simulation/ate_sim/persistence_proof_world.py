@@ -58,7 +58,7 @@ def _check_sources(store,g,ca,sa,ia,ra,da):
     directory._preflight(store,type('PinContext',(),{'captured_head':g,'store_identity':store.store_identity})(),*da,1048576)
     if directory_publish._load(store,g)[0]!=da:raise StoreIntegrityError('World directory authority disagreement')
     scope._guard_construction(store.db);scope._guard_child_keys(store);scope._guard_sequence_keys(store)
-    if scope._construct_roots(store,g,sa[0].next_incarnation_id,include_children=True,include_sequence=True)!=sa[0].roots:raise StoreIntegrityError('World physical scoped relations disagree with accepted roots')
+    if scope._construct_roots(store,g,sa[0].next_incarnation_id,include_children=True,include_sequence=True,include_rank=len(sa[0].roots)==7)!=sa[0].roots:raise StoreIntegrityError('World physical scoped relations disagree with accepted roots')
     counts=[0,0,0]
     for ns,key in store.db.execute('SELECT namespace,typed_key FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(g,g)):
         row=target.content._source_version(store,g,ns,key);actual=target.content._version_value(ns,key,row,store.codec.version)
@@ -462,8 +462,8 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
                 raw=ns.encode();position=len(raw).to_bytes(4,'big')+raw+ordinal.to_bytes(8,'big')+key
                 yield position,_digest(b'ate-world-ordinary-order-member/1',position)
         order=om.build(ordered());orders=_composite(store,b'orders',(da[0].root,order,hr,sa[0].roots[2]))
-        topo=_composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],br,orr))
-        query=_composite(store,b'queries',(*sa[0].roots[2:4],qr))
+        topo=_composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:6],br,orr))
+        query=_composite(store,b'queries',(*sa[0].roots[2:4],qr,*sa[0].roots[6:]))
         return WorldRoots((ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root),owners,br.count,orr.count,(br,orr,qr,order,hr))
     finally:
         store.db.execute('DROP TABLE ate_world_edges');store.db.execute('DROP TABLE ate_world_orders');store.db.execute('DROP TABLE ate_world_projection');store.db.execute('DROP TABLE ate_world_backings')

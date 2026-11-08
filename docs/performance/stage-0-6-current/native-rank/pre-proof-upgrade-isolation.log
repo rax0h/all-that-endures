@@ -1,0 +1,14 @@
+upgrade only
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 502, in _copy_with_checked_catalog
+    _verify_catalog(target, pin, workspace)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 162, in _verify_catalog
+    links, expected_nodes, live_owners = 0, DiskSet(workspace), DiskSet(workspace)
+                                            ^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 249, in __init__
+    workspace.db.execute('CREATE TABLE IF NOT EXISTS conversion_sets(stream INTEGER,key BLOB,checksum TEXT,PRIMARY KEY(stream,key)) WITHOUT ROWID')
+sqlite3.OperationalError: attempt to write a readonly database

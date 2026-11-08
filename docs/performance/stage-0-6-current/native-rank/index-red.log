@@ -1,0 +1,112 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+___ test_reverse_seek_proves_strict_predecessor_with_prefixes_and_old_roots ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_reverse_seek_proves_stric0')
+
+    def test_reverse_seek_proves_strict_predecessor_with_prefixes_and_old_roots(tmp_path):
+        db,m=make_map(tmp_path)
+        keys=[b'',b'\x00',b'\x00\x00',b'a',b'a\x00',b'aa',b'a\xff',b'b',b'\xff']
+        db.execute('BEGIN');root=m.build((k,value(i)) for i,k in enumerate(keys));db.commit()
+>       assert m.reverse_page(m.empty)==()
+               ^^^^^^^^^^^^^^
+E       AttributeError: 'OrderedSeekMap' object has no attribute 'reverse_page'
+
+simulation/tests/test_stage_0_5_proof_seek.py:66: AttributeError
+___ test_rank_projection_is_separate_from_ordinal_query_and_atomically_moves ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_rank_projection_is_separa0')
+
+    def test_rank_projection_is_separate_from_ordinal_query_and_atomically_moves(tmp_path):
+>       store,pin,pair=ranked_store(tmp_path)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_projection.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_rank_projection_is_separa0')
+ranked = True
+
+    def ranked_store(tmp_path,*,ranked=True):
+        store=LazyRecordStore.create(tmp_path/'rank.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=(change('a',-2,7),change('b',-2,2),change('c',4,0)),
+            changes=(),new_segments=(),metadata=metadata()).pin
+>       pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=ranked)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: bootstrap_scope_proofs() got an unexpected keyword argument 'include_rank'
+
+simulation/tests/test_stage_0_6_rank_projection.py:25: TypeError
+___ test_rank_projection_fault_keeps_original_atomic_recovery[before_commit] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_rank_projection_fault_kee0')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_commit','after_commit'])
+    def test_rank_projection_fault_keeps_original_atomic_recovery(tmp_path,phase):
+>       store,pin,pair=ranked_store(tmp_path)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_projection.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_rank_projection_fault_kee0')
+ranked = True
+
+    def ranked_store(tmp_path,*,ranked=True):
+        store=LazyRecordStore.create(tmp_path/'rank.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=(change('a',-2,7),change('b',-2,2),change('c',4,0)),
+            changes=(),new_segments=(),metadata=metadata()).pin
+>       pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=ranked)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: bootstrap_scope_proofs() got an unexpected keyword argument 'include_rank'
+
+simulation/tests/test_stage_0_6_rank_projection.py:25: TypeError
+___ test_rank_projection_fault_keeps_original_atomic_recovery[after_commit] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_rank_projection_fault_kee1')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase',['before_commit','after_commit'])
+    def test_rank_projection_fault_keeps_original_atomic_recovery(tmp_path,phase):
+>       store,pin,pair=ranked_store(tmp_path)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_projection.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_rank_projection_fault_kee1')
+ranked = True
+
+    def ranked_store(tmp_path,*,ranked=True):
+        store=LazyRecordStore.create(tmp_path/'rank.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=(change('a',-2,7),change('b',-2,2),change('c',4,0)),
+            changes=(),new_segments=(),metadata=metadata()).pin
+>       pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=ranked)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: bootstrap_scope_proofs() got an unexpected keyword argument 'include_rank'
+
+simulation/tests/test_stage_0_6_rank_projection.py:25: TypeError
+__________ test_six_root_certificate_cannot_claim_empty_ranked_scope ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_six_root_certificate_cann0')
+
+    def test_six_root_certificate_cannot_claim_empty_ranked_scope(tmp_path):
+>       from ate_sim.persistence_proof_rank import RankScope
+E       ModuleNotFoundError: No module named 'ate_sim.persistence_proof_rank'
+
+simulation/tests/test_stage_0_6_rank_projection.py:78: ModuleNotFoundError
+_____ test_rank_scope_position_handles_binary_prefixes_without_collisions ______
+
+    def test_rank_scope_position_handles_binary_prefixes_without_collisions():
+>       from ate_sim.persistence_proof_rank import position,parse_position
+E       ModuleNotFoundError: No module named 'ate_sim.persistence_proof_rank'
+
+simulation/tests/test_stage_0_6_rank_projection.py:87: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_seek.py::test_reverse_seek_proves_strict_predecessor_with_prefixes_and_old_roots
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_projection_is_separate_from_ordinal_query_and_atomically_moves
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_projection_fault_keeps_original_atomic_recovery[before_commit]
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_projection_fault_keeps_original_atomic_recovery[after_commit]
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_six_root_certificate_cannot_claim_empty_ranked_scope
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_scope_position_handles_binary_prefixes_without_collisions
+6 failed in 0.67s

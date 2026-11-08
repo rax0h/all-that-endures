@@ -100,7 +100,7 @@ def _authority(store,pin,c,e):
 
 def _components(store,pin,ca,sa,ia,ra):
     target._pairs(store,pin,(ca,sa,ia));records._authority(store,pin,*ra)
-    if len(sa[0].roots)!=6:raise StoreError('durable references require six-root scope authority')
+    if len(sa[0].roots) not in (6,7):raise StoreError('durable references require sequence-complete scope authority')
     return tuple(pair[1] for pair in (ca,sa,ia,ra))
 
 def _checked_components(store,ca,sa,ia,ra):

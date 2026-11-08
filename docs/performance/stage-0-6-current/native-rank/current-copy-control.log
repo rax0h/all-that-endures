@@ -1,0 +1,21 @@
+[]
+Traceback (most recent call last):
+  File "<stdin>", line 13, in <module>
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_world_copy.py", line 93, in copy_world_with_proofs
+    elif floor<6:upgrade_lazy_snapshot(source,private,rules_id=rules_id)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 471, in _copy_with_checked_catalog
+    _check_reference_targets((v.value for v in chain(all_versions, all_ordinary)), dependencies,
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 264, in _check_reference_targets
+    for root in values:
+                ^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 471, in <genexpr>
+    _check_reference_targets((v.value for v in chain(all_versions, all_ordinary)), dependencies,
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 63, in __iter__
+    cursor = workspace.db.execute('SELECT ordinal,payload,checksum FROM replay_rows WHERE stream=? ORDER BY ordinal', (self.stream,))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.DatabaseError: database disk image is malformed

@@ -101,7 +101,7 @@ def _read_checked(store,pin,reference,content_authority,scope_authority,inventor
     """Private producer seam, under one already checked owned snapshot."""
     if not getattr(store,'_checked_snapshot_depth',0):raise StoreError('closure producer requires checked snapshot')
     target._pairs(store,pin,(content_authority,scope_authority,inventory_authority))
-    if len(scope_authority[0].roots)!=6:raise StoreError('reference closure requires explicit six-root authority')
+    if len(scope_authority[0].roots) not in (6,7):raise StoreError('reference closure requires explicit sequence-complete authority')
     if record_authority is not None:
         incoming.records._authority(store,pin,*record_authority);incoming.records._schemas(store.db)
         if incoming.records._load_root(store,pin.captured_head)[0]!=record_authority:raise StoreIntegrityError('closure record root disagreement')
@@ -137,7 +137,7 @@ def read_reference_closure(store,pin,reference,content_authority,scope_authority
         if type(n) is not int or not 1<=n<=maximum:raise StoreIntegrityError('invalid reference closure budget')
     options=dict(max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes)
     incoming.groups._check(store,pin,reference,content_authority,scope_authority,inventory_authority,**options)
-    if len(scope_authority[0].roots)!=6:raise StoreError('reference closure requires explicit six-root authority')
+    if len(scope_authority[0].roots) not in (6,7):raise StoreError('reference closure requires explicit sequence-complete authority')
     if record_authority is not None:
         if type(record_authority) is not tuple or len(record_authority)!=2:raise StoreIntegrityError('invalid closure record authority')
         incoming.records._authority(store,pin,*record_authority)

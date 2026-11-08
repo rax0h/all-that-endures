@@ -1,0 +1,4 @@
+shadow rejected <class 'ate_sim.incremental_store.StoreError'> proof source cannot shadow persistent SQLite objects
+rank rank field exceeds metadata budget 10031
+key rank field exceeds metadata budget 10167
+stale pin <class 'ate_sim.incremental_store.StoreConflictError'> []

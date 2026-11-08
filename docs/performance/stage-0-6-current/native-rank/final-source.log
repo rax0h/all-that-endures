@@ -1,0 +1,25 @@
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+........................................................................ [ 83%]
+...........................................                              [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_sources.py:207: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_limited_excluded_queries_fetch_only_selected_owner_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_limited_excluded_queries_fetch_only_selected_owner_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_query.py:179: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_query_windows_paginate_release_bodies_and_preserve_prefix_contract
+  simulation/tests/test_stage_0_6_proof_native_query.py:210: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_native_query_windows_paginate_release_bodies_and_preserve_prefix_contract(tmp_path,monkeypatch,record_property):
+
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_long_query_keys_shrink_windows_without_skips
+  simulation/tests/test_stage_0_6_proof_native_query.py:275: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_native_long_query_keys_shrink_windows_without_skips(tmp_path,monkeypatch,record_property):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+259 passed, 6 warnings in 231.87s (0:03:51)

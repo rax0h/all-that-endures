@@ -16,9 +16,9 @@ class ExtentWork:
 
 
 def physical_locators(s,pair,inc,budget,*,require_sequence=False):
-    if require_sequence and len(pair[0].roots)!=6:raise StoreError('extent requires explicitly constructed sequence authority')
+    if require_sequence and len(pair[0].roots) not in (6,7):raise StoreError('extent requires explicitly constructed sequence authority')
     scopes_to_read=[(scopes.ChildScope(inc),scopes._CHILD_NAMES,scopes._child_locator)]
-    if len(pair[0].roots)==6:scopes_to_read.append((scopes.SequenceScope(inc),scopes._SEQUENCE_NAMES,scopes._sequence_locator))
+    if len(pair[0].roots)>=6:scopes_to_read.append((scopes.SequenceScope(inc),scopes._SEQUENCE_NAMES,scopes._sequence_locator))
     locators=[]
     for scope,names,locator in scopes_to_read:
         root=scopes._resolve(s.store,pair[0],scope);budget.take_children(root.count)

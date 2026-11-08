@@ -34,7 +34,8 @@ def check_restored(stdout, expected):
         raise exc
 
 
-def run(output):
+def run(output,*,rank_proofs=False):
+    if type(rank_proofs) is not bool:raise ValueError('rank_proofs must be boolean')
     from ate_sim.engine import Simulation
     from ate_sim.worldgen import generate_world
     from ate_sim.persistence_session import write_cold_snapshot
@@ -51,7 +52,7 @@ def run(output):
     receipt = dict(status='running', source=dict(head=git('rev-parse', 'HEAD'),
         runtime_tree=git('rev-parse', 'HEAD:simulation/ate_sim'), python=platform.python_version(),
         sqlite=sqlite3.sqlite_version, driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()),
-        fixture=dict(seed=843000, width=8, height=6, settlements=1, initial_year=2, saved_year=3),
+        fixture=dict(seed=843000, width=8, height=6, settlements=1, initial_year=2, saved_year=3,rank_proofs=rank_proofs),
         limitation='Small real generated world; not mature-world or cold-cache acceptance', phases=[])
 
     def publish():
@@ -86,7 +87,7 @@ def run(output):
         control = copy.deepcopy(world); Simulation(control).run(1)
         write_cold_snapshot(world, output/'cold.sqlite', rules_id=rules)
         convert_cold_to_lazy(output/'cold.sqlite', output/'lazy.sqlite', rules_id=rules, native_graph_buckets=True)
-        proof = copy_world_with_proofs(output/'lazy.sqlite', output/'accepted.sqlite', rules_id=rules)
+        proof = copy_world_with_proofs(output/'lazy.sqlite', output/'accepted.sqlite', rules_id=rules,rank_proofs=rank_proofs)
         return proof.commitment, control.digest()
 
     try:
@@ -170,4 +171,6 @@ def run(output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
-    run(parser.parse_args().output)
+    parser.add_argument('--rank-proofs',action='store_true',help='Explicitly construct seventh-root rank authority')
+    args=parser.parse_args()
+    run(args.output,rank_proofs=args.rank_proofs)

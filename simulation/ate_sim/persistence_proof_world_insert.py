@@ -376,7 +376,7 @@ def stage(store, request, pin, ca, sa, ia):
     from .persistence_proof_world_owner_edits import stage as stage_owner_edits
     stage_owner_edits(store, request, pin, owners, placements, roots, facts)
     if (sa[0].next_incarnation_id != allocator or sa[0].roots[:2] != tuple(roots[:2])
-            or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:] != request.sequence_roots
+            or sa[0].roots[4] != request.tail_child_root or sa[0].roots[5:6] != request.sequence_roots
             or ca[0].versions.count != oldca[0].versions.count + added
             or ca[0].events != oldca[0].events
             or ia[0].head.namespace_inventory != oldia[0].head.namespace_inventory):

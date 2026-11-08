@@ -59,6 +59,21 @@ def test_empty_prefix_zero_and_absent_middle_cursors(tmp_path):
     db.close()
 
 
+def test_reverse_seek_proves_strict_predecessor_with_prefixes_and_old_roots(tmp_path):
+    db,m=make_map(tmp_path)
+    keys=[b'',b'\x00',b'\x00\x00',b'a',b'a\x00',b'aa',b'a\xff',b'b',b'\xff']
+    db.execute('BEGIN');root=m.build((k,value(i)) for i,k in enumerate(keys));db.commit()
+    assert m.reverse_page(m.empty)==()
+    assert tuple(k for k,_ in m.reverse_page(root))==tuple(reversed(keys))
+    assert tuple(k for k,_ in m.reverse_page(root,before=b'a',limit=2))==(b'\x00\x00',b'\x00')
+    assert tuple(k for k,_ in m.reverse_page(root,before=b'a\x01'))==(b'a\x00',b'a',b'\x00\x00',b'\x00',b'')
+    assert m.reverse_page(root,before=b'')==()
+    db.execute('BEGIN');new=m.set(root,b'b',None);db.commit()
+    assert m.reverse_page(root,before=b'\xff',limit=1)[0][0]==b'b'
+    assert m.reverse_page(new,before=b'\xff',limit=1)[0][0]==b'a\xff'
+    db.close()
+
+
 def test_seeded_transitions_match_model_canonical_rebuild_and_retained_roots(tmp_path):
     db,m=make_map(tmp_path);root=m.empty;model={};old=[];rng=random.Random(713)
     keys=[bytes([i//6])+b'\x00prefix'+bytes([i%6]) for i in range(75)]

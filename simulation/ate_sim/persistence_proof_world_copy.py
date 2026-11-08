@@ -71,7 +71,8 @@ def _rebase_private_snapshot(store):
         raise
 
 
-def copy_world_with_proofs(source,destination,*,rules_id):
+def copy_world_with_proofs(source,destination,*,rules_id,rank_proofs=False):
+    if type(rank_proofs) is not bool:raise StoreError('invalid rank proof copy option')
     from .persistence_session import _preflight_conversion_paths,_publish_private_cold_file
     from .persistence_complete_format import upgrade_lazy_snapshot
     from .persistence_proof_record import bootstrap_record_proofs
@@ -101,7 +102,7 @@ def copy_world_with_proofs(source,destination,*,rules_id):
             store.db.execute("UPDATE store_metadata SET value='7' WHERE key='format_version'");store.db.commit()
             pin=store.capture_pin()
             try:
-                ra=bootstrap_record_proofs(store,pin);sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True)
+                ra=bootstrap_record_proofs(store,pin);sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=rank_proofs)
                 ca=bootstrap_content_proofs(store,pin);da=bootstrap_collection_directory(store,pin);ia=bootstrap_inventory(store,pin)
                 manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
             finally:store.release_pin(pin)

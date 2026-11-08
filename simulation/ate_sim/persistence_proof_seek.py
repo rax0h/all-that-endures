@@ -289,6 +289,46 @@ class OrderedSeekMap:
             result.append(item);after=item[0]
         return tuple(result)
 
+    def _maximum(self,ref,required):
+        while True:
+            node=self._read(ref,required)
+            if type(node) is _Leaf:return node.key,node.value
+            slot,ref=node.children[-1];required=node.prefix+bytes([slot])
+
+    def _predecessor(self,root,before):
+        if not root.count:return None
+        if before is None:return self._maximum(root,b'')
+        wanted=_symbols(before);ref,required,candidate=root,b'',None
+        while True:
+            node=self._read(ref,required);prefix=_prefix(node)
+            if type(node) is _Leaf:
+                if node.key<before:return node.key,node.value
+                return self._maximum(*candidate) if candidate is not None else None
+            common=wanted[:len(prefix)]
+            if prefix<common:return self._maximum(ref,required)
+            if prefix>common:return self._maximum(*candidate) if candidate is not None else None
+            slot=wanted[len(prefix)];equal=None;lesser=None
+            for chosen,child in node.children:
+                if chosen==slot:equal=child
+                elif chosen<slot:lesser=(child,prefix+bytes([chosen]))
+            if equal is None:
+                chosen=lesser if lesser is not None else candidate
+                return self._maximum(*chosen) if chosen is not None else None
+            if lesser is not None:candidate=lesser
+            ref,required=equal,prefix+bytes([slot])
+
+    def reverse_page(self,root,*,before=None,limit=128):
+        self._reference(root)
+        if before is not None:_key(before)
+        if type(limit) is not int or not 1<=limit<=256:raise StoreIntegrityError('invalid reverse seek page limit')
+        result=[]
+        for _ in range(limit):
+            item=self._predecessor(root,before)
+            if item is None:break
+            if before is not None and item[0]>=before:raise StoreIntegrityError('ordered seek predecessor did not retreat')
+            result.append(item);before=item[0]
+        return tuple(result)
+
     def verify(self,root):
         count=0;after=None
         while True:

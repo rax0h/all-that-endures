@@ -1,0 +1,120 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_rank_physical_window_limits_indexed_live_bucket_before_materializing[False-1000] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rank_physical_window_limi0')
+count = 1000, before = False
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    @pytest.mark.parametrize('before',[False,True])
+    def test_rank_physical_window_limits_indexed_live_bucket_before_materializing(tmp_path,count,before):
+        from ate_sim.persistence_proof_rank import RankScope
+        from ate_sim.persistence_proof_native_rank import _physical
+        store=LazyRecordStore.create(tmp_path/'live.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        try:
+            pin=store.commit(store.capture_pin(),commit_token='live',version_changes=(change(i,1,i) for i in range(count)),
+                changes=(),new_segments=(),metadata=metadata()).pin
+            pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
+            scope=RankScope('people',NAME)
+            wanted=(count-1,count-2) if before else (0,1)
+            positions=[(store.codec.encode(numeric_rank(1)),i,store.codec.encode(i)) for i in wanted]
+            ticks=[];store.db.set_progress_handler(lambda:ticks.append(1) or 0,100)
+            try:
+                with store.read_snapshot(pin):
+                    _physical(store,pin.captured_head,scope,positions,bound=None,before=before,continuation=None)
+            finally:store.db.set_progress_handler(None,0)
+>           assert len(ticks)*100<8000
+E           assert (505 * 100) < 8000
+E            +  where 505 = len([1, 1, 1, 1, 1, 1, ...])
+
+simulation/tests/test_stage_0_6_rank_projection.py:112: AssertionError
+_ test_rank_physical_window_limits_indexed_live_bucket_before_materializing[False-10000] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rank_physical_window_limi1')
+count = 10000, before = False
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    @pytest.mark.parametrize('before',[False,True])
+    def test_rank_physical_window_limits_indexed_live_bucket_before_materializing(tmp_path,count,before):
+        from ate_sim.persistence_proof_rank import RankScope
+        from ate_sim.persistence_proof_native_rank import _physical
+        store=LazyRecordStore.create(tmp_path/'live.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        try:
+            pin=store.commit(store.capture_pin(),commit_token='live',version_changes=(change(i,1,i) for i in range(count)),
+                changes=(),new_segments=(),metadata=metadata()).pin
+            pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
+            scope=RankScope('people',NAME)
+            wanted=(count-1,count-2) if before else (0,1)
+            positions=[(store.codec.encode(numeric_rank(1)),i,store.codec.encode(i)) for i in wanted]
+            ticks=[];store.db.set_progress_handler(lambda:ticks.append(1) or 0,100)
+            try:
+                with store.read_snapshot(pin):
+                    _physical(store,pin.captured_head,scope,positions,bound=None,before=before,continuation=None)
+            finally:store.db.set_progress_handler(None,0)
+>           assert len(ticks)*100<8000
+E           assert (5005 * 100) < 8000
+E            +  where 5005 = len([1, 1, 1, 1, 1, 1, ...])
+
+simulation/tests/test_stage_0_6_rank_projection.py:112: AssertionError
+_ test_rank_physical_window_limits_indexed_live_bucket_before_materializing[True-1000] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rank_physical_window_limi2')
+count = 1000, before = True
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    @pytest.mark.parametrize('before',[False,True])
+    def test_rank_physical_window_limits_indexed_live_bucket_before_materializing(tmp_path,count,before):
+        from ate_sim.persistence_proof_rank import RankScope
+        from ate_sim.persistence_proof_native_rank import _physical
+        store=LazyRecordStore.create(tmp_path/'live.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        try:
+            pin=store.commit(store.capture_pin(),commit_token='live',version_changes=(change(i,1,i) for i in range(count)),
+                changes=(),new_segments=(),metadata=metadata()).pin
+            pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
+            scope=RankScope('people',NAME)
+            wanted=(count-1,count-2) if before else (0,1)
+            positions=[(store.codec.encode(numeric_rank(1)),i,store.codec.encode(i)) for i in wanted]
+            ticks=[];store.db.set_progress_handler(lambda:ticks.append(1) or 0,100)
+            try:
+                with store.read_snapshot(pin):
+                    _physical(store,pin.captured_head,scope,positions,bound=None,before=before,continuation=None)
+            finally:store.db.set_progress_handler(None,0)
+>           assert len(ticks)*100<8000
+E           assert (535 * 100) < 8000
+E            +  where 535 = len([1, 1, 1, 1, 1, 1, ...])
+
+simulation/tests/test_stage_0_6_rank_projection.py:112: AssertionError
+_ test_rank_physical_window_limits_indexed_live_bucket_before_materializing[True-10000] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_rank_physical_window_limi3')
+count = 10000, before = True
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    @pytest.mark.parametrize('before',[False,True])
+    def test_rank_physical_window_limits_indexed_live_bucket_before_materializing(tmp_path,count,before):
+        from ate_sim.persistence_proof_rank import RankScope
+        from ate_sim.persistence_proof_native_rank import _physical
+        store=LazyRecordStore.create(tmp_path/'live.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='rank-test')
+        try:
+            pin=store.commit(store.capture_pin(),commit_token='live',version_changes=(change(i,1,i) for i in range(count)),
+                changes=(),new_segments=(),metadata=metadata()).pin
+            pair=scopes.bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
+            scope=RankScope('people',NAME)
+            wanted=(count-1,count-2) if before else (0,1)
+            positions=[(store.codec.encode(numeric_rank(1)),i,store.codec.encode(i)) for i in wanted]
+            ticks=[];store.db.set_progress_handler(lambda:ticks.append(1) or 0,100)
+            try:
+                with store.read_snapshot(pin):
+                    _physical(store,pin.captured_head,scope,positions,bound=None,before=before,continuation=None)
+            finally:store.db.set_progress_handler(None,0)
+>           assert len(ticks)*100<8000
+E           assert (5305 * 100) < 8000
+E            +  where 5305 = len([1, 1, 1, 1, 1, 1, ...])
+
+simulation/tests/test_stage_0_6_rank_projection.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_physical_window_limits_indexed_live_bucket_before_materializing[False-1000]
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_physical_window_limits_indexed_live_bucket_before_materializing[False-10000]
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_physical_window_limits_indexed_live_bucket_before_materializing[True-1000]
+FAILED simulation/tests/test_stage_0_6_rank_projection.py::test_rank_physical_window_limits_indexed_live_bucket_before_materializing[True-10000]
+4 failed, 5 deselected in 6.39s

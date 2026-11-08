@@ -1,0 +1,65 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_rank_rechecks_durable_sources_after_exclusion_codec_hook _________
+
+    def operation():
+        with monkeypatch.context() as patch:
+            patch.setattr(store.codec,'encode',changed)
+            try:
+>               with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,exclude=('hook-key',))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:244: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_rank_rechecks_durable_sou0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bac9dfbf0>
+
+    def test_rank_rechecks_durable_sources_after_exclusion_codec_hook(tmp_path,monkeypatch):
+        path,pair=rank_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;scope=bucket(store);encode=store.codec.encode;created=[]
+            def changed(value):
+                if value=='hook-key' and not created:
+                    created.append(True)
+                    store.db.execute('CREATE TEMP TABLE lazy_query_versions AS SELECT * FROM main.lazy_query_versions')
+                    store.db.execute('CREATE INDEX temp.lazy_query_current ON lazy_query_versions(namespace,index_name,index_value,ordinal,record_key) WHERE valid_to IS NULL')
+                    store.db.execute('CREATE INDEX temp.ate_rank_query_closed ON lazy_query_versions(namespace,index_name,valid_to,index_value,ordinal,record_key) WHERE valid_to IS NOT NULL')
+                return encode(value)
+            def operation():
+                with monkeypatch.context() as patch:
+                    patch.setattr(store.codec,'encode',changed)
+                    try:
+                        with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,exclude=('hook-key',))
+                    finally:
+                        if created:store.db.execute('DROP TABLE temp.lazy_query_versions')
+>           store._world_proof_authority.execute(session,operation)
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_session.py:104: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_native_rank.py:246: in operation
+    if created:store.db.execute('DROP TABLE temp.lazy_query_versions')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7f1bac9576e0>
+args = ('DROP TABLE temp.lazy_query_versions',), kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such table: temp.lazy_query_versions
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rechecks_durable_sources_after_exclusion_codec_hook
+1 failed, 37 deselected in 1.35s

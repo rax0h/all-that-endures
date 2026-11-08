@@ -55,7 +55,7 @@ def _load(store,pin,pair):
     raw=reference._ProjectionCodec(metadata=True).decode(row[0])
     if type(raw) is not tuple or len(raw)!=5 or any(type(p) is not tuple or len(p)!=2 for p in raw):raise StoreIntegrityError('invalid World proof context')
     facts=tuple(Root(*p) for p in raw)
-    topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],*facts[:2]),persist=False);query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2]),persist=False)
+    topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:6],*facts[:2]),persist=False);query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2],*sa[0].roots[6:]),persist=False)
     orders=world._composite(store,b'orders',(da[0].root,facts[3],facts[4],sa[0].roots[2]),persist=False)
     actual=(ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root)
     if actual!=value.roots:raise StoreIntegrityError('World manifest mixed component/fact authority')
@@ -197,7 +197,7 @@ def _stage(store,r,g,writer,token,inventory_pair):
         with store.read_snapshot(pin,_preflight=lambda:_schemas(store)):
             oldca,oldsa,oldia,oldra,oldda=r.pairs
             reuse=r.may_reuse and ca[0].versions==oldca[0].versions and ca[0].events==oldca[0].events and sa[0].roots==oldsa[0].roots and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id and da[0].root==oldda[0].root
-            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4]==r.tail_child_root and sa[0].roots[5:]==r.sequence_roots
+            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4]==r.tail_child_root and sa[0].roots[5:6]==r.sequence_roots
                 and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id
                 and (da[0].root.count==oldda[0].root.count if r.tail_new else da[0].root==oldda[0].root)
                 and ca[0].versions.count==oldca[0].versions.count+r.tail_added-len(r.tail_removed or {}) and ca[0].events==oldca[0].events
@@ -208,12 +208,12 @@ def _stage(store,r,g,writer,token,inventory_pair):
             if r.insertions is not None:
                 from .persistence_proof_world_insert import stage as stage_insertions
                 facts=stage_insertions(store,r,pin,ca,sa,ia)
-                topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],*facts[:2]))
-                query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2]))
+                topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:6],*facts[:2]))
+                query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2],*sa[0].roots[6:]))
                 orders=world._composite(store,b'orders',(da[0].root,facts[3],facts[4],sa[0].roots[2]))
                 roots=(ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root)
             elif reuse:
-                facts=r.tail_facts if r.value_only and r.tail_facts is not None else r.facts;topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],*facts[:2]));query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2]))
+                facts=r.tail_facts if r.value_only and r.tail_facts is not None else r.facts;topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:6],*facts[:2]));query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2],*sa[0].roots[6:]))
                 orders=world._composite(store,b'orders',(da[0].root,facts[3],facts[4],sa[0].roots[2]))
                 roots=(ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root)
             else:

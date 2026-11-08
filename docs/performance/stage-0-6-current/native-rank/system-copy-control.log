@@ -1,0 +1,41 @@
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_world_copy.py", line 93, in copy_world_with_proofs
+    elif floor<6:upgrade_lazy_snapshot(source,private,rules_id=rules_id)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 502, in _copy_with_checked_catalog
+    _verify_catalog(target, pin, workspace)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 164, in _verify_catalog
+    group = catalog.read_identity_group(pin, incarnation)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py", line 744, in read_identity_group
+    with checked_read_operation(self.store, pin, byte_limit=min(256*1024, self.byte_limit//6)) as scope:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_validation_scope.py", line 104, in checked_read_operation
+    with store.read_snapshot(pin):
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 1332, in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 1302, in _read_snapshot_start
+    head = int(self._checked_head_row(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 709, in _checked_head_row
+    row = self.db.execute(
+          ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_sqlite_guard.py", line 134, in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_sqlite_guard.py", line 43, in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.DatabaseError: database disk image is malformed

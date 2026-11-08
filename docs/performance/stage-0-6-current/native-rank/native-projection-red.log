@@ -1,0 +1,269 @@
+.........FFFFFFF.F..                                                     [100%]
+=================================== FAILURES ===================================
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[extra-earlier] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7afa3bc0>
+damage = 'extra-earlier'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+            with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+>           assert not seen and not store.db.in_transaction
+E           assert (not [b'["int","99"]'])
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:71: AssertionError
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[extra-later] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7ad17bf0>
+damage = 'extra-later'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+            with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+>           assert not seen and not store.db.in_transaction
+E           assert (not [b'["int","99"]'])
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:71: AssertionError
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[missing] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7adc5400>
+damage = 'missing'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+>           with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:70: Failed
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[ordinal] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7aa1e660>
+damage = 'ordinal'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+>           with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:70: Failed
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[future-start] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7aeb3c50>
+damage = 'future-start'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+            with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+>           assert not seen and not store.db.in_transaction
+E           assert (not [b'["int","11"]'])
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:71: AssertionError
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[future-close] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7ae26990>
+damage = 'future-close'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+>           with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:70: Failed
+_ test_native_rank_rejects_coherent_physical_window_damage_before_decoding[overlap] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_rejects_coher6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab7a91fcb0>
+damage = 'overlap'
+
+    @pytest.mark.parametrize('damage',['extra-earlier','extra-later','missing','ordinal','future-start','future-close','overlap','oversized-rank'])
+    def test_native_rank_rejects_coherent_physical_window_damage_before_decoding(tmp_path,monkeypatch,damage):
+        path,pair=rank_fixture(tmp_path);session=opened(path,pair);store=session.store
+        try:
+            scope=bucket(store);key=store.codec.encode(11);rank=store.codec.encode(numeric_rank(-2));ordinal=0;start,end=0,None
+            if damage in ('missing','ordinal','future-start','future-close','oversized-rank'):
+                store.db.execute('DELETE FROM lazy_query_versions WHERE namespace=? AND index_name=? AND record_key=?',(NS,scope,key))
+            if damage!='missing':
+                if damage in ('extra-earlier','extra-later'):key=store.codec.encode(99);rank=store.codec.encode(numeric_rank(-3 if damage=='extra-earlier' else 10));ordinal=9
+                if damage=='ordinal':ordinal=99
+                if damage in ('future-start','overlap'):start=1
+                if damage=='future-close':end=1
+                if damage=='oversized-rank':rank=b'0'*4097
+                store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',
+                    (NS,scope,rank,key,ordinal,start,end,_query_checksum(NS,scope,rank,key,ordinal,start,end)))
+            store.db.commit();store._world_proof_authority.epoch=store._world_proof_authority._epoch()
+            seen=[];decode=store.codec.decode;selected=tuple(store.codec.encode(k) for k in (11,12,13,99))
+            def watched(raw):
+                if raw in selected:seen.append(raw)
+                return decode(raw)
+            monkeypatch.setattr(store.codec,'decode',watched)
+>           with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,before=damage=='extra-later')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:70: Failed
+_________ test_native_rank_uses_original_caller_pin_and_callback_guard _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_native_rank_uses_original0')
+
+    def test_native_rank_uses_original_caller_pin_and_callback_guard(tmp_path):
+        from dataclasses import replace
+        path,pair=rank_fixture(tmp_path)
+        with opened(path,pair) as session:
+            store=session.store;scope=bucket(store)
+            with pytest.raises(StoreError):rank_neighbor(store,replace(session.pin,token='released-pin'),NS,scope)
+            with pytest.raises(StoreConflictError):rank_neighbor(store,replace(session.pin,captured_head=1),NS,scope)
+            with pytest.raises(StoreError):
+                store.db.create_function('rank_callback',0,lambda:rank_neighbor(store,session.pin,NS,scope))
+>               store.db.execute('SELECT rank_callback()').fetchone()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_native_rank.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7fab7a869400>
+args = ('SELECT rank_callback()',), kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+>       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: user-defined function raised exception
+
+simulation/ate_sim/persistence_sqlite_guard.py:43: OperationalError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[extra-earlier]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[extra-later]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[missing]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[ordinal]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[future-start]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[future-close]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_rejects_coherent_physical_window_damage_before_decoding[overlap]
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_native_rank_uses_original_caller_pin_and_callback_guard
+8 failed, 12 passed in 17.73s

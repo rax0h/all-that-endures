@@ -1,0 +1,65 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0 -- /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/scratch/d88f8db353e8/ate
+collecting ... collected 36 items / 27 deselected / 9 selected
+
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_bad_pin_before_serializing_supplied_fields FAILED [ 11%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_temporary_physical_source_during_guarded_preparation FAILED [ 22%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-commit] FAILED [ 33%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-epoch] FAILED [ 44%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-end-snapshot] FAILED [ 55%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[True-commit] PASSED [ 66%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[True-epoch] PASSED [ 77%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[True-end-snapshot] FAILED [ 88%]
+simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_missing_active_components_cannot_fall_back_to_legacy FAILED [100%]
+
+=================================== FAILURES ===================================
+_________ test_rank_rejects_bad_pin_before_serializing_supplied_fields _________
+simulation/tests/test_stage_0_6_proof_native_rank.py:171: in test_rank_rejects_bad_pin_before_serializing_supplied_fields
+    assert not seen
+E   AssertionError: assert not ['RANK', 'KEY']
+____ test_rank_rejects_temporary_physical_source_during_guarded_preparation ____
+simulation/tests/test_stage_0_6_proof_native_rank.py:185: in test_rank_rejects_temporary_physical_source_during_guarded_preparation
+    store._world_proof_authority.execute(session,shadow)
+simulation/ate_sim/persistence_proof_world_session.py:104: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_native_rank.py:183: in shadow
+    with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-commit] _
+simulation/tests/test_stage_0_6_proof_native_rank.py:204: in test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder
+    with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,exclude=(11,) if excluded else ())
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-epoch] _
+simulation/tests/test_stage_0_6_proof_native_rank.py:204: in test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder
+    with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,exclude=(11,) if excluded else ())
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-end-snapshot] _
+simulation/tests/test_stage_0_6_proof_native_rank.py:204: in test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder
+    with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,exclude=(11,) if excluded else ())
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[True-end-snapshot] _
+simulation/tests/test_stage_0_6_proof_native_rank.py:204: in test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder
+    with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope,exclude=(11,) if excluded else ())
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+________ test_rank_missing_active_components_cannot_fall_back_to_legacy ________
+simulation/tests/test_stage_0_6_proof_native_rank.py:216: in test_rank_missing_active_components_cannot_fall_back_to_legacy
+    with pytest.raises(StoreError):rank_neighbor(store,session.pin,NS,scope)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_bad_pin_before_serializing_supplied_fields - AssertionError: assert not ['RANK', 'KEY']
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_temporary_physical_source_during_guarded_preparation - Failed: DID NOT RAISE StoreError
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-commit] - Failed: DID NOT RAISE StoreError
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-epoch] - Failed: DID NOT RAISE StoreError
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[False-end-snapshot] - Failed: DID NOT RAISE StoreError
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_rejects_snapshot_or_epoch_drift_from_selected_decoder[True-end-snapshot] - Failed: DID NOT RAISE StoreError
+FAILED simulation/tests/test_stage_0_6_proof_native_rank.py::test_rank_missing_active_components_cannot_fall_back_to_legacy - Failed: DID NOT RAISE StoreError
+================== 7 failed, 2 passed, 27 deselected in 8.68s ==================

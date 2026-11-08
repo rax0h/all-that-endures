@@ -1,0 +1,55 @@
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........................................................................ [ 40%]
+........................................................................ [ 50%]
+........................................................................ [ 60%]
+........................................................................ [ 70%]
+........................................................................ [ 80%]
+........................................................................ [ 91%]
+................................................................         [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_sources.py::test_native_point_reads_do_not_fetch_unrelated_history_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_sources.py:207: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_windows_paginate_and_shrink_without_skipping[12]
+simulation/tests/test_stage_0_6_proof_native_order.py::test_native_key_windows_paginate_and_shrink_without_skipping[3950]
+  simulation/tests/test_stage_0_6_proof_native_order.py:122: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('width',[12,3950])
+
+simulation/tests/test_stage_0_6_proof_native_order.py::test_native_count_point_and_key_page_fetch_no_unrelated_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_order.py::test_native_count_point_and_key_page_fetch_no_unrelated_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_order.py:437: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_limited_excluded_queries_fetch_only_selected_owner_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_limited_excluded_queries_fetch_only_selected_owner_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_query.py:179: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_query_windows_paginate_release_bodies_and_preserve_prefix_contract
+  simulation/tests/test_stage_0_6_proof_native_query.py:210: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_native_query_windows_paginate_release_bodies_and_preserve_prefix_contract(tmp_path,monkeypatch,record_property):
+
+simulation/tests/test_stage_0_6_proof_native_query.py::test_native_long_query_keys_shrink_windows_without_skips
+  simulation/tests/test_stage_0_6_proof_native_query.py:275: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_native_long_query_keys_shrink_windows_without_skips(tmp_path,monkeypatch,record_property):
+
+simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_reads_fetch_no_owner_or_archive_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_identity_reads_fetch_no_owner_or_archive_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_identity.py:155: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+simulation/tests/test_stage_0_6_proof_native_identity.py::test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope
+  simulation/tests/test_stage_0_6_proof_native_identity.py:214: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_native_long_identity_group_shrinks_pages_and_counts_only_current_scope(tmp_path,monkeypatch,record_property):
+
+simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_roster_reads_only_selected_ordinary_namespace_bodies[1000]
+simulation/tests/test_stage_0_6_proof_native_roster.py::test_native_roster_reads_only_selected_ordinary_namespace_bodies[10000]
+  simulation/tests/test_stage_0_6_proof_native_roster.py:156: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('size',[1000,10000])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+712 passed, 15 warnings in 1113.25s (0:18:33)

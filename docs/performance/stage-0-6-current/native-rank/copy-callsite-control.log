@@ -1,0 +1,6 @@
+stage close conversion-s2w20k5a.sqlite 0 [('ok',)]
+stage close conversion-uognv6o9.sqlite 3 [('ok',)]
+stage close conversion-yijjwmnr.sqlite 23 [('ok',)]
+stage close conversion-z5apu8zk.sqlite 7 [('ok',)]
+current with baseline neighbor passed 0baa4995d83bf7b7f9cd2c783567f415d44bece130c49a20bb623836ffa332f8
+minimum neighbor calls 0
