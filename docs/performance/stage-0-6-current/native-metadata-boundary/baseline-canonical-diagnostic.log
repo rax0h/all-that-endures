@@ -1,0 +1,33 @@
+Traceback (most recent call last):
+  File "<stdin>", line 20, in <module>
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File ".github/tests/run_proof_real_year_probe.py", line 176, in <module>
+    run(args.output,rank_proofs=args.rank_proofs)
+  File ".github/tests/run_proof_real_year_probe.py", line 94, in run
+    commitment, expected = phase('construction_and_eager_control', setup)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".github/tests/run_proof_real_year_probe.py", line 70, in phase
+    result = action(); entry['status'] = 'complete'
+             ^^^^^^^^
+  File ".github/tests/run_proof_real_year_probe.py", line 90, in setup
+    proof = copy_world_with_proofs(output/'lazy.sqlite', output/'accepted.sqlite', rules_id=rules,rank_proofs=rank_proofs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/metadata-green-baseline/simulation/ate_sim/persistence_proof_world_copy.py", line 93, in copy_world_with_proofs
+    elif floor<6:upgrade_lazy_snapshot(source,private,rules_id=rules_id)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/metadata-green-baseline/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/metadata-green-baseline/simulation/ate_sim/persistence_catalog_copy.py", line 492, in _copy_with_checked_catalog
+    committed = target.commit(pin, commit_token=token,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/metadata-green-baseline/simulation/ate_sim/persistence_lazy_store.py", line 2910, in commit
+    self._write_lazy_changes(
+  File "/workspace/scratch/d88f8db353e8/metadata-green-baseline/simulation/ate_sim/persistence_lazy_store.py", line 2243, in _write_lazy_changes
+    for namespace, items in grouped:
+                            ^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/metadata-green-baseline/simulation/ate_sim/persistence_conversion_workspace.py", line 199, in namespace_groups
+    raise StoreIntegrityError('prepared namespace index count mismatch')
+ate_sim.incremental_store.StoreIntegrityError: prepared namespace index count mismatch

@@ -50,3 +50,25 @@ This extends A2, not a new runtime relaxation. Final consumer rerun74passed266.4
 Final static/collection checks pass:4911tests1.72s, all5workflow Bash blocks,
 YAML, AST and product whitespace.170literal inventory anchors refreshed,54
 anchors changed in edited store source. No runtime change after final46cases.
+
+Clean source6a2a173/runtime d91d48cc36dc4fa822b1bf5a52bca6a218437a28:
+canonical construction failed twice, at12.283s/14.138s, with SQLite malformed
+private destination errors before native continuation. Input cold/lazy files
+both pass quick_check. Same-input fresh-process conversion succeeds on green
+baseline49.067s and candidate39.439s; both outputs pass quick_check. Instrumented
+baseline complete construction also fails, in prepared namespace-count staging.
+Cause unproven; no repair or environment attribution claimed. All raw evidence
+preserved; canonical construction gate is unqualified.
+
+Retained current-source converted artifact dcac00f3389a519fecbaac790162165ea9be3847f662110da7eb76ef2cf2f258
+supports complete eager/fresh continuation in raw and diagnostic modes. Starting
+state independently matches fresh eager year2 under full audited admission;
+year3 matches eager/fresh, accepted source unchanged, zero diagnostic save-time
+World audits. Only setup differs from canonical driver (AST verified). Raw
+opening14.967/year11.871/save9.174/fresh+digest29.982s; no controlled baseline
+speed or mature acceptance claim. This validates continuation, not the failed
+same-process construction path. Detailed limitation and provenance are recorded.
+
+API source698efdd612d051309ed5e234533d15871822b27f equals local6a2a173
+complete tree cbd4497c80a773f5c0e3ea74560469704b282354. Runtime/workflow/driver
+fingerprints rechecked unchanged; evidence child and one bundled hosted gate next.

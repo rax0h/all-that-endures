@@ -1,0 +1,33 @@
+{
+  "status": "failed",
+  "source": {
+    "head": "98eb84a61a81d9115af93a484f472ff93cdde14c",
+    "runtime_tree": "e07f77094ac4679a404ab6f2c3db1818cab7ce33",
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "driver_sha256": "4eaf1ce74f5db8a91dccf41c0400580d7804e68e68d264b026bcee8df5e6e8ca"
+  },
+  "fixture": {
+    "seed": 843000,
+    "width": 8,
+    "height": 6,
+    "settlements": 1,
+    "initial_year": 2,
+    "saved_year": 3,
+    "rank_proofs": true
+  },
+  "limitation": "Small real generated world; not mature-world or cold-cache acceptance",
+  "phases": [
+    {
+      "name": "construction_and_eager_control",
+      "status": "failed",
+      "error": "StoreIntegrityError: prepared namespace index count mismatch",
+      "wall_seconds": 14.226985342999797,
+      "parent_cpu_seconds": 13.104872127999998,
+      "child_cpu_seconds": 0.0,
+      "parent_peak_rss_high_water_kib": 37800,
+      "child_peak_rss_high_water_kib": 23976
+    }
+  ],
+  "error": "StoreIntegrityError: prepared namespace index count mismatch"
+}

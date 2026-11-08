@@ -1,0 +1,14 @@
+[
+  {
+    "name": "green-baseline",
+    "exit_code": 0,
+    "seconds": 49.067055312999855,
+    "stdout": "{\"status\": \"complete\", \"commitment\": \"2d0b22ac81e30ed6505f062cbd20d87474bf8a1124306e11fd8706bddc75b336\", \"quick_check\": [[\"ok\"]], \"new_native_helper_calls\": {}}\n"
+  },
+  {
+    "name": "candidate",
+    "exit_code": 0,
+    "seconds": 39.438535538,
+    "stdout": "{\"status\": \"complete\", \"commitment\": \"55226d28d6943c1a4efc6978ce2844c91cbec4abf06997bef139103881d3cb96\", \"quick_check\": [[\"ok\"]], \"new_native_helper_calls\": {\"head_row\": 0, \"prefix_guard\": 1363, \"codec_guard\": 0}}\n"
+  }
+]

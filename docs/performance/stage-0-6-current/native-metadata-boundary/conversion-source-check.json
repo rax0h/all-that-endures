@@ -1,0 +1,32 @@
+[
+  {
+    "name": "cold.sqlite",
+    "bytes": 512000,
+    "sha256": "4031c43c28d897f0005b6cbff95e90c427da728c8b4a50db2ede1f69be2a14cf",
+    "quick_check": [
+      [
+        "ok"
+      ]
+    ],
+    "head": [
+      [
+        2
+      ]
+    ]
+  },
+  {
+    "name": "lazy.sqlite",
+    "bytes": 5148672,
+    "sha256": "f9f20e1d737c3b7ef0c26337221d764c6ac46a8a3e1606dc468f6ac61d75a0dc",
+    "quick_check": [
+      [
+        "ok"
+      ]
+    ],
+    "head": [
+      [
+        2
+      ]
+    ]
+  }
+]

@@ -20,7 +20,17 @@ pass. Fixed independent probe: point/cache length16SQL statements each versus
 latency. Public head validation has extra bounded checks; no speedup is claimed.
 39new cases70.00s pass. Source-level body/epoch tests include callback-safe
 normal save/fresh restoration and full-audit preservation; final source/harness
-and generated-year receipts are recorded in closure.md when complete.
+and retained generated-year receipts are recorded in closure.md. Both continuation
+modes pass eager/fresh/source-immutability checks and the diagnostic save has zero
+World audits. Only fixture setup differs from the canonical driver, verified by
+AST comparison; all remaining assertions are identical.
+
+Validation limitation: canonical same-process construction did not pass in this
+workspace. Candidate private conversion and instrumented green-baseline staging
+failed before native continuation; exact-input fresh-process copies both pass.
+This is not a repaired runtime finding or a passing construction gate. Preserve
+all raw receipts and use the hash-bound, eagerly verified retained fixture to
+establish this package's continuation contract. See fixture-construction-incident.md.
 
 Review scope rulings: captured_generation and cache counters describe immutable
 capture/local diagnostics and are not new semantic source authority. Existing

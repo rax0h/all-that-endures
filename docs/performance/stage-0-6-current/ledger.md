@@ -76,3 +76,38 @@ Nov6 verifiede423c94/run42226884633 bothjobs green4,790tests+2subtests8,916.04s.
 Nov6 native ordinary roster/catalog composition: accepted head record counts now join a namespace-indexed physical COUNT before payload selection, retain every actual source proof and verify final enumeration count. Lazy namespaces reject before interpreting counts; segment count remains separate. Closed metadata parser/immutable scoped cache never replaces physical validation; selected-namespace linear work, no archive-body scan. Catalog runtime unchanged; public descriptor/retired/owner/tree/group/link/placement/membership and missing-header/source/placements checks plus metadata-only witness boundary certified. Initial7RED20controls82.11s;65GREEN171.96s;22extended73.47s;3physical13.42s; extra catalog fixture corrected from unregistered world.year to real skills owner, final9pass25.53s. Final345runtime regression1211.80s loaded before three extra catalog cases, covered by final9 and independent8pass21.66s;33clean launcher46.16s,4816collection2.27s. One independent review/probes no actionable issue or deferred Minor; author fixture/instrumentation findings all closed. Canonical eager/fresh/source immutability/zero-save-audit gates pass; raw open16.567/step13.880/save11.063/fresh34.621s shared host alongside correctness work, no controlled speed/mature claim. Local53ed484 equals API403664d full source tree6ac8e9eff6f0750646b99ecabf94b9b4264cf7ca, runtime757c3c3f5ea0f876d4a48c75af83e88b5a241bb6. Source pin/fingerprints/YAML/all21Bash blocks/reviewed hashes verified. One evidence-child full/proof publication; hosted completion pending. Full opening audit stays until remaining raw metadata readers are certified; next inventory names rank-neighbor/head metadata/retirement scope consumers. No main/default/mature/endurance action. Detailed register and raw history:native-roster/.
 
 Nov7 native rank boundary: explicit seventh scope root/v4 with atomic rank projection; indexed first/last/strict predecessor/successor windows authenticate selected absence/gaps before decoding, plus budgets/pin/epoch/source/snapshot rechecks. One independent review4Important+1Minor all closed with final47cases45.35s. Broader712cases1113.25s and259affected231.87s pass (pre-last-one-line-guard supporting scope qualified); final runtime e07f77094ac4679a404ab6f2c3db1818cab7ce33. Clean serial generated year3 raw/diagnostic eager/fresh/source-immutable/0save-audit gates pass. Earlier setup conversion/SQLite failures preserved without proven attribution. Rank opt-in only; audited opening, remaining metadata reader inventory and mature10s/2s/1s remain open. Consolidated closure/review/evidence:native-rank/. One bundled hosted full/proof gate next; no main/default/mature/endurance action.
+
+
+Nov8 verified98eb84a/run42438098176 green: 4,872 tests, 2 subtests, one deliberate
+ZIP warning, 9,417.42s; proof job successful. The extra time versus the previous
+7,467.25s run includes slower old tests; no controlled runner/code attribution.
+
+Native metadata/cache boundary candidate: public generation/checked_head/
+head_metadata retain the admitted original pin, epoch, snapshot and source before
+and after decoding/cleanup. Cached sealed-event reads check accepted context;
+cold reads and explicit verify_full retain the original binding through decoding.
+One independent review, four Important and two Minor findings, all fixed locally.
+Final 46 metadata/head cases pass in89.41s; 39 new metadata cases70.00s; 74 recovery
+cases266.47s. Twenty old diagnostic assertion sites now read physical generation
+explicitly during uncertain/stale states; public reads still reject and original
+recovery/retry/fresh checks remain. Broader pre-final-review selection276pass/
+1diagnostic-contract failure707.50s is qualified supporting evidence, not final
+source verification. 4,911 cases collect1.72s; AST/YAML/all5Bash blocks and source
+fingerprints checked. Literal reader inventory170sites is not proof-only opening
+approval. Local6a2a173 equals API698efdd complete tree cbd4497c80a773f5c0e3ea74560469704b282354,
+runtime d91d48cc36dc4fa822b1bf5a52bca6a218437a28.
+
+Canonical same-process fixture construction failed twice in candidate private
+conversion (SQLite malformed database); instrumented baseline staging also failed
+with a different checked namespace-count error. Both inputs pass quick_check;
+exact-input fresh-process conversions succeed on baseline and candidate with valid
+outputs. Cause unproven, construction not marked repaired. Hash-bound retained
+current-source fixture independently matches eager initial state under full audit;
+raw/diagnostic year3 and fresh restores then match eager, source remains unchanged,
+zero diagnostic save-time World audits. Only setup differs from canonical driver
+(AST checked). Raw small-world open14.967/year11.871/save9.174/fresh+digest29.982s;
+no controlled speed or mature claim. Raw failures, retained receipt/provenance and
+scope limitation are preserved in native-metadata-boundary/. Evidence child and
+one bundled full/proof publication next. Hosted validation, canonical construction,
+proof-only opening, mature10s/2s/1s and final acceptance remain unqualified. No
+main/default/mature/endurance action.
