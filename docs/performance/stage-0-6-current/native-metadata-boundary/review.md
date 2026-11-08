@@ -40,3 +40,10 @@ approve proof-only opening. Full audit removal, default activation, generic
 reader redesign and mature target qualification remain outside this group;
 those gates remain enforced. If relaxed prematurely, unverified restoration or
 unmeasured latency could be exposed. No second review dispatched.
+
+Workflow label correction: the inherited Actions display name still said Stage0.5.
+Rename it to Stage0.6 durable proof map validation, retaining the existing filename
+and every trigger/job/step/timeout/concurrency setting. Parsed YAML equality after
+removing only name confirms no functional workflow change; product diff whitespace
+passes. Publish with [skip ci] so the active 8d0fea0 validation continues without
+a duplicate cycle. This label finding is closed in the current package.

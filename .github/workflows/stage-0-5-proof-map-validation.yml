@@ -1,4 +1,4 @@
-name: Stage 0.5 durable proof map validation
+name: Stage 0.6 durable proof map validation
 'on':
   push:
     branches: [sol/durable-proof-map]
