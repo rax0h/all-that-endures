@@ -131,7 +131,9 @@ def test_scalar_growth_rejects_inconsistent_frozen_authority(tmp_path, monkeypat
         with monkeypatch.context() as patch:
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError):session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
         pair = session.proof_manifest
@@ -326,7 +328,9 @@ def test_above_total_cap_still_requires_exact_catalog_and_recovers(tmp_path, mon
         with monkeypatch.context() as patch:
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError, match='catalog differs'):session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
         pair = session.proof_manifest

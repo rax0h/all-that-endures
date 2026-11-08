@@ -1,0 +1,22 @@
+{
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "sha256": {
+    "simulation/ate_sim/persistence_proof_native_metadata.py": "bc91f91b6d622c26bf0c3683e341cdbbeb735cf332ba9d6219617592a02161b6",
+    "simulation/ate_sim/persistence_lazy_store.py": "2992f5513d32c9bf6228251c770b13141d3ca002db23cca4e9da0e644a2ee7f5",
+    "simulation/ate_sim/persistence_events.py": "f8a1d4d8ae2859568dabcdc5b2843d80ea40fc0a24f00137ef34594fd070e838",
+    "simulation/tests/test_stage_0_6_proof_native_metadata.py": "869ff7d3571d18966b5f6ecc484a684a11e031e24ca62da36c1ac456e9785ea7",
+    ".github/tests/run_proof_real_year_probe.py": "4eaf1ce74f5db8a91dccf41c0400580d7804e68e68d264b026bcee8df5e6e8ca",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "d2698080956426f185050760548cffdaa1cad94cfec3b95bef9d1ad44c100e4a"
+  },
+  "literal_read_sites": 170,
+  "collection": {
+    "tests": 4911,
+    "seconds": 1.72
+  },
+  "static": {
+    "python_ast": "pass",
+    "workflow_yaml": "pass",
+    "bash_blocks": 5
+  }
+}

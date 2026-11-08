@@ -1,0 +1,51 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_native_component_refresh_failure_requires_original_parent_recovery ____
+simulation/tests/test_stage_0_6_proof_native_order.py:235: in test_native_component_refresh_failure_requires_original_parent_recovery
+    assert failed and store.generation==1 and session._pending_save is not None
+                      ^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_native_order.py:225: in test_native_component_refresh_failure_requires_original_parent_recovery
+    with opened(path,pair) as session:
+         ^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_order.py::test_native_component_refresh_failure_requires_original_parent_recovery
+1 failed in 3.85s

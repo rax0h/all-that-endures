@@ -1,0 +1,3014 @@
+Selected functions 21
+FFFFFFFFFFFFFFFFFF......FFFFF....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 97%]
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_scalar_growth_rejects_inconsistent_frozen_authority[missing-entry] ____
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_scalar_growth_rejects_inconsistent_frozen_authority[wrong-types] _____
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_scalar_growth_rejects_inconsistent_frozen_authority[wrong-ordinal] ____
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_scalar_growth_rejects_inconsistent_frozen_authority[wrong-membership] __
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_scalar_growth_rejects_inconsistent_frozen_authority[malformed-entry] ___
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_scalar_growth_rejects_inconsistent_frozen_authority[missing-header] ___
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_scalar_growth_rejects_inconsistent_frozen_authority[bad-header] _____
+simulation/tests/test_stage_0_6_proof_world_components.py:134: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:109: in test_scalar_growth_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_above_total_cap_still_requires_exact_catalog_and_recovers[missing-header] _
+simulation/tests/test_stage_0_6_proof_world_components.py:329: in test_above_total_cap_still_requires_exact_catalog_and_recovers
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:313: in test_above_total_cap_still_requires_exact_catalog_and_recovers
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_above_total_cap_still_requires_exact_catalog_and_recovers[bad-header] __
+simulation/tests/test_stage_0_6_proof_world_components.py:329: in test_above_total_cap_still_requires_exact_catalog_and_recovers
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_components.py:313: in test_above_total_cap_still_requires_exact_catalog_and_recovers
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_allocation_free_insertion_authenticates_catalog_dependencies[aux.lazy.identity.catalog] _
+simulation/tests/test_stage_0_6_proof_world_insert.py:65: in test_allocation_free_insertion_authenticates_catalog_dependencies
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:43: in test_allocation_free_insertion_authenticates_catalog_dependencies
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_allocation_free_insertion_authenticates_catalog_dependencies[aux.lazy.identity.retired] _
+simulation/tests/test_stage_0_6_proof_world_insert.py:65: in test_allocation_free_insertion_authenticates_catalog_dependencies
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:43: in test_allocation_free_insertion_authenticates_catalog_dependencies
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_________ test_insertion_rejects_inconsistent_frozen_authority[group] __________
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+________ test_insertion_rejects_inconsistent_frozen_authority[catalog] _________
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_________ test_insertion_rejects_inconsistent_frozen_authority[query] __________
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_insertion_rejects_inconsistent_frozen_authority[missing-identity] ____
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_insertion_rejects_inconsistent_frozen_authority[extra-identity] _____
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_________ test_insertion_rejects_inconsistent_frozen_authority[layout] _________
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_insertion_rejects_inconsistent_frozen_authority[ordinary-owner] _____
+simulation/tests/test_stage_0_6_proof_world_insert.py:254: in test_insertion_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_insert.py:216: in test_insertion_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_mixed_save_rejects_incomplete_or_inconsistent_authority[existing-header] _
+simulation/tests/test_stage_0_6_proof_world_mixed.py:158: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_mixed.py:130: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_mixed_save_rejects_incomplete_or_inconsistent_authority[new-header] ___
+simulation/tests/test_stage_0_6_proof_world_mixed.py:158: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_mixed.py:130: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_mixed_save_rejects_incomplete_or_inconsistent_authority[missing-page] __
+simulation/tests/test_stage_0_6_proof_world_mixed.py:158: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_mixed.py:130: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_mixed_save_rejects_incomplete_or_inconsistent_authority[wrong-types] ___
+simulation/tests/test_stage_0_6_proof_world_mixed.py:158: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_mixed.py:130: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_mixed_save_rejects_incomplete_or_inconsistent_authority[extra-identity] _
+simulation/tests/test_stage_0_6_proof_world_mixed.py:158: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_mixed.py:130: in test_mixed_save_rejects_incomplete_or_inconsistent_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_________________ test_cyclic_fresh_backing_graph_is_rejected __________________
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:116: in test_cyclic_fresh_backing_graph_is_rejected
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:88: in test_cyclic_fresh_backing_graph_is_rejected
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+________ test_backed_record_cannot_bypass_class_incoming_policy[False] _________
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:142: in test_backed_record_cannot_bypass_class_incoming_policy
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:137: in test_backed_record_cannot_bypass_class_incoming_policy
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_________ test_backed_record_cannot_bypass_class_incoming_policy[True] _________
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:142: in test_backed_record_cannot_bypass_class_incoming_policy
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:137: in test_backed_record_cannot_bypass_class_incoming_policy
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_fresh_forest_rejects_inconsistent_frozen_authority[missing-page] _____
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_fresh_forest_rejects_inconsistent_frozen_authority[extra-page] ______
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_fresh_forest_rejects_inconsistent_frozen_authority[bool-count] ______
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_fresh_forest_rejects_inconsistent_frozen_authority[dependency-kind] ___
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_fresh_forest_rejects_inconsistent_frozen_authority[missing-identity] ___
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_fresh_forest_rejects_inconsistent_frozen_authority[extra-identity] ____
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_fresh_forest_rejects_inconsistent_frozen_authority[missing-header] ____
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:208: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:182: in test_fresh_forest_rejects_inconsistent_frozen_authority
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_surplus_physical_alias_roster_is_rejected_before_legacy_scan[occurrence] _
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:243: in test_surplus_physical_alias_roster_is_rejected_before_legacy_scan
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:220: in test_surplus_physical_alias_roster_is_rejected_before_legacy_scan
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_surplus_physical_alias_roster_is_rejected_before_legacy_scan[link] ____
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:243: in test_surplus_physical_alias_roster_is_rejected_before_legacy_scan
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_new_backings.py:220: in test_surplus_physical_alias_roster_is_rejected_before_legacy_scan
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+______ test_ordinary_composition_rejects_forged_frozen_sources[event-id] _______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+______ test_ordinary_composition_rejects_forged_frozen_sources[event-gap] ______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_ordinary_composition_rejects_forged_frozen_sources[event-cause] _____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_ordinary_composition_rejects_forged_frozen_sources[tail-count] ______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+______ test_ordinary_composition_rejects_forged_frozen_sources[tail-year] ______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+______ test_ordinary_composition_rejects_forged_frozen_sources[event-ids] ______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_ordinary_composition_rejects_forged_frozen_sources[next-event] ______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_______ test_ordinary_composition_rejects_forged_frozen_sources[layout] ________
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_ordinary_composition_rejects_forged_frozen_sources[action-prefix] ____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_ordinary_composition_rejects_forged_frozen_sources[missing-header] ____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_ordinary_composition_rejects_forged_frozen_sources[bad-header] ______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:89: in test_ordinary_composition_rejects_forged_frozen_sources
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:50: in test_ordinary_composition_rejects_forged_frozen_sources
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+__ test_adoption_counter_delta_requires_all_and_only_derived_updates[missing] __
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:316: in test_adoption_counter_delta_requires_all_and_only_derived_updates
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:296: in test_adoption_counter_delta_requires_all_and_only_derived_updates
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_adoption_counter_delta_requires_all_and_only_derived_updates[wrong] ___
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:316: in test_adoption_counter_delta_requires_all_and_only_derived_updates
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:296: in test_adoption_counter_delta_requires_all_and_only_derived_updates
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+___ test_adoption_counter_delta_requires_all_and_only_derived_updates[extra] ___
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:316: in test_adoption_counter_delta_requires_all_and_only_derived_updates
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:296: in test_adoption_counter_delta_requires_all_and_only_derived_updates
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+________ test_catalog_retirement_rejects_missing_physical_query_witness ________
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:343: in test_catalog_retirement_rejects_missing_physical_query_witness
+    assert session.store.generation == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:330: in test_catalog_retirement_rejects_missing_physical_query_witness
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_________ test_catalog_retirement_cannot_delete_a_live_unrelated_group _________
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:374: in test_catalog_retirement_cannot_delete_a_live_unrelated_group
+    assert session.store.generation == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:357: in test_catalog_retirement_cannot_delete_a_live_unrelated_group
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_______ test_uncertified_adoption_cannot_commit_omitted_counters[budget] _______
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:405: in test_uncertified_adoption_cannot_commit_omitted_counters
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:392: in test_uncertified_adoption_cannot_commit_omitted_counters
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_uncertified_adoption_cannot_commit_omitted_counters[full-audit] _____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:405: in test_uncertified_adoption_cannot_commit_omitted_counters
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:392: in test_uncertified_adoption_cannot_commit_omitted_counters
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_genealogy_invalid_tuple_cannot_publish_with_matching_owner[False] ____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:467: in test_genealogy_invalid_tuple_cannot_publish_with_matching_owner
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:449: in test_genealogy_invalid_tuple_cannot_publish_with_matching_owner
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_genealogy_invalid_tuple_cannot_publish_with_matching_owner[True] _____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:467: in test_genealogy_invalid_tuple_cannot_publish_with_matching_owner
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:449: in test_genealogy_invalid_tuple_cannot_publish_with_matching_owner
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_retirement_rejects_oversized_interval_metadata_without_transfer _____
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:651: in test_retirement_rejects_oversized_interval_metadata_without_transfer
+    assert session.store.generation == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_ordinary.py:636: in test_retirement_rejects_oversized_interval_metadata_without_transfer
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_sequence_append_rejects_inconsistent_frozen_rows[missing-locator] ____
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_sequence_append_rejects_inconsistent_frozen_rows[wrong-locator] _____
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+______ test_sequence_append_rejects_inconsistent_frozen_rows[wrong-types] ______
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____ test_sequence_append_rejects_inconsistent_frozen_rows[missing-owner] _____
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_______ test_sequence_append_rejects_inconsistent_frozen_rows[bad-owner] _______
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_sequence_append_rejects_inconsistent_frozen_rows[bad-descriptor] _____
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+____ test_sequence_append_rejects_inconsistent_frozen_rows[malformed-leaf] _____
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_ test_sequence_append_rejects_inconsistent_frozen_rows[malformed-occurrence] __
+simulation/tests/test_stage_0_6_proof_world_sequence.py:152: in test_sequence_append_rejects_inconsistent_frozen_rows
+    assert session.store.generation == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:766: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:775: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:44: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1338: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1287: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_proof_world_sequence.py:116: in test_sequence_append_rejects_inconsistent_frozen_rows
+    with opened(path, pair) as session:
+         ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[missing-entry]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[wrong-types]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[wrong-ordinal]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[wrong-membership]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[malformed-entry]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[missing-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_scalar_growth_rejects_inconsistent_frozen_authority[bad-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_above_total_cap_still_requires_exact_catalog_and_recovers[missing-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_components.py::test_above_total_cap_still_requires_exact_catalog_and_recovers[bad-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_allocation_free_insertion_authenticates_catalog_dependencies[aux.lazy.identity.catalog]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_allocation_free_insertion_authenticates_catalog_dependencies[aux.lazy.identity.retired]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[group]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[catalog]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[query]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[missing-identity]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[extra-identity]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[layout]
+FAILED simulation/tests/test_stage_0_6_proof_world_insert.py::test_insertion_rejects_inconsistent_frozen_authority[ordinary-owner]
+FAILED simulation/tests/test_stage_0_6_proof_world_mixed.py::test_mixed_save_rejects_incomplete_or_inconsistent_authority[existing-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_mixed.py::test_mixed_save_rejects_incomplete_or_inconsistent_authority[new-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_mixed.py::test_mixed_save_rejects_incomplete_or_inconsistent_authority[missing-page]
+FAILED simulation/tests/test_stage_0_6_proof_world_mixed.py::test_mixed_save_rejects_incomplete_or_inconsistent_authority[wrong-types]
+FAILED simulation/tests/test_stage_0_6_proof_world_mixed.py::test_mixed_save_rejects_incomplete_or_inconsistent_authority[extra-identity]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_cyclic_fresh_backing_graph_is_rejected
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_backed_record_cannot_bypass_class_incoming_policy[False]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_backed_record_cannot_bypass_class_incoming_policy[True]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[missing-page]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[extra-page]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[bool-count]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[dependency-kind]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[missing-identity]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[extra-identity]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_fresh_forest_rejects_inconsistent_frozen_authority[missing-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_surplus_physical_alias_roster_is_rejected_before_legacy_scan[occurrence]
+FAILED simulation/tests/test_stage_0_6_proof_world_new_backings.py::test_surplus_physical_alias_roster_is_rejected_before_legacy_scan[link]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[event-id]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[event-gap]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[event-cause]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[tail-count]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[tail-year]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[event-ids]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[next-event]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[layout]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[action-prefix]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[missing-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_ordinary_composition_rejects_forged_frozen_sources[bad-header]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_adoption_counter_delta_requires_all_and_only_derived_updates[missing]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_adoption_counter_delta_requires_all_and_only_derived_updates[wrong]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_adoption_counter_delta_requires_all_and_only_derived_updates[extra]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_catalog_retirement_rejects_missing_physical_query_witness
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_catalog_retirement_cannot_delete_a_live_unrelated_group
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_uncertified_adoption_cannot_commit_omitted_counters[budget]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_uncertified_adoption_cannot_commit_omitted_counters[full-audit]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_genealogy_invalid_tuple_cannot_publish_with_matching_owner[False]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_genealogy_invalid_tuple_cannot_publish_with_matching_owner[True]
+FAILED simulation/tests/test_stage_0_6_proof_world_ordinary.py::test_retirement_rejects_oversized_interval_metadata_without_transfer
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[missing-locator]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[wrong-locator]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[wrong-types]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[missing-owner]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[bad-owner]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[bad-descriptor]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[malformed-leaf]
+FAILED simulation/tests/test_stage_0_6_proof_world_sequence.py::test_sequence_append_rejects_inconsistent_frozen_rows[malformed-occurrence]
+64 failed, 10 passed in 220.12s (0:03:40)

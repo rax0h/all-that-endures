@@ -1,0 +1,90 @@
+...............................................F..............F..        [100%]
+=================================== FAILURES ===================================
+__ test_native_partial_participant_acknowledgement_recovers_original_manifest __
+simulation/tests/test_stage_0_5_proof_world_session.py:84: in test_native_partial_participant_acknowledgement_recovers_original_manifest
+    assert s.store.generation==1
+           ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:761: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:770: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:25: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1333: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1282: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:39: in before_snapshot
+    raise StoreError('native source publication requires exact recovery')
+E   ate_sim.incremental_store.StoreError: native source publication requires exact recovery
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_5_proof_world_session.py:80: in test_native_partial_participant_acknowledgement_recovers_original_manifest
+    with opened(path,pair) as s:
+         ^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18058: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18016: in close
+    raise StoreError(
+E   ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+_____________ test_noop_does_not_accept_a_new_epoch_without_audit ______________
+simulation/tests/test_stage_0_5_proof_world_session.py:212: in test_noop_does_not_accept_a_new_epoch_without_audit
+    assert injected and s.store.generation==0
+                        ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:761: in generation
+    with self._head_read() as row:
+         ^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:770: in _head_read
+    with head_row(self,authority) as row:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_metadata.py:25: in head_row
+    with sources._snapshot(store,authority,pin=pin) as manifest:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_native_sources.py:81: in _snapshot
+    with store.read_snapshot(pin) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1333: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1282: in _read_snapshot_start
+    proof_sources.before_snapshot(self, authority, pin)
+simulation/ate_sim/persistence_proof_native_sources.py:45: in before_snapshot
+    _epoch(store, authority)
+simulation/ate_sim/persistence_proof_native_sources.py:54: in _epoch
+    raise StoreConflictError('native source snapshot epoch differs from accepted authority')
+E   ate_sim.incremental_store.StoreConflictError: native source snapshot epoch differs from accepted authority
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_native_partial_participant_acknowledgement_recovers_original_manifest
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_noop_does_not_accept_a_new_epoch_without_audit
+2 failed, 63 passed in 157.87s (0:02:37)

@@ -740,46 +740,52 @@ class LazyRecordStore:
         # field. Do not cache the row read itself: rereading + rehashing is what
         # preserves live corruption detection.
         if row != self._validated_head_row_cache:
-            self.codec.decode(row[2])
-            self.codec.decode(row[4])
-            namespaces = self.codec.decode(row[5])
-            if type(namespaces) is not tuple or any(
-                type(v) is not str for v in namespaces
-            ):
-                raise StoreIntegrityError("invalid namespace inventory")
-            counts = _namespace_counts(self.codec, row[6])
-            if not set(counts).issubset(set(namespaces)):
-                raise StoreIntegrityError(
-                    "namespace counts are outside head inventory"
-                )
-            self._validated_head_row_cache = row
+            guard=nullcontext()
+            if expected_manifest is not None:
+                from .persistence_proof_native_metadata import codec_guard
+                guard=codec_guard(self)
+            with guard:
+                self.codec.decode(row[2])
+                self.codec.decode(row[4])
+                namespaces = self.codec.decode(row[5])
+                if type(namespaces) is not tuple or any(
+                    type(v) is not str for v in namespaces
+                ):
+                    raise StoreIntegrityError("invalid namespace inventory")
+                counts = _namespace_counts(self.codec, row[6])
+                if not set(counts).issubset(set(namespaces)):
+                    raise StoreIntegrityError(
+                        "namespace counts are outside head inventory"
+                    )
+                self._validated_head_row_cache = row
         return row
 
     @property
     def generation(self) -> int:
         self._ensure_open()
-        return int(self._checked_head_row()[0])
+        with self._head_read() as row:
+            return int(row[0])
+
+    @contextmanager
+    def _head_read(self):
+        from . import persistence_proof_native_sources as proof_sources
+        authority=proof_sources.active(self)
+        if authority is not None:
+            from .persistence_proof_native_metadata import head_row
+            with head_row(self,authority) as row:
+                yield row
+        else:
+            yield self._checked_head_row()
 
     def head_metadata(self) -> dict[str, Any]:
         self._ensure_open()
-        from . import persistence_proof_native_sources as proof_sources
-        authority = proof_sources.active(self)
-        if authority is not None:
-            with proof_sources._snapshot(self, authority) as manifest:
-                row = self._checked_head_row(expected_manifest=manifest)
-                return {
-                    "simulation_position": self.codec.decode(row[2]),
-                    "seed": row[3],
-                    "next_ids": self.codec.decode(row[4]),
-                    "namespaces": self.codec.decode(row[5]),
-                }
-        row = self._checked_head_row()
-        return {
-            "simulation_position": self.codec.decode(row[2]),
-            "seed": row[3],
-            "next_ids": self.codec.decode(row[4]),
-            "namespaces": self.codec.decode(row[5]),
-        }
+        with self._head_read() as row:
+            return {
+                "simulation_position": self.codec.decode(row[2]),
+                "seed": row[3],
+                "next_ids": self.codec.decode(row[4]),
+                "namespaces": self.codec.decode(row[5]),
+            }
 
     def _checked_pin_row(self, token: str) -> tuple[str, int, str]:
         row = self.db.execute(
@@ -968,18 +974,18 @@ class LazyRecordStore:
 
     def checked_head(self) -> CheckedHead:
         self._ensure_open()
-        row = self._checked_head_row()
-        return CheckedHead(
-            generation=int(row[0]),
-            parent_generation=row[1],
-            metadata={
-                "simulation_position": self.codec.decode(row[2]),
-                "seed": row[3],
-                "next_ids": self.codec.decode(row[4]),
-                "namespaces": self.codec.decode(row[5]),
-            },
-            namespace_counts=_namespace_counts(self.codec, row[6]),
-        )
+        with self._head_read() as row:
+            return CheckedHead(
+                generation=int(row[0]),
+                parent_generation=row[1],
+                metadata={
+                    "simulation_position": self.codec.decode(row[2]),
+                    "seed": row[3],
+                    "next_ids": self.codec.decode(row[4]),
+                    "namespaces": self.codec.decode(row[5]),
+                },
+                namespace_counts=_namespace_counts(self.codec, row[6]),
+            )
 
     @contextmanager
     def read_transaction(self):

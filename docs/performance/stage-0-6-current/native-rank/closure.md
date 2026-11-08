@@ -45,3 +45,5 @@ retirement readers; proof-based opening; mature open+restore<=10s/save<=2s/warm
 year<=1s measurements; final end-to-end architecture acceptance. Full opening
 audit stays mandatory. No main merge, default activation or endurance run.
 One bundled hosted full-suite/proof-map publication follows this evidence.
+
+Hosted gate closed:98eb84a/run42438098176 both jobs green;4872tests+2subtests9417.42s,1deliberate ZIP warning. New rank cases passed in proof-map50.91s; source/runtime matches the reviewed candidate.

@@ -1,0 +1,58 @@
+.FFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_ test_native_prefix_rechecks_after_segment_codec_before_caching[False-verify] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:125: in test_native_prefix_rechecks_after_segment_codec_before_caching
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+__ test_native_prefix_rechecks_after_segment_codec_before_caching[True-point] __
+simulation/tests/test_stage_0_6_proof_native_metadata.py:125: in test_native_prefix_rechecks_after_segment_codec_before_caching
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_native_prefix_rechecks_after_segment_codec_before_caching[True-verify] __
+simulation/tests/test_stage_0_6_proof_native_metadata.py:125: in test_native_prefix_rechecks_after_segment_codec_before_caching
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+____ test_native_head_retains_original_transaction_and_pin[opener-rebegin] _____
+simulation/tests/test_stage_0_6_proof_native_metadata.py:159: in test_native_head_retains_original_transaction_and_pin
+    with pytest.raises(StoreError):store.checked_head()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+______ test_native_head_retains_original_transaction_and_pin[opener-pin] _______
+simulation/tests/test_stage_0_6_proof_native_metadata.py:159: in test_native_head_retains_original_transaction_and_pin
+    with pytest.raises(StoreError):store.checked_head()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+____ test_native_head_retains_original_transaction_and_pin[result-rebegin] _____
+simulation/tests/test_stage_0_6_proof_native_metadata.py:159: in test_native_head_retains_original_transaction_and_pin
+    with pytest.raises(StoreError):store.checked_head()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+______ test_native_head_retains_original_transaction_and_pin[result-pin] _______
+simulation/tests/test_stage_0_6_proof_native_metadata.py:159: in test_native_head_retains_original_transaction_and_pin
+    with pytest.raises(StoreError):store.checked_head()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+__________ test_native_head_checks_epoch_after_owned_snapshot_cleanup __________
+simulation/tests/test_stage_0_6_proof_native_metadata.py:173: in test_native_head_checks_epoch_after_owned_snapshot_cleanup
+    with pytest.raises(StoreError):store.checked_head()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warm_prefix_has_one_bounded_context_check_and_rejects_arbitrary_transaction _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:185: in test_warm_prefix_has_one_bounded_context_check_and_rejects_arbitrary_transaction
+    assert len(sql)<=25
+E   assert 54 <= 25
+E    +  where 54 = len(["SELECT 1 FROM sqlite_temp_schema AS t JOIN main.sqlite_schema AS m ON t.name=m.name COLLATE NOCASE WHERE t.type IN (... WHERE type='trigger' LIMIT 1", 'PRAGMA data_version', 'PRAGMA main.schema_version', 'PRAGMA temp.schema_version', ...])
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_prefix_rechecks_after_segment_codec_before_caching[False-verify]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_prefix_rechecks_after_segment_codec_before_caching[True-point]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_prefix_rechecks_after_segment_codec_before_caching[True-verify]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_head_retains_original_transaction_and_pin[opener-rebegin]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_head_retains_original_transaction_and_pin[opener-pin]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_head_retains_original_transaction_and_pin[result-rebegin]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_head_retains_original_transaction_and_pin[result-pin]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_head_checks_epoch_after_owned_snapshot_cleanup
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warm_prefix_has_one_bounded_context_check_and_rejects_arbitrary_transaction
+9 failed, 1 passed, 29 deselected in 19.28s

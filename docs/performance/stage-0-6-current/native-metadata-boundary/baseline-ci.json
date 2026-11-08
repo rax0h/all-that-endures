@@ -1,0 +1,35 @@
+{
+  "run": 42438098176,
+  "source": "98eb84a61a81d9115af93a484f472ff93cdde14c",
+  "conclusion": "success",
+  "full_suite": {
+    "passed": 4872,
+    "subtests": 2,
+    "warnings": 1,
+    "seconds": 9417.42
+  },
+  "proof_map": {
+    "conclusion": "success",
+    "rank_cases": 47,
+    "rank_seconds": 50.91
+  },
+  "previous_full_suite_seconds": 7467.25,
+  "slow_cases": [
+    {
+      "name": "history streaming400",
+      "before": 1026.31,
+      "after": 1288.48
+    },
+    {
+      "name": "scalar imported history",
+      "before": 331.0,
+      "after": 491.32
+    },
+    {
+      "name": "cold bootstrap",
+      "before": 289.98,
+      "after": 345.02
+    }
+  ],
+  "limitation": "Cross-run observation; does not distinguish runner variance from indirect code cost."
+}

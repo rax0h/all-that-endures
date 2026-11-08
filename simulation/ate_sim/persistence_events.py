@@ -392,16 +392,18 @@ class SealedEventPrefix(Sequence):
         self._segment_reads = 0
         self._segment_read_bytes = 0
 
-    def _ensure_readable(self) -> None:
+    def _ensure_readable(self) -> tuple | None:
         if self._closed:
             raise StoreError("sealed-event reader is closed")
         if (id(self._store), id(self._store.db)) != self._store_identity:
             raise StoreError("sealed-event reader store identity changed")
         self._store._ensure_open()
+        from .persistence_proof_native_metadata import prefix_guard
+        return prefix_guard(self._store)
 
     def _read_segment_from_store(self, ordinal: int) -> tuple[Event, ...]:
         """Reread and validate one captured segment through P1 storage."""
-        self._ensure_readable()
+        binding = self._ensure_readable()
         if ordinal < 0 or ordinal >= self._descriptor.segment_count:
             raise IndexError(ordinal)
         try:
@@ -424,10 +426,13 @@ class SealedEventPrefix(Sequence):
         events = _decode_segment(checked.value, ordinal)
         if events[0].id != checked.first_id or events[-1].id != checked.last_id:
             raise StoreIntegrityError("sealed-event payload disagrees with segment metadata")
+        from .persistence_proof_native_metadata import prefix_guard
+        prefix_guard(self._store,binding=binding)
         return events
 
     def _load_segment(self, ordinal: int) -> tuple[Event, ...]:
-        self._ensure_readable()
+        # The sole caller (__getitem__) checked reader/pin/epoch before this
+        # private lookup. Cold reads recheck their original binding on return.
         if ordinal < 0 or ordinal >= self._descriptor.segment_count:
             raise IndexError(ordinal)
         cached = self._cache.get(ordinal)

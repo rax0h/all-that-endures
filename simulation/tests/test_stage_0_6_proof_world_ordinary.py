@@ -86,7 +86,9 @@ def test_ordinary_composition_rejects_forged_frozen_sources(tmp_path, monkeypatc
         with monkeypatch.context() as patch:
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError):session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
         pair = session.proof_manifest
@@ -313,7 +315,9 @@ def test_adoption_counter_delta_requires_all_and_only_derived_updates(tmp_path, 
         with monkeypatch.context() as patch:
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError, match='bucket'):session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
 
@@ -340,7 +344,9 @@ def test_catalog_retirement_rejects_missing_physical_query_witness(tmp_path, mon
         with monkeypatch.context() as patch:
             patch.setattr(insert, 'prepare', missing)
             with pytest.raises(StoreError, match='retirement physical query'):session.save()
-        assert session.store.generation == 1
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (1,)
         assert session.resolve_save() == 1
         assert session.save() == 2
 
@@ -371,7 +377,9 @@ def test_catalog_retirement_cannot_delete_a_live_unrelated_group(tmp_path, monke
         with monkeypatch.context() as patch:
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError):session.save()
-        assert session.store.generation == 1
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (1,)
         assert session.resolve_save() == 1
         assert session.save() == 2
         pair = session.proof_manifest
@@ -402,7 +410,9 @@ def test_uncertified_adoption_cannot_commit_omitted_counters(tmp_path, monkeypat
                 patch.setattr(value, 'validate_value_transition', lambda *a, **k:False)
                 patch.setattr(insert, 'prepare', lambda *a, **k:None)
             with pytest.raises(StoreError):session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
         pair = session.proof_manifest
@@ -464,7 +474,9 @@ def test_genealogy_invalid_tuple_cannot_publish_with_matching_owner(tmp_path, mo
                 patch.setattr(value, 'validate_value_transition', lambda *a, **k:False)
                 patch.setattr(insert, 'prepare', lambda *a, **k:None)
             with pytest.raises(StoreError):session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
         pair = session.proof_manifest
@@ -648,7 +660,9 @@ def test_retirement_rejects_oversized_interval_metadata_without_transfer(tmp_pat
             patch.setattr(insert, 'prepare', corrupt)
             with pytest.raises(StoreError, match='retirement physical query'):session.save()
         session.store.db.text_factory = str
-        assert session.store.generation == 1
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (1,)
         assert session.resolve_save() == 1
         assert session.save() == 2
 

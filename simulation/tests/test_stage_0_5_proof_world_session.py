@@ -81,7 +81,10 @@ def test_native_partial_participant_acknowledgement_recovers_original_manifest(t
   s.skills[1,'craft'].level=.375
   monkeypatch.setattr(FamilySaveParticipant,'accept_delta',partial)
   with pytest.raises(RuntimeError):s.save()
-  assert s.store.generation==1
+  # Durable evidence is diagnostic SQL while acknowledged native reads remain
+  # blocked until this exact partially accepted attempt is resolved.
+  assert s.store.db.execute('SELECT generation FROM main.save_head WHERE singleton=1').fetchone()==(1,)
+  with pytest.raises(StoreError):s.store.generation
   monkeypatch.setattr(FamilySaveParticipant,'accept_delta',original)
   assert s.resolve_save()==1 and s.save()==1
   child=s.proof_manifest
@@ -209,7 +212,8 @@ def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
    return captured
   monkeypatch.setattr(authority,'_epoch',race)
   assert s.save()==0
-  assert injected and s.store.generation==0
+  assert injected and s.store.db.execute('SELECT generation FROM main.save_head WHERE singleton=1').fetchone()==(0,)
+  with pytest.raises(StoreError):s.store.generation
   with pytest.raises(StoreError):s.proof_manifest
  finally:s.store.close()
 

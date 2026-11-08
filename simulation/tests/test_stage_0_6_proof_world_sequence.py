@@ -149,7 +149,9 @@ def test_sequence_append_rejects_inconsistent_frozen_rows(tmp_path, monkeypatch,
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError):
                 session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
         pair = session.proof_manifest

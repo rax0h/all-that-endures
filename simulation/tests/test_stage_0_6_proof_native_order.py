@@ -232,7 +232,8 @@ def test_native_component_refresh_failure_requires_original_parent_recovery(tmp_
         with monkeypatch.context() as patch:
             patch.setattr(manifests,'_load',interrupted)
             with pytest.raises(RuntimeError,match='component acknowledgement'):session.save()
-        assert failed and store.generation==1 and session._pending_save is not None
+        assert failed and store.db.execute('SELECT generation FROM main.save_head WHERE singleton=1').fetchone()==(1,) and session._pending_save is not None
+        with pytest.raises(StoreError):store.generation
         with pytest.raises(StoreError):store.namespace_size(session.pin,NS)
         assert session.resolve_save()==1 and session.save()==1
         assert authority.read_components[4][0].generation==1

@@ -113,7 +113,9 @@ def test_cyclic_fresh_backing_graph_is_rejected(tmp_path, monkeypatch):
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError, match='cyclic fresh backing'):
                 session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
 
@@ -139,7 +141,9 @@ def test_backed_record_cannot_bypass_class_incoming_policy(tmp_path, old):
         session.world.culture.practices[3] = Practice(3, 'craft', 'policy', 0, 1, traits={'record': value})
         with pytest.raises(StoreError, match='incoming member policy'):
             session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
 
 
@@ -205,7 +209,9 @@ def test_fresh_forest_rejects_inconsistent_frozen_authority(tmp_path, monkeypatc
         with monkeypatch.context() as patch:
             patch.setattr(manifests, 'commit_world_manifest', corrupt)
             with pytest.raises(StoreError): session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
 
@@ -240,7 +246,9 @@ def test_surplus_physical_alias_roster_is_rejected_before_legacy_scan(tmp_path, 
                     patch.setattr(store, 'iter_query_memberships', lambda *a, **k: pytest.fail('unbounded link scan'))
             patch.setattr(backing.Forest, 'guard_alias_work', inject)
             with pytest.raises(StoreError, match='physical alias roster'): session.save()
-        assert session.store.generation == 0
+        # Physical commit diagnostic; public accepted reads require recovery.
+        assert session.store.db.execute(
+            'SELECT generation FROM main.save_head WHERE singleton=1').fetchone() == (0,)
         assert session.resolve_save() == 0
         assert session.save() == 1
 

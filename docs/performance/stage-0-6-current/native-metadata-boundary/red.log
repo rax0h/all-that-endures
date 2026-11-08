@@ -1,0 +1,120 @@
+FF.FF.FF.FFFFFF...FFFFFFF                                                [100%]
+=================================== FAILURES ===================================
+_ test_all_public_head_reads_bind_before_forged_bytes_are_decoded[seed-generation] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:31: in test_all_public_head_reads_bind_before_forged_bytes_are_decoded
+    with pytest.raises(StoreIntegrityError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreIntegrityError
+_ test_all_public_head_reads_bind_before_forged_bytes_are_decoded[seed-checked_head] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:31: in test_all_public_head_reads_bind_before_forged_bytes_are_decoded
+    with pytest.raises(StoreIntegrityError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreIntegrityError
+_ test_all_public_head_reads_bind_before_forged_bytes_are_decoded[position-generation] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:31: in test_all_public_head_reads_bind_before_forged_bytes_are_decoded
+    with pytest.raises(StoreIntegrityError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreIntegrityError
+_ test_all_public_head_reads_bind_before_forged_bytes_are_decoded[position-checked_head] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:31: in test_all_public_head_reads_bind_before_forged_bytes_are_decoded
+    with pytest.raises(StoreIntegrityError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreIntegrityError
+_ test_all_public_head_reads_bind_before_forged_bytes_are_decoded[counts-generation] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:32: in test_all_public_head_reads_bind_before_forged_bytes_are_decoded
+    assert not seen and not store.db.in_transaction
+E   assert (not [True])
+_ test_all_public_head_reads_bind_before_forged_bytes_are_decoded[counts-checked_head] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:32: in test_all_public_head_reads_bind_before_forged_bytes_are_decoded
+    assert not seen and not store.db.in_transaction
+E   assert (not [True])
+_ test_public_head_decoder_cannot_end_or_rebind_the_snapshot[end-transaction-generation] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:50: in test_public_head_decoder_cannot_end_or_rebind_the_snapshot
+    with pytest.raises(StoreError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_public_head_decoder_cannot_end_or_rebind_the_snapshot[end-transaction-checked_head] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:50: in test_public_head_decoder_cannot_end_or_rebind_the_snapshot
+    with pytest.raises(StoreError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_public_head_decoder_cannot_end_or_rebind_the_snapshot[end-transaction-head_metadata] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:50: in test_public_head_decoder_cannot_end_or_rebind_the_snapshot
+    with pytest.raises(StoreError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_public_head_decoder_cannot_end_or_rebind_the_snapshot[change-epoch-generation] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:50: in test_public_head_decoder_cannot_end_or_rebind_the_snapshot
+    with pytest.raises(StoreError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_public_head_decoder_cannot_end_or_rebind_the_snapshot[change-epoch-checked_head] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:50: in test_public_head_decoder_cannot_end_or_rebind_the_snapshot
+    with pytest.raises(StoreError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_public_head_decoder_cannot_end_or_rebind_the_snapshot[change-epoch-head_metadata] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:50: in test_public_head_decoder_cannot_end_or_rebind_the_snapshot
+    with pytest.raises(StoreError):head_read(store,api)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[False-event] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:79: in test_warmed_native_prefix_rejects_untracked_sql_before_cached_output
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[False-count] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:79: in test_warmed_native_prefix_rejects_untracked_sql_before_cached_output
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[False-year] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:79: in test_warmed_native_prefix_rejects_untracked_sql_before_cached_output
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[True-event] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:79: in test_warmed_native_prefix_rejects_untracked_sql_before_cached_output
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[True-count] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:79: in test_warmed_native_prefix_rejects_untracked_sql_before_cached_output
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[True-year] _
+simulation/tests/test_stage_0_6_proof_native_metadata.py:79: in test_warmed_native_prefix_rejects_untracked_sql_before_cached_output
+    with pytest.raises(StoreError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+______ test_warmed_native_prefix_keeps_same_cache_across_legitimate_save _______
+simulation/tests/test_stage_0_6_proof_native_metadata.py:93: in test_warmed_native_prefix_keeps_same_cache_across_legitimate_save
+    assert prefix[0] is first and prefix.diagnostics().segment_reads==reads
+           ^^^^^^^^^
+simulation/ate_sim/persistence_events.py:449: in __getitem__
+    self._ensure_readable()
+simulation/ate_sim/persistence_events.py:397: in _ensure_readable
+    raise StoreError("sealed-event reader is closed")
+E   ate_sim.incremental_store.StoreError: sealed-event reader is closed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_all_public_head_reads_bind_before_forged_bytes_are_decoded[seed-generation]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_all_public_head_reads_bind_before_forged_bytes_are_decoded[seed-checked_head]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_all_public_head_reads_bind_before_forged_bytes_are_decoded[position-generation]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_all_public_head_reads_bind_before_forged_bytes_are_decoded[position-checked_head]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_all_public_head_reads_bind_before_forged_bytes_are_decoded[counts-generation]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_all_public_head_reads_bind_before_forged_bytes_are_decoded[counts-checked_head]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_public_head_decoder_cannot_end_or_rebind_the_snapshot[end-transaction-generation]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_public_head_decoder_cannot_end_or_rebind_the_snapshot[end-transaction-checked_head]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_public_head_decoder_cannot_end_or_rebind_the_snapshot[end-transaction-head_metadata]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_public_head_decoder_cannot_end_or_rebind_the_snapshot[change-epoch-generation]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_public_head_decoder_cannot_end_or_rebind_the_snapshot[change-epoch-checked_head]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_public_head_decoder_cannot_end_or_rebind_the_snapshot[change-epoch-head_metadata]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[False-event]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[False-count]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[False-year]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[True-event]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[True-count]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_rejects_untracked_sql_before_cached_output[True-year]
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_warmed_native_prefix_keeps_same_cache_across_legitimate_save
+19 failed, 6 passed in 48.05s

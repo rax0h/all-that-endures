@@ -1,0 +1,10 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_native_prefix_rechecks_after_segment_codec_before_caching ________
+simulation/tests/test_stage_0_6_proof_native_metadata.py:121: in test_native_prefix_rechecks_after_segment_codec_before_caching
+    with pytest.raises(StoreError):prefix[0]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_native_metadata.py::test_native_prefix_rechecks_after_segment_codec_before_caching
+1 failed, 1 passed, 28 deselected in 5.25s

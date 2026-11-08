@@ -1,0 +1,1702 @@
+[
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 128,
+    "function": "_verify_sequences",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT typed_key FROM lazy_record_versions WHERE namespace=? '\n                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 336,
+    "function": "_restore_copy_ordinals",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT member_count FROM lazy_namespace_state '\n                'WHERE namespace=? AND valid_from=? AND valid_to IS NULL'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 384,
+    "function": "_copy_with_checked_catalog",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT owner_namespace,owner_key,occurrence_path,incarnation_id '\n                            'FROM lazy_identity_occurrence_versions WHERE valid_from<=? '\n                            'AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 398,
+    "function": "_copy_with_checked_catalog",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "'SELECT * FROM segments'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 401,
+    "function": "_copy_with_checked_catalog",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT namespace,member_count,next_ordinal '\n                            'FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 424,
+    "function": "_copy_with_checked_catalog",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT namespace,typed_key,payload,record_schema FROM records'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 560,
+    "function": "_copy_current_checked_catalog",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? '\n                        'AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_catalog_copy.py",
+    "line": 569,
+    "function": "_copy_current_checked_catalog",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT payload FROM records'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_complete_format.py",
+    "line": 52,
+    "function": "_check_fixed_contract",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT 1 FROM records WHERE namespace=? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_history_retirement.py",
+    "line": 99,
+    "function": "_scope_keys",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "f'SELECT typed_key FROM lazy_record_versions INDEXED BY {SCOPE_INDEX} '\n        'WHERE namespace=? AND valid_to IS NULL AND typed_key>=? AND typed_key<? '\n        'ORDER BY typed_key LIMIT ?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 1207,
+    "function": "_convert_event_id_authority",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT 1 FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 1212,
+    "function": "_convert_event_id_authority",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT payload FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 1235,
+    "function": "_declare_bounded_collections",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 1238,
+    "function": "_declare_bounded_collections",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 1329,
+    "function": "convert_cold_to_lazy",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "\"SELECT generation,parent_generation,simulation_position,seed,\"\n                \"next_ids,namespace_inventory,namespace_counts,head_checksum \"\n                \"FROM save_head WHERE singleton=1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 1486,
+    "function": "convert_cold_to_lazy",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT namespace,typed_key,payload,payload_checksum,\"\n                        \"codec_version,record_schema,last_changed_generation \"\n                        \"FROM records\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 2197,
+    "function": "convert_cold_to_lazy",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "\"SELECT namespace,ordinal,payload,payload_checksum,\"\n                        \"codec_version,element_count,first_id,last_id,\"\n                        \"created_generation FROM segments ORDER BY namespace,ordinal\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 16447,
+    "function": "_validate_minimum_successor",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_query_versions '\n                        'WHERE namespace=? AND record_key=? AND valid_from<=? '\n                        'AND (valid_to IS NULL OR ?<valid_to) LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 16460,
+    "function": "_validate_minimum_successor",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_query_versions '\n                        'WHERE namespace=? AND index_name=? AND record_key=? AND valid_from<=? '\n                        'AND (valid_to IS NULL OR ?<valid_to) LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 16499,
+    "function": "_validate_adoption_successor",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_query_versions WHERE namespace=? AND record_key=? '\n                        'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy.py",
+    "line": 16507,
+    "function": "_validate_adoption_successor",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT valid_from,valid_to,row_checksum FROM lazy_query_versions '\n                        'WHERE namespace=? AND record_key=? AND index_name=? AND index_value=? AND ordinal=? '\n                        'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_identity_catalog.py",
+    "line": 571,
+    "function": "_owner",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_identity_catalog.py",
+    "line": 575,
+    "function": "_owner",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT last_changed_generation,record_schema,payload_checksum FROM records '\n                'WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_identity_catalog.py",
+    "line": 592,
+    "function": "_has_source",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_identity_catalog.py",
+    "line": 599,
+    "function": "_has_source",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT last_changed_generation FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_identity_catalog.py",
+    "line": 606,
+    "function": "_has_source",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_identity_retired.py",
+    "line": 288,
+    "function": "scrub",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT typed_key FROM lazy_record_versions WHERE namespace=? AND valid_from<=? '\n                'AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_minimum.py",
+    "line": 92,
+    "function": "checked_marker",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT valid_from,valid_to,row_checksum FROM lazy_query_versions '\n        'WHERE namespace=? AND index_name=? AND index_value=? AND record_key=? AND ordinal=? '\n        'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_nested_history.py",
+    "line": 158,
+    "function": "checked_list_extent.present",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT valid_from FROM lazy_record_versions WHERE namespace=? AND typed_key=? '\n                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_nested_history.py",
+    "line": 600,
+    "function": "checked_scalar_entry",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_query_versions WHERE namespace=? AND record_key=? '\n                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_nested_history.py",
+    "line": 614,
+    "function": "checked_scalar_entry",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT valid_from,valid_to,row_checksum FROM lazy_query_versions '\n            'WHERE namespace=? AND index_name=? AND index_value=? AND record_key=? AND ordinal=? '\n            'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_participants.py",
+    "line": 166,
+    "function": "validate_publication",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT payload,payload_checksum,codec_version,record_schema,'\n                    'last_changed_generation FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_sequence.py",
+    "line": 1203,
+    "function": "scrub",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT typed_key FROM lazy_record_versions WHERE namespace=? '\n                        'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 709,
+    "function": "_checked_head_row",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "\"SELECT generation,parent_generation,simulation_position,seed,next_ids,\"\n            \"namespace_inventory,namespace_counts,head_checksum FROM save_head WHERE singleton=1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1010,
+    "function": "_ordinary_namespace_is_lazy",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "\"SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1031,
+    "function": "read_record",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT payload,payload_checksum,codec_version,record_schema,\"\n            \"last_changed_generation FROM records \"\n            \"WHERE namespace=? AND typed_key=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1080,
+    "function": "read_records",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1124,
+    "function": "read_segment_checked",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "\"SELECT payload,payload_checksum,codec_version,element_count,\"\n            \"first_id,last_id,created_generation FROM segments \"\n            \"WHERE namespace=? AND ordinal=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1382,
+    "function": "_visible_record_row",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1433,
+    "function": "read_version",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1594,
+    "function": "query_memberships",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT record_key,ordinal,valid_from,valid_to,row_checksum \"\n                    \"FROM lazy_query_versions INDEXED BY lazy_query_current \"\n                    \"WHERE namespace=? AND index_name=? AND index_value=? AND valid_to IS NULL \"\n                    + exclusion_sql + \" ORDER BY ordinal,record_key\" + limit_sql"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1602,
+    "function": "query_memberships",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT record_key,ordinal,valid_from,valid_to,row_checksum \"\n                    \"FROM lazy_query_versions INDEXED BY lazy_query_open_generation \"\n                    \"WHERE namespace=? AND index_name=? AND index_value=? \"\n                    \"AND valid_to IS NULL AND valid_from<=? \"\n                    + exclusion_sql + \" ORDER BY ordinal,record_key\" + limit_sql"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1610,
+    "function": "query_memberships",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT record_key,ordinal,valid_from,valid_to,row_checksum \"\n                    \"FROM lazy_query_versions INDEXED BY lazy_query_closed_generation \"\n                    \"WHERE namespace=? AND index_name=? AND index_value=? AND valid_to=? \"\n                    + exclusion_sql + \" ORDER BY ordinal,record_key\" + limit_sql"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1644,
+    "function": "query_memberships",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1687,
+    "function": "iter_query_memberships",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1687,
+    "function": "iter_query_memberships",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1795,
+    "function": "_identity_state_at",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "'lazy_identity_state'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1824,
+    "function": "_visible_identity_occurrence",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1907,
+    "function": "iter_identity_occurrences_for_owner",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 1970,
+    "function": "iter_identity_occurrences_for_incarnation",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2128,
+    "function": "_namespace_state_at",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'lazy_namespace_state'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2188,
+    "function": "_close_queries",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2219,
+    "function": "_validate_owner_projection",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2250,
+    "function": "_write_lazy_changes",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT 1 FROM records WHERE namespace=? LIMIT 1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2281,
+    "function": "_write_lazy_changes",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT 1 FROM lazy_record_versions WHERE namespace=? AND typed_key=? LIMIT 1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2590,
+    "function": "_write_ordinary_changes",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 2596,
+    "function": "_write_ordinary_changes",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT 1 FROM records WHERE namespace=? AND typed_key=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3194,
+    "function": "_verify_ordinary",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "\"SELECT DISTINCT namespace FROM lazy_namespace_state\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3195,
+    "function": "_verify_ordinary",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3209,
+    "function": "_verify_ordinary",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "\"SELECT namespace,ordinal,first_id,last_id,element_count,payload,payload_checksum,codec_version,created_generation FROM segments\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3227,
+    "function": "_verify_ordinary",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT 1 FROM records WHERE namespace=? AND typed_key=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3245,
+    "function": "_verify_lazy_generation",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "\"SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3256,
+    "function": "_verify_lazy_generation",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum \"\n                \"FROM lazy_record_versions WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3299,
+    "function": "_verify_lazy_generation",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_query_versions \"\n                \"WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3354,
+    "function": "_verify_all_in_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "\"SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,\"\n                \"valid_from,valid_to,row_checksum \"\n                \"FROM lazy_identity_occurrence_versions \"\n                \"WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3414,
+    "function": "_verify_all_in_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT namespace,typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3429,
+    "function": "_verify_all_in_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT namespace,index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_query_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3436,
+    "function": "_verify_all_in_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "\"SELECT namespace,member_count,next_ordinal,valid_from,valid_to,row_checksum FROM lazy_namespace_state\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3441,
+    "function": "_verify_all_in_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "\"SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum \"\n            \"FROM lazy_identity_occurrence_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3461,
+    "function": "_verify_all_in_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "\"SELECT next_incarnation_id,valid_from,valid_to,row_checksum \"\n            \"FROM lazy_identity_state\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3493,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT COUNT(*) FROM lazy_record_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3495,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT COUNT(*) FROM lazy_query_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3496,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "\"SELECT COUNT(*) FROM lazy_namespace_state\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3497,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "\"SELECT COUNT(*) FROM lazy_identity_occurrence_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3500,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "\"SELECT COUNT(*) FROM lazy_identity_state\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3503,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT COALESCE(SUM(LENGTH(payload)),0) FROM lazy_record_versions\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3504,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT COALESCE(SUM(LENGTH(payload)),0) FROM records\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3505,
+    "function": "storage_metrics",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "\"SELECT COALESCE(SUM(LENGTH(payload)),0) FROM segments\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3521,
+    "function": "query_plan",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions \"\n                    \"INDEXED BY lazy_query_current WHERE namespace=? AND index_name=? \"\n                    \"AND index_value=? AND valid_to IS NULL ORDER BY ordinal,record_key\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3528,
+    "function": "query_plan",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions \"\n                    \"INDEXED BY lazy_query_open_generation WHERE namespace=? AND index_name=? \"\n                    \"AND index_value=? AND valid_to IS NULL AND valid_from<=? \"\n                    \"ORDER BY ordinal,record_key\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3535,
+    "function": "query_plan",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions \"\n                    \"INDEXED BY lazy_query_closed_generation WHERE namespace=? AND index_name=? \"\n                    \"AND index_value=? AND valid_to=? ORDER BY ordinal,record_key\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3599,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT namespace,typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum \"\n                \"FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3609,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "\"SELECT namespace,index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum \"\n                \"FROM lazy_query_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3614,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "\"SELECT namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum FROM lazy_namespace_state \"\n                \"WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3619,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "\"SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,\"\n                \"valid_from,valid_to,row_checksum \"\n                \"FROM lazy_identity_occurrence_versions \"\n                \"WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3626,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "\"SELECT valid_from,valid_to,next_incarnation_id,row_checksum \"\n                \"FROM lazy_identity_state WHERE valid_from<=? \"\n                \"AND (valid_to IS NULL OR ?<valid_to)\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3636,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT * FROM records\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_lazy_store.py",
+    "line": 3638,
+    "function": "copy_current_head",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "\"SELECT * FROM segments\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_collection.py",
+    "line": 43,
+    "function": "_state",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'lazy_namespace_state'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_collection_directory.py",
+    "line": 90,
+    "function": "_audit_namespace_inventory",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT 1 FROM '+table+' AS source WHERE source.valid_from<=? AND (source.valid_to IS NULL OR ?<source.valid_to) AND NOT EXISTS(SELECT 1 FROM lazy_namespace_state AS state WHERE state.namespace=source.namespace AND state.valid_from<=? AND (state.valid_to IS NULL OR ?<state.valid_to)) LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_collection_directory.py",
+    "line": 109,
+    "function": "bootstrap_collection_directory",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY CAST(namespace AS BLOB)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_generation.py",
+    "line": 197,
+    "function": "read_generation_manifest",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "'SELECT simulation_position,next_ids,namespace_inventory,namespace_counts,seed FROM save_head WHERE singleton=1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_identity_group.py",
+    "line": 105,
+    "function": "_owner_header",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_identity_group.py",
+    "line": 112,
+    "function": "_owner_header",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END,\"+\n            common+' FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_inventory.py",
+    "line": 184,
+    "function": "_guard",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT 1 FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 40,
+    "function": "_state",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "'SELECT 1 FROM lazy_identity_state INDEXED BY lazy_identity_state_interval WHERE valid_to>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 42,
+    "function": "_state",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(next_incarnation_id)='integer' THEN next_incarnation_id END,\"\n        \"CASE WHEN typeof(valid_from)='integer' THEN valid_from END,\"\n        \"CASE WHEN typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64 THEN row_checksum END \"\n        'FROM lazy_identity_state INDEXED BY lazy_identity_state_interval WHERE valid_to IS NULL LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 76,
+    "function": "_point",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY lazy_identity_occurrence_interval WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 78,
+    "function": "_point",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT '+_columns()+' FROM lazy_identity_occurrence_versions INDEXED BY lazy_identity_occurrence_interval WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to IS NULL LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 116,
+    "function": "_next",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT CASE WHEN '+match+' THEN 1 ELSE 0 END,'+_columns()+\n        ' FROM lazy_identity_occurrence_versions INDEXED BY '+index+' WHERE '+where+' ORDER BY '+ordering+' LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 164,
+    "function": "iter_occurrences.iterator",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_identity_occurrence_versions INDEXED BY '+closed+' WHERE '+where+' AND valid_to>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_identity.py",
+    "line": 167,
+    "function": "iter_occurrences.iterator",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT count(*) FROM lazy_identity_occurrence_versions INDEXED BY lazy_identity_incarnation_interval WHERE incarnation_id=? AND valid_to IS NULL'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_order.py",
+    "line": 62,
+    "function": "_state",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT 1 FROM lazy_namespace_state INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_order.py",
+    "line": 64,
+    "function": "_state",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT '+\n        \"CASE WHEN typeof(member_count)='integer' THEN member_count END,\"\n        \"CASE WHEN typeof(next_ordinal)='integer' THEN next_ordinal END,\"\n        \"CASE WHEN typeof(valid_from)='integer' THEN valid_from END,\"\n        \"CASE WHEN typeof(valid_to)='integer' THEN valid_to END,typeof(valid_to),\"\n        \"CASE WHEN typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64 THEN row_checksum END\"+\n        ' FROM lazy_namespace_state INDEXED BY lazy_namespace_interval WHERE namespace=? AND valid_to IS NULL LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_query.py",
+    "line": 51,
+    "function": "_window",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_query_versions INDEXED BY lazy_query_closed_generation WHERE namespace=? AND index_name=? AND index_value=? AND valid_to>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_rank.py",
+    "line": 33,
+    "function": "_physical",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'SELECT 1 FROM lazy_query_versions INDEXED BY ate_rank_query_closed '\n            'WHERE namespace=? AND index_name=? AND valid_to>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_roster.py",
+    "line": 25,
+    "function": "check_count",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT count(*) FROM records WHERE namespace=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_sources.py",
+    "line": 60,
+    "function": "snapshot_preflight",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(generation)='integer' THEN generation END FROM main.save_head WHERE singleton=1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_sources.py",
+    "line": 95,
+    "function": "version_row",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_sources.py",
+    "line": 153,
+    "function": "record_row",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT '+_record_columns(store, manifest)+' FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_sources.py",
+    "line": 166,
+    "function": "record_rows",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(typed_key)='blob' AND length(typed_key)<=? THEN typed_key END,\"\n            +_record_columns(store, manifest)+' FROM records WHERE namespace=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_native_sources.py",
+    "line": 190,
+    "function": "segment_row",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "'SELECT '+valid+\",length(payload),length(first_id)+length(last_id),\"\n            \"CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END \"\n            'FROM segments WHERE namespace=? AND ordinal=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_occurrence.py",
+    "line": 136,
+    "function": "_check_allocator",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "'lazy_identity_state'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_occurrence.py",
+    "line": 183,
+    "function": "_rows",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "f'SELECT {columns} FROM lazy_identity_occurrence_versions INDEXED BY {current} '\n        f'WHERE {where} AND valid_to IS NULL'+suffix"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_occurrence.py",
+    "line": 186,
+    "function": "_rows",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "f'SELECT {columns} FROM lazy_identity_occurrence_versions INDEXED BY {closed} '\n            f'WHERE {where} AND valid_to=?'+suffix"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_occurrence.py",
+    "line": 213,
+    "function": "_rows",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_occurrence_seek.py",
+    "line": 82,
+    "function": "_point",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_projection.py",
+    "line": 92,
+    "function": "_closed_snapshot_preflight",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "'SELECT simulation_position,next_ids,namespace_inventory,namespace_counts '\n        'FROM save_head WHERE singleton=1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_publication.py",
+    "line": 129,
+    "function": "_source_version",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_publication.py",
+    "line": 146,
+    "function": "_source_event",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(payload)='blob' THEN length(payload) END,CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,CASE WHEN typeof(first_id)='blob' AND typeof(last_id)='blob' THEN length(first_id)+length(last_id) END,CASE WHEN typeof(first_id)='blob' AND typeof(last_id)='blob' AND length(first_id)+length(last_id)<=? THEN first_id END,CASE WHEN typeof(first_id)='blob' AND typeof(last_id)='blob' AND length(first_id)+length(last_id)<=? THEN last_id END,CASE WHEN typeof(codec_version)='integer' THEN codec_version END,CASE WHEN typeof(element_count)='integer' THEN element_count END,CASE WHEN typeof(created_generation)='integer' THEN created_generation END,CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END FROM segments WHERE namespace=? AND ordinal=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_publication.py",
+    "line": 200,
+    "function": "bootstrap_content_proofs",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "'SELECT namespace,ordinal FROM segments'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_publication.py",
+    "line": 206,
+    "function": "bootstrap_content_proofs",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT namespace,typed_key FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_publication.py",
+    "line": 307,
+    "function": "_stage_content_proof",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "'SELECT generation,parent_generation FROM save_head WHERE singleton=1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_query.py",
+    "line": 97,
+    "function": "_rows",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "f'SELECT {columns} FROM lazy_query_versions INDEXED BY lazy_query_current '\n            f'WHERE {where}AND valid_to IS NULL AND valid_from<=?' + suffix"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_query.py",
+    "line": 101,
+    "function": "_rows",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "f'SELECT {columns} FROM lazy_query_versions INDEXED BY lazy_query_open_generation '\n            f'WHERE {where}AND valid_to IS NULL AND valid_from<=?' + suffix"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_query.py",
+    "line": 104,
+    "function": "_rows",
+    "method": "execute",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "f'SELECT {columns} FROM lazy_query_versions INDEXED BY lazy_query_closed_generation '\n            f'WHERE {where}AND valid_to=? AND valid_from<=?' + suffix"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_query.py",
+    "line": 125,
+    "function": "_rows",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_query_seek.py",
+    "line": 72,
+    "function": "_read",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 125,
+    "function": "_retain_body",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT 1 FROM ate_retained_records WHERE commitment=? AND namespace=? AND typed_key=? '\n            'AND payload=? AND payload_checksum=? AND codec_version=? AND record_schema=? AND last_changed_generation=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 148,
+    "function": "bootstrap_record_proofs",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT '+valid+\",CASE WHEN typeof(payload)='blob' THEN length(payload) END,\"+locator+\n            ' FROM records WHERE NOT('+valid+\") OR typeof(payload)!='blob' OR length(payload)>? OR \"+locator+'>? LIMIT 1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 159,
+    "function": "bootstrap_record_proofs",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 195,
+    "function": "read_record_proof_bytes",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(payload)='blob' THEN length(payload) END,\"\n                \"CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,\"\n                \"typeof(namespace)='text' AND typeof(typed_key)='blob' AND namespace=? AND typed_key=?,\"\n                \"CASE WHEN typeof(record_schema)='integer' THEN record_schema END,\"\n                \"CASE WHEN typeof(codec_version)='integer' THEN codec_version END,\"\n                \"CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END,\"\n                \"CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END \"\n                'FROM ate_retained_records WHERE commitment=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 268,
+    "function": "_stage_record_proof",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "'SELECT generation,parent_generation FROM save_head WHERE singleton=1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 279,
+    "function": "_stage_record_proof",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT 1 FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_record.py",
+    "line": 284,
+    "function": "_stage_record_proof",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,\"\n                \"CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END,\"\n                \"CASE WHEN typeof(codec_version)='integer' THEN codec_version END,\"\n                \"CASE WHEN typeof(record_schema)='integer' THEN record_schema END,\"\n                \"CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END \"\n                \"FROM records WHERE namespace=? AND typed_key=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 378,
+    "function": "_query_source",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 392,
+    "function": "_identity_source",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 460,
+    "function": "_stage_scope_proof",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "'SELECT generation,parent_generation FROM save_head WHERE singleton=1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 466,
+    "function": "_stage_scope_proof",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_state"
+    ],
+    "expression": "'lazy_identity_state'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 570,
+    "function": "_guard_child_keys",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT 1 FROM lazy_record_versions WHERE namespace IN (\"+names+\") AND (typeof(typed_key)!='blob' OR length(typed_key)>4096) LIMIT 1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 575,
+    "function": "_construct_child_spool",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT namespace,typed_key FROM lazy_record_versions WHERE namespace IN ('+names+') AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 583,
+    "function": "_child_present",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 615,
+    "function": "_guard_sequence_keys",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "\"SELECT 1 FROM lazy_record_versions WHERE namespace IN (\"+names+\") AND (typeof(typed_key)!='blob' OR length(typed_key)>4096) LIMIT 1\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_scope.py",
+    "line": 620,
+    "function": "_construct_sequence_spool",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT namespace,typed_key FROM lazy_record_versions WHERE namespace IN ('+names+') AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_version.py",
+    "line": 60,
+    "function": "_guard_operational_metadata",
+    "method": "execute",
+    "targets": [
+      "save_head"
+    ],
+    "expression": "\"SELECT typeof(generation)='integer' \"\n        \"AND typeof(parent_generation) IN ('integer','null') AND typeof(seed) IN ('integer','null') \"\n        \"AND typeof(head_checksum)='text' AND length(CAST(head_checksum AS BLOB))=64 \"\n        \"AND typeof(simulation_position)='blob' AND typeof(next_ids)='blob' \"\n        \"AND typeof(namespace_inventory)='blob' AND typeof(namespace_counts)='blob',\"\n        \"length(simulation_position)+length(next_ids)+length(namespace_inventory)+length(namespace_counts) \"\n        'FROM save_head WHERE singleton=1'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_version.py",
+    "line": 141,
+    "function": "read_version_bytes",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 63,
+    "function": "_check_sources",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT namespace,typed_key FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 68,
+    "function": "_check_sources",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT namespace,typed_key,payload,codec_version,record_schema,last_changed_generation FROM records'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 72,
+    "function": "_check_sources",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "'SELECT namespace,ordinal FROM segments'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 79,
+    "function": "_check_sources.collections",
+    "method": "execute",
+    "targets": [
+      "lazy_namespace_state"
+    ],
+    "expression": "'SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY CAST(namespace AS BLOB)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 105,
+    "function": "_check_record_class",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT payload FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_to IS NULL'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 158,
+    "function": "_check_field_values.allowed",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT payload FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_to IS NULL'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 219,
+    "function": "_project",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT incarnation_id FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to IS NULL'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 323,
+    "function": "_fixed_world_sources",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT typed_key,payload FROM records WHERE namespace=? LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 329,
+    "function": "_fixed_world_sources",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT typed_key FROM records WHERE namespace=? LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 330,
+    "function": "_fixed_world_sources",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT typed_key FROM lazy_record_versions WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world.py",
+    "line": 401,
+    "function": "_audit_world",
+    "method": "execute",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'SELECT incarnation_id FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_adoption.py",
+    "line": 40,
+    "function": "_prepare.read",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_catalog_retirement.py",
+    "line": 36,
+    "function": "candidates",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_query_versions"
+    ],
+    "expression": "'lazy_query_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_copy.py",
+    "line": 32,
+    "function": "_rebase_private_snapshot",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT namespace,typed_key,payload,codec_version,record_schema FROM records'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_copy.py",
+    "line": 37,
+    "function": "_rebase_private_snapshot",
+    "method": "execute",
+    "targets": [
+      "segments"
+    ],
+    "expression": "'SELECT namespace,ordinal,payload,first_id,last_id,element_count,codec_version FROM segments'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_copy.py",
+    "line": 39,
+    "function": "_rebase_private_snapshot",
+    "method": "execute",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'SELECT namespace,typed_key,payload,codec_version,record_schema,memberships FROM lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_copy.py",
+    "line": 43,
+    "function": "_rebase_private_snapshot",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "'SELECT payload_checksum FROM records WHERE namespace=? AND typed_key=?'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_insert.py",
+    "line": 58,
+    "function": "_prepare.predecessor",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_insert.py",
+    "line": 86,
+    "function": "_prepare.ordinary_predecessor",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,\"\n            \"CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END,\"\n            \"CASE WHEN typeof(codec_version)='integer' THEN codec_version END,\"\n            \"CASE WHEN typeof(record_schema)='integer' THEN record_schema END,\"\n            \"CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END \"\n            \"FROM records WHERE namespace=? AND typed_key=?\""
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_sequence.py",
+    "line": 69,
+    "function": "source",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_tail_shrink.py",
+    "line": 22,
+    "function": "prepare.read",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_value.py",
+    "line": 30,
+    "function": "_projection",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_identity_occurrence_versions"
+    ],
+    "expression": "'lazy_identity_occurrence_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_value.py",
+    "line": 92,
+    "function": "validate_value_transition",
+    "method": "_interval_rows",
+    "targets": [
+      "lazy_record_versions"
+    ],
+    "expression": "'lazy_record_versions'"
+  },
+  {
+    "path": "simulation/ate_sim/persistence_proof_world_value.py",
+    "line": 165,
+    "function": "validate_value_transition",
+    "method": "execute",
+    "targets": [
+      "records"
+    ],
+    "expression": "\"SELECT CASE WHEN typeof(payload)='blob' AND length(payload)<=? THEN payload END,\"\n            \"CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END,\"\n            \"CASE WHEN typeof(codec_version)='integer' THEN codec_version END,\"\n            \"CASE WHEN typeof(record_schema)='integer' THEN record_schema END,\"\n            \"CASE WHEN typeof(last_changed_generation)='integer' THEN last_changed_generation END \"\n            \"FROM records WHERE namespace=? AND typed_key=?\""
+  }
+]

@@ -1,0 +1,6 @@
+journal ('delete',)
+owned 0 0 2048 True
+nested 0 2048 True
+arbitrary StoreError native metadata cannot borrow an arbitrary transaction clean True
+early-close clean True 0
+error clean True 0
