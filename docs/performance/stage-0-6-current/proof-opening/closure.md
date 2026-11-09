@@ -49,21 +49,22 @@ Local validation:469affected cases pass920.82s on the pre-cancellation handler;
 final57opening/launcher cases pass72.55s including both cancellation outcomes.
 All4955simulation tests collect; Python AST/YAML/all5Bash blocks and final tested
 source hashes pass. No timing claim is based on concurrent correctness tests.
-Serial qualified-runtime generated-year validation passes every13phases at
-source276d323/runtime53a57cc04c39933bdf2d5d5650a840e267a8877f. Raw and diagnostic
+Final serial qualified-runtime generated-year validation passes every13phases at
+source943bb86/runtime6ca23be5208e8c198081c73b40806b42a4eb8626. Raw and diagnostic
 continuations match the independently advanced eager World after fresh-process
 restoration; the accepted template hash is unchanged. Actual parent continuation
 and both fresh-child World-audit counters are zero; diagnostic save audits are
-also zero. Construction still uses the existing full audit. See serial-year.json.
+also zero. Construction still uses the existing full audit. See serial-year-final.json;
+serial-year.json preserves the earlier reviewed276d323 pass.
 
 | Small-world raw phase | Wall seconds |
 |---|---:|
-| Proof-backed open | 1.841 |
-| Simulation year | 9.504 |
-| Native save | 7.140 |
-| Fresh-process open plus full digest comparison | 11.557 |
+| Proof-backed open | 1.597 |
+| Simulation year | 9.485 |
+| Native save | 7.104 |
+| Fresh-process open plus full digest comparison | 10.460 |
 
-Diagnostic save19.271s includes instrumentation and is not substituted for the
+Diagnostic save19.121s includes instrumentation and is not substituted for the
 raw pass. This serial shared-host run is neither a controlled before/after speed
 comparison nor mature-world acceptance. The local runtime qualification and its
 unchanged fingerprints are in ../fixture-construction/qualified-local-runtime.json;
@@ -80,8 +81,14 @@ intermediate collision red and final reports remain in review-raw/ and review.md
 Every finding, including Minor, closes in this group. All4960tests collect;
 Python AST/YAML/all5Bash blocks/product whitespace pass.
 
-Repeat the serial year on the corrected source checkpoint before publishing;
-the bundled hosted full/proof gate remains pending.
+The corrected-source serial year passes with tracked execution source clean
+before and after execution; author/reviewer final hashes match and full local
+runtime fingerprints are reverified in runtime-verification-final.json.
+Local source943bb86 has the identical complete source tree
+ff5a594e35fe7ad9426b5808bda0df453a4122ab as API source checkpoint
+1ce7bb091f3328bf5c7ce3b7a3ee112dbbde4ef0. Only commit metadata differs.
+The dedicated branch's one bundled hosted full/proof gate remains pending;
+no hosted success is inferred from these local gates.
 Mature10sopening/2ssave/1syear and final architecture
 acceptance remain separate Stage0.6 gates. No main merge, default activation or
 endurance run is part of this package.

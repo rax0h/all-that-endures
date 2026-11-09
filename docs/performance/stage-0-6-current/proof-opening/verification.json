@@ -1,0 +1,35 @@
+{
+  "source_checkpoint": "943bb86bf719e62dd42e9a2ef8ed0a0d9973bbaa",
+  "api_equivalent_source_checkpoint": "1ce7bb091f3328bf5c7ce3b7a3ee112dbbde4ef0",
+  "source_tree": "ff5a594e35fe7ad9426b5808bda0df453a4122ab",
+  "runtime_tree": "6ca23be5208e8c198081c73b40806b42a4eb8626",
+  "final_regression": {
+    "passed": 113,
+    "seconds": 78.38
+  },
+  "independent_closure": {
+    "passed": 10,
+    "seconds": 13.46,
+    "closed": [
+      "R1 Important",
+      "R2 Minor"
+    ]
+  },
+  "collected_tests": 4960,
+  "serial_year": {
+    "phases": 13,
+    "status": "complete",
+    "receipt_sha256": "16efaf4b35fa2d7a37b44a1c04b6c3b71f70a6bb3b4375adc0aa063dfe7d8930"
+  },
+  "historical_qualified_broad_regression": {
+    "passed": 469,
+    "seconds": 920.82,
+    "qualification": "Loaded pre-cancellation handler; final current-source failure/ownership paths covered by final regression and independent closure"
+  },
+  "hosted_gate": "Pending one dedicated-branch full/proof validation; do not infer hosted acceptance",
+  "limits": [
+    "small generated world",
+    "returned BLOBs are not physical I/O",
+    "mature10s/2s/1s and final architecture acceptance remain"
+  ]
+}

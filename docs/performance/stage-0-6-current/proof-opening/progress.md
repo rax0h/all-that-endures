@@ -128,3 +128,15 @@ R2 before/after-registry and constructor-return controls pass; partially initial
 fields tolerated. Independent source hashes match final bytes. Review-raw preserves
 initial request-changes, intermediate collision red and final closure. Every finding,
 including Minor, closed in this work group. Checkpoint/serial final probe next.
+
+Final checkpoint943bb86bf719e62dd42e9a2ef8ed0a0d9973bbaa,
+runtime6ca23be5208e8c198081c73b40806b42a4eb8626. Full runtime fingerprint
+rechecked and saved before execution. Exact corrected-source serial year passes
+all13phases with tracked source clean before/after: raw open1.597/year9.485/
+save7.104/fresh+digest10.460s; diagnostic open1.560/year9.541/save19.121/
+fresh+digest10.019s. Both eager/fresh matches, accepted-source SHA unchanged,
+zero parent/child World audits and zero diagnostic save audits. Final receipt
+preserved separately; prior276d323 receipt remains historical evidence.
+API source checkpoint1ce7bb091f3328bf5c7ce3b7a3ee112dbbde4ef0 has exact local
+complete treeff5a594e35fe7ad9426b5808bda0df453a4122ab; commit metadata differs.
+One evidence child/ref publication and hosted acceptance remain; no mature claim.
