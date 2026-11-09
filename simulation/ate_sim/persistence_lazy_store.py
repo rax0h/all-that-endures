@@ -706,6 +706,11 @@ class LazyRecordStore:
         )
 
     def _checked_head_row(self, *, expected_manifest=None) -> tuple[Any, ...]:
+        opening = getattr(self, '_opening_manifest', None)
+        if opening is not None:
+            from .persistence_proof_open import guard_head
+            guard_head(self)
+            if expected_manifest is None:expected_manifest = opening
         row = self.db.execute(
             "SELECT generation,parent_generation,simulation_position,seed,next_ids,"
             "namespace_inventory,namespace_counts,head_checksum FROM save_head WHERE singleton=1"
@@ -1199,7 +1204,10 @@ class LazyRecordStore:
         finally:
             self._read_snapshot_end()
 
-    def capture_pin(self, *, source_pin: GenerationPin | None = None) -> GenerationPin:
+    def capture_pin(self, *, source_pin: GenerationPin | None = None, _opening_resources=None) -> GenerationPin:
+        if _opening_resources is not None:
+            from .persistence_proof_open import _check_resources
+            _check_resources(_opening_resources,self)
         self._ensure_open()
         token = str(uuid.uuid4())
         self._phase_hook("before_pin_capture")
@@ -1217,6 +1225,9 @@ class LazyRecordStore:
                 "INSERT INTO generation_pins(token,store_uuid,generation,row_checksum) VALUES (?,?,?,?)",
                 (token, self.store_identity, generation, checksum),
             )
+            if _opening_resources is not None:
+                from .persistence_proof_open import _remember_pin
+                _remember_pin(_opening_resources,self,GenerationPin(token,self.store_identity,generation))
             self._pin_rows += 1
             self._phase_hook("before_pin_capture_commit")
             self.db.commit()
@@ -1224,7 +1235,8 @@ class LazyRecordStore:
             if self.db.in_transaction:
                 self.db.rollback()
             raise
-        return GenerationPin(token, self.store_identity, generation)
+        return (GenerationPin(token,self.store_identity,generation) if _opening_resources is None
+            else _opening_resources.pin)
 
     def release_pin(self, pin: GenerationPin, *, cleanup_budget: int = 256) -> None:
         self.release_pins((pin,), cleanup_budget=cleanup_budget)

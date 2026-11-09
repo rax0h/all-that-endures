@@ -1,0 +1,34 @@
+FF....F..F..                                                             [100%]
+=================================== FAILURES ===================================
+________ test_head_change_after_pin_capture_releases_exact_owned_lease _________
+simulation/tests/test_stage_0_6_proof_open.py:139: in test_head_change_after_pin_capture_releases_exact_owned_lease
+    assert changed and pin_count(path)==0
+E   AssertionError: assert ([True] and 1 == 0)
+E    +  where 1 = pin_count(PosixPath('/tmp/pytest-of-root/pytest-2/test_head_change_after_pin_cap0/ranked.sqlite'))
+____ test_private_fast_admission_rejects_foreign_capability_before_callback ____
+simulation/tests/test_stage_0_6_proof_open.py:151: in test_private_fast_admission_rejects_foreign_capability_before_callback
+    with pytest.raises(StoreError):open_lazy_world_session(path,rules_id=RULES,_proof_admission=ForeignAdmission())
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18079: in open_lazy_world_session
+    store = open_store(path,_proof_admission,rules_id=rules_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_open.py:88: in open_store
+    authority.bind(store)
+simulation/tests/test_stage_0_6_proof_open.py:150: in bind
+    raise AssertionError('foreign admission callback executed')
+E   AssertionError: foreign admission callback executed
+_ test_last_restore_context_drift_rejects_without_audit_or_lease_leak[codec-method] _
+simulation/tests/test_stage_0_6_proof_open.py:172: in test_last_restore_context_drift_rejects_without_audit_or_lease_leak
+    with pytest.raises(StoreError):returned=fast_open(path,pair)
+E   Failed: DID NOT RAISE StoreError
+_ test_restore_connection_rebinding_does_not_rollback_or_close_foreign_connection _
+simulation/tests/test_stage_0_6_proof_open.py:224: in test_restore_connection_rebinding_does_not_rollback_or_close_foreign_connection
+    assert foreign.in_transaction
+           ^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.ProgrammingError: Cannot operate on a closed database.
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_head_change_after_pin_capture_releases_exact_owned_lease
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_private_fast_admission_rejects_foreign_capability_before_callback
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_last_restore_context_drift_rejects_without_audit_or_lease_leak[codec-method]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_restore_connection_rebinding_does_not_rollback_or_close_foreign_connection
+4 failed, 8 passed, 20 deselected in 15.05s

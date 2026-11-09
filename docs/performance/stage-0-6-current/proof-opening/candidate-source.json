@@ -1,0 +1,14 @@
+{
+  "base": "280e95b5c992f7e278ad373d25a44cce9e402b9b",
+  "files": {
+    ".github/tests/run_proof_real_year_probe.py": "dbee329b8700f8d4a7341f4b763f58aa7ffc8d43f83688973df447ee50433760",
+    ".github/tests/test_real_year_probe.py": "9af738646a1ce20e3bf09095b34e0b9d6e3879f6f189ed386bf1cfac966d6f4e",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "46d6da11af52e7fe88d1d671f86a37347f1246c41161cc4e326cfa408ce26229",
+    "simulation/ate_sim/persistence_complete_format.py": "f7d0c7d93e656dcd93594771515e6d9c032b725222e3f031571dd4c8c3e86c15",
+    "simulation/ate_sim/persistence_lazy.py": "ae55b498288369482e3e697db4212ee7a3c3d8eef0a7cbe6c164ba4c7e124987",
+    "simulation/ate_sim/persistence_lazy_store.py": "97b9f9267478cd1bc9c10685b5ef48fb9585d036fd42f99e14c59e7ff9b1aab9",
+    "simulation/ate_sim/persistence_proof_open.py": "e1cbdf0cf0fb95029d81c80997deb65da1642ef6eded59151ce12baf8289063a",
+    "simulation/ate_sim/persistence_proof_world_session.py": "5811b96a9e157b873ca7414a5b2a65db19ed2bf44945b025b40dd871bdc6942c",
+    "simulation/tests/test_stage_0_6_proof_open.py": "d0019ec5ff6f2ba5c52f6d75e7732a56a154a22723eb1e01dc30769eaca4662d"
+  }
+}

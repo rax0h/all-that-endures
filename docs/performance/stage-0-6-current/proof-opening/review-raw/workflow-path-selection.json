@@ -1,0 +1,5 @@
+{
+  ".github/tests/run_proof_real_year_probe.py": false,
+  ".github/tests/test_real_year_probe.py": false,
+  "simulation/ate_sim/persistence_proof_open.py": true
+}

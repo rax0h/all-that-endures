@@ -1,0 +1,16 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_cancelled_proof_restore_releases_its_owned_pin_and_connection[KeyboardInterrupt] _
+simulation/tests/test_stage_0_6_proof_open.py:408: in test_cancelled_proof_restore_releases_its_owned_pin_and_connection
+    assert pin_count(path)==0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = pin_count(PosixPath('/tmp/pytest-of-root/pytest-5/test_cancelled_proof_restore_r0/ranked.sqlite'))
+_ test_cancelled_proof_restore_releases_its_owned_pin_and_connection[SystemExit] _
+simulation/tests/test_stage_0_6_proof_open.py:408: in test_cancelled_proof_restore_releases_its_owned_pin_and_connection
+    assert pin_count(path)==0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = pin_count(PosixPath('/tmp/pytest-of-root/pytest-5/test_cancelled_proof_restore_r1/ranked.sqlite'))
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_cancelled_proof_restore_releases_its_owned_pin_and_connection[KeyboardInterrupt]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_cancelled_proof_restore_releases_its_owned_pin_and_connection[SystemExit]
+2 failed, 42 deselected in 3.28s

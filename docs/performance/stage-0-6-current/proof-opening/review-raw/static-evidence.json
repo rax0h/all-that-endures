@@ -1,0 +1,7 @@
+{
+  "changed_python_ast_count": 8,
+  "bash_blocks": 3,
+  "serial_receipt": "complete 13 phases; runtime/driver/head match; exact eager/fresh results and zero recorded World audits",
+  "focused_log": ".........................................................                [100%]\n57 passed in 65.78s (0:01:05)\n",
+  "git_status": " M docs/performance/stage-0-6-current/proof-opening/closure.md\n M docs/performance/stage-0-6-current/proof-opening/progress.md\n M docs/superpowers/plans/2026-11-08-proof-backed-opening.md\n?? docs/performance/stage-0-6-current/proof-opening/serial-year.json\n?? docs/performance/stage-0-6-current/proof-opening/serial-year.log\n"
+}

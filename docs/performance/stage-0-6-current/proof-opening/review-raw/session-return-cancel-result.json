@@ -1,0 +1,22 @@
+{
+  "connection_closed": true,
+  "pin_count_after_failure": 0,
+  "registry_closed": false,
+  "session_active": true,
+  "session_state": "active",
+  "registry_diagnostics": {
+    "live_incarnations": 2,
+    "weak_forward_entries": 2,
+    "weak_reverse_entries": 2,
+    "occurrences": 2,
+    "incarnations_with_occurrences": 2,
+    "owners_with_occurrences": 1,
+    "owner_groups": 1,
+    "max_owner_group_size": 1,
+    "metadata_container_bytes": 1880,
+    "strong_object_roots": 0,
+    "nonreflexive_key_queue": 0,
+    "nonreflexive_key_checks": 0,
+    "next_incarnation": 10
+  }
+}

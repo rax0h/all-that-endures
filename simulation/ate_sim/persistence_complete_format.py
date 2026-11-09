@@ -37,7 +37,7 @@ def check_open(store, pin, head, manifest):
         from .persistence_proof_world_session import _WorldProofAuthority
         authority=getattr(store,'_world_proof_authority',None)
         if type(authority) is not _WorldProofAuthority:raise StoreFormatError('proof World admission requires explicit audited native integration')
-        authority.admit(pin)
+        authority.check_restore(pin)
     return _check_fixed_contract(store,pin,head,manifest)
 
 

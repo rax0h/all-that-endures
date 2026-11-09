@@ -1,0 +1,19 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_restore_preserves_store_identity_and_session_owned_pin[store-identity] __
+simulation/tests/test_stage_0_6_proof_open.py:277: in test_restore_preserves_store_identity_and_session_owned_pin
+    with pytest.raises(StoreError):returned=fast_open(path,pair)
+E   Failed: DID NOT RAISE StoreError
+___ test_restore_preserves_store_identity_and_session_owned_pin[session-pin] ___
+simulation/tests/test_stage_0_6_proof_open.py:277: in test_restore_preserves_store_identity_and_session_owned_pin
+    with pytest.raises(StoreError):returned=fast_open(path,pair)
+E   Failed: DID NOT RAISE StoreError
+_ test_restore_preserves_store_identity_and_session_owned_pin[session-pin-cleanup] _
+simulation/tests/test_stage_0_6_proof_open.py:277: in test_restore_preserves_store_identity_and_session_owned_pin
+    with pytest.raises(StoreError):returned=fast_open(path,pair)
+E   Failed: DID NOT RAISE StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_restore_preserves_store_identity_and_session_owned_pin[store-identity]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_restore_preserves_store_identity_and_session_owned_pin[session-pin]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_restore_preserves_store_identity_and_session_owned_pin[session-pin-cleanup]
+3 failed, 32 deselected in 3.72s

@@ -9,8 +9,10 @@ from . import persistence_proof_world as world
 
 
 class _WorldProofAuthority:
-    def __init__(self,expected):
+    def __init__(self,expected,*,proof_only=False):
         if type(expected) is not bytes or len(expected)!=32:raise StoreIntegrityError('invalid external World commitment')
+        if type(proof_only) is not bool:raise StoreError('invalid proof opening mode')
+        self.proof_only=proof_only;self._opening_admitted=False
         self.expected=expected;self.store=None;self.pair=None;self.epoch=None
         self.busy=False;self.uncertain=False;self.pending=None;self._postcommit_verified_epoch=None
         self.read_pin=None
@@ -56,17 +58,30 @@ class _WorldProofAuthority:
         finally:store._active_read_transaction=active
 
     def admit(self,pin):
-        if self.pair is not None:raise StoreError('native proof admission cannot be replayed')
+        if self._opening_admitted or self.pair is not None and not self.proof_only:raise StoreError('native proof admission cannot be replayed')
         from .persistence_proof_generation import read_generation_manifest
         self.busy=True
         try:
             with self.store.read_snapshot(pin,_preflight=lambda:manifests._schemas(self.store)):
                 value=read_generation_manifest(self.store,pin,self.expected)
+                if self.proof_only and self.pair!=(value,self.expected):raise StoreIntegrityError('opening accepted manifest changed before admission')
                 self.pair=value,self.expected
-                verified_epoch=self._audit(pin)
+                if self.proof_only:
+                    components,_facts=manifests._load(self.store,pin,self.pair)
+                    if len(components[1][0].roots)!=7:raise StoreError('proof opening requires complete seven-root scope certification')
+                    self.read_components=components
+                    verified_epoch=self._epoch()
+                else:verified_epoch=self._audit(pin)
             self.epoch=verified_epoch
             self.read_pin=pin
+            self._opening_admitted=True
+            if self.proof_only:del self.store._opening_manifest
         finally:self.busy=False
+
+    def check_restore(self,pin):
+        if not self.proof_only:return self.admit(pin)
+        if not self._opening_admitted or self.read_pin!=pin:raise StoreIntegrityError('proof restoration lacks its original admitted pin')
+        self.guard()
 
     def finish_admission(self):
         # The native opener rolls back its owned restore transaction. TEMP
@@ -223,3 +238,10 @@ def open_audited_proof_world_session(path,*,rules_id,expected_commitment,paged_h
         try:session.close()
         except BaseException:session.store.close()
         raise
+
+
+def open_proof_world_session(path,*,rules_id,expected_commitment,paged_household_members=None):
+    """Restore an externally accepted seven-root World using on-demand proofs."""
+    from .persistence_lazy import open_lazy_world_session
+    admission=_WorldProofAuthority(expected_commitment,proof_only=True)
+    return open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)

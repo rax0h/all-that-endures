@@ -1,0 +1,30 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_cancelled_committed_capture_cleans_only_its_owned_lease[KeyboardInterrupt] _
+simulation/tests/test_stage_0_6_proof_open.py:434: in test_cancelled_committed_capture_cleans_only_its_owned_lease
+    assert held and pin_count(path)==1
+E   AssertionError: assert ([<ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f3a5574f050>] and 2 == 1)
+E    +  where 2 = pin_count(PosixPath('/tmp/pytest-of-root/pytest-9/test_cancelled_committed_captu0/ranked.sqlite'))
+___ test_cancelled_committed_capture_cleans_only_its_owned_lease[SystemExit] ___
+simulation/tests/test_stage_0_6_proof_open.py:434: in test_cancelled_committed_capture_cleans_only_its_owned_lease
+    assert held and pin_count(path)==1
+E   AssertionError: assert ([<ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f3a55510f50>] and 2 == 1)
+E    +  where 2 = pin_count(PosixPath('/tmp/pytest-of-root/pytest-9/test_cancelled_committed_captu1/ranked.sqlite'))
+_ test_cancelled_session_construction_closes_its_registry[registry-allocated] __
+simulation/tests/test_stage_0_6_proof_open.py:460: in test_cancelled_session_construction_closes_its_registry
+    assert session._registry._closed and not session._active and session._state=='closed'
+E   assert (False)
+E    +  where False = <ate_sim.persistence_lazy_identity.LazyIdentityRegistry object at 0x7f3a55392900>._closed
+E    +    where <ate_sim.persistence_lazy_identity.LazyIdentityRegistry object at 0x7f3a55392900> = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f3a55390ec0>._registry
+_ test_cancelled_session_construction_closes_its_registry[constructor-return] __
+simulation/tests/test_stage_0_6_proof_open.py:460: in test_cancelled_session_construction_closes_its_registry
+    assert session._registry._closed and not session._active and session._state=='closed'
+E   assert (False)
+E    +  where False = <ate_sim.persistence_lazy_identity.LazyIdentityRegistry object at 0x7f3a552723f0>._closed
+E    +    where <ate_sim.persistence_lazy_identity.LazyIdentityRegistry object at 0x7f3a552723f0> = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f3a552705f0>._registry
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_cancelled_committed_capture_cleans_only_its_owned_lease[KeyboardInterrupt]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_cancelled_committed_capture_cleans_only_its_owned_lease[SystemExit]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_cancelled_session_construction_closes_its_registry[registry-allocated]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_cancelled_session_construction_closes_its_registry[constructor-return]
+4 failed, 44 deselected in 4.94s

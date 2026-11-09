@@ -1,0 +1,175 @@
+.FFFFFFFFFFFFFFFFFFF                                                     [100%]
+=================================== FAILURES ===================================
+_________ test_proof_open_restores_shared_identity_without_full_audit __________
+simulation/tests/test_stage_0_6_proof_open.py:54: in test_proof_open_restores_shared_identity_without_full_audit
+    with fast_open(path,pair) as session:
+         ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_____ test_proof_open_scalar_save_and_fresh_reopen_use_existing_publisher ______
+simulation/tests/test_stage_0_6_proof_open.py:64: in test_proof_open_scalar_save_and_fresh_reopen_use_existing_publisher
+    with fast_open(path,pair) as session:
+         ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+___________ test_six_root_proof_open_rejects_without_implicit_audit ____________
+simulation/tests/test_stage_0_6_proof_open.py:78: in test_six_root_proof_open_rejects_without_implicit_audit
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+___________ test_proof_open_requires_exact_external_commitment[None] ___________
+simulation/tests/test_stage_0_6_proof_open.py:85: in test_proof_open_requires_exact_external_commitment
+    with pytest.raises(StoreError):fast_open(path,(pair[0],bad))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+__________ test_proof_open_requires_exact_external_commitment[False] ___________
+simulation/tests/test_stage_0_6_proof_open.py:85: in test_proof_open_requires_exact_external_commitment
+    with pytest.raises(StoreError):fast_open(path,(pair[0],bad))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+____________ test_proof_open_requires_exact_external_commitment[1] _____________
+simulation/tests/test_stage_0_6_proof_open.py:85: in test_proof_open_requires_exact_external_commitment
+    with pytest.raises(StoreError):fast_open(path,(pair[0],bad))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+___________ test_proof_open_requires_exact_external_commitment[bad] ____________
+simulation/tests/test_stage_0_6_proof_open.py:85: in test_proof_open_requires_exact_external_commitment
+    with pytest.raises(StoreError):fast_open(path,(pair[0],bad))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_ test_proof_open_requires_exact_external_commitment[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+simulation/tests/test_stage_0_6_proof_open.py:85: in test_proof_open_requires_exact_external_commitment
+    with pytest.raises(StoreError):fast_open(path,(pair[0],bad))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_ test_proof_open_requires_exact_external_commitment[\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00] _
+simulation/tests/test_stage_0_6_proof_open.py:85: in test_proof_open_requires_exact_external_commitment
+    with pytest.raises(StoreError):fast_open(path,(pair[0],bad))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+______ test_proof_open_rejects_coherent_head_forgery_before_decode[seed] _______
+simulation/tests/test_stage_0_6_proof_open.py:104: in test_proof_open_rejects_coherent_head_forgery_before_decode
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+____ test_proof_open_rejects_coherent_head_forgery_before_decode[position] _____
+simulation/tests/test_stage_0_6_proof_open.py:104: in test_proof_open_rejects_coherent_head_forgery_before_decode
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_____ test_proof_open_rejects_coherent_head_forgery_before_decode[counts] ______
+simulation/tests/test_stage_0_6_proof_open.py:104: in test_proof_open_rejects_coherent_head_forgery_before_decode
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+____ test_proof_open_rejects_coherent_head_forgery_before_decode[inventory] ____
+simulation/tests/test_stage_0_6_proof_open.py:104: in test_proof_open_rejects_coherent_head_forgery_before_decode
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+____ test_proof_open_rejects_coherent_head_forgery_before_decode[next_ids] _____
+simulation/tests/test_stage_0_6_proof_open.py:104: in test_proof_open_rejects_coherent_head_forgery_before_decode
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+____ test_proof_open_fixed_context_and_budget_failures_leave_no_pin[rules] _____
+simulation/tests/test_stage_0_6_proof_open.py:118: in test_proof_open_fixed_context_and_budget_failures_leave_no_pin
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+____ test_proof_open_fixed_context_and_budget_failures_leave_no_pin[format] ____
+simulation/tests/test_stage_0_6_proof_open.py:118: in test_proof_open_fixed_context_and_budget_failures_leave_no_pin
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_ test_proof_open_fixed_context_and_budget_failures_leave_no_pin[metadata-size] _
+simulation/tests/test_stage_0_6_proof_open.py:118: in test_proof_open_fixed_context_and_budget_failures_leave_no_pin
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_ test_proof_open_fixed_context_and_budget_failures_leave_no_pin[manifest-size] _
+simulation/tests/test_stage_0_6_proof_open.py:118: in test_proof_open_fixed_context_and_budget_failures_leave_no_pin
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+_ test_proof_open_fixed_context_and_budget_failures_leave_no_pin[scope-roots] __
+simulation/tests/test_stage_0_6_proof_open.py:118: in test_proof_open_fixed_context_and_budget_failures_leave_no_pin
+    with pytest.raises(StoreError):fast_open(path,pair)
+                                   ^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_proof_open.py:25: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'ate_sim.persistence_proof_world_session' has no attribute 'open_proof_world_session'. Did you mean: 'open_audited_proof_world_session'?
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_restores_shared_identity_without_full_audit
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_scalar_save_and_fresh_reopen_use_existing_publisher
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_six_root_proof_open_rejects_without_implicit_audit
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_requires_exact_external_commitment[None]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_requires_exact_external_commitment[False]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_requires_exact_external_commitment[1]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_requires_exact_external_commitment[bad]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_requires_exact_external_commitment[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_requires_exact_external_commitment[\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_rejects_coherent_head_forgery_before_decode[seed]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_rejects_coherent_head_forgery_before_decode[position]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_rejects_coherent_head_forgery_before_decode[counts]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_rejects_coherent_head_forgery_before_decode[inventory]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_rejects_coherent_head_forgery_before_decode[next_ids]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_fixed_context_and_budget_failures_leave_no_pin[rules]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_fixed_context_and_budget_failures_leave_no_pin[format]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_fixed_context_and_budget_failures_leave_no_pin[metadata-size]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_fixed_context_and_budget_failures_leave_no_pin[manifest-size]
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_fixed_context_and_budget_failures_leave_no_pin[scope-roots]
+19 failed, 1 passed in 26.07s

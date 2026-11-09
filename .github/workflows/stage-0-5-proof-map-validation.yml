@@ -128,6 +128,8 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --output evidence/native-insert-scaling 2>&1 | tee evidence/native-insert-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_6_rank_projection.py simulation/tests/test_stage_0_6_proof_native_rank.py --junitxml=evidence/native-rank-tests.xml 2>&1 | tee evidence/native-rank-tests.log
           python -m pytest -q simulation/tests/test_stage_0_6_proof_native_metadata.py -o junit_family=legacy --junitxml=evidence/native-metadata-tests.xml 2>&1 | tee evidence/native-metadata-tests.log
+          python -m pytest -q simulation/tests/test_stage_0_6_proof_open.py .github/tests/test_real_year_probe.py -o junit_family=legacy --junitxml=evidence/proof-open-tests.xml 2>&1 | tee evidence/proof-open-tests.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_real_year_probe.py --rank-proofs --proof-only --output evidence/proof-open-year 2>&1 | tee evidence/proof-open-year.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --scenario mixed --output evidence/native-mixed-scaling 2>&1 | tee evidence/native-mixed-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_native_insert_scaling.py --scenario fresh --output evidence/native-fresh-scaling 2>&1 | tee evidence/native-fresh-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_world_session.py simulation/tests/test_stage_0_6_proof_world_continuation.py --junitxml=evidence/native-world-session-tests.xml 2>&1 | tee evidence/native-world-session-tests.log

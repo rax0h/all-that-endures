@@ -1,0 +1,30 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_____ test_invalid_opening_mode_rejects_before_output_creation[False-True] _____
+.github/tests/test_real_year_probe.py:36: in test_invalid_opening_mode_rejects_before_output_creation
+    probe.run(output,rank_proofs=rank,proof_only=proof_only)
+E   TypeError: run() got an unexpected keyword argument 'proof_only'
+_______ test_invalid_opening_mode_rejects_before_output_creation[True-1] _______
+.github/tests/test_real_year_probe.py:36: in test_invalid_opening_mode_rejects_before_output_creation
+    probe.run(output,rank_proofs=rank,proof_only=proof_only)
+E   TypeError: run() got an unexpected keyword argument 'proof_only'
+______ test_invalid_opening_mode_rejects_before_output_creation[1-False] _______
+.github/tests/test_real_year_probe.py:36: in test_invalid_opening_mode_rejects_before_output_creation
+    probe.run(output,rank_proofs=rank,proof_only=proof_only)
+E   TypeError: run() got an unexpected keyword argument 'proof_only'
+_____ test_invalid_opening_mode_rejects_before_output_creation[False-None] _____
+.github/tests/test_real_year_probe.py:36: in test_invalid_opening_mode_rejects_before_output_creation
+    probe.run(output,rank_proofs=rank,proof_only=proof_only)
+E   TypeError: run() got an unexpected keyword argument 'proof_only'
+_________________ test_cli_proof_only_requires_rank_authority __________________
+.github/tests/test_real_year_probe.py:45: in test_cli_proof_only_requires_rank_authority
+    assert '--proof-only requires --rank-proofs' in result.stderr
+E   AssertionError: assert '--proof-only requires --rank-proofs' in 'usage: run_proof_real_year_probe.py [-h] --output OUTPUT [--rank-proofs]\nrun_proof_real_year_probe.py: error: unrecognized arguments: --proof-only\n'
+E    +  where 'usage: run_proof_real_year_probe.py [-h] --output OUTPUT [--rank-proofs]\nrun_proof_real_year_probe.py: error: unrecognized arguments: --proof-only\n' = CompletedProcess(args=['/workspace/scratch/d88f8db353e8/ate-qualified-python/bin/python', '/workspace/scratch/d88f8db3....py [-h] --output OUTPUT [--rank-proofs]\nrun_proof_real_year_probe.py: error: unrecognized arguments: --proof-only\n').stderr
+=========================== short test summary info ============================
+FAILED .github/tests/test_real_year_probe.py::test_invalid_opening_mode_rejects_before_output_creation[False-True]
+FAILED .github/tests/test_real_year_probe.py::test_invalid_opening_mode_rejects_before_output_creation[True-1]
+FAILED .github/tests/test_real_year_probe.py::test_invalid_opening_mode_rejects_before_output_creation[1-False]
+FAILED .github/tests/test_real_year_probe.py::test_invalid_opening_mode_rejects_before_output_creation[False-None]
+FAILED .github/tests/test_real_year_probe.py::test_cli_proof_only_requires_rank_authority
+5 failed, 7 deselected in 0.09s

@@ -1,0 +1,13 @@
+healthy_control_pin_count 0
+primary_error KeyboardInterrupt('cancelled at committed pin return')
+{
+  "injection": [
+    {
+      "in_transaction": false,
+      "token": "fcaacf57-43cc-4157-bd99-55e6fe1a6350",
+      "returned_pin": "GenerationPin(token='fcaacf57-43cc-4157-bd99-55e6fe1a6350', store_identity='11fe702e-554f-4f6f-adc3-689b2cdff1cb', captured_head=0)"
+    }
+  ],
+  "connection_closed": true,
+  "pin_count_after_failure": 1
+}

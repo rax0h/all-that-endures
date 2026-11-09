@@ -1,0 +1,14 @@
+{
+  "error": "UNIQUE constraint failed: generation_pins.token",
+  "before": [
+    [
+      "214654ef-73d6-4cb3-a0d7-549de2dc3cf7",
+      "dd50925f-353b-418b-969f-eccb13386077",
+      0,
+      "2da0bd874ec932238da7efd4c2f917f43cfbc2277d02d220b78336c9cf7d8ab3"
+    ]
+  ],
+  "after": [],
+  "foreign_connection_usable": true,
+  "foreign_pin_preserved": false
+}

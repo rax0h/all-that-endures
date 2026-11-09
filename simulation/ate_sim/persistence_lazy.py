@@ -10414,6 +10414,7 @@ class LazyWorldSession:
         tail_descriptor,
         commit_descriptor,
         paged_household_members=False,
+        _opening_resources=None,
     ):
         self.store = store
         self._history_cache_budget = SharedCacheBudget()
@@ -10422,6 +10423,9 @@ class LazyWorldSession:
         )
         self.pin = pin
         self.world = world
+        if _opening_resources is not None:
+            from .persistence_proof_open import _remember_session
+            _remember_session(_opening_resources,self)
         self.manifest = manifest
         self.identity_links = tuple(links)
         self.prefix = prefix
@@ -18073,7 +18077,14 @@ def _begin_matching_snapshot(store, pin):
 def open_lazy_world_session(path, *, rules_id, paged_household_members=None, _proof_admission=None):
     """Open P4 lazy World without decoding migrated record families."""
     path = Path(path)
-    store = LazyRecordStore.open(
+    if _proof_admission is not None:
+        from .persistence_proof_world_session import _WorldProofAuthority
+        if type(_proof_admission) is not _WorldProofAuthority:raise StoreError('invalid private native proof admission')
+    proof_only = _proof_admission is not None and _proof_admission.proof_only
+    if proof_only:
+        from .persistence_proof_open import open_store
+        store = open_store(path,_proof_admission,rules_id=rules_id)
+    else:store = LazyRecordStore.open(
         path,
         codec=WorldCodec(identity_links_recorded=True),
         expected_simulation_schema=SCHEMA,
@@ -18082,27 +18093,45 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None, _pr
 
     pin = None
     prefix = None
+    session = None
+    opening_context = None
+    opening_pin = None
+    opening_resources = None
+    opening_db,opening_codec = store.db,store.codec
     try:
+        if proof_only:
+            from .persistence_proof_open import _OpeningResources
+            opening_resources=_OpeningResources(store)
         if _proof_admission is not None:
             from .persistence_proof_world_session import _WorldProofAuthority
             if type(_proof_admission) is not _WorldProofAuthority:raise StoreError('invalid private native proof admission')
-            _proof_admission.bind(store)
-            store._world_proof_authority=_proof_admission
+            if not proof_only:
+                _proof_admission.bind(store)
+                store._world_proof_authority=_proof_admission
         # A pin can allow one concurrent advance.  Retry until the ordinary
         # eager capture transaction is exactly the pin's generation.
         for _attempt in range(4):
-            candidate = store.capture_pin()
+            candidate = (store.capture_pin(_opening_resources=opening_resources) if proof_only
+                else store.capture_pin())
+            if proof_only:pin=opening_pin=candidate
             head = _begin_matching_snapshot(store, candidate)
             if head is not None:
                 pin = candidate
                 break
             store.release_pin(candidate)
+            if proof_only:
+                pin=opening_pin=None
+                opening_resources.pin=None
         if pin is None:
             raise StoreError(
                 "could not capture a stable lazy World open generation"
             )
 
         try:
+            if proof_only:
+                from .persistence_proof_open import context
+                _proof_admission.admit(pin)
+                opening_context = context(_proof_admission)
             # Use the accepted cold manifest reader so a structurally
             # updated collections/v1 overlay is authority for current
             # collection sizes. Reading only the fixed base manifest here
@@ -18322,6 +18351,7 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None, _pr
                 tail_descriptor=tail_descriptor,
                 commit_descriptor=commit_descriptor,
                 paged_household_members=paged_household_members,
+                **({'_opening_resources':opening_resources} if proof_only else {}),
             )
             if checked_identity_count is not None:
                 session._activate_checked_identity_catalog()
@@ -18339,18 +18369,38 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None, _pr
             # Rollback originals are needed only while binding the private
             # restore. Keeping them afterwards retains deleted eager records
             # (and all histories reachable from those records) indefinitely.
+            if proof_only:
+                from .persistence_proof_world_session import _restore_current_event_aliases
+                from .persistence_proof_open import check_context
+                _restore_current_event_aliases(session)
+                check_context(_proof_admission,opening_context,transaction=True,session=session)
             session._eager_tracker._bound_root_originals.clear()
             session._eager_tracker._bootstrap_originals.clear()
             prefix = None
             pin = None
             return session
         finally:
+            rebound = proof_only and (store.db is not opening_db or store.codec is not opening_codec)
+            if proof_only:store.db,store.codec=opening_db,opening_codec
             store._owned_open_read = None
             store._active_read_transaction = False
             if store.db.in_transaction:
                 store.db.rollback()
             if _proof_admission is not None:_proof_admission.finish_admission()
-    except Exception:
+            if proof_only and opening_context is not None and pin is None:
+                from .persistence_proof_open import check_context
+                if rebound:raise StoreError('proof opening changed its owned handles')
+                check_context(_proof_admission,opening_context,transaction=False,session=session)
+    except BaseException as exc:
+        if proof_only:
+            from .persistence_proof_open import abort_open
+            if opening_resources is not None:
+                if opening_pin is None:opening_pin=opening_resources.pin
+                if session is None:session=opening_resources.session
+            try:abort_open(store,opening_pin,prefix,session,
+                owned_db=opening_db,owned_codec=opening_codec)
+            except BaseException as cleanup:exc.add_note('proof opening cleanup failed: '+str(cleanup))
+            raise
         if prefix is not None:
             prefix.close()
         if pin is not None:

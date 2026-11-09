@@ -34,14 +34,49 @@ def check_restored(stdout, expected):
         raise exc
 
 
-def run(output,*,rank_proofs=False):
+FRESH_RESTORE_CODE = '''
+import json,sys
+from ate_sim import persistence_proof_world as world_proof
+from ate_sim.persistence_proof_world_session import open_audited_proof_world_session,open_proof_world_session
+proof_only=sys.argv[4]=='1'
+opener=open_proof_world_session if proof_only else open_audited_proof_world_session
+original_audit=world_proof._audit_world
+audit_calls=0
+def audit(*args,**kwargs):
+    global audit_calls
+    audit_calls+=1
+    if proof_only:raise AssertionError('proof-only fresh restore attempted a full World audit')
+    return original_audit(*args,**kwargs)
+world_proof._audit_world=audit
+with opener(sys.argv[1],rules_id=sys.argv[2],expected_commitment=bytes.fromhex(sys.argv[3])) as session:
+    state=[session.world.year,session.world.digest()]
+print(json.dumps(dict(state=state,world_audit_calls=audit_calls,opener=opener.__name__)))
+'''
+
+
+def restore_in_fresh_process(path,rules,commitment,expected,*,proof_only=False):
+    if type(proof_only) is not bool:raise ValueError('proof_only must be boolean')
+    result=subprocess.run([sys.executable,'-c',FRESH_RESTORE_CODE,str(path),rules,commitment.hex(),
+        '1' if proof_only else '0'],check=True,capture_output=True,text=True,timeout=120)
+    evidence=json.loads(result.stdout)
+    check_restored(json.dumps(evidence['state']),expected)
+    wanted='open_proof_world_session' if proof_only else 'open_audited_proof_world_session'
+    if (evidence.get('opener')!=wanted or type(evidence.get('world_audit_calls')) is not int
+            or evidence['world_audit_calls']<0 or proof_only and evidence['world_audit_calls']!=0):
+        raise ValueError('fresh restore did not honor the selected opening mode')
+    return evidence
+
+
+def run(output,*,rank_proofs=False,proof_only=False):
     if type(rank_proofs) is not bool:raise ValueError('rank_proofs must be boolean')
+    if type(proof_only) is not bool:raise ValueError('proof_only must be boolean')
+    if proof_only and not rank_proofs:raise ValueError('proof-only requires rank proofs')
     from ate_sim.engine import Simulation
     from ate_sim.worldgen import generate_world
     from ate_sim.persistence_session import write_cold_snapshot
     from ate_sim.persistence_lazy import convert_cold_to_lazy
     from ate_sim.persistence_proof_world_copy import copy_world_with_proofs
-    from ate_sim.persistence_proof_world_session import open_audited_proof_world_session
+    from ate_sim.persistence_proof_world_session import open_audited_proof_world_session,open_proof_world_session
     from ate_sim import persistence_proof_world as world_proof
     from ate_sim import persistence_proof_manifest_publish as manifests
 
@@ -52,8 +87,12 @@ def run(output,*,rank_proofs=False):
     receipt = dict(status='running', source=dict(head=git('rev-parse', 'HEAD'),
         runtime_tree=git('rev-parse', 'HEAD:simulation/ate_sim'), python=platform.python_version(),
         sqlite=sqlite3.sqlite_version, driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()),
-        fixture=dict(seed=843000, width=8, height=6, settlements=1, initial_year=2, saved_year=3,rank_proofs=rank_proofs),
-        limitation='Small real generated world; not mature-world or cold-cache acceptance', phases=[])
+        fixture=dict(seed=843000, width=8, height=6, settlements=1, initial_year=2, saved_year=3,
+            rank_proofs=rank_proofs,proof_only=proof_only),
+        limitation='Small real generated world; not mature-world or cold-cache acceptance',
+        phases=[],parent_world_audits=[])
+    opener=open_proof_world_session if proof_only else open_audited_proof_world_session
+    active_phase=None
 
     def publish():
         target = output/'receipt.json'
@@ -62,6 +101,8 @@ def run(output,*,rank_proofs=False):
         temporary.replace(target)
 
     def phase(label, action):
+        nonlocal active_phase
+        previous_phase,active_phase=active_phase,label
         entry = dict(name=label, status='running')
         receipt['phases'].append(entry); publish()
         start, cpu = time.perf_counter(), time.process_time()
@@ -79,6 +120,7 @@ def run(output,*,rank_proofs=False):
                 parent_peak_rss_high_water_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
                 child_peak_rss_high_water_kib=child_after.ru_maxrss)
             publish()
+            active_phase=previous_phase
 
     rules = 'stage-0-6-real-year-probe'
     def setup():
@@ -90,8 +132,17 @@ def run(output,*,rank_proofs=False):
         proof = copy_world_with_proofs(output/'lazy.sqlite', output/'accepted.sqlite', rules_id=rules,rank_proofs=rank_proofs)
         return proof.commitment, control.digest()
 
+    original_parent_audit=world_proof._audit_world
+    def parent_audit(*args,**kwargs):
+        receipt['parent_world_audits'].append(dict(phase=active_phase))
+        if proof_only:raise AssertionError('proof-only continuation attempted a full World audit')
+        return original_parent_audit(*args,**kwargs)
+
     try:
         commitment, expected = phase('construction_and_eager_control', setup)
+        # Genesis construction is fully audited. Ordinary continuation below
+        # must honor the explicitly selected opening contract in every phase.
+        world_proof._audit_world=parent_audit
         receipt['accepted_commitment'] = commitment.hex()
         accepted = output/'accepted.sqlite'
         original_hash = hashlib.sha256(accepted.read_bytes()).hexdigest()
@@ -100,7 +151,7 @@ def run(output,*,rank_proofs=False):
         for mode in ('raw', 'diagnostic'):
             path = output/(mode+'.sqlite')
             phase(mode+'.copy', lambda: shutil.copyfile(accepted, path))
-            session = phase(mode+'.open_and_full_admission', lambda: open_audited_proof_world_session(
+            session = phase(mode+('.open_and_proof_admission' if proof_only else '.open_and_full_admission'), lambda: opener(
                 path, rules_id=rules, expected_commitment=commitment))
             try:
                 phase(mode+'.simulation_year', lambda: Simulation(session.world).run(1))
@@ -149,14 +200,8 @@ def run(output,*,rank_proofs=False):
                         warning='Instrumented pass; timings are not substituted for raw pass')
             finally:
                 phase(mode+'.close', session.close)
-            def restore():
-                result = subprocess.run([sys.executable, '-c',
-                    "import json,sys;from ate_sim.persistence_proof_world_session import open_audited_proof_world_session;"
-                    "s=open_audited_proof_world_session(sys.argv[1],rules_id=sys.argv[2],expected_commitment=bytes.fromhex(sys.argv[3]));"
-                    "print(json.dumps([s.world.year,s.world.digest()]));s.close()",
-                    str(path), rules, child.hex()], check=True, capture_output=True, text=True, timeout=120)
-                check_restored(result.stdout, expected)
-            phase(mode+'.fresh_process_restore_and_digest_verification', restore)
+            receipt[mode+'_fresh_process']=phase(mode+'.fresh_process_restore_and_digest_verification',
+                lambda:restore_in_fresh_process(path,rules,child,expected,proof_only=proof_only))
             receipt[mode+'_storage_bytes'] = {p.name:p.stat().st_size for p in output.glob(mode+'.sqlite*')}
         if hashlib.sha256(accepted.read_bytes()).hexdigest() != original_hash:
             raise ValueError('accepted fixture changed')
@@ -165,6 +210,7 @@ def run(output,*,rank_proofs=False):
         receipt.update(status='failed', **failure_details(exc))
         raise
     finally:
+        world_proof._audit_world=original_parent_audit
         publish()
 
 
@@ -172,5 +218,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rank-proofs',action='store_true',help='Explicitly construct seventh-root rank authority')
+    parser.add_argument('--proof-only',action='store_true',help='Open through accepted proofs without full-history admission')
     args=parser.parse_args()
-    run(args.output,rank_proofs=args.rank_proofs)
+    if args.proof_only and not args.rank_proofs:parser.error('--proof-only requires --rank-proofs')
+    run(args.output,rank_proofs=args.rank_proofs,proof_only=args.proof_only)

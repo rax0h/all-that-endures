@@ -1,0 +1,20 @@
+[
+  {
+    "error": "KeyboardInterrupt",
+    "primary": "cancelled before registry allocation",
+    "registry_ever_allocated": false,
+    "connection_closed": true,
+    "pins_remaining": 0,
+    "active": false,
+    "state": "closed"
+  },
+  {
+    "error": "SystemExit",
+    "primary": "cancelled before registry allocation",
+    "registry_ever_allocated": false,
+    "connection_closed": true,
+    "pins_remaining": 0,
+    "active": false,
+    "state": "closed"
+  }
+]

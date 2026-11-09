@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_fresh_child_rejects_nonboolean_mode_before_io ______________
+.github/tests/test_real_year_probe.py:51: in test_fresh_child_rejects_nonboolean_mode_before_io
+    probe.restore_in_fresh_process(tmp_path/'absent.sqlite','rules',b'0'*32,'expected',proof_only=1)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'real_year_probe' has no attribute 'restore_in_fresh_process'
+=========================== short test summary info ============================
+FAILED .github/tests/test_real_year_probe.py::test_fresh_child_rejects_nonboolean_mode_before_io
+1 failed, 12 deselected in 0.04s

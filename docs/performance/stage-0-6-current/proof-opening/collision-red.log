@@ -1,0 +1,12 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_rejected_duplicate_capture_token_never_owns_a_foreign_pin ________
+simulation/tests/test_stage_0_6_proof_open.py:476: in test_rejected_duplicate_capture_token_never_owns_a_foreign_pin
+    assert foreign.db.execute('SELECT * FROM generation_pins').fetchall()==before
+E   AssertionError: assert [] == [('e22a4388-b...2f8053b5783')]
+E     
+E     Right contains one more item: ('e22a4388-b9cb-449c-9f50-48d63cba66a4', '926e675a-9588-430b-94bb-9150f0c37659', 0, '213a53d85ad964770de97d521c89a36ce60f85697902098a5d63d2f8053b5783')
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_open.py::test_rejected_duplicate_capture_token_never_owns_a_foreign_pin
+1 failed, 48 deselected in 1.40s

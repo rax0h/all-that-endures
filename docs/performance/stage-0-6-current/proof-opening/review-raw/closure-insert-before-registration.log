@@ -1,0 +1,28 @@
+[
+  {
+    "error": "KeyboardInterrupt",
+    "primary": "cancelled after INSERT before registration",
+    "injection": [
+      {
+        "in_transaction": true,
+        "registered_pin": false
+      }
+    ],
+    "owned_connection_closed": true,
+    "foreign_pin_preserved": true,
+    "foreign_connection_usable": true
+  },
+  {
+    "error": "SystemExit",
+    "primary": "cancelled after INSERT before registration",
+    "injection": [
+      {
+        "in_transaction": true,
+        "registered_pin": false
+      }
+    ],
+    "owned_connection_closed": true,
+    "foreign_pin_preserved": true,
+    "foreign_connection_usable": true
+  }
+]
