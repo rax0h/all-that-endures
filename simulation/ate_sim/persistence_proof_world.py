@@ -398,7 +398,9 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
             facade=None
             for path,inc,kind,fingerprint in projections:
                 encoded=codec.encode(path)
-                actual=store.db.execute('SELECT incarnation_id FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(c.namespace,typed,encoded,pin.captured_head,pin.captured_head)).fetchall()
+                cursor=store.db.execute('SELECT incarnation_id FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(c.namespace,typed,encoded,pin.captured_head,pin.captured_head))
+                try:actual=cursor.fetchall()
+                finally:cursor.close()
                 if len(actual)!=1 or inc is not None and actual[0][0]!=inc:raise StoreIntegrityError('World body projection missing or wrong complete owner placement')
                 inc=actual[0][0]
                 if adapter is not None and fingerprint is None:store.db.execute('INSERT OR IGNORE INTO ate_world_edges VALUES(?,?)',(c.key[0],inc))
@@ -466,7 +468,13 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
         query=_composite(store,b'queries',(*sa[0].roots[2:4],qr,*sa[0].roots[6:]))
         return WorldRoots((ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root),owners,br.count,orr.count,(br,orr,qr,order,hr))
     finally:
-        store.db.execute('DROP TABLE ate_world_edges');store.db.execute('DROP TABLE ate_world_orders');store.db.execute('DROP TABLE ate_world_projection');store.db.execute('DROP TABLE ate_world_backings')
+        import sys
+        primary=sys.exception()
+        for table in ('ate_world_edges','ate_world_orders','ate_world_projection','ate_world_backings'):
+            try:store.db.execute('DROP TABLE '+table)
+            except BaseException as cleanup:
+                if primary is None:raise
+                primary.add_note('World audit cleanup failed for '+table+': '+str(cleanup))
 
 
 def audit_world_roots(store,pin,content_authority,scope_authority,inventory_authority,record_authority,directory_authority):

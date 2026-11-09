@@ -1,0 +1,2 @@
+{"probe": "frozen_map_certification", "outcome": "bulk-path", "error": "conversion frozen-map certification called _ordered_entries"}
+{"probe": "empty_scalar_spill", "iterations": 1000, "scratch_databases": 1000, "wall_seconds": 0.6872900220005249, "estimated_million_spill_seconds": 687.2900220005249, "limitation": "single empty proxy microbenchmark; excludes descriptor reads and all mature acceptance work"}

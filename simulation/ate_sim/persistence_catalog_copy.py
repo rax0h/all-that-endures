@@ -9,7 +9,7 @@ from dataclasses import is_dataclass
 import tempfile
 import uuid
 from itertools import chain
-from .persistence_conversion_workspace import ConversionWorkspace, DiskSet
+from .persistence_conversion_workspace import ConversionWorkspace, DiskSet, DiskLookup
 
 from .incremental_store import (
     Membership, RecordChange, StoreFormatError, StoreIntegrityError,
@@ -18,7 +18,7 @@ from .incremental_store import (
 from .persistence_adapters import WorldCodec, SCHEMA
 from .persistence_lazy_store import (
     LazyRecordStore, VersionChange, IdentityOccurrenceChange,
-    _namespace_checksum, _order_checksum, BOUNDED_AUTHORITY_FORMAT_VERSION,
+    _namespace_checksum, _order_checksum, BOUNDED_AUTHORITY_FORMAT_VERSION, _CONVERSION_AUDITS,
 )
 from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES
 from .persistence_lazy_identity_catalog import (
@@ -86,21 +86,31 @@ def _owner_sources(store, pin):
     return versions, ordinary
 
 
-def _backing_rosters(store, pin, next_incarnation):
-    kinds = {}
-    for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, RECORD_HEADERS, NAN_HEADERS):
-        for key in store.iter_keys(pin, namespace):
-            value = store.read_version(pin, namespace, key, expected_record_schema=1).value
-            inc = key[0] if namespace in (RECORD_HEADERS, NAN_HEADERS) and type(key) is tuple else key
-            kind = ('nan-key' if namespace == NAN_HEADERS else 'record' if namespace == RECORD_HEADERS
-                    else 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0])
-            if namespace == NAN_HEADERS:
-                AUXILIARY_OWNER_FAMILIES[namespace].validate_source(
-                    VersionChange(namespace, key, value), 'lazy', store.codec)
-            if (type(inc) is not int or not 0 < inc < next_incarnation or inc in kinds):
-                raise StoreIntegrityError('duplicate or unallocated backing in catalog copy')
-            kinds[inc] = kind
-    return tuple(VersionChange(DEPENDENCIES, inc, dependency_value(kind)) for inc, kind in kinds.items())
+def _backing_rosters(store, pin, next_incarnation, *, workspace=None):
+    seen = set() if workspace is None else DiskSet(workspace)
+    def rows():
+        for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, RECORD_HEADERS, NAN_HEADERS):
+            for key in store.iter_keys(pin, namespace):
+                value = store.read_version(pin, namespace, key, expected_record_schema=1).value
+                inc = key[0] if namespace in (RECORD_HEADERS, NAN_HEADERS) and type(key) is tuple else key
+                kind = ('nan-key' if namespace == NAN_HEADERS else 'record' if namespace == RECORD_HEADERS
+                        else 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0])
+                if namespace == NAN_HEADERS:
+                    AUXILIARY_OWNER_FAMILIES[namespace].validate_source(
+                        VersionChange(namespace, key, value), 'lazy', store.codec)
+                marker = inc if workspace is None else store.codec.encode(inc)
+                if type(inc) is not int or not 0 < inc < next_incarnation or marker in seen:
+                    raise StoreIntegrityError('duplicate or unallocated backing in catalog copy')
+                seen.add(marker)
+                yield VersionChange(DEPENDENCIES, inc, dependency_value(kind))
+        if workspace is not None:
+            seen.validate()
+    return tuple(rows()) if workspace is None else workspace.stage_versions(rows())
+
+
+def _dependency_kinds(codec, dependencies, workspace):
+    rows = ((change.key, change.value[1]) for change in dependencies)
+    return dict(rows) if workspace is None else DiskLookup(workspace, rows)
 
 
 def _verify_sequences(store, pin, workspace):
@@ -123,7 +133,8 @@ def _verify_sequences(store, pin, workspace):
                 continue
             active.add(store.codec.encode(incarnation))
             LazyOrderedSequence(store, pin, incarnation, value_mode='native',
-                checked_types=True, recursive=True).scrub(_inventory=collect)
+                checked_types=True, recursive=True).scrub(_inventory=collect,
+                    _workspace=workspace if _CONVERSION_AUDITS.get() else None)
         for namespace in SEQUENCE_NAMESPACES:
             cursor = store.db.execute('SELECT typed_key FROM lazy_record_versions WHERE namespace=? '
                 'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
@@ -191,8 +202,9 @@ def _verify_catalog(store, pin, workspace=None):
         raise StoreIntegrityError('extra/missing identity owner tree authority')
     if descriptor[0] == CATALOG_TAG:
         from .persistence_lazy_identity_retired import RetiredIdentityRanges
-        RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub()
-    verify_type_witnesses(store, pin)
+        RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub(
+            workspace=workspace if _CONVERSION_AUDITS.get() else None)
+    verify_type_witnesses(store, pin, workspace=workspace if _CONVERSION_AUDITS.get() else None)
     _verify_sequences(store, pin, workspace)
     if store._namespace_state_at('world.event_ids',pin.captured_head) is None:
         envelope=store.read_record('world.event_ids',0,expected_record_schema=1)
@@ -205,18 +217,20 @@ def _verify_catalog(store, pin, workspace=None):
         verify_exception_descriptor(store,pin,authority)
 
 
-def _check_backing_graph(codec, versions, dependencies):
+def _check_backing_graph(codec, versions, dependencies, *, workspace=None):
     """Scrub the existing physical ownership relation during explicit full copy.
 
     The temporary traversal state is discarded before publication. No new
     persistent dependency graph, registry or ordinary-operation scan is added.
     """
-    kinds = {change.key: change.value[1] for change in dependencies}
+    kinds = _dependency_kinds(codec, dependencies, workspace)
     expected = {PAGE_NAMESPACE: ('list', 'frozen-list'),
         ENTRY_NAMESPACE: ('map', 'set', 'frozen-map'),
         RECORD_HEADERS: ('record',), NAN_HEADERS: ('nan-key',)}
     expected.update((ns, ('sequence',)) for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR)
     edges = {}
+    if workspace is not None:
+        workspace.db.execute('CREATE TEMP TABLE ate_world_edges(parent INTEGER,child INTEGER,PRIMARY KEY(parent,child)) WITHOUT ROWID')
     for change in versions:
         adapter = AUXILIARY_OWNER_FAMILIES.get(change.namespace)
         if change.namespace not in expected or change.delete:
@@ -238,7 +252,18 @@ def _check_backing_graph(codec, versions, dependencies):
             continue
         adapter.validate_source(change, 'lazy', codec)
         for _path, child in adapter.reference_placements(change.value):
-            edges.setdefault(parent, set()).add(child)
+            if workspace is None:
+                edges.setdefault(parent, set()).add(child)
+            else:
+                workspace.db.execute('INSERT OR IGNORE INTO ate_world_edges VALUES (?,?)', (parent, child))
+    if workspace is not None:
+        from .persistence_proof_world import _acyclic_backings
+        kinds.validate()
+        try:
+            _acyclic_backings(workspace)
+        finally:
+            workspace.db.execute('DROP TABLE ate_world_edges')
+        return
     colors = {}
     for root in edges:
         pending = [(root, False)]
@@ -257,9 +282,9 @@ def _check_backing_graph(codec, versions, dependencies):
             pending.extend((child, False) for child in edges.get(incarnation, ()))
 
 
-def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
+def _check_reference_targets(values, dependencies, *, event_id_incarnations=(), workspace=None):
     """Explicit conversion scrub, including compact refs inside eager headers."""
-    kinds = {change.key: change.value[1] for change in dependencies}
+    kinds = _dependency_kinds(workspace.codec if workspace is not None else None, dependencies, workspace)
     used_facades = set()
     for root in values:
         pending, seen = [root], set()
@@ -291,6 +316,8 @@ def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
                 pending.extend(value)
             elif is_dataclass(value) and type(value) in RECORD_FIELDS:
                 pending.extend(getattr(value, field) for field in RECORD_FIELDS[type(value)])
+    if workspace is not None:
+        kinds.validate()
     return used_facades
 
 
@@ -535,7 +562,7 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
             expected_simulation_schema=SCHEMA, expected_rules_id=rules_id)
         _copy_phase('after_private_copy', private)
         with LazyRecordStore.open(private, codec=codec, expected_simulation_schema=SCHEMA,
-                                  expected_rules_id=rules_id) as target:
+                                  expected_rules_id=rules_id) as target, ConversionWorkspace(codec, directory=directory) as workspace:
             pin = target.capture_pin()
             try:
                 with target.read_snapshot(pin):
@@ -550,30 +577,32 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
                         from .persistence_adapters import _read_cold_manifest
                         check_open(target, pin, target.checked_head(), _read_cold_manifest(target))
                     _verify_catalog(target, pin)
-                    rosters = _backing_rosters(target, pin, target.read_identity_state(pin))
-                    if set(target.iter_keys(pin, DEPENDENCIES)) != {r.key for r in rosters}:
+                    rosters = _backing_rosters(target, pin, target.read_identity_state(pin), workspace=workspace)
+                    roster_keys = DiskSet(workspace)
+                    for roster in rosters:
+                        roster_keys.add(codec.encode(roster.key))
+                    if not roster_keys.equals(codec.encode(key) for key in target.iter_keys(pin, DEPENDENCIES)):
                         raise StoreIntegrityError('checked copy dependency roster inventory is incomplete or extra')
                     for roster in rosters:
                         if checked_dependency(target, pin, roster.key)[1] != roster.value[1]:
                             raise StoreIntegrityError('checked copy dependency roster has wrong backing kind')
-                    versions = []
-                    namespaces = tuple(ns for (ns,) in target.db.execute(
-                        'SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? '
-                        'AND (valid_to IS NULL OR ?<valid_to)', (pin.captured_head, pin.captured_head)))
-                    for ns in namespaces:
-                        for key in target.iter_keys(pin, ns):
-                            row = target._visible_record_row(pin.captured_head, ns, codec.encode(key))
-                            value, schema, _a, _b, members = target._check_record_row(ns, codec.encode(key), row, decode=True)
-                            versions.append(VersionChange(ns, key, value, record_schema=schema,
-                                memberships=tuple(Membership(*m) for m in members)))
-                    ordinary = tuple(codec.decode(payload) for (payload,) in target.db.execute('SELECT payload FROM records'))
+                    def versions():
+                        for ns, key, *row in target.db.execute(
+                                'SELECT namespace,typed_key,valid_from,valid_to,payload,payload_checksum,'
+                                'codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions '
+                                'WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
+                                (pin.captured_head, pin.captured_head)):
+                            value, schema, _a, _b, members = target._check_record_row(ns, key, tuple(row), decode=True)
+                            yield VersionChange(ns, codec.decode(key), value, record_schema=schema,
+                                memberships=tuple(Membership(*m) for m in members))
+                    ordinary = (codec.decode(payload) for (payload,) in target.db.execute('SELECT payload FROM records'))
                     facade = IdentityCatalog(target).read_owner_identity(pin, ('world.event_ids', 0))
                     try:
                         facade_ids = {inc for path, inc in facade.occurrences if not path}
                     finally:
                         if hasattr(facade.occurrences, 'close'): facade.occurrences.close()
-                    used_facades = _check_reference_targets((*ordinary, *(v.value for v in versions)), rosters,
-                        event_id_incarnations=facade_ids)
+                    used_facades = _check_reference_targets(chain(ordinary, (v.value for v in versions())), rosters,
+                        event_id_incarnations=facade_ids, workspace=workspace)
                     if used_facades:
                         namespace = 'world.event_ids'
                         if target._namespace_state_at(namespace, pin.captured_head) is None:
@@ -584,7 +613,7 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
                         else:
                             authority = target.read_version(pin, namespace, 0, expected_record_schema=1).value
                         check_compact_authority(authority)
-                    _check_backing_graph(codec, versions, rosters)
+                    _check_backing_graph(codec, versions(), rosters, workspace=workspace)
                     metadata = target.head_metadata()
                 token = uuid.uuid4().hex
                 _copy_phase('before_catalog_commit', private)
@@ -592,7 +621,7 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
                     changes=(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
                         (1, pin.captured_head + 1, token)),),
                     version_changes=rosters, identity_changes=(), new_segments=(),
-                    required_format_version=floor, metadata=metadata)
+                    required_format_version=floor, metadata=metadata, preparation_budget=(4096, 2*1024*1024))
                 pin = committed.pin
                 _copy_phase('after_catalog_commit', private)
                 target.verify_all()

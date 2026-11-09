@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_rebase_preserves_multiple_query_positions_for_one_owner _________
+simulation/tests/test_stage_0_6_bounded_genesis.py:217: in test_rebase_preserves_multiple_query_positions_for_one_owner
+    copy_api._rebase_private_snapshot(store)
+simulation/ate_sim/persistence_proof_world_copy.py:100: in _rebase_private_snapshot
+    db.execute('UPDATE '+table+' SET '+','.join(name+'=?' for name in names)+
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:43: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.IntegrityError: UNIQUE constraint failed: lazy_query_versions.namespace, lazy_query_versions.index_name, lazy_query_versions.index_value, lazy_query_versions.record_key, lazy_query_versions.ordinal, lazy_query_versions.valid_from
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_rebase_preserves_multiple_query_positions_for_one_owner
+1 failed, 17 deselected in 0.28s

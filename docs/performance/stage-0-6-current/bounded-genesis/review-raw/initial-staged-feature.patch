@@ -1,0 +1,1148 @@
+diff --git a/simulation/ate_sim/persistence_catalog_copy.py b/simulation/ate_sim/persistence_catalog_copy.py
+index 8b488f0..e0c84a7 100644
+--- a/simulation/ate_sim/persistence_catalog_copy.py
++++ b/simulation/ate_sim/persistence_catalog_copy.py
+@@ -9,7 +9,7 @@ from dataclasses import is_dataclass
+ import tempfile
+ import uuid
+ from itertools import chain
+-from .persistence_conversion_workspace import ConversionWorkspace, DiskSet
++from .persistence_conversion_workspace import ConversionWorkspace, DiskSet, DiskLookup
+ 
+ from .incremental_store import (
+     Membership, RecordChange, StoreFormatError, StoreIntegrityError,
+@@ -18,7 +18,7 @@ from .incremental_store import (
+ from .persistence_adapters import WorldCodec, SCHEMA
+ from .persistence_lazy_store import (
+     LazyRecordStore, VersionChange, IdentityOccurrenceChange,
+-    _namespace_checksum, _order_checksum, BOUNDED_AUTHORITY_FORMAT_VERSION,
++    _namespace_checksum, _order_checksum, BOUNDED_AUTHORITY_FORMAT_VERSION, _CONVERSION_AUDITS,
+ )
+ from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES
+ from .persistence_lazy_identity_catalog import (
+@@ -86,21 +86,31 @@ def _owner_sources(store, pin):
+     return versions, ordinary
+ 
+ 
+-def _backing_rosters(store, pin, next_incarnation):
+-    kinds = {}
+-    for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, RECORD_HEADERS, NAN_HEADERS):
+-        for key in store.iter_keys(pin, namespace):
+-            value = store.read_version(pin, namespace, key, expected_record_schema=1).value
+-            inc = key[0] if namespace in (RECORD_HEADERS, NAN_HEADERS) and type(key) is tuple else key
+-            kind = ('nan-key' if namespace == NAN_HEADERS else 'record' if namespace == RECORD_HEADERS
+-                    else 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0])
+-            if namespace == NAN_HEADERS:
+-                AUXILIARY_OWNER_FAMILIES[namespace].validate_source(
+-                    VersionChange(namespace, key, value), 'lazy', store.codec)
+-            if (type(inc) is not int or not 0 < inc < next_incarnation or inc in kinds):
+-                raise StoreIntegrityError('duplicate or unallocated backing in catalog copy')
+-            kinds[inc] = kind
+-    return tuple(VersionChange(DEPENDENCIES, inc, dependency_value(kind)) for inc, kind in kinds.items())
++def _backing_rosters(store, pin, next_incarnation, *, workspace=None):
++    seen = set() if workspace is None else DiskSet(workspace)
++    def rows():
++        for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, RECORD_HEADERS, NAN_HEADERS):
++            for key in store.iter_keys(pin, namespace):
++                value = store.read_version(pin, namespace, key, expected_record_schema=1).value
++                inc = key[0] if namespace in (RECORD_HEADERS, NAN_HEADERS) and type(key) is tuple else key
++                kind = ('nan-key' if namespace == NAN_HEADERS else 'record' if namespace == RECORD_HEADERS
++                        else 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0])
++                if namespace == NAN_HEADERS:
++                    AUXILIARY_OWNER_FAMILIES[namespace].validate_source(
++                        VersionChange(namespace, key, value), 'lazy', store.codec)
++                marker = inc if workspace is None else store.codec.encode(inc)
++                if type(inc) is not int or not 0 < inc < next_incarnation or marker in seen:
++                    raise StoreIntegrityError('duplicate or unallocated backing in catalog copy')
++                seen.add(marker)
++                yield VersionChange(DEPENDENCIES, inc, dependency_value(kind))
++        if workspace is not None:
++            seen.validate()
++    return tuple(rows()) if workspace is None else workspace.stage_versions(rows())
++
++
++def _dependency_kinds(codec, dependencies, workspace):
++    rows = ((change.key, change.value[1]) for change in dependencies)
++    return dict(rows) if workspace is None else DiskLookup(workspace, rows)
+ 
+ 
+ def _verify_sequences(store, pin, workspace):
+@@ -123,7 +133,8 @@ def _verify_sequences(store, pin, workspace):
+                 continue
+             active.add(store.codec.encode(incarnation))
+             LazyOrderedSequence(store, pin, incarnation, value_mode='native',
+-                checked_types=True, recursive=True).scrub(_inventory=collect)
++                checked_types=True, recursive=True).scrub(_inventory=collect,
++                    _workspace=workspace if _CONVERSION_AUDITS.get() else None)
+         for namespace in SEQUENCE_NAMESPACES:
+             cursor = store.db.execute('SELECT typed_key FROM lazy_record_versions WHERE namespace=? '
+                 'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
+@@ -191,8 +202,9 @@ def _verify_catalog(store, pin, workspace=None):
+         raise StoreIntegrityError('extra/missing identity owner tree authority')
+     if descriptor[0] == CATALOG_TAG:
+         from .persistence_lazy_identity_retired import RetiredIdentityRanges
+-        RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub()
+-    verify_type_witnesses(store, pin)
++        RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub(
++            workspace=workspace if _CONVERSION_AUDITS.get() else None)
++    verify_type_witnesses(store, pin, workspace=workspace if _CONVERSION_AUDITS.get() else None)
+     _verify_sequences(store, pin, workspace)
+     if store._namespace_state_at('world.event_ids',pin.captured_head) is None:
+         envelope=store.read_record('world.event_ids',0,expected_record_schema=1)
+@@ -205,18 +217,20 @@ def _verify_catalog(store, pin, workspace=None):
+         verify_exception_descriptor(store,pin,authority)
+ 
+ 
+-def _check_backing_graph(codec, versions, dependencies):
++def _check_backing_graph(codec, versions, dependencies, *, workspace=None):
+     """Scrub the existing physical ownership relation during explicit full copy.
+ 
+     The temporary traversal state is discarded before publication. No new
+     persistent dependency graph, registry or ordinary-operation scan is added.
+     """
+-    kinds = {change.key: change.value[1] for change in dependencies}
++    kinds = _dependency_kinds(codec, dependencies, workspace)
+     expected = {PAGE_NAMESPACE: ('list', 'frozen-list'),
+         ENTRY_NAMESPACE: ('map', 'set', 'frozen-map'),
+         RECORD_HEADERS: ('record',), NAN_HEADERS: ('nan-key',)}
+     expected.update((ns, ('sequence',)) for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR)
+     edges = {}
++    if workspace is not None:
++        workspace.db.execute('CREATE TEMP TABLE ate_world_edges(parent INTEGER,child INTEGER,PRIMARY KEY(parent,child)) WITHOUT ROWID')
+     for change in versions:
+         adapter = AUXILIARY_OWNER_FAMILIES.get(change.namespace)
+         if change.namespace not in expected or change.delete:
+@@ -238,7 +252,18 @@ def _check_backing_graph(codec, versions, dependencies):
+             continue
+         adapter.validate_source(change, 'lazy', codec)
+         for _path, child in adapter.reference_placements(change.value):
+-            edges.setdefault(parent, set()).add(child)
++            if workspace is None:
++                edges.setdefault(parent, set()).add(child)
++            else:
++                workspace.db.execute('INSERT OR IGNORE INTO ate_world_edges VALUES (?,?)', (parent, child))
++    if workspace is not None:
++        from .persistence_proof_world import _acyclic_backings
++        kinds.validate()
++        try:
++            _acyclic_backings(workspace)
++        finally:
++            workspace.db.execute('DROP TABLE ate_world_edges')
++        return
+     colors = {}
+     for root in edges:
+         pending = [(root, False)]
+@@ -257,9 +282,9 @@ def _check_backing_graph(codec, versions, dependencies):
+             pending.extend((child, False) for child in edges.get(incarnation, ()))
+ 
+ 
+-def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
++def _check_reference_targets(values, dependencies, *, event_id_incarnations=(), workspace=None):
+     """Explicit conversion scrub, including compact refs inside eager headers."""
+-    kinds = {change.key: change.value[1] for change in dependencies}
++    kinds = _dependency_kinds(workspace.codec if workspace is not None else None, dependencies, workspace)
+     used_facades = set()
+     for root in values:
+         pending, seen = [root], set()
+@@ -291,6 +316,8 @@ def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
+                 pending.extend(value)
+             elif is_dataclass(value) and type(value) in RECORD_FIELDS:
+                 pending.extend(getattr(value, field) for field in RECORD_FIELDS[type(value)])
++    if workspace is not None:
++        kinds.validate()
+     return used_facades
+ 
+ 
+@@ -535,7 +562,7 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
+             expected_simulation_schema=SCHEMA, expected_rules_id=rules_id)
+         _copy_phase('after_private_copy', private)
+         with LazyRecordStore.open(private, codec=codec, expected_simulation_schema=SCHEMA,
+-                                  expected_rules_id=rules_id) as target:
++                                  expected_rules_id=rules_id) as target, ConversionWorkspace(codec, directory=directory) as workspace:
+             pin = target.capture_pin()
+             try:
+                 with target.read_snapshot(pin):
+@@ -550,30 +577,32 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
+                         from .persistence_adapters import _read_cold_manifest
+                         check_open(target, pin, target.checked_head(), _read_cold_manifest(target))
+                     _verify_catalog(target, pin)
+-                    rosters = _backing_rosters(target, pin, target.read_identity_state(pin))
+-                    if set(target.iter_keys(pin, DEPENDENCIES)) != {r.key for r in rosters}:
++                    rosters = _backing_rosters(target, pin, target.read_identity_state(pin), workspace=workspace)
++                    roster_keys = DiskSet(workspace)
++                    for roster in rosters:
++                        roster_keys.add(codec.encode(roster.key))
++                    if not roster_keys.equals(codec.encode(key) for key in target.iter_keys(pin, DEPENDENCIES)):
+                         raise StoreIntegrityError('checked copy dependency roster inventory is incomplete or extra')
+                     for roster in rosters:
+                         if checked_dependency(target, pin, roster.key)[1] != roster.value[1]:
+                             raise StoreIntegrityError('checked copy dependency roster has wrong backing kind')
+-                    versions = []
+-                    namespaces = tuple(ns for (ns,) in target.db.execute(
+-                        'SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? '
+-                        'AND (valid_to IS NULL OR ?<valid_to)', (pin.captured_head, pin.captured_head)))
+-                    for ns in namespaces:
+-                        for key in target.iter_keys(pin, ns):
+-                            row = target._visible_record_row(pin.captured_head, ns, codec.encode(key))
+-                            value, schema, _a, _b, members = target._check_record_row(ns, codec.encode(key), row, decode=True)
+-                            versions.append(VersionChange(ns, key, value, record_schema=schema,
+-                                memberships=tuple(Membership(*m) for m in members)))
+-                    ordinary = tuple(codec.decode(payload) for (payload,) in target.db.execute('SELECT payload FROM records'))
++                    def versions():
++                        for ns, key, *row in target.db.execute(
++                                'SELECT namespace,typed_key,valid_from,valid_to,payload,payload_checksum,'
++                                'codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions '
++                                'WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
++                                (pin.captured_head, pin.captured_head)):
++                            value, schema, _a, _b, members = target._check_record_row(ns, key, tuple(row), decode=True)
++                            yield VersionChange(ns, codec.decode(key), value, record_schema=schema,
++                                memberships=tuple(Membership(*m) for m in members))
++                    ordinary = (codec.decode(payload) for (payload,) in target.db.execute('SELECT payload FROM records'))
+                     facade = IdentityCatalog(target).read_owner_identity(pin, ('world.event_ids', 0))
+                     try:
+                         facade_ids = {inc for path, inc in facade.occurrences if not path}
+                     finally:
+                         if hasattr(facade.occurrences, 'close'): facade.occurrences.close()
+-                    used_facades = _check_reference_targets((*ordinary, *(v.value for v in versions)), rosters,
+-                        event_id_incarnations=facade_ids)
++                    used_facades = _check_reference_targets(chain(ordinary, (v.value for v in versions())), rosters,
++                        event_id_incarnations=facade_ids, workspace=workspace)
+                     if used_facades:
+                         namespace = 'world.event_ids'
+                         if target._namespace_state_at(namespace, pin.captured_head) is None:
+@@ -584,7 +613,7 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
+                         else:
+                             authority = target.read_version(pin, namespace, 0, expected_record_schema=1).value
+                         check_compact_authority(authority)
+-                    _check_backing_graph(codec, versions, rosters)
++                    _check_backing_graph(codec, versions(), rosters, workspace=workspace)
+                     metadata = target.head_metadata()
+                 token = uuid.uuid4().hex
+                 _copy_phase('before_catalog_commit', private)
+@@ -592,7 +621,7 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
+                     changes=(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
+                         (1, pin.captured_head + 1, token)),),
+                     version_changes=rosters, identity_changes=(), new_segments=(),
+-                    required_format_version=floor, metadata=metadata)
++                    required_format_version=floor, metadata=metadata, preparation_budget=(4096, 2*1024*1024))
+                 pin = committed.pin
+                 _copy_phase('after_catalog_commit', private)
+                 target.verify_all()
+diff --git a/simulation/ate_sim/persistence_conversion_audit.py b/simulation/ate_sim/persistence_conversion_audit.py
+new file mode 100644
+index 0000000..2212e7f
+--- /dev/null
++++ b/simulation/ate_sim/persistence_conversion_audit.py
+@@ -0,0 +1,134 @@
++"""Full construction audits with disk inventories and sorted row streams.
++
++Only explicit offline conversion selects this implementation. Every payload and
++checksum is still read; no proof or predecessor audit is assumed valid.
++"""
++from contextlib import contextmanager, nullcontext
++from contextvars import ContextVar
++from itertools import zip_longest
++import tempfile
++
++from .incremental_store import StoreIntegrityError, _framed_sha
++
++
++_ORDER_WORKSPACE = ContextVar('ate_construction_order_workspace', default=None)
++
++
++@contextmanager
++def construction_spills(workspace):
++    token = _ORDER_WORKSPACE.set(workspace)
++    try:
++        yield
++    finally:
++        _ORDER_WORKSPACE.reset(token)
++
++
++def ordered_memberships(store, pin, namespace, index, value):
++    """Checked ordered projection; reuse one private spool across tiny histories."""
++    import sqlite3
++    from .persistence_conversion_workspace import ConversionWorkspace
++    shared = _ORDER_WORKSPACE.get()
++    with (nullcontext(shared) if shared is not None else ConversionWorkspace(store.codec,directory=None)) as workspace:
++        workspace._stream += 1
++        stream = workspace._stream
++        workspace.db.execute('CREATE TABLE IF NOT EXISTS membership_order('
++            'stream INTEGER,ordinal INTEGER,key BLOB,checksum TEXT,PRIMARY KEY(stream,ordinal)) WITHOUT ROWID')
++        count = root = 0
++        cursor = None
++        try:
++            for key, ordinal in store.iter_query_memberships(pin, namespace, index, value):
++                encoded = store.codec.encode(key)
++                checksum = _framed_sha(b'construction-order/v1',str(ordinal).encode(),encoded)
++                try:
++                    workspace.db.execute('INSERT INTO membership_order VALUES (?,?,?,?)', (stream,ordinal,encoded,checksum))
++                except sqlite3.IntegrityError as exc:
++                    raise StoreIntegrityError('duplicate construction membership ordinal') from exc
++                count += 1;root ^= int(checksum,16)
++            actual_count = actual_root = 0
++            cursor = workspace.db.execute('SELECT ordinal,key,checksum FROM membership_order WHERE stream=? ORDER BY ordinal',(stream,))
++            for ordinal, key, checksum in cursor:
++                if checksum != _framed_sha(b'construction-order/v1',str(ordinal).encode(),key):
++                    raise StoreIntegrityError('construction membership checksum mismatch')
++                actual_count += 1;actual_root ^= int(checksum,16)
++                yield store.codec.decode(key), ordinal
++            if (actual_count,actual_root)!=(count,root):
++                raise StoreIntegrityError('construction membership inventory mismatch')
++        finally:
++            if cursor is not None:cursor.close()
++            workspace.db.execute('DELETE FROM membership_order WHERE stream=?',(stream,))
++
++
++def clean_insertion_keys(owner):
++    count = 0
++    for key, _ordinal in ordered_memberships(owner._store, owner._pin, owner._namespace, 'insertion', 0):
++        count += 1
++        yield key
++    if count != owner._baseline_count:
++        raise StoreIntegrityError('construction insertion cardinality mismatch')
++
++
++def verify_lazy_generation(store, generation):
++    from .persistence_lazy_store import _order_checksum, _query_checksum
++    from .persistence_conversion_workspace import ConversionWorkspace, DiskSet
++    counts = {}
++    db, codec = store.db, store.codec
++    visible = 'valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'
++    with tempfile.TemporaryDirectory(prefix='ate-conversion-audit-') as directory:
++        with ConversionWorkspace(codec, directory=directory) as workspace:
++            for (namespace,) in db.execute('SELECT namespace FROM lazy_namespace_state WHERE '+visible,
++                                           (generation, generation)):
++                state = store._namespace_state_at(namespace, generation)
++                if state is None:
++                    raise StoreIntegrityError('visible lazy namespace has no state')
++                expected_count, next_ordinal = state[:2]
++                queries = DiskSet(workspace)
++                previous, count = None, 0
++                rows = db.execute('SELECT typed_key,valid_from,valid_to,payload,payload_checksum,'
++                    'codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions '
++                    'WHERE namespace=? AND '+visible+' ORDER BY typed_key,valid_from',
++                    (namespace, generation, generation))
++                for key, *row in rows:
++                    if previous == key:
++                        raise StoreIntegrityError('overlapping visible lazy record versions')
++                    previous = key
++                    codec.decode(key)
++                    store._check_record_row(namespace, key, tuple(row), decode=True)
++                    for name, value, ordinal in store._decode_memberships(row[6]):
++                        queries.add(codec.encode((name, codec.encode(value), key, ordinal)))
++                    count += 1
++                if count != expected_count:
++                    raise StoreIntegrityError('lazy namespace count does not match visible records')
++                keys = db.execute('SELECT typed_key FROM lazy_record_versions WHERE namespace=? AND '
++                                  +visible+' ORDER BY typed_key,valid_from', (namespace, generation, generation))
++                orders = db.execute('SELECT typed_key,ordinal,valid_from,valid_to,row_checksum '
++                    'FROM lazy_order_versions WHERE namespace=? AND '+visible+' ORDER BY typed_key,valid_from',
++                    (namespace, generation, generation))
++                order_count = 0
++                for key_row, order in zip_longest(keys, orders):
++                    if key_row is None or order is None or key_row[0] != order[0]:
++                        raise StoreIntegrityError('lazy collection order does not match visible owners')
++                    key, ordinal, start, end, checksum = order
++                    if checksum != _order_checksum(namespace, key, ordinal, start, end):
++                        raise StoreIntegrityError('lazy order checksum mismatch')
++                    if ordinal >= next_ordinal:
++                        raise StoreIntegrityError('collection ordinal is outside namespace counter')
++                    order_count += 1
++                if order_count != expected_count:
++                    raise StoreIntegrityError('lazy collection order is incomplete')
++                if db.execute('SELECT ordinal FROM lazy_order_versions WHERE namespace=? AND '+visible+
++                    ' GROUP BY ordinal HAVING count(*)>1 LIMIT 1', (namespace, generation, generation)).fetchone():
++                    raise StoreIntegrityError('duplicate visible collection ordinal')
++                def actual_queries():
++                    for name, value, key, ordinal, start, end, checksum in db.execute(
++                        'SELECT index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum '
++                        'FROM lazy_query_versions WHERE namespace=? AND '+visible, (namespace, generation, generation)):
++                        if checksum != _query_checksum(namespace, name, value, key, ordinal, start, end):
++                            raise StoreIntegrityError('lazy query checksum mismatch')
++                        yield codec.encode((name, value, key, ordinal))
++                if not queries.equals(actual_queries()):
++                    raise StoreIntegrityError('lazy query membership is incomplete or contains extra rows')
++                counts[namespace] = expected_count
++                # The inventories have been fully authenticated and are disposable.
++                workspace.db.execute('DELETE FROM conversion_sets')
++                workspace.db.commit()
++    return counts
+diff --git a/simulation/ate_sim/persistence_conversion_sequence_audit.py b/simulation/ate_sim/persistence_conversion_sequence_audit.py
+new file mode 100644
+index 0000000..a51eaa3
+--- /dev/null
++++ b/simulation/ate_sim/persistence_conversion_sequence_audit.py
+@@ -0,0 +1,77 @@
++"""Disk-backed physical inventories for explicit clean sequence construction."""
++from .incremental_store import StoreIntegrityError
++from .persistence_conversion_workspace import DiskSet, DiskLookup
++
++
++def scrub(sequence, workspace, inventory):
++    from .persistence_lazy_sequence import (NAMESPACES, DESCRIPTOR_NAMESPACE, NODE_NAMESPACE,
++        PARENT_NAMESPACE, LOCATOR_NAMESPACE, DIRECTORY_NAMESPACE, MEMBER_NAMESPACE, LEAF_SIZE, FANOUT)
++    codec, store, inc = sequence._store.codec, sequence._store, sequence._incarnation
++    expected = {namespace:DiskSet(workspace) for namespace in NAMESPACES}
++    wanted_members, found_members = DiskSet(workspace), DiskSet(workspace)
++    expected[DESCRIPTOR_NAMESPACE].add(codec.encode(inc))
++    occurrences = None
++    count = 0
++    def mark(namespace, key, error):
++        encoded = codec.encode(key)
++        if encoded in expected[namespace]:raise StoreIntegrityError(error)
++        expected[namespace].add(encoded)
++    def visit(link, parent, root=False):
++        nonlocal count
++        key = inc,link[0]
++        mark(NODE_NAMESPACE,key,'duplicate/cyclic main sequence node')
++        expected[PARENT_NAMESPACE].add(codec.encode(key))
++        kind,entries=sequence._nread(link,parent)
++        if not root and len(entries)<(LEAF_SIZE//2 if kind=='leaf' else FANOUT//2):
++            raise StoreIntegrityError('underfull main sequence node')
++        if root and kind=='branch' and len(entries)<2:
++            raise StoreIntegrityError('uncollapsed sequence root')
++        if kind=='leaf':
++            for slot,(occurrence,value) in enumerate(entries):
++                mark(LOCATOR_NAMESPACE,(inc,occurrence),'duplicate main sequence occurrence')
++                if sequence._read(LOCATOR_NAMESPACE,(inc,occurrence))!=(link[0],slot):
++                    raise StoreIntegrityError('sequence scrub locator disagreement')
++                member=sequence._member_key(value)
++                if member is not None:wanted_members.add(codec.encode((member,count,occurrence)))
++                yield occurrence,(count,value)
++                count+=1
++        else:
++            for slot,child in enumerate(entries):yield from visit(child,(link[0],slot))
++    def directory(link):
++        mark(DIRECTORY_NAMESPACE,(inc,link[0]),'duplicate/cyclic sequence directory node')
++        node=sequence._dread(link)
++        if node[0]=='directory-branch/v1':
++            for child in node[2]:directory(child[1:])
++            return
++        value,root=node[1:]
++        def member(link,lower,upper):
++            if link is None:return
++            mark(MEMBER_NAMESPACE,(inc,link[0]),'duplicate/cyclic sequence member node')
++            row=sequence._mread(link,value)
++            rank,actual=occurrences.get(link[0],(-1,None))
++            if actual!=value or not lower<rank<upper:
++                raise StoreIntegrityError('sequence scrub member order disagreement')
++            member(row[2],lower,rank)
++            found_members.add(codec.encode((sequence._member_key(value),rank,link[0])))
++            member(row[3],rank,upper)
++        member(root,-1,sequence._length)
++    try:
++        with store.read_snapshot(sequence._pin):
++            occurrences=DiskLookup(workspace,visit(sequence._root,(None,0),True))
++            if occurrences.count!=sequence._length:
++                raise StoreIntegrityError('sequence scrub descriptor count disagreement')
++            if sequence._directory is not None:directory(sequence._directory)
++            if not wanted_members.equals_set(found_members):
++                raise StoreIntegrityError('sequence scrub membership completeness disagreement')
++            occurrences.validate();found_members.validate()
++            for namespace,keys in expected.items():
++                keys.validate()
++                inventory(namespace,(codec.decode(key) for (key,) in workspace.db.execute(
++                    'SELECT key FROM conversion_sets WHERE stream=?',(keys.stream,))))
++    finally:
++        # Reuse scratch pages across millions of small backing trees.
++        for keys in (*expected.values(),wanted_members,found_members):
++            workspace.db.execute('DELETE FROM conversion_sets WHERE stream=?',(keys.stream,))
++        if occurrences is not None:
++            workspace.db.execute('DELETE FROM conversion_lookup WHERE stream=?',(occurrences.stream,))
++        workspace.db.commit()
+diff --git a/simulation/ate_sim/persistence_conversion_workspace.py b/simulation/ate_sim/persistence_conversion_workspace.py
+index fa0760b..48f6e4b 100644
+--- a/simulation/ate_sim/persistence_conversion_workspace.py
++++ b/simulation/ate_sim/persistence_conversion_workspace.py
+@@ -263,6 +263,13 @@ class DiskSet:
+         self.count += 1
+         self.root ^= int(checksum, 16)
+ 
++    def discard(self, key):
++        if key not in self:
++            return
++        self.workspace.db.execute('DELETE FROM conversion_sets WHERE stream=? AND key=?', (self.stream, key))
++        self.count -= 1
++        self.root ^= int(_framed_sha(b'conversion-set/v1', key), 16)
++
+     def validate(self):
+         count, root = 0, 0
+         for key, checksum in self.workspace.db.execute('SELECT key,checksum FROM conversion_sets WHERE stream=?', (self.stream,)):
+@@ -275,5 +282,58 @@ class DiskSet:
+     def equals(self, keys):
+         other = DiskSet(self.workspace)
+         for key in keys: other.add(key)
++        return self.equals_set(other)
++
++    def equals_set(self, other):
++        if self.workspace is not other.workspace:
++            raise ValueError('conversion inventories must share a workspace')
+         self.validate(); other.validate()
+         return self.workspace.db.execute('SELECT key FROM conversion_sets WHERE stream=? EXCEPT SELECT key FROM conversion_sets WHERE stream=? LIMIT 1', (self.stream,other.stream)).fetchone() is None and self.workspace.db.execute('SELECT key FROM conversion_sets WHERE stream=? EXCEPT SELECT key FROM conversion_sets WHERE stream=? LIMIT 1', (other.stream,self.stream)).fetchone() is None
++
++
++class DiskLookup:
++    """Checked, unique scratch key/value map with a constant-sized commitment."""
++    def __init__(self, workspace, values):
++        self.workspace = workspace
++        workspace._stream += 1
++        self.stream, self.count, self.root = workspace._stream, 0, 0
++        workspace.db.execute('CREATE TABLE IF NOT EXISTS conversion_lookup('
++            'stream INTEGER,key BLOB,value BLOB,checksum TEXT,PRIMARY KEY(stream,key)) WITHOUT ROWID')
++        for key, value in values:
++            key, value = workspace.codec.encode(key), workspace.codec.encode(value)
++            checksum = _framed_sha(b'conversion-lookup/v1', key, value)
++            try:
++                workspace.db.execute('INSERT INTO conversion_lookup VALUES (?,?,?,?)',
++                                     (self.stream, key, value, checksum))
++            except sqlite3.IntegrityError as exc:
++                raise StoreIntegrityError('duplicate conversion lookup key') from exc
++            self.count += 1
++            self.root ^= int(checksum, 16)
++        workspace.db.commit()
++        self.validate()
++
++    def get(self, key, default=None):
++        encoded = self.workspace.codec.encode(key)
++        row = self.workspace.db.execute('SELECT value,checksum FROM conversion_lookup WHERE stream=? AND key=?',
++                                        (self.stream, encoded)).fetchone()
++        if row is None:
++            return default
++        value, checksum = row
++        if checksum != _framed_sha(b'conversion-lookup/v1', encoded, value):
++            raise StoreIntegrityError('conversion lookup checksum mismatch')
++        return self.workspace.codec.decode(value)
++
++    def __contains__(self, key):
++        marker = object()
++        return self.get(key, marker) is not marker
++
++    def validate(self):
++        count, root = 0, 0
++        for key, value, checksum in self.workspace.db.execute(
++                'SELECT key,value,checksum FROM conversion_lookup WHERE stream=?', (self.stream,)):
++            if checksum != _framed_sha(b'conversion-lookup/v1', key, value):
++                raise StoreIntegrityError('conversion lookup checksum mismatch')
++            count += 1
++            root ^= int(checksum, 16)
++        if (count, root) != (self.count, self.root):
++            raise StoreIntegrityError('conversion lookup count/root mismatch')
+diff --git a/simulation/ate_sim/persistence_frozen_snapshots.py b/simulation/ate_sim/persistence_frozen_snapshots.py
+index 461cacd..92b1b59 100644
+--- a/simulation/ate_sim/persistence_frozen_snapshots.py
++++ b/simulation/ate_sim/persistence_frozen_snapshots.py
+@@ -49,7 +49,13 @@ def read_frozen_certification(store, pin, value):
+ def verify_frozen_certification(history):
+     """Explicit full scrub; ordinary reads rely on checked certification rows."""
+     resolver = lambda value: read_frozen_certification(history._store, history._pin, value)
+-    values = iter(history) if history._kind == 'list' else (entry[2] for entry in history._ordered_entries())
++    from .persistence_lazy_store import _CONVERSION_AUDITS
++    if history._kind == 'list':
++        values = iter(history)
++    else:
++        clean_conversion = _CONVERSION_AUDITS.get() and not history._new and not history._dirty_entries
++        entries = history._construction_entries() if clean_conversion else history._ordered_entries()
++        values = (entry[2] for entry in entries)
+     actual = True
+     for value in values:
+         actual = immutable_snapshot_value(value, resolver) and actual
+diff --git a/simulation/ate_sim/persistence_history_types.py b/simulation/ate_sim/persistence_history_types.py
+index 25fd15d..e970701 100644
+--- a/simulation/ate_sim/persistence_history_types.py
++++ b/simulation/ate_sim/persistence_history_types.py
+@@ -102,17 +102,20 @@ class HistoryMemberTypes:
+             raise StoreIntegrityError('history member type witness disagrees with backing values')
+ 
+ 
+-def verify_type_witnesses(store, pin):
++def verify_type_witnesses(store, pin, *, workspace=None):
+     """Explicit full destination verification with bounded streamed member state."""
+     from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, HISTORY_CLASSES
+     from .persistence_lazy_sequence import DESCRIPTOR_NAMESPACE as SEQUENCE_DESCRIPTOR
+     from .persistence_history_retirement import _job, _scopes, NAMESPACE as RETIREMENT
+-    descriptors, witnesses = set(), set(store.iter_keys(pin, NAMESPACE))
++    from .persistence_conversion_workspace import DiskSet
++    descriptors = set() if workspace is None else DiskSet(workspace)
++    witnesses = set(store.iter_keys(pin, NAMESPACE)) if workspace is None else None
++    marker = (lambda inc: inc) if workspace is None else store.codec.encode
+     for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR):
+         for incarnation in store.iter_keys(pin, namespace):
+-            if type(incarnation) is not int or incarnation < 1 or incarnation in descriptors:
++            if type(incarnation) is not int or incarnation < 1 or marker(incarnation) in descriptors:
+                 raise StoreIntegrityError('invalid or duplicate history type backing')
+-            descriptors.add(incarnation)
++            descriptors.add(marker(incarnation))
+             descriptor = store.read_version(pin, namespace, incarnation, expected_record_schema=1).value
+             if type(descriptor) is not tuple or not descriptor:
+                 raise StoreIntegrityError('invalid history type backing descriptor')
+@@ -130,7 +133,7 @@ def verify_type_witnesses(store, pin):
+                 if job[1] != kind:
+                     raise StoreIntegrityError('history retirement type disagrees with backing')
+                 if job[4]:
+-                    if incarnation in witnesses:
++                    if (incarnation in witnesses if workspace is None else store.contains_lazy_key(pin, NAMESPACE, incarnation)):
+                         types = HistoryMemberTypes(store, pin, incarnation, base_kind, required=True)
+                         position = 3 if kind == 'sequence' else 1
+                         if len(descriptor) <= position or type(descriptor[position]) is not int:
+@@ -142,13 +145,20 @@ def verify_type_witnesses(store, pin):
+                         scopes = _scopes(job)
+                         if job[0] != 'history-retirement/v2' or job[2] != len(scopes) - 1:
+                             raise StoreIntegrityError('retiring history lost its type witness early')
+-                        descriptors.remove(incarnation)
++                        if workspace is None:
++                            descriptors.remove(incarnation)
++                        else:
++                            descriptors.discard(marker(incarnation))
+                     continue
+             history = HISTORY_CLASSES[kind](store, pin, incarnation, checked_types=True, recursive=True)
+             history._member_types.verify_values(history)
+             if kind in ("frozen-map", "frozen-list"):
+                 from .persistence_frozen_snapshots import verify_frozen_certification
+                 verify_frozen_certification(history)
++    if workspace is not None:
++        if not descriptors.equals(store.codec.encode(inc) for inc in store.iter_keys(pin, NAMESPACE)):
++            raise StoreIntegrityError('history type witness inventory is incomplete or extra')
++        return descriptors.count
+     if descriptors != witnesses:
+         raise StoreIntegrityError('history type witness inventory is incomplete or extra')
+     return len(witnesses)
+diff --git a/simulation/ate_sim/persistence_lazy_adoption.py b/simulation/ate_sim/persistence_lazy_adoption.py
+index 3b3abe6..dbadfe0 100644
+--- a/simulation/ate_sim/persistence_lazy_adoption.py
++++ b/simulation/ate_sim/persistence_lazy_adoption.py
+@@ -61,6 +61,10 @@ class AdoptionQueries:
+     def __iter__(self):
+         self._ensure()
+         touched = self._effective_touched()
++        from .persistence_lazy_store import _CONVERSION_AUDITS
++        if _CONVERSION_AUDITS.get() and not touched:
++            from .persistence_conversion_audit import clean_insertion_keys
++            return clean_insertion_keys(self)
+         rows = self._store.query_memberships(self._pin, self._namespace, 'insertion', 0, exclude_keys=touched)
+         expected = self._baseline_count - sum(self._baseline_exists(key) for key in touched)
+         if len(rows) != expected:
+diff --git a/simulation/ate_sim/persistence_lazy_identity_retired.py b/simulation/ate_sim/persistence_lazy_identity_retired.py
+index 0e3dbdc..8421e80 100644
+--- a/simulation/ate_sim/persistence_lazy_identity_retired.py
++++ b/simulation/ate_sim/persistence_lazy_identity_retired.py
+@@ -271,12 +271,14 @@ class RetiredIdentityRanges:
+                     + sum(_resident(key) + _resident(value) for key, value in self._dirty.items())
+                     + sum(_resident(key) + _resident(value) for key, value in self._baseline.items()))}
+ 
+-    def scrub(self):
++    def scrub(self, *, workspace=None):
+         with self.store.read_snapshot(self.pin):
+             self._cache.clear()
+             self._cache_bytes = 0
+             if not self.initial and self.store.codec.encode(self._raw(HEADER_NAMESPACE, 0)) != self._base:
+                 raise StoreIntegrityError('retirement directory header changed underneath captured authority')
++            if workspace is not None:
++                return self._scrub_bounded(workspace)
+             visited = set()
+             def walk(link):
+                 if link is None: return
+@@ -297,3 +299,35 @@ class RetiredIdentityRanges:
+                 if node is None: actual.discard(key)
+                 else: actual.add(key)
+             if actual != visited: raise StoreIntegrityError('extra/missing retired interval nodes')
++
++
++    def _scrub_bounded(self, workspace):
++        from .persistence_conversion_workspace import DiskSet
++        visited, actual = DiskSet(workspace), DiskSet(workspace)
++        def walk(link):
++            if link is None:
++                return
++            key = self.store.codec.encode(link[0])
++            if key in visited:
++                raise StoreIntegrityError('duplicate/cyclic retirement node')
++            visited.add(key)
++            node = self._read(link)
++            walk(node[3]); walk(node[4])
++        walk(self.root)
++        if not self.initial:
++            for (key,) in self.store.db.execute(
++                'SELECT typed_key FROM lazy_record_versions WHERE namespace=? AND valid_from<=? '
++                'AND (valid_to IS NULL OR ?<valid_to)',
++                (NODE_NAMESPACE, self.pin.captured_head, self.pin.captured_head)):
++                self.store._metadata_rows += 1
++                self.store.codec.decode(key)
++                if key in actual:
++                    raise StoreIntegrityError('overlapping retirement nodes')
++                actual.add(key)
++        for key, node in self._dirty.items():
++            encoded = self.store.codec.encode(key)
++            actual.discard(encoded) if node is None else actual.add(encoded)
++        if not visited.equals(key for (key,) in workspace.db.execute(
++                'SELECT key FROM conversion_sets WHERE stream=?', (actual.stream,))):
++            raise StoreIntegrityError('extra/missing retired interval nodes')
++        actual.validate()
+diff --git a/simulation/ate_sim/persistence_lazy_minimum.py b/simulation/ate_sim/persistence_lazy_minimum.py
+index 9d0cd5e..83b930d 100644
+--- a/simulation/ate_sim/persistence_lazy_minimum.py
++++ b/simulation/ate_sim/persistence_lazy_minimum.py
+@@ -209,6 +209,10 @@ class MinimumQueries:
+     def __iter__(self):
+         self._ensure()
+         touched = self._effective_touched()
++        from .persistence_lazy_store import _CONVERSION_AUDITS
++        if _CONVERSION_AUDITS.get() and not touched:
++            from .persistence_conversion_audit import clean_insertion_keys
++            return clean_insertion_keys(self)
+         rows = self._store.query_memberships(self._pin, self._namespace, 'insertion', 0, exclude_keys=touched)
+         if len(rows) != self._baseline_count - sum(self._baseline_exists(key) for key in touched):
+             raise StoreIntegrityError('minimum insertion cardinality mismatch')
+diff --git a/simulation/ate_sim/persistence_lazy_nested_history.py b/simulation/ate_sim/persistence_lazy_nested_history.py
+index 939fcf2..0c2eb17 100644
+--- a/simulation/ate_sim/persistence_lazy_nested_history.py
++++ b/simulation/ate_sim/persistence_lazy_nested_history.py
+@@ -853,10 +853,33 @@ class _ScalarHistory(CleanCacheOwner):
+         return sorted(entries, key=lambda entry: entry[0])
+ 
+     def __iter__(self):
++        from .persistence_lazy_store import _CONVERSION_AUDITS
++        if _CONVERSION_AUDITS.get() and not self._new and not self._dirty_entries:
++            return self._construction_keys()
+         iterator = _HistoryIterator(self, self._ordered_entries())
+         self._iterators.add(iterator)
+         return iterator
+ 
++    def _construction_keys(self):
++        for entry in self._construction_entries():
++            yield self._native_key(entry)
++
++    def _construction_entries(self):
++        """Read-only conversion entries, with a checked disk ordinal index."""
++        from .persistence_conversion_audit import ordered_memberships
++        self._ensure()
++        count = 0
++        for key, ordinal in ordered_memberships(self._store, self._pin, ENTRY_NAMESPACE, 'incarnation', self._incarnation):
++            if type(key) is not tuple or len(key) != 2 or key[0] != self._incarnation:
++                raise StoreIntegrityError('nested scalar membership addresses wrong child')
++            entry = self._entry(key[1])
++            if entry is None or entry[0] != ordinal:
++                raise StoreIntegrityError('nested scalar membership disagrees with entry')
++            count += 1
++            yield entry
++        if count != self._count:
++            raise StoreIntegrityError('nested scalar descriptor count/order mismatch')
++
+     def pending_changes(self):
+         self._ensure()
+         changes = list(self._member_types.pending_changes(self._count))
+diff --git a/simulation/ate_sim/persistence_lazy_sequence.py b/simulation/ate_sim/persistence_lazy_sequence.py
+index b462fa9..db6fa6b 100644
+--- a/simulation/ate_sim/persistence_lazy_sequence.py
++++ b/simulation/ate_sim/persistence_lazy_sequence.py
+@@ -1120,12 +1120,17 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
+             self._pin = pin
+             self._clear_cache()
+ 
+-    def scrub(self, *, _inventory=None):
++    def scrub(self, *, _inventory=None, _workspace=None):
+         """Explicit full-history validation, including orphan/extra projections."""
+         self._ensure()
+         if _inventory is not None and (self._new or self._dirty
+                 or self._store.codec.encode(self._descriptor()) != self._base_descriptor):
+             raise StoreConflictError('shared sequence scrub requires a clean persisted sequence')
++        if _workspace is not None:
++            if _inventory is None:
++                raise ValueError('bounded sequence scrub requires shared physical inventory')
++            from .persistence_conversion_sequence_audit import scrub
++            return scrub(self, _workspace, _inventory)
+         expected = {ns: set() for ns in NAMESPACES}
+         expected[DESCRIPTOR_NAMESPACE].add(self._incarnation)
+         occurrences, members = {}, defaultdict(list)
+diff --git a/simulation/ate_sim/persistence_lazy_store.py b/simulation/ate_sim/persistence_lazy_store.py
+index 6825983..7afcefa 100644
+--- a/simulation/ate_sim/persistence_lazy_store.py
++++ b/simulation/ate_sim/persistence_lazy_store.py
+@@ -6,6 +6,7 @@ import tempfile
+ import time
+ import uuid
+ from contextlib import contextmanager, nullcontext
++from contextvars import ContextVar
+ from dataclasses import dataclass
+ from pathlib import Path
+ from typing import Any, Iterable, Iterator, Mapping
+@@ -48,6 +49,19 @@ MAX_PINS = 64
+ MAX_PAGE_SIZE = 128
+ 
+ 
++_CONVERSION_AUDITS = ContextVar('ate_bounded_conversion_audits', default=False)
++
++
++@contextmanager
++def _bounded_conversion_audits():
++    """Private offline construction scope; ordinary readers retain their audit."""
++    token = _CONVERSION_AUDITS.set(True)
++    try:
++        yield
++    finally:
++        _CONVERSION_AUDITS.reset(token)
++
++
+ class GenerationPressureError(StoreConflictError):
+     def __init__(self, head_generation: int, minimum_pinned_generation: int):
+         self.head_generation = head_generation
+@@ -3252,6 +3266,9 @@ class LazyRecordStore:
+         return tuple(range(floor, head + 1))
+ 
+     def _verify_lazy_generation(self, generation: int) -> dict[str, int]:
++        if _CONVERSION_AUDITS.get():
++            from .persistence_conversion_audit import verify_lazy_generation
++            return verify_lazy_generation(self, generation)
+         namespaces = [
+             row[0]
+             for row in self.db.execute(
+@@ -3367,10 +3384,12 @@ class LazyRecordStore:
+                 "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
+                 "valid_from,valid_to,row_checksum "
+                 "FROM lazy_identity_occurrence_versions "
+-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
++                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
++                "ORDER BY owner_namespace,owner_key,occurrence_path,valid_from",
+                 (generation, generation),
+-            ).fetchall()
+-            seen_occurrences = set()
++            )
++            previous_occurrence = None
++            occurrence_count = 0
+             for (
+                 owner_namespace,
+                 owner_key,
+@@ -3381,11 +3400,12 @@ class LazyRecordStore:
+                 checksum,
+             ) in occurrence_rows:
+                 marker = (owner_namespace, owner_key, occurrence_path)
+-                if marker in seen_occurrences:
++                if marker == previous_occurrence:
+                     raise StoreIntegrityError(
+                         "overlapping visible identity occurrences"
+                     )
+-                seen_occurrences.add(marker)
++                previous_occurrence = marker
++                occurrence_count += 1
+                 if checksum != _identity_occurrence_checksum(
+                     owner_namespace,
+                     owner_key,
+@@ -3409,7 +3429,7 @@ class LazyRecordStore:
+                     )
+             if generation == head_generation:
+                 current_lazy_counts = lazy_counts
+-                current_identity_occurrences = len(occurrence_rows)
++                current_identity_occurrences = occurrence_count
+ 
+         actual_counts = dict(ordinary_counts)
+         for namespace, count in current_lazy_counts.items():
+@@ -3608,46 +3628,14 @@ class LazyRecordStore:
+             source_store.verify_all()
+             head = source_store._checked_head_row()
+             generation = int(head[0])
+-            lazy_records = source_store.db.execute(
+-                "SELECT namespace,typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum "
+-                "FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+-                (generation, generation),
+-            ).fetchall()
+-            lazy_orders = source_store.db.execute(
+-                "SELECT namespace,typed_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_order_versions "
+-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+-                (generation, generation),
+-            ).fetchall()
+-            lazy_queries = source_store.db.execute(
+-                "SELECT namespace,index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum "
+-                "FROM lazy_query_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+-                (generation, generation),
+-            ).fetchall()
+-            lazy_states = source_store.db.execute(
+-                "SELECT namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum FROM lazy_namespace_state "
+-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+-                (generation, generation),
+-            ).fetchall()
+-            identity_occurrences = source_store.db.execute(
+-                "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
+-                "valid_from,valid_to,row_checksum "
+-                "FROM lazy_identity_occurrence_versions "
+-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+-                (generation, generation),
+-            ).fetchall()
+             identity_state = source_store.db.execute(
+                 "SELECT valid_from,valid_to,next_incarnation_id,row_checksum "
+                 "FROM lazy_identity_state WHERE valid_from<=? "
+-                "AND (valid_to IS NULL OR ?<valid_to)",
++                "AND (valid_to IS NULL OR ?<valid_to) LIMIT 2",
+                 (generation, generation),
+             ).fetchall()
+             if len(identity_state) != 1:
+-                raise StoreIntegrityError(
+-                    "identity state must have exactly one current version"
+-                )
+-            ordinary_records = source_store.db.execute("SELECT * FROM records").fetchall()
+-            ordinary_memberships = source_store.db.execute("SELECT * FROM query_membership").fetchall()
+-            segments = source_store.db.execute("SELECT * FROM segments").fetchall()
++                raise StoreIntegrityError("identity state must have exactly one current version")
+ 
+             cls._copy_phase_hook("after_source_capture")
+             new_store = cls.create(
+@@ -3670,43 +3658,34 @@ class LazyRecordStore:
+                     "INSERT INTO save_head VALUES (1,?,?,?,?,?,?,?,?)",
+                     head,
+                 )
+-                new_store.db.executemany(
+-                    "INSERT INTO records VALUES (?,?,?,?,?,?,?)", ordinary_records
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO query_membership VALUES (?,?,?,?,?,?)", ordinary_memberships
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO segments VALUES (?,?,?,?,?,?,?,?,?)", segments
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO lazy_record_versions VALUES (?,?,?,?,?,?,?,?,?,?)", lazy_records
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO lazy_order_versions VALUES (?,?,?,?,?,?)", lazy_orders
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO lazy_query_versions VALUES (?,?,?,?,?,?,?,?)", lazy_queries
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO lazy_namespace_state VALUES (?,?,?,?,?,?)", lazy_states
+-                )
++                tables = (
++                    ('records', 'namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation', False),
++                    ('query_membership', 'namespace,index_name,index_value,record_key,ordinal,generation', False),
++                    ('segments', 'namespace,ordinal,first_id,last_id,element_count,payload,payload_checksum,codec_version,created_generation', False),
++                    ('lazy_record_versions', 'namespace,typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum', True),
++                    ('lazy_order_versions', 'namespace,typed_key,ordinal,valid_from,valid_to,row_checksum', True),
++                    ('lazy_query_versions', 'namespace,index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum', True),
++                    ('lazy_namespace_state', 'namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum', True),
++                    ('lazy_identity_occurrence_versions', 'owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum', True))
++                for table, columns, interval in tables:
++                    query = 'SELECT '+columns+' FROM '+table
++                    if interval:
++                        query += ' WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'
++                    rows = source_store.db.execute(query, (generation, generation) if interval else ())
++                    try:
++                        new_store.db.executemany('INSERT INTO '+table+'('+columns+') VALUES ('+
++                            ','.join('?' for _ in columns.split(','))+')', rows)
++                    finally:
++                        rows.close()
+                 new_store.db.execute("DELETE FROM lazy_identity_state")
+-                new_store.db.executemany(
+-                    "INSERT INTO lazy_identity_occurrence_versions VALUES (?,?,?,?,?,?,?)",
+-                    identity_occurrences,
+-                )
+-                new_store.db.executemany(
+-                    "INSERT INTO lazy_identity_state VALUES (?,?,?,?)",
+-                    identity_state,
+-                )
++                new_store.db.executemany("INSERT INTO lazy_identity_state VALUES (?,?,?,?)", identity_state)
+                 # create() starts with no pins/receipts; keep operational state empty.
+                 new_store.db.execute("DELETE FROM save_receipts")
+                 new_store.db.execute("DELETE FROM pin_receipts")
+                 new_store.db.execute("DELETE FROM pin_attempts")
+                 new_store.db.execute("DELETE FROM generation_pins")
+                 new_store.db.commit()
+-            except Exception:
++            except BaseException:
+                 new_store.db.rollback()
+                 raise
+             source_store.db.rollback()
+@@ -3721,7 +3700,7 @@ class LazyRecordStore:
+             staging.unlink()
+             cls._fsync_dir(destination.parent)
+             return CopyResult(destination, identity, generation)
+-        except Exception:
++        except BaseException:
+             if source_store.db.in_transaction:
+                 source_store.db.rollback()
+             if new_store is not None:
+diff --git a/simulation/ate_sim/persistence_proof_world.py b/simulation/ate_sim/persistence_proof_world.py
+index 8ba0e7e..6d62c90 100644
+--- a/simulation/ate_sim/persistence_proof_world.py
++++ b/simulation/ate_sim/persistence_proof_world.py
+@@ -398,7 +398,9 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
+             facade=None
+             for path,inc,kind,fingerprint in projections:
+                 encoded=codec.encode(path)
+-                actual=store.db.execute('SELECT incarnation_id FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(c.namespace,typed,encoded,pin.captured_head,pin.captured_head)).fetchall()
++                cursor=store.db.execute('SELECT incarnation_id FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(c.namespace,typed,encoded,pin.captured_head,pin.captured_head))
++                try:actual=cursor.fetchall()
++                finally:cursor.close()
+                 if len(actual)!=1 or inc is not None and actual[0][0]!=inc:raise StoreIntegrityError('World body projection missing or wrong complete owner placement')
+                 inc=actual[0][0]
+                 if adapter is not None and fingerprint is None:store.db.execute('INSERT OR IGNORE INTO ate_world_edges VALUES(?,?)',(c.key[0],inc))
+@@ -466,7 +468,13 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
+         query=_composite(store,b'queries',(*sa[0].roots[2:4],qr,*sa[0].roots[6:]))
+         return WorldRoots((ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root),owners,br.count,orr.count,(br,orr,qr,order,hr))
+     finally:
+-        store.db.execute('DROP TABLE ate_world_edges');store.db.execute('DROP TABLE ate_world_orders');store.db.execute('DROP TABLE ate_world_projection');store.db.execute('DROP TABLE ate_world_backings')
++        import sys
++        primary=sys.exception()
++        for table in ('ate_world_edges','ate_world_orders','ate_world_projection','ate_world_backings'):
++            try:store.db.execute('DROP TABLE '+table)
++            except BaseException as cleanup:
++                if primary is None:raise
++                primary.add_note('World audit cleanup failed for '+table+': '+str(cleanup))
+ 
+ 
+ def audit_world_roots(store,pin,content_authority,scope_authority,inventory_authority,record_authority,directory_authority):
+diff --git a/simulation/ate_sim/persistence_proof_world_copy.py b/simulation/ate_sim/persistence_proof_world_copy.py
+index 937276c..1c98881 100644
+--- a/simulation/ate_sim/persistence_proof_world_copy.py
++++ b/simulation/ate_sim/persistence_proof_world_copy.py
+@@ -14,6 +14,31 @@ class WorldManifestCopy:
+     commitment:bytes
+ 
+ 
++
++
++def _genesis_phase(phase):
++    """Private construction progress/fault seam, never publication authority."""
++    return None
++
++def _bounded_rows(db, table, keys, fields):
++    """At most64 stable locators and one row, even while revisions change."""
++    watermark = None
++    columns = ','.join(keys)
++    while True:
++        where = '' if watermark is None else ' WHERE ('+columns+')>('+','.join('?' for _ in keys)+')'
++        cursor = db.execute('SELECT '+columns+' FROM '+table+where+' ORDER BY '+columns+' LIMIT 64', watermark or ())
++        batch = cursor.fetchall()
++        cursor.close()
++        if not batch:
++            return
++        watermark = batch[-1]
++        for locator in batch:
++            row = db.execute('SELECT '+','.join(fields)+' FROM '+table+' WHERE '+
++                ' AND '.join(key+'=?' for key in keys), locator).fetchone()
++            if row is None:
++                raise StoreIntegrityError('private genesis row disappeared')
++            yield row
++
+ def _rebase_private_snapshot(store):
+     """A new unpublished identity has no predecessor proof generation.
+ 
+@@ -24,19 +49,22 @@ def _rebase_private_snapshot(store):
+     if store.db.in_transaction:raise StoreError('private genesis rebase requires owned construction')
+     g=store.generation;db=store.db;codec=store.codec
+     if db.execute('SELECT 1 FROM generation_pins LIMIT 1').fetchone():raise StoreError('private genesis cannot carry live publisher leases')
++    _genesis_phase('rebase.full_audit')
+     store.verify_all();db.execute('BEGIN IMMEDIATE')
+     try:
+         # Normalize current source revisions before rewriting owner witnesses.
+         for table in ('lazy_record_versions','lazy_order_versions','lazy_query_versions','lazy_namespace_state','lazy_identity_occurrence_versions','lazy_identity_state'):
+             db.execute('DELETE FROM '+table+' WHERE NOT(valid_from<=? AND (valid_to IS NULL OR ?<valid_to))',(g,g))
+-        for ns,key,payload,version,schema in db.execute('SELECT namespace,typed_key,payload,codec_version,record_schema FROM records').fetchall():
++        for ns,key,payload,version,schema in _bounded_rows(db,'records',('namespace','typed_key'),('namespace','typed_key','payload','codec_version','record_schema')):
+             if ns==EVENT_STORAGE and key==codec.encode(COMMIT_DESCRIPTOR_KEY):payload=codec.encode((1,0,'0'*32))
+             checksum=_record_checksum(ns,key,schema,version,0,payload)
+             db.execute('UPDATE records SET payload=?,payload_checksum=?,last_changed_generation=0 WHERE namespace=? AND typed_key=?',(payload,checksum,ns,key))
++        _genesis_phase('rebase.ordinary_complete')
+         db.execute('UPDATE query_membership SET generation=0')
+-        for ns,ordinal,payload,first,last,count,version in db.execute('SELECT namespace,ordinal,payload,first_id,last_id,element_count,codec_version FROM segments').fetchall():
++        for ns,ordinal,payload,first,last,count,version in _bounded_rows(db,'segments',('namespace','ordinal'),('namespace','ordinal','payload','first_id','last_id','element_count','codec_version')):
+             db.execute('UPDATE segments SET created_generation=0,payload_checksum=? WHERE namespace=? AND ordinal=?',(_segment_checksum(ns,ordinal,first,last,count,version,0,payload),ns,ordinal))
+-        for ns,key,payload,version,schema,members in db.execute('SELECT namespace,typed_key,payload,codec_version,record_schema,memberships FROM lazy_record_versions').fetchall():
++        _genesis_phase('rebase.segments_complete')
++        for ns,key,payload,version,schema,members in _bounded_rows(db,'lazy_record_versions',('namespace','typed_key'),('namespace','typed_key','payload','codec_version','record_schema','memberships')):
+             if ns==catalog.OWNER_NAMESPACE:
+                 h=list(codec.decode(payload));h[3]=0
+                 if h[2]=='ordinary':
+@@ -48,29 +76,39 @@ def _rebase_private_snapshot(store):
+                 members=codec.encode(tuple((name,value,0 if name=='retired' else ordinal) for name,value,ordinal in codec.decode(members)))
+             db.execute('UPDATE lazy_record_versions SET payload=?,payload_checksum=?,memberships=?,valid_from=0,valid_to=NULL,row_checksum=? WHERE namespace=? AND typed_key=?',
+                 (payload,_framed_sha(b'lazy-payload-v1',payload),members,lazy._version_checksum(ns,key,schema,version,0,None,members,payload),ns,key))
++        _genesis_phase('rebase.lazy_records_complete')
+         layouts=(
+             ('lazy_order_versions',('namespace','typed_key','ordinal'),lazy._order_checksum),
+             ('lazy_query_versions',('namespace','index_name','index_value','record_key','ordinal'),lazy._query_checksum),
+             ('lazy_namespace_state',('namespace','member_count','next_ordinal'),lazy._namespace_checksum),
+             ('lazy_identity_occurrence_versions',('owner_namespace','owner_key','occurrence_path','incarnation_id'),lazy._identity_occurrence_checksum),
+             ('lazy_identity_state',('next_incarnation_id',),lazy._identity_state_checksum))
+-        for table,fields,checksum in layouts:
+-            rows=db.execute('SELECT '+','.join(fields)+' FROM '+table).fetchall()
+-            db.execute('DELETE FROM '+table)
+-            for row in rows:
++        stable_keys = (
++            ('namespace','typed_key'),
++            ('namespace','index_name','index_value','record_key','ordinal'),
++            ('namespace',),
++            ('owner_namespace','owner_key','occurrence_path'),
++            ('valid_from',))
++        for (table,fields,checksum),keys in zip(layouts,stable_keys):
++            _genesis_phase('rebase.'+table)
++            for captured in _bounded_rows(db,table,keys,tuple(dict.fromkeys((*fields,*keys)))):
++                row=captured[:len(fields)]
++                locator=tuple(captured[tuple(dict.fromkeys((*fields,*keys))).index(key)] for key in keys)
+                 if table=='lazy_query_versions' and row[:2]==(catalog.GROUP_NAMESPACE,'retired'):
+                     row=(*row[:-1],0)
+                 names=(*fields,'valid_from','valid_to','row_checksum');values=(*row,0,None,checksum(*row,0,None))
+-                db.execute('INSERT INTO '+table+'('+','.join(names)+') VALUES('+','.join('?' for _ in names)+')',values)
++                db.execute('UPDATE '+table+' SET '+','.join(name+'=?' for name in names)+
++                    ' WHERE '+' AND '.join(key+'=?' for key in keys),(*values,*locator))
+         for table in ('save_receipts','pin_receipts','pin_attempts'):db.execute('DELETE FROM '+table)
+         row=store._checked_head_row();values=(0,None,*row[2:7])
+         db.execute('UPDATE save_head SET generation=0,parent_generation=NULL,head_checksum=?',(_head_checksum(*values),))
+-        db.commit();store.verify_all()
++        db.commit();_genesis_phase('rebase.final_audit');store.verify_all()
+     except BaseException:
+         if db.in_transaction:db.rollback()
+         raise
+ 
+ 
++@lazy._bounded_conversion_audits()
+ def copy_world_with_proofs(source,destination,*,rules_id,rank_proofs=False):
+     if type(rank_proofs) is not bool:raise StoreError('invalid rank proof copy option')
+     from .persistence_session import _preflight_conversion_paths,_publish_private_cold_file
+@@ -83,10 +121,14 @@ def copy_world_with_proofs(source,destination,*,rules_id,rank_proofs=False):
+     from .persistence_proof_manifest_publish import bootstrap_world_manifest
+     source,destination=_preflight_conversion_paths(source,destination)
+     destination.parent.mkdir(parents=True,exist_ok=True)
+-    with tempfile.TemporaryDirectory(prefix='.ate-proof-genesis-',dir=destination.parent) as scratch:
++    from .persistence_conversion_workspace import ConversionWorkspace
++    from .persistence_conversion_audit import construction_spills
++    with tempfile.TemporaryDirectory(prefix='.ate-proof-genesis-',dir=destination.parent) as scratch, \
++            ConversionWorkspace(WorldCodec(identity_links_recorded=True),directory=scratch) as spill, construction_spills(spill):
+         private=Path(scratch)/'world.sqlite'
+         with LazyRecordStore.open(source,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as original:
+             floor=int(original.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
++        _genesis_phase('checked_current_copy')
+         if floor==6:
+             from .persistence_catalog_copy import _copy_current_checked_catalog
+             _copy_current_checked_catalog(source,private,rules_id=rules_id)
+@@ -94,17 +136,30 @@ def copy_world_with_proofs(source,destination,*,rules_id,rank_proofs=False):
+         else:raise StoreError('proof copy source requires old checked reader authority')
+         from .persistence_lazy import open_lazy_world_session
+         from .core import _digest_world_unchecked
++        _genesis_phase('canonical_digest.before_rebase')
+         with open_lazy_world_session(private,rules_id=rules_id) as session:before=_digest_world_unchecked(session.world)
+         with LazyRecordStore.open(private,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as store:_rebase_private_snapshot(store)
++        _genesis_phase('canonical_digest.after_rebase')
+         with open_lazy_world_session(private,rules_id=rules_id) as session:
+             if _digest_world_unchecked(session.world)!=before:raise StoreIntegrityError('proof genesis changed the canonical World digest')
+         with LazyRecordStore.open(private,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as store:
+             store.db.execute("UPDATE store_metadata SET value='7' WHERE key='format_version'");store.db.commit()
+             pin=store.capture_pin()
+             try:
+-                ra=bootstrap_record_proofs(store,pin);sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=rank_proofs)
+-                ca=bootstrap_content_proofs(store,pin);da=bootstrap_collection_directory(store,pin);ia=bootstrap_inventory(store,pin)
++                _genesis_phase('bootstrap.records')
++                ra=bootstrap_record_proofs(store,pin)
++                _genesis_phase('bootstrap.scopes')
++                sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=rank_proofs)
++                _genesis_phase('bootstrap.content')
++                ca=bootstrap_content_proofs(store,pin)
++                _genesis_phase('bootstrap.directory')
++                da=bootstrap_collection_directory(store,pin)
++                _genesis_phase('bootstrap.inventory')
++                ia=bootstrap_inventory(store,pin)
++                _genesis_phase('bootstrap.World_manifest')
+                 manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
+             finally:store.release_pin(pin)
++        _genesis_phase('publish')
+         _publish_private_cold_file(private,destination)
++        _genesis_phase('complete')
+     return WorldManifestCopy(manifest,expected)

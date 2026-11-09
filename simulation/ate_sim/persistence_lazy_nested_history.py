@@ -853,9 +853,32 @@ class _ScalarHistory(CleanCacheOwner):
         return sorted(entries, key=lambda entry: entry[0])
 
     def __iter__(self):
+        from .persistence_lazy_store import _CONVERSION_AUDITS
+        if _CONVERSION_AUDITS.get() and not self._new and not self._dirty_entries:
+            return self._construction_keys()
         iterator = _HistoryIterator(self, self._ordered_entries())
         self._iterators.add(iterator)
         return iterator
+
+    def _construction_keys(self):
+        for entry in self._construction_entries():
+            yield self._native_key(entry)
+
+    def _construction_entries(self):
+        """Read-only conversion entries, with a checked disk ordinal index."""
+        from .persistence_conversion_audit import ordered_memberships
+        self._ensure()
+        count = 0
+        for key, ordinal in ordered_memberships(self._store, self._pin, ENTRY_NAMESPACE, 'incarnation', self._incarnation):
+            if type(key) is not tuple or len(key) != 2 or key[0] != self._incarnation:
+                raise StoreIntegrityError('nested scalar membership addresses wrong child')
+            entry = self._entry(key[1])
+            if entry is None or entry[0] != ordinal:
+                raise StoreIntegrityError('nested scalar membership disagrees with entry')
+            count += 1
+            yield entry
+        if count != self._count:
+            raise StoreIntegrityError('nested scalar descriptor count/order mismatch')
 
     def pending_changes(self):
         self._ensure()

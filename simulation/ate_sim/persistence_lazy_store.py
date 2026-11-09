@@ -6,6 +6,7 @@ import tempfile
 import time
 import uuid
 from contextlib import contextmanager, nullcontext
+from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
@@ -46,6 +47,19 @@ SUPPORTED_FORMAT_VERSIONS = (
 )
 MAX_PINS = 64
 MAX_PAGE_SIZE = 128
+
+
+_CONVERSION_AUDITS = ContextVar('ate_bounded_conversion_audits', default=False)
+
+
+@contextmanager
+def _bounded_conversion_audits():
+    """Private offline construction scope; ordinary readers retain their audit."""
+    token = _CONVERSION_AUDITS.set(True)
+    try:
+        yield
+    finally:
+        _CONVERSION_AUDITS.reset(token)
 
 
 class GenerationPressureError(StoreConflictError):
@@ -3252,6 +3266,9 @@ class LazyRecordStore:
         return tuple(range(floor, head + 1))
 
     def _verify_lazy_generation(self, generation: int) -> dict[str, int]:
+        if _CONVERSION_AUDITS.get():
+            from .persistence_conversion_audit import verify_lazy_generation
+            return verify_lazy_generation(self, generation)
         namespaces = [
             row[0]
             for row in self.db.execute(
@@ -3367,10 +3384,12 @@ class LazyRecordStore:
                 "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
                 "valid_from,valid_to,row_checksum "
                 "FROM lazy_identity_occurrence_versions "
-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
+                "ORDER BY owner_namespace,owner_key,occurrence_path,valid_from",
                 (generation, generation),
-            ).fetchall()
-            seen_occurrences = set()
+            )
+            previous_occurrence = None
+            occurrence_count = 0
             for (
                 owner_namespace,
                 owner_key,
@@ -3381,11 +3400,12 @@ class LazyRecordStore:
                 checksum,
             ) in occurrence_rows:
                 marker = (owner_namespace, owner_key, occurrence_path)
-                if marker in seen_occurrences:
+                if marker == previous_occurrence:
                     raise StoreIntegrityError(
                         "overlapping visible identity occurrences"
                     )
-                seen_occurrences.add(marker)
+                previous_occurrence = marker
+                occurrence_count += 1
                 if checksum != _identity_occurrence_checksum(
                     owner_namespace,
                     owner_key,
@@ -3409,7 +3429,7 @@ class LazyRecordStore:
                     )
             if generation == head_generation:
                 current_lazy_counts = lazy_counts
-                current_identity_occurrences = len(occurrence_rows)
+                current_identity_occurrences = occurrence_count
 
         actual_counts = dict(ordinary_counts)
         for namespace, count in current_lazy_counts.items():
@@ -3608,46 +3628,14 @@ class LazyRecordStore:
             source_store.verify_all()
             head = source_store._checked_head_row()
             generation = int(head[0])
-            lazy_records = source_store.db.execute(
-                "SELECT namespace,typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum "
-                "FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
-                (generation, generation),
-            ).fetchall()
-            lazy_orders = source_store.db.execute(
-                "SELECT namespace,typed_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_order_versions "
-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
-                (generation, generation),
-            ).fetchall()
-            lazy_queries = source_store.db.execute(
-                "SELECT namespace,index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum "
-                "FROM lazy_query_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
-                (generation, generation),
-            ).fetchall()
-            lazy_states = source_store.db.execute(
-                "SELECT namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum FROM lazy_namespace_state "
-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
-                (generation, generation),
-            ).fetchall()
-            identity_occurrences = source_store.db.execute(
-                "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
-                "valid_from,valid_to,row_checksum "
-                "FROM lazy_identity_occurrence_versions "
-                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
-                (generation, generation),
-            ).fetchall()
             identity_state = source_store.db.execute(
                 "SELECT valid_from,valid_to,next_incarnation_id,row_checksum "
                 "FROM lazy_identity_state WHERE valid_from<=? "
-                "AND (valid_to IS NULL OR ?<valid_to)",
+                "AND (valid_to IS NULL OR ?<valid_to) LIMIT 2",
                 (generation, generation),
             ).fetchall()
             if len(identity_state) != 1:
-                raise StoreIntegrityError(
-                    "identity state must have exactly one current version"
-                )
-            ordinary_records = source_store.db.execute("SELECT * FROM records").fetchall()
-            ordinary_memberships = source_store.db.execute("SELECT * FROM query_membership").fetchall()
-            segments = source_store.db.execute("SELECT * FROM segments").fetchall()
+                raise StoreIntegrityError("identity state must have exactly one current version")
 
             cls._copy_phase_hook("after_source_capture")
             new_store = cls.create(
@@ -3670,43 +3658,34 @@ class LazyRecordStore:
                     "INSERT INTO save_head VALUES (1,?,?,?,?,?,?,?,?)",
                     head,
                 )
-                new_store.db.executemany(
-                    "INSERT INTO records VALUES (?,?,?,?,?,?,?)", ordinary_records
-                )
-                new_store.db.executemany(
-                    "INSERT INTO query_membership VALUES (?,?,?,?,?,?)", ordinary_memberships
-                )
-                new_store.db.executemany(
-                    "INSERT INTO segments VALUES (?,?,?,?,?,?,?,?,?)", segments
-                )
-                new_store.db.executemany(
-                    "INSERT INTO lazy_record_versions VALUES (?,?,?,?,?,?,?,?,?,?)", lazy_records
-                )
-                new_store.db.executemany(
-                    "INSERT INTO lazy_order_versions VALUES (?,?,?,?,?,?)", lazy_orders
-                )
-                new_store.db.executemany(
-                    "INSERT INTO lazy_query_versions VALUES (?,?,?,?,?,?,?,?)", lazy_queries
-                )
-                new_store.db.executemany(
-                    "INSERT INTO lazy_namespace_state VALUES (?,?,?,?,?,?)", lazy_states
-                )
+                tables = (
+                    ('records', 'namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation', False),
+                    ('query_membership', 'namespace,index_name,index_value,record_key,ordinal,generation', False),
+                    ('segments', 'namespace,ordinal,first_id,last_id,element_count,payload,payload_checksum,codec_version,created_generation', False),
+                    ('lazy_record_versions', 'namespace,typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum', True),
+                    ('lazy_order_versions', 'namespace,typed_key,ordinal,valid_from,valid_to,row_checksum', True),
+                    ('lazy_query_versions', 'namespace,index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum', True),
+                    ('lazy_namespace_state', 'namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum', True),
+                    ('lazy_identity_occurrence_versions', 'owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum', True))
+                for table, columns, interval in tables:
+                    query = 'SELECT '+columns+' FROM '+table
+                    if interval:
+                        query += ' WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'
+                    rows = source_store.db.execute(query, (generation, generation) if interval else ())
+                    try:
+                        new_store.db.executemany('INSERT INTO '+table+'('+columns+') VALUES ('+
+                            ','.join('?' for _ in columns.split(','))+')', rows)
+                    finally:
+                        rows.close()
                 new_store.db.execute("DELETE FROM lazy_identity_state")
-                new_store.db.executemany(
-                    "INSERT INTO lazy_identity_occurrence_versions VALUES (?,?,?,?,?,?,?)",
-                    identity_occurrences,
-                )
-                new_store.db.executemany(
-                    "INSERT INTO lazy_identity_state VALUES (?,?,?,?)",
-                    identity_state,
-                )
+                new_store.db.executemany("INSERT INTO lazy_identity_state VALUES (?,?,?,?)", identity_state)
                 # create() starts with no pins/receipts; keep operational state empty.
                 new_store.db.execute("DELETE FROM save_receipts")
                 new_store.db.execute("DELETE FROM pin_receipts")
                 new_store.db.execute("DELETE FROM pin_attempts")
                 new_store.db.execute("DELETE FROM generation_pins")
                 new_store.db.commit()
-            except Exception:
+            except BaseException:
                 new_store.db.rollback()
                 raise
             source_store.db.rollback()
@@ -3721,7 +3700,7 @@ class LazyRecordStore:
             staging.unlink()
             cls._fsync_dir(destination.parent)
             return CopyResult(destination, identity, generation)
-        except Exception:
+        except BaseException:
             if source_store.db.in_transaction:
                 source_store.db.rollback()
             if new_store is not None:

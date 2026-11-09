@@ -1,0 +1,35 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_world_audit_failure_keeps_primary_error_and_discards_output _______
+simulation/tests/test_stage_0_6_bounded_genesis.py:194: in fail
+    raise Cancelled('primary World audit cancellation')
+E   test_stage_0_6_bounded_genesis.test_world_audit_failure_keeps_primary_error_and_discards_output.<locals>.Cancelled: primary World audit cancellation
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_bounded_genesis.py:200: in test_world_audit_failure_keeps_primary_error_and_discards_output
+    copy_api.copy_world_with_proofs(source,dest,rules_id=RULES,rank_proofs=True)
+/usr/lib/python3.12/contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:135: in copy_world_with_proofs
+    manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:75: in bootstrap_world_manifest
+    proof=world._audit_world(store,pin,content_authority,scope_authority,inventory_authority,record_authority,directory_authority)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:469: in _audit_world
+    store.db.execute('DROP TABLE ate_world_edges');store.db.execute('DROP TABLE ate_world_orders');store.db.execute('DROP TABLE ate_world_projection');store.db.execute('DROP TABLE ate_world_backings')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:191: in track
+    return execute(self,sql,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:43: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.OperationalError: database table is locked
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_world_audit_failure_keeps_primary_error_and_discards_output
+1 failed, 15 deselected in 1.14s

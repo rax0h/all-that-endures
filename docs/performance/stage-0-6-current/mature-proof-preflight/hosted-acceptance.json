@@ -1,0 +1,11 @@
+{
+  "run_id": 42583331513,
+  "job_id": 129047075130,
+  "head": "7df089ff2b347ae8e36bb535291591a5bb6dfb82",
+  "conclusion": "success",
+  "artifact_id": 13659365343,
+  "artifact_bytes": 54393,
+  "artifact_sha256": "cbf3c31317b46795683f00428cbedf2c190252bcb507d251fc44f26d9326f57e",
+  "original_source_unchanged": true,
+  "scope": "Read-only original year1001 format6 inventory, no World operation or mature performance acceptance"
+}

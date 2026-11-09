@@ -1,0 +1,39 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_genesis_streams_real_complete_world_and_preserves_source _________
+simulation/tests/test_stage_0_6_bounded_genesis.py:45: in test_genesis_streams_real_complete_world_and_preserves_source
+    result = copy_api.copy_world_with_proofs(source, dest, rules_id=RULES, rank_proofs=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:125: in copy_world_with_proofs
+    with open_lazy_world_session(private,rules_id=rules_id) as session:before=_digest_world_unchecked(session.world)
+                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/core.py:129: in _digest_world_unchecked
+    return digest(world,_canonical,_canonical_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/canonical_stream.py:48: in digest
+    for piece in pieces(value):
+                 ^^^^^^^^^^^^^
+simulation/ate_sim/canonical_stream.py:31: in pieces
+    yield encode_basestring(key);yield ':';yield from pieces(getattr(v,name))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/canonical_stream.py:31: in pieces
+    yield encode_basestring(key);yield ':';yield from pieces(getattr(v,name))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/canonical_stream.py:35: in pieces
+    for i,key in enumerate(sorted(v,key=repr)):
+                           ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_adoption.py:64: in __iter__
+    rows = self._store.query_memberships(self._pin, self._namespace, 'insertion', 0, exclude_keys=touched)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1626: in query_memberships
+    ).fetchall()
+      ^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:26: in check
+    raise AssertionError('unbounded construction fetchall: '+sql)
+E   AssertionError: unbounded construction fetchall: select record_key,ordinal,valid_from,valid_to,row_checksum from lazy_query_versions indexed by lazy_query_current where namespace=? and index_name=? and index_value=? and valid_to is null  order by ordinal,record_key
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_genesis_streams_real_complete_world_and_preserves_source
+1 failed, 3 passed in 1.39s

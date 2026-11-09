@@ -1,0 +1,18 @@
+.............F.                                                          [100%]
+=================================== FAILURES ===================================
+_______ test_rebase_crosses_multiple_locator_batches_without_losing_rows _______
+simulation/tests/test_stage_0_6_bounded_genesis.py:153: in test_rebase_crosses_multiple_locator_batches_without_losing_rows
+    assert store.query_keys(pin,'people','bucket','x') == tuple(range(130))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1592: in query_keys
+    return tuple(key for key, _ordinal in self.query_memberships(pin, namespace, index_name, value))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1626: in query_memberships
+    ).fetchall()
+      ^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:27: in check
+    raise AssertionError('unbounded construction fetchall: '+sql)
+E   AssertionError: unbounded construction fetchall: select record_key,ordinal,valid_from,valid_to,row_checksum from lazy_query_versions indexed by lazy_query_current where namespace=? and index_name=? and index_value=? and valid_to is null  order by ordinal,record_key
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_rebase_crosses_multiple_locator_batches_without_losing_rows
+1 failed, 14 passed in 2.62s

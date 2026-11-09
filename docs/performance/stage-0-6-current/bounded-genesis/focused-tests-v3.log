@@ -1,0 +1,36 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_genesis_streams_real_complete_world_and_preserves_source _________
+simulation/tests/test_stage_0_6_bounded_genesis.py:26: in check
+    raise AssertionError('unbounded construction fetchall: '+sql)
+E   AssertionError: unbounded construction fetchall: select incarnation_id from lazy_identity_occurrence_versions where owner_namespace=? and owner_key=? and occurrence_path=? and valid_from<=? and (valid_to is null or ?<valid_to)
+
+During handling of the above exception, another exception occurred:
+simulation/tests/test_stage_0_6_bounded_genesis.py:45: in test_genesis_streams_real_complete_world_and_preserves_source
+    result = copy_api.copy_world_with_proofs(source, dest, rules_id=RULES, rank_proofs=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:135: in copy_world_with_proofs
+    manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:75: in bootstrap_world_manifest
+    proof=world._audit_world(store,pin,content_authority,scope_authority,inventory_authority,record_authority,directory_authority)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:469: in _audit_world
+    store.db.execute('DROP TABLE ate_world_edges');store.db.execute('DROP TABLE ate_world_orders');store.db.execute('DROP TABLE ate_world_projection');store.db.execute('DROP TABLE ate_world_backings')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:17: in track
+    return execute(self, sql, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:43: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.OperationalError: database table is locked
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_genesis_streams_real_complete_world_and_preserves_source
+1 failed, 3 passed in 2.18s

@@ -1,0 +1,35 @@
+{
+  "status": "failed",
+  "source": {
+    "head": "b628bd10739bcba660be9f6bf700765f25cb7be7",
+    "runtime_tree": "e68a2ea8b5f7c83a7aa4fd41e51f4cad4a60393e",
+    "python": "3.12.3",
+    "sqlite": "3.45.1",
+    "driver_sha256": "dbee329b8700f8d4a7341f4b763f58aa7ffc8d43f83688973df447ee50433760"
+  },
+  "fixture": {
+    "seed": 843000,
+    "width": 8,
+    "height": 6,
+    "settlements": 1,
+    "initial_year": 2,
+    "saved_year": 3,
+    "rank_proofs": true,
+    "proof_only": true
+  },
+  "limitation": "Small real generated world; not mature-world or cold-cache acceptance",
+  "phases": [
+    {
+      "name": "construction_and_eager_control",
+      "status": "failed",
+      "error": "StoreIntegrityError: conversion staging row/order checksum mismatch",
+      "wall_seconds": 8.544481118999101,
+      "parent_cpu_seconds": 8.542527076999999,
+      "child_cpu_seconds": 0.0,
+      "parent_peak_rss_high_water_kib": 38544,
+      "child_peak_rss_high_water_kib": 25232
+    }
+  ],
+  "parent_world_audits": [],
+  "error": "StoreIntegrityError: conversion staging row/order checksum mismatch"
+}

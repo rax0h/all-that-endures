@@ -1,0 +1,22 @@
+[
+  {
+    "rows": 1000,
+    "payload_bytes": 1024000,
+    "wall_seconds": 6.916827598000964,
+    "python_traced_peak_bytes": 312149,
+    "python_traced_live_bytes": 245612,
+    "process_peak_rss_before_bytes": 41091072,
+    "process_peak_rss_after_bytes": 43974656,
+    "limitation": "RSS high water includes fixture construction; allocator measurement covers streamed copy/audit/rebase only"
+  },
+  {
+    "rows": 10000,
+    "payload_bytes": 10240000,
+    "wall_seconds": 53.7369751749975,
+    "python_traced_peak_bytes": 474303,
+    "python_traced_live_bytes": 407683,
+    "process_peak_rss_before_bytes": 44105728,
+    "process_peak_rss_after_bytes": 45539328,
+    "limitation": "RSS high water includes fixture construction; allocator measurement covers streamed copy/audit/rebase only"
+  }
+]

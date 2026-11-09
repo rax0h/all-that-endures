@@ -1,5 +1,16 @@
 # Fixture and native continuation runtime qualification
 
+> November9 follow-up: the original successful qualification below is historical.
+> Current repeats of the unchanged complete driver on the fingerprint-matched
+> Python3.12.3/GCC13.3.0/SQLite3.45.1 tuple fail on both the bounded-genesis
+> candidate and the untouched7df089f baseline. Candidate construction rejects
+> staging integrity; baseline construction/raw year/save/fresh restore pass, then
+> diagnostic save/close fail. Cause remains unassigned. There is no current local
+> complete-acceptance claim and no engine-only attribution or application
+> exoneration. Exact commands, source preservation, runtime and failure receipts
+> are retained in ../bounded-genesis/ and its independent review-raw/. Hosted
+> validation uses its separately recorded runtime and remains mandatory.
+
 Hosted validation is green at8d0fea0:4,911tests,2subtests,one deliberate ZIP
 warning,9,304.06s; the proof job also passed. Display-name-only child65cb777
 retains the identical runtime tree d91d48cc36dc4fa822b1bf5a52bca6a218437a28.

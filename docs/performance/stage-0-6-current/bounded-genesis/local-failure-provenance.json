@@ -1,0 +1,17 @@
+{
+  "candidate_head": "b628bd10739bcba660be9f6bf700765f25cb7be7",
+  "candidate_runtime_tree": "e68a2ea8b5f7c83a7aa4fd41e51f4cad4a60393e",
+  "candidate_runtime_clean": true,
+  "candidate_tracked_changes": "M docs/performance/stage-0-6-current/fixture-construction/closure.md\n M docs/superpowers/plans/2026-11-09-bounded-proof-genesis.md",
+  "baseline_head": "7df089ff2b347ae8e36bb535291591a5bb6dfb82",
+  "baseline_runtime_tree": "6ca23be5208e8c198081c73b40806b42a4eb8626",
+  "baseline_tracked_clean": true,
+  "driver_unchanged": true,
+  "tuple_evidence": "review-raw/fingerprint.json",
+  "explanation": "Candidate code clean; only qualification and implementation-plan documentation changed while matrix ran. No local complete acceptance. Process/observer effects are not causal conclusions.",
+  "baseline_accepted_template": {
+    "recorded_before_sha256": "3b440bd286d3bd9bce1fabf775aeeb5711983e25683f11c3adb8688fc0fd2b27",
+    "closed_after_sha256": "3b440bd286d3bd9bce1fabf775aeeb5711983e25683f11c3adb8688fc0fd2b27",
+    "unchanged": true
+  }
+}

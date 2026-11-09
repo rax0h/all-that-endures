@@ -263,6 +263,13 @@ class DiskSet:
         self.count += 1
         self.root ^= int(checksum, 16)
 
+    def discard(self, key):
+        if key not in self:
+            return
+        self.workspace.db.execute('DELETE FROM conversion_sets WHERE stream=? AND key=?', (self.stream, key))
+        self.count -= 1
+        self.root ^= int(_framed_sha(b'conversion-set/v1', key), 16)
+
     def validate(self):
         count, root = 0, 0
         for key, checksum in self.workspace.db.execute('SELECT key,checksum FROM conversion_sets WHERE stream=?', (self.stream,)):
@@ -275,5 +282,58 @@ class DiskSet:
     def equals(self, keys):
         other = DiskSet(self.workspace)
         for key in keys: other.add(key)
+        return self.equals_set(other)
+
+    def equals_set(self, other):
+        if self.workspace is not other.workspace:
+            raise ValueError('conversion inventories must share a workspace')
         self.validate(); other.validate()
         return self.workspace.db.execute('SELECT key FROM conversion_sets WHERE stream=? EXCEPT SELECT key FROM conversion_sets WHERE stream=? LIMIT 1', (self.stream,other.stream)).fetchone() is None and self.workspace.db.execute('SELECT key FROM conversion_sets WHERE stream=? EXCEPT SELECT key FROM conversion_sets WHERE stream=? LIMIT 1', (other.stream,self.stream)).fetchone() is None
+
+
+class DiskLookup:
+    """Checked, unique scratch key/value map with a constant-sized commitment."""
+    def __init__(self, workspace, values):
+        self.workspace = workspace
+        workspace._stream += 1
+        self.stream, self.count, self.root = workspace._stream, 0, 0
+        workspace.db.execute('CREATE TABLE IF NOT EXISTS conversion_lookup('
+            'stream INTEGER,key BLOB,value BLOB,checksum TEXT,PRIMARY KEY(stream,key)) WITHOUT ROWID')
+        for key, value in values:
+            key, value = workspace.codec.encode(key), workspace.codec.encode(value)
+            checksum = _framed_sha(b'conversion-lookup/v1', key, value)
+            try:
+                workspace.db.execute('INSERT INTO conversion_lookup VALUES (?,?,?,?)',
+                                     (self.stream, key, value, checksum))
+            except sqlite3.IntegrityError as exc:
+                raise StoreIntegrityError('duplicate conversion lookup key') from exc
+            self.count += 1
+            self.root ^= int(checksum, 16)
+        workspace.db.commit()
+        self.validate()
+
+    def get(self, key, default=None):
+        encoded = self.workspace.codec.encode(key)
+        row = self.workspace.db.execute('SELECT value,checksum FROM conversion_lookup WHERE stream=? AND key=?',
+                                        (self.stream, encoded)).fetchone()
+        if row is None:
+            return default
+        value, checksum = row
+        if checksum != _framed_sha(b'conversion-lookup/v1', encoded, value):
+            raise StoreIntegrityError('conversion lookup checksum mismatch')
+        return self.workspace.codec.decode(value)
+
+    def __contains__(self, key):
+        marker = object()
+        return self.get(key, marker) is not marker
+
+    def validate(self):
+        count, root = 0, 0
+        for key, value, checksum in self.workspace.db.execute(
+                'SELECT key,value,checksum FROM conversion_lookup WHERE stream=?', (self.stream,)):
+            if checksum != _framed_sha(b'conversion-lookup/v1', key, value):
+                raise StoreIntegrityError('conversion lookup checksum mismatch')
+            count += 1
+            root ^= int(checksum, 16)
+        if (count, root) != (self.count, self.root):
+            raise StoreIntegrityError('conversion lookup count/root mismatch')

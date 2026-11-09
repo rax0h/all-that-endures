@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/workspace/scratch/d88f8db353e8/ate-baseline-7df/simulation/ate_sim/persistence_proof_world_copy.py", line 93, in copy_world_with_proofs
+    elif floor<6:upgrade_lazy_snapshot(source,private,rules_id=rules_id)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate-baseline-7df/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate-baseline-7df/simulation/ate_sim/persistence_catalog_copy.py", line 500, in _copy_with_checked_catalog
+    _restore_copy_ordinals(target, pin.captured_head, orders, states)
+  File "/workspace/scratch/d88f8db353e8/ate-baseline-7df/simulation/ate_sim/persistence_catalog_copy.py", line 329, in _restore_copy_ordinals
+    for ns, key, ordinal in orders:
+  File "/workspace/scratch/d88f8db353e8/ate-baseline-7df/simulation/ate_sim/persistence_conversion_workspace.py", line 68, in __iter__
+    raise StoreIntegrityError('conversion staging row/order checksum mismatch')
+ate_sim.incremental_store.StoreIntegrityError: conversion staging row/order checksum mismatch

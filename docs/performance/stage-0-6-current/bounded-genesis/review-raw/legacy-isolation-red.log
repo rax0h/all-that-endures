@@ -1,0 +1,38 @@
+BEGIN False
+Traceback (most recent call last):
+  File "<stdin>", line 11, in <module>
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 519, in _copy_with_checked_catalog
+    committed = target.commit(pin, commit_token=token,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 2817, in commit
+    version_prepared = prepare_changes(workspace, self, version_changes, 'version')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 239, in prepare_changes
+    rows = workspace.stage(values(), decode=decode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 131, in stage
+    for value in values:
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 219, in values
+    for change in changes:
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 63, in __iter__
+    cursor = workspace.db.execute('SELECT ordinal,payload,checksum FROM replay_rows WHERE stream=? ORDER BY ordinal', (self.stream,))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.DatabaseError: database disk image is malformed
+BEGIN True
+Traceback (most recent call last):
+  File "<stdin>", line 10, in <module>
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 519, in _copy_with_checked_catalog
+    committed = target.commit(pin, commit_token=token,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 2822, in commit
+    for _ in rows: pass
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 63, in __iter__
+    cursor = workspace.db.execute('SELECT ordinal,payload,checksum FROM replay_rows WHERE stream=? ORDER BY ordinal', (self.stream,))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.DatabaseError: database disk image is malformed

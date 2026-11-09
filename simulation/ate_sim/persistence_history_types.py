@@ -102,17 +102,20 @@ class HistoryMemberTypes:
             raise StoreIntegrityError('history member type witness disagrees with backing values')
 
 
-def verify_type_witnesses(store, pin):
+def verify_type_witnesses(store, pin, *, workspace=None):
     """Explicit full destination verification with bounded streamed member state."""
     from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, HISTORY_CLASSES
     from .persistence_lazy_sequence import DESCRIPTOR_NAMESPACE as SEQUENCE_DESCRIPTOR
     from .persistence_history_retirement import _job, _scopes, NAMESPACE as RETIREMENT
-    descriptors, witnesses = set(), set(store.iter_keys(pin, NAMESPACE))
+    from .persistence_conversion_workspace import DiskSet
+    descriptors = set() if workspace is None else DiskSet(workspace)
+    witnesses = set(store.iter_keys(pin, NAMESPACE)) if workspace is None else None
+    marker = (lambda inc: inc) if workspace is None else store.codec.encode
     for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR):
         for incarnation in store.iter_keys(pin, namespace):
-            if type(incarnation) is not int or incarnation < 1 or incarnation in descriptors:
+            if type(incarnation) is not int or incarnation < 1 or marker(incarnation) in descriptors:
                 raise StoreIntegrityError('invalid or duplicate history type backing')
-            descriptors.add(incarnation)
+            descriptors.add(marker(incarnation))
             descriptor = store.read_version(pin, namespace, incarnation, expected_record_schema=1).value
             if type(descriptor) is not tuple or not descriptor:
                 raise StoreIntegrityError('invalid history type backing descriptor')
@@ -130,7 +133,7 @@ def verify_type_witnesses(store, pin):
                 if job[1] != kind:
                     raise StoreIntegrityError('history retirement type disagrees with backing')
                 if job[4]:
-                    if incarnation in witnesses:
+                    if (incarnation in witnesses if workspace is None else store.contains_lazy_key(pin, NAMESPACE, incarnation)):
                         types = HistoryMemberTypes(store, pin, incarnation, base_kind, required=True)
                         position = 3 if kind == 'sequence' else 1
                         if len(descriptor) <= position or type(descriptor[position]) is not int:
@@ -142,13 +145,20 @@ def verify_type_witnesses(store, pin):
                         scopes = _scopes(job)
                         if job[0] != 'history-retirement/v2' or job[2] != len(scopes) - 1:
                             raise StoreIntegrityError('retiring history lost its type witness early')
-                        descriptors.remove(incarnation)
+                        if workspace is None:
+                            descriptors.remove(incarnation)
+                        else:
+                            descriptors.discard(marker(incarnation))
                     continue
             history = HISTORY_CLASSES[kind](store, pin, incarnation, checked_types=True, recursive=True)
             history._member_types.verify_values(history)
             if kind in ("frozen-map", "frozen-list"):
                 from .persistence_frozen_snapshots import verify_frozen_certification
                 verify_frozen_certification(history)
+    if workspace is not None:
+        if not descriptors.equals(store.codec.encode(inc) for inc in store.iter_keys(pin, NAMESPACE)):
+            raise StoreIntegrityError('history type witness inventory is incomplete or extra')
+        return descriptors.count
     if descriptors != witnesses:
         raise StoreIntegrityError('history type witness inventory is incomplete or extra')
     return len(witnesses)

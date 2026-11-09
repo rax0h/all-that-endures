@@ -1,5 +1,17 @@
 # Stage0.6 gate audit before measurement
 
+Current November9 status: proof-backed opening is hosted green atb9196f9 in
+42561091501 (4960tests+2subtests, full/proof successful). Mature input inventory
+42583331513 also succeeded and preserved the original29.9GB format6 source.
+Bounded proof-genesis candidate validation is next; bounded-genesis/closure.md
+owns its findings and limits. Local complete generated-year checks now fail on
+both candidate and untouched baseline, so findingR6/group remain OPEN. The same
+candidate hosted full suite and unchanged proof-year command must both pass
+before the dependent mature conversion/measurement job can start. Mature targets
+and final architecture acceptance remain OPEN. All older observations below are
+historical; no default activation, main merge or endurance is authorized.
+
+
 - Correctness baseline: current branch SHA `29751bd4c03662868fc242a5e88795eaf3925f55` has both jobs GREEN in [run 40885724761](https://github.com/rax0h/all-that-endures/actions/runs/40885724761). Full suite: 4,409 passed, 1 warning, 2 subtests, 7,455.30s; proof-map passed. Predecessor [40878875434](https://github.com/rax0h/all-that-endures/actions/runs/40878875434): 4,392 passed, 7,336.96s. Difference +17 tests and +118.34s (+1.61%); new continuation test 217.83s, so suite total alone does not prove a runtime regression. These are correctness timings, not mature latency acceptance.
 - Current mature timing: MEASURED, FAIL. Run40712867500 at36a362d6: open454.541s, first year4092.171s, save3219.980s, warm year censored at2452.955s. Fresh restore skipped. Original receipts, verified archive identity and comparison are retained in ../run-40712867500/. Opening/restoration were combined in this run.
 - Default proof activation: OPEN and deliberately unchanged. New proof-aware sessions remain explicit; benchmark calls the current ordinary open_lazy_world_session path on the accepted historical format. No benchmark-harness change activates proof defaults.

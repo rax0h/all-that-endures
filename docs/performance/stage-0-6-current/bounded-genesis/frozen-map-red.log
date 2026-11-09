@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_frozen_map_certification_streams_checked_entries _____________
+simulation/tests/test_stage_0_6_bounded_genesis.py:229: in test_frozen_map_certification_streams_checked_entries
+    verify_frozen_certification(proxy)
+simulation/ate_sim/persistence_frozen_snapshots.py:52: in verify_frozen_certification
+    values = iter(history) if history._kind == 'list' else (entry[2] for entry in history._ordered_entries())
+                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:227: in <lambda>
+    monkeypatch.setattr(proxy,'_ordered_entries',lambda:pytest.fail('frozen certification retained all entries'))
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: frozen certification retained all entries
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_frozen_map_certification_streams_checked_entries
+1 failed, 18 deselected in 0.62s

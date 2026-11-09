@@ -271,12 +271,14 @@ class RetiredIdentityRanges:
                     + sum(_resident(key) + _resident(value) for key, value in self._dirty.items())
                     + sum(_resident(key) + _resident(value) for key, value in self._baseline.items()))}
 
-    def scrub(self):
+    def scrub(self, *, workspace=None):
         with self.store.read_snapshot(self.pin):
             self._cache.clear()
             self._cache_bytes = 0
             if not self.initial and self.store.codec.encode(self._raw(HEADER_NAMESPACE, 0)) != self._base:
                 raise StoreIntegrityError('retirement directory header changed underneath captured authority')
+            if workspace is not None:
+                return self._scrub_bounded(workspace)
             visited = set()
             def walk(link):
                 if link is None: return
@@ -297,3 +299,35 @@ class RetiredIdentityRanges:
                 if node is None: actual.discard(key)
                 else: actual.add(key)
             if actual != visited: raise StoreIntegrityError('extra/missing retired interval nodes')
+
+
+    def _scrub_bounded(self, workspace):
+        from .persistence_conversion_workspace import DiskSet
+        visited, actual = DiskSet(workspace), DiskSet(workspace)
+        def walk(link):
+            if link is None:
+                return
+            key = self.store.codec.encode(link[0])
+            if key in visited:
+                raise StoreIntegrityError('duplicate/cyclic retirement node')
+            visited.add(key)
+            node = self._read(link)
+            walk(node[3]); walk(node[4])
+        walk(self.root)
+        if not self.initial:
+            for (key,) in self.store.db.execute(
+                'SELECT typed_key FROM lazy_record_versions WHERE namespace=? AND valid_from<=? '
+                'AND (valid_to IS NULL OR ?<valid_to)',
+                (NODE_NAMESPACE, self.pin.captured_head, self.pin.captured_head)):
+                self.store._metadata_rows += 1
+                self.store.codec.decode(key)
+                if key in actual:
+                    raise StoreIntegrityError('overlapping retirement nodes')
+                actual.add(key)
+        for key, node in self._dirty.items():
+            encoded = self.store.codec.encode(key)
+            actual.discard(encoded) if node is None else actual.add(encoded)
+        if not visited.equals(key for (key,) in workspace.db.execute(
+                'SELECT key FROM conversion_sets WHERE stream=?', (actual.stream,))):
+            raise StoreIntegrityError('extra/missing retired interval nodes')
+        actual.validate()

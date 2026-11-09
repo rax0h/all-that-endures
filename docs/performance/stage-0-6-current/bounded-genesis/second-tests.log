@@ -1,0 +1,39 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_genesis_streams_real_complete_world_and_preserves_source _________
+simulation/tests/test_stage_0_6_bounded_genesis.py:45: in test_genesis_streams_real_complete_world_and_preserves_source
+    result = copy_api.copy_world_with_proofs(source, dest, rules_id=RULES, rank_proofs=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:120: in copy_world_with_proofs
+    _copy_current_checked_catalog(source,private,rules_id=rules_id)
+simulation/ate_sim/persistence_catalog_copy.py:577: in _copy_current_checked_catalog
+    _verify_catalog(target, pin)
+simulation/ate_sim/persistence_catalog_copy.py:169: in _verify_catalog
+    return _verify_catalog(store, pin, temporary)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_catalog_copy.py:205: in _verify_catalog
+    verify_type_witnesses(store, pin, workspace=workspace)
+simulation/ate_sim/persistence_history_types.py:154: in verify_type_witnesses
+    history._member_types.verify_values(history)
+simulation/ate_sim/persistence_history_types.py:101: in verify_values
+    if self.enabled and member_counts(values) != self.counts:
+                        ^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_history_types.py:28: in member_counts
+    for value in values:
+simulation/ate_sim/persistence_lazy_nested_history.py:856: in __iter__
+    iterator = _HistoryIterator(self, self._ordered_entries())
+                                      ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_nested_history.py:840: in _ordered_entries
+    rows = () if self._new else self._store.query_memberships(self._pin, ENTRY_NAMESPACE, 'incarnation', self._incarnation,
+simulation/ate_sim/persistence_lazy_store.py:1626: in query_memberships
+    ).fetchall()
+      ^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:26: in check
+    raise AssertionError('unbounded construction fetchall: '+sql)
+E   AssertionError: unbounded construction fetchall: select record_key,ordinal,valid_from,valid_to,row_checksum from lazy_query_versions indexed by lazy_query_current where namespace=? and index_name=? and index_value=? and valid_to is null  order by ordinal,record_key
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_genesis_streams_real_complete_world_and_preserves_source
+1 failed, 3 passed in 1.34s

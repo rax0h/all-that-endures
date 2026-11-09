@@ -1120,12 +1120,17 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
             self._pin = pin
             self._clear_cache()
 
-    def scrub(self, *, _inventory=None):
+    def scrub(self, *, _inventory=None, _workspace=None):
         """Explicit full-history validation, including orphan/extra projections."""
         self._ensure()
         if _inventory is not None and (self._new or self._dirty
                 or self._store.codec.encode(self._descriptor()) != self._base_descriptor):
             raise StoreConflictError('shared sequence scrub requires a clean persisted sequence')
+        if _workspace is not None:
+            if _inventory is None:
+                raise ValueError('bounded sequence scrub requires shared physical inventory')
+            from .persistence_conversion_sequence_audit import scrub
+            return scrub(self, _workspace, _inventory)
         expected = {ns: set() for ns in NAMESPACES}
         expected[DESCRIPTOR_NAMESPACE].add(self._incarnation)
         occurrences, members = {}, defaultdict(list)

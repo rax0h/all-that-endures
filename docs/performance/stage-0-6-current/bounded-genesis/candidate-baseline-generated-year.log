@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/usr/lib/python3.12/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_world_copy.py", line 135, in copy_world_with_proofs
+    elif floor<6:upgrade_lazy_snapshot(source,private,rules_id=rules_id)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_complete_format.py", line 74, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_catalog_copy.py", line 519, in _copy_with_checked_catalog
+    committed = target.commit(pin, commit_token=token,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 2819, in commit
+    ordinary_prepared = prepare_changes(workspace, self, changes, 'ordinary')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 239, in prepare_changes
+    rows = workspace.stage(values(), decode=decode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 131, in stage
+    for value in values:
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 219, in values
+    for change in changes:
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_conversion_workspace.py", line 63, in __iter__
+    cursor = workspace.db.execute('SELECT ordinal,payload,checksum FROM replay_rows WHERE stream=? ORDER BY ordinal', (self.stream,))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.DatabaseError: database disk image is malformed

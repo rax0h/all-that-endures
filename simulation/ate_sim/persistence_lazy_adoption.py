@@ -61,6 +61,10 @@ class AdoptionQueries:
     def __iter__(self):
         self._ensure()
         touched = self._effective_touched()
+        from .persistence_lazy_store import _CONVERSION_AUDITS
+        if _CONVERSION_AUDITS.get() and not touched:
+            from .persistence_conversion_audit import clean_insertion_keys
+            return clean_insertion_keys(self)
         rows = self._store.query_memberships(self._pin, self._namespace, 'insertion', 0, exclude_keys=touched)
         expected = self._baseline_count - sum(self._baseline_exists(key) for key in touched)
         if len(rows) != expected:

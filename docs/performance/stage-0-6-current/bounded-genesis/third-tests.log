@@ -1,0 +1,28 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_genesis_streams_real_complete_world_and_preserves_source _________
+simulation/tests/test_stage_0_6_bounded_genesis.py:45: in test_genesis_streams_real_complete_world_and_preserves_source
+    result = copy_api.copy_world_with_proofs(source, dest, rules_id=RULES, rank_proofs=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:120: in copy_world_with_proofs
+    _copy_current_checked_catalog(source,private,rules_id=rules_id)
+simulation/ate_sim/persistence_catalog_copy.py:618: in _copy_current_checked_catalog
+    committed = target.commit(pin, commit_token=token,
+simulation/ate_sim/persistence_lazy_store.py:2942: in commit
+    self._write_lazy_changes(
+simulation/ate_sim/persistence_lazy_store.py:2292: in _write_lazy_changes
+    self._validate_owner_projection(
+simulation/ate_sim/persistence_lazy_store.py:2245: in _validate_owner_projection
+    rows = self._interval_rows('lazy_query_versions',
+simulation/ate_sim/persistence_lazy_store.py:1401: in _interval_rows
+    return cursor if stream else cursor.fetchall()
+                                 ^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_6_bounded_genesis.py:26: in check
+    raise AssertionError('unbounded construction fetchall: '+sql)
+E   AssertionError: unbounded construction fetchall: select index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum from lazy_query_versions indexed by lazy_query_owner_interval where namespace=? and record_key=? and valid_to is null and valid_from<=? union all select index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum from lazy_query_versions indexed by lazy_query_owner_interval where namespace=? and record_key=? and valid_to>? and valid_from<=?
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_bounded_genesis.py::test_genesis_streams_real_complete_world_and_preserves_source
+1 failed, 3 passed in 1.49s

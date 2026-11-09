@@ -1,0 +1,149 @@
+{
+  "status": "failed",
+  "source": {
+    "head": "7df089ff2b347ae8e36bb535291591a5bb6dfb82",
+    "runtime_tree": "6ca23be5208e8c198081c73b40806b42a4eb8626",
+    "python": "3.12.3",
+    "sqlite": "3.45.1",
+    "driver_sha256": "dbee329b8700f8d4a7341f4b763f58aa7ffc8d43f83688973df447ee50433760"
+  },
+  "fixture": {
+    "seed": 843000,
+    "width": 8,
+    "height": 6,
+    "settlements": 1,
+    "initial_year": 2,
+    "saved_year": 3,
+    "rank_proofs": true,
+    "proof_only": true
+  },
+  "limitation": "Small real generated world; not mature-world or cold-cache acceptance",
+  "phases": [
+    {
+      "name": "construction_and_eager_control",
+      "status": "complete",
+      "wall_seconds": 35.38412868600062,
+      "parent_cpu_seconds": 35.378105216,
+      "child_cpu_seconds": 6.938893903907228e-18,
+      "parent_peak_rss_high_water_kib": 66284,
+      "child_peak_rss_high_water_kib": 62904
+    },
+    {
+      "name": "raw.copy",
+      "status": "complete",
+      "wall_seconds": 0.007577722000860376,
+      "parent_cpu_seconds": 0.007555062999998086,
+      "child_cpu_seconds": 6.938893903907228e-18,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 62904
+    },
+    {
+      "name": "raw.open_and_proof_admission",
+      "status": "complete",
+      "wall_seconds": 1.8906695619989478,
+      "parent_cpu_seconds": 1.890263474000001,
+      "child_cpu_seconds": 6.938893903907228e-18,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 62904
+    },
+    {
+      "name": "raw.simulation_year",
+      "status": "complete",
+      "wall_seconds": 10.512022745999275,
+      "parent_cpu_seconds": 10.508661763,
+      "child_cpu_seconds": 6.938893903907228e-18,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 62904
+    },
+    {
+      "name": "raw.save",
+      "status": "complete",
+      "wall_seconds": 7.81207662000088,
+      "parent_cpu_seconds": 7.8116080839999995,
+      "child_cpu_seconds": 6.938893903907228e-18,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 62904
+    },
+    {
+      "name": "raw.close",
+      "status": "complete",
+      "wall_seconds": 0.010218862000328954,
+      "parent_cpu_seconds": 0.010214253999997425,
+      "child_cpu_seconds": 6.938893903907228e-18,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 62904
+    },
+    {
+      "name": "raw.fresh_process_restore_and_digest_verification",
+      "status": "complete",
+      "wall_seconds": 11.713703684999928,
+      "parent_cpu_seconds": 0.000611913000000186,
+      "child_cpu_seconds": 11.707828999999998,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 93440
+    },
+    {
+      "name": "diagnostic.copy",
+      "status": "complete",
+      "wall_seconds": 0.009399978000146803,
+      "parent_cpu_seconds": 0.009381472999997698,
+      "child_cpu_seconds": -2.498001805406602e-16,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 93440
+    },
+    {
+      "name": "diagnostic.open_and_proof_admission",
+      "status": "complete",
+      "wall_seconds": 1.7050413739998476,
+      "parent_cpu_seconds": 1.705006730000001,
+      "child_cpu_seconds": -2.498001805406602e-16,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 93440
+    },
+    {
+      "name": "diagnostic.simulation_year",
+      "status": "complete",
+      "wall_seconds": 9.96446153099896,
+      "parent_cpu_seconds": 9.963932261000004,
+      "child_cpu_seconds": -2.498001805406602e-16,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 93440
+    },
+    {
+      "name": "diagnostic.save",
+      "status": "failed",
+      "error": "StoreConflictError: native source snapshot epoch differs from accepted authority",
+      "wall_seconds": 16.72014504699837,
+      "parent_cpu_seconds": 16.716068179000004,
+      "child_cpu_seconds": -2.498001805406602e-16,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 93440
+    },
+    {
+      "name": "diagnostic.close",
+      "status": "failed",
+      "error": "StoreError: native source publication requires exact recovery",
+      "wall_seconds": 4.9179998313775286e-05,
+      "parent_cpu_seconds": 4.829099999881237e-05,
+      "child_cpu_seconds": -2.498001805406602e-16,
+      "parent_peak_rss_high_water_kib": 93440,
+      "child_peak_rss_high_water_kib": 93440
+    }
+  ],
+  "parent_world_audits": [],
+  "accepted_commitment": "b0214d7360bee69631db137e3198b3999c3dbe16fa0206546bc37097471a41fb",
+  "accepted_database_sha256": "3b440bd286d3bd9bce1fabf775aeeb5711983e25683f11c3adb8688fc0fd2b27",
+  "expected_digest": "de2e839eefbf248bc8e86d811e3341aa1a914156756f3019ea8e9f076a6b5486",
+  "raw_fresh_process": {
+    "state": [
+      3,
+      "de2e839eefbf248bc8e86d811e3341aa1a914156756f3019ea8e9f076a6b5486"
+    ],
+    "world_audit_calls": 0,
+    "opener": "open_proof_world_session"
+  },
+  "raw_storage_bytes": {
+    "raw.sqlite": 31510528
+  },
+  "error": "StoreError: native source publication requires exact recovery"
+}

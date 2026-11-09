@@ -49,7 +49,13 @@ def read_frozen_certification(store, pin, value):
 def verify_frozen_certification(history):
     """Explicit full scrub; ordinary reads rely on checked certification rows."""
     resolver = lambda value: read_frozen_certification(history._store, history._pin, value)
-    values = iter(history) if history._kind == 'list' else (entry[2] for entry in history._ordered_entries())
+    from .persistence_lazy_store import _CONVERSION_AUDITS
+    if history._kind == 'list':
+        values = iter(history)
+    else:
+        clean_conversion = _CONVERSION_AUDITS.get() and not history._new and not history._dirty_entries
+        entries = history._construction_entries() if clean_conversion else history._ordered_entries()
+        values = (entry[2] for entry in entries)
     actual = True
     for value in values:
         actual = immutable_snapshot_value(value, resolver) and actual

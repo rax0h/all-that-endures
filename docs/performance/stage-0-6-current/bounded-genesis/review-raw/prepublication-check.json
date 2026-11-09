@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "head": "b628bd10739bcba660be9f6bf700765f25cb7be7",
+  "runtime_tree": "e68a2ea8b5f7c83a7aa4fd41e51f4cad4a60393e",
+  "request_fingerprints": 17,
+  "request_fingerprints_match": true,
+  "closure_runtime_files": 180,
+  "changed_runtime_files": [],
+  "negative_controls": 4,
+  "baseline_clean": true,
+  "baseline_accepted_template_unchanged": true,
+  "errors": [],
+  "scope": "prepublication metadata and source checks only; R6 and overall group OPEN"
+}

@@ -35,6 +35,7 @@ name: Stage 0.6 durable proof map validation
       - .github/tests/run_proof_native_value_scaling.py
       - .github/tests/run_proof_native_insert_scaling.py
       - .github/workflows/stage-0-5-proof-map-validation.yml
+      - simulation/stage_0_6_proof_genesis_request.json
 permissions:
   contents: read
 concurrency:
@@ -44,6 +45,26 @@ env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
 jobs:
+  mature-genesis-request:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.request.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - id: request
+        env:
+          BEFORE: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --name-only "$BEFORE" "$GITHUB_SHA" -- simulation/stage_0_6_proof_genesis_request.json | grep -q .; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          fi
   proof-map:
     runs-on: ubuntu-latest
     # The previous green job used 52m; retain room for the added forest matrix
@@ -179,4 +200,55 @@ jobs:
           name: stage-0-5-proof-map-suite-${{ github.sha }}
           path: evidence
           retention-days: 14
+          if-no-files-found: error
+  mature-genesis:
+    needs: [proof-map, full-suite, mature-genesis-request]
+    if: ${{ needs.mature-genesis-request.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Validate mature execution boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python -m pytest -q .github/tests/test_stage_0_6_proof_mature_genesis.py .github/tests/test_stage_0_6_retained_archive.py .github/tests/test_stage_0_6_retained_producer.py .github/tests/test_stage_0_6_retained_transport.py .github/tests/test_stage_0_6_retained_launch.py -o junit_family=legacy --junitxml=evidence/genesis-harness.xml 2>&1 | tee evidence/genesis-harness.log
+      - name: Reserve disposable construction disk
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
+          sudo docker image prune -af
+          df -h . > evidence/disk-start.txt
+      - name: Convert accepted mature fixture and measure proof continuation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=0
+          timeout --signal=TERM --kill-after=30s 330m python -m simulation.stage_0_6_proof_mature_genesis run --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_proof_genesis_request.json 2>&1 | tee evidence/genesis.log || status=$?
+          python -m simulation.stage_0_6_proof_mature_genesis record-exit --root "$GITHUB_WORKSPACE" --status "$status"
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-6-mature-proof-genesis-${{ github.sha }}
+          path: |
+            evidence/**/*.json
+            evidence/**/*.xml
+            evidence/**/*.log
+            evidence/disk-start.txt
+          retention-days: 30
           if-no-files-found: error

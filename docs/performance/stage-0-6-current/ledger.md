@@ -144,3 +144,27 @@ Nov8 explicit proof-backed opening: complete seven-root/v4 format7 API authentic
 
 
 Nov9 b9196f9/run42561091501 verified both jobs green:4960tests+2subtests9233.81s,one deliberate ZIP warning;62new opening/launcher cases90.07s and complete proof-only year command pass. Proof-opening work group closed. Mature proof-input preflight uses unchanged authenticated retained year1001 ZIP12849181590 (live throughNov27), without World decoding/restore/step/save/migration. New readonly aggregate inspector and dedicated bounded45mjob/35mcommand/900sSQL inventory, one source+ZIP+6GiB disk floor and always-upload partial/error receipts. One independent package review R1Moderate late world/pin request rejection, promoted11RED and closed by same seat15invalid/1valid actual-source controls; final96targeted30.26s and independent96targeted33.62s pass, no deferred Minor. Qualified runtime/full fingerprints, clean cf3ed0dsource fence, AST/YAML/4Bash/14request fingerprints verified. ate_sim runtime remains green6ca23be5208e8c198081c73b40806b42a4eb8626; marker selects only benchmark preflight. Publication/actual large-file inventory pending; mature performance and proof-genesis resource budget not inferred. Consolidated evidence:mature-proof-preflight/.
+## November9 bounded proof-genesis validation candidate
+
+Hosted mature-input preflight42583331513 succeeded at7df089f: source remains
+format6/year1001/generation126,29.9GB,13,684,547visible rows; unchanged source,
+447.79s inventory,49.05MB whole-process peak. No mature World operation yet.
+
+The source-preserving format6→7 construction candidate streams physical copy,
+full audits, catalog and sequence/type/retired inventories into checked disk
+workspaces and rebases64locators at a time. Existing canonical live World/key
+costs remain; disk grows with inventory/copies/journals. Independent review's
+five initial findings closed; raw review/closure and measured component bounds
+are in bounded-genesis/. One complete generated-year findingR6 remains OPEN:
+current local candidate and untouched baseline both have checked staging/native
+continuation failures on the fingerprint-matched previously qualified runtime.
+Preserved exact commands, source hashes, failure matrix, baseline driver receipt
+and historical qualification follow-up establish no engine cause or application
+exoneration. Local complete acceptance is unavailable.
+
+Publish only for one bundled hosted full/proof validation at the same candidate
+SHA. The requested mature-genesis job depends on BOTH jobs passing, then measures
+authenticated original construction, explicit proof open/year/save/warm year and
+fresh digest against accepted year1002. Default readers, full audited opening,
+integrity checks, main and endurance remain unchanged. Stage0.6/group acceptance
+is outstanding. See bounded-genesis/closure.md and its consolidated register.
