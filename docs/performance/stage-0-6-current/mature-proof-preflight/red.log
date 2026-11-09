@@ -1,0 +1,238 @@
+FFFFFFFFFFFFF                                                            [100%]
+=================================== FAILURES ===================================
+______ test_real_inventory_aggregates_lengths_without_decoding_or_changes ______
+.github/tests/test_stage_0_6_proof_mature_preflight.py:28: in test_real_inventory_aggregates_lengths_without_decoding_or_changes
+    result=mod().inspect_database(path,authority,output=tmp_path/'inventory.json')
+           ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+__________ test_wrong_source_binding_cannot_complete_inventory[hash] ___________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+__________ test_wrong_source_binding_cannot_complete_inventory[size] ___________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+___________ test_wrong_source_binding_cannot_complete_inventory[pin] ___________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+__________ test_wrong_source_binding_cannot_complete_inventory[rules] __________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+_______ test_wrong_source_binding_cannot_complete_inventory[generation] ________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+__________ test_wrong_source_binding_cannot_complete_inventory[seed] ___________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+______________ test_live_or_indirect_source_is_rejected[symlink] _______________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:62: in test_live_or_indirect_source_is_rejected
+    with pytest.raises(ValueError):mod().inspect_database(path,authority)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+______________ test_live_or_indirect_source_is_rejected[journal] _______________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:62: in test_live_or_indirect_source_is_rejected
+    with pytest.raises(ValueError):mod().inspect_database(path,authority)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+________________ test_live_or_indirect_source_is_rejected[wal] _________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:62: in test_live_or_indirect_source_is_rejected
+    with pytest.raises(ValueError):mod().inspect_database(path,authority)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+________________ test_live_or_indirect_source_is_rejected[shm] _________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:62: in test_live_or_indirect_source_is_rejected
+    with pytest.raises(ValueError):mod().inspect_database(path,authority)
+                                   ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+______________________ test_namespace_budget_fails_closed ______________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:66: in test_namespace_budget_fails_closed
+    path,authority=source;monkeypatch.setattr(mod(),'MAX_NAMESPACES',1)
+                                              ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+____________________ test_expired_inventory_is_not_complete ____________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:75: in test_expired_inventory_is_not_complete
+    mod().inspect_database(path,authority,budget_seconds=1e-9,output=tmp_path/'timeout.json')
+    ^^^^^
+.github/tests/test_stage_0_6_proof_mature_preflight.py:11: in mod
+    def mod():return importlib.import_module('simulation.stage_0_6_proof_mature_preflight')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'simulation.stage_0_6_proof_mature_preflight'
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_real_inventory_aggregates_lengths_without_decoding_or_changes
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_wrong_source_binding_cannot_complete_inventory[hash]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_wrong_source_binding_cannot_complete_inventory[size]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_wrong_source_binding_cannot_complete_inventory[pin]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_wrong_source_binding_cannot_complete_inventory[rules]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_wrong_source_binding_cannot_complete_inventory[generation]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_wrong_source_binding_cannot_complete_inventory[seed]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_live_or_indirect_source_is_rejected[symlink]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_live_or_indirect_source_is_rejected[journal]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_live_or_indirect_source_is_rejected[wal]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_live_or_indirect_source_is_rejected[shm]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_namespace_budget_fails_closed
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_expired_inventory_is_not_complete
+13 failed in 7.81s

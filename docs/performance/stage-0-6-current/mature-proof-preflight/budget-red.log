@@ -1,0 +1,31 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_bad_inventory_budget_rejects_before_transport[0] _____________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:176: in test_bad_inventory_budget_rejects_before_transport
+    with pytest.raises(ValueError,match='budget'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:151: in launch
+    performance,transport=prepare_retained(root,config,identity,
+    ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: cannot unpack non-iterable NoneType object
+___________ test_bad_inventory_budget_rejects_before_transport[True] ___________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:176: in test_bad_inventory_budget_rejects_before_transport
+    with pytest.raises(ValueError,match='budget'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:151: in launch
+    performance,transport=prepare_retained(root,config,identity,
+    ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: cannot unpack non-iterable NoneType object
+___________ test_bad_inventory_budget_rejects_before_transport[901] ____________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:176: in test_bad_inventory_budget_rejects_before_transport
+    with pytest.raises(ValueError,match='budget'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:151: in launch
+    performance,transport=prepare_retained(root,config,identity,
+    ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: cannot unpack non-iterable NoneType object
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_bad_inventory_budget_rejects_before_transport[0]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_bad_inventory_budget_rejects_before_transport[True]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_bad_inventory_budget_rejects_before_transport[901]
+3 failed, 23 deselected in 0.27s

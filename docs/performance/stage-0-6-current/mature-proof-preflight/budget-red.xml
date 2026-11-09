@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.273" timestamp="2026-11-09T01:44:27.110347-06:00" hostname="1b4d917590b5"><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_bad_inventory_budget_rejects_before_transport[0]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="168" time="0.036"><failure message="TypeError: cannot unpack non-iterable NoneType object">.github/tests/test_stage_0_6_proof_mature_preflight.py:176: in test_bad_inventory_budget_rejects_before_transport
+    with pytest.raises(ValueError,match='budget'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:151: in launch
+    performance,transport=prepare_retained(root,config,identity,
+    ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: cannot unpack non-iterable NoneType object</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_bad_inventory_budget_rejects_before_transport[True]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="168" time="0.005"><failure message="TypeError: cannot unpack non-iterable NoneType object">.github/tests/test_stage_0_6_proof_mature_preflight.py:176: in test_bad_inventory_budget_rejects_before_transport
+    with pytest.raises(ValueError,match='budget'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:151: in launch
+    performance,transport=prepare_retained(root,config,identity,
+    ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: cannot unpack non-iterable NoneType object</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_bad_inventory_budget_rejects_before_transport[901]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="168" time="0.005"><failure message="TypeError: cannot unpack non-iterable NoneType object">.github/tests/test_stage_0_6_proof_mature_preflight.py:176: in test_bad_inventory_budget_rejects_before_transport
+    with pytest.raises(ValueError,match='budget'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:151: in launch
+    performance,transport=prepare_retained(root,config,identity,
+    ^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: cannot unpack non-iterable NoneType object</failure></testcase></testsuite></testsuites>

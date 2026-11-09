@@ -72,4 +72,4 @@ provenance; proof-opening audits must be counted/forbidden as well as save audit
 - [x] Run selected broader regressions and static workflow/source checks, then commit clean source before the generated-year probe.
 - [x] Run one complete original-driver proof-only generated year on the qualified runtime, with eager/fresh/source-immutable/zero-opening-audit assertions. Record raw and diagnostic phase times without mature claims.
 - [x] Request the one independent whole-package review. Promote concrete reproductions, resolve every finding including Minor, and verify the final runtime source.
-- [ ] Publish source/evidence with exact tree equivalence on the dedicated branch; launch one combined full/proof gate. No default/merge/endurance action.
+- [x] Publish source/evidence with exact tree equivalence on the dedicated branch; launch one combined full/proof gate. No default/merge/endurance action.

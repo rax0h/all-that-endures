@@ -1,0 +1,101 @@
+{
+  "head": "cf3ed0d875bd0b97eeb107d29cc5f108425c0a84",
+  "real_source_check": {
+    "head": "cf3ed0d875bd0b97eeb107d29cc5f108425c0a84",
+    "committed_tree": "6ca23be5208e8c198081c73b40806b42a4eb8626",
+    "source_sha256": "ed20686985ff927b59be17d4a629af1f489632d08709af00bd321f07d66a64cc",
+    "root": "/workspace/scratch/d88f8db353e8/ate",
+    "engine_path": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/engine.py",
+    "persistence_path": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py"
+  },
+  "expected_world": {
+    "seed": 843000,
+    "year": 1001
+  },
+  "expected_pin": {
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+    "captured_head": 126
+  },
+  "cases": {
+    "wrong_seed": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "wrong_year": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "wrong_store": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "wrong_head": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "missing_seed": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "missing_head": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "missing_world": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "missing_pin": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "extra_world": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "extra_pin": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "float_seed": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "float_year": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "float_head": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "bool_seed": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    },
+    "bool_head": {
+      "status": "rejected-before-transport",
+      "error": "preflight world/pin request differs from original accepted source",
+      "transport_calls": 0
+    }
+  },
+  "valid_control": {
+    "status": "reached-transport",
+    "transport_calls": 1,
+    "same_original_authority": true
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "validated_checkpoint": "cf3ed0d875bd0b97eeb107d29cc5f108425c0a84",
+  "runtime_tree": "6ca23be5208e8c198081c73b40806b42a4eb8626",
+  "green_ancestor": "b9196f9885fed0323c473bcc148f6b9dad9da9eb",
+  "targeted": {
+    "passed": 96,
+    "seconds": 30.26,
+    "warnings": 1,
+    "warning": "deliberate duplicate-ZIP control"
+  },
+  "independent": {
+    "passed": 96,
+    "seconds": 33.62,
+    "invalid_request_controls": 15,
+    "closed": [
+      "R1 Moderate/P2"
+    ],
+    "remaining_findings": []
+  },
+  "fingerprints": {
+    "simulation/stage_0_6_proof_mature_preflight.py": "fa06d6defacc3ce5e328fb079e276d573e1df547e5bb12b1637e1e5176ec1754",
+    ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1dce11b312a4d45deb467e7e2b0da5bedf4f5a6e1908f7f39ce5eb048de65763",
+    ".github/workflows/stage-0-6-proof-mature-preflight.yml": "183d9a756a3e96eafa3f6e12e348cb0b59342299155870b0c57bb85f42451502",
+    "simulation/stage_0_5_save1002_preflight.json": "7f0648786159007816c2a64ee1b8501c0210d2121f011052c4a2179db5a62b7a",
+    "simulation/stage_0_6_mature_benchmark.py": "cf4de34669a8d5f4352e14d210e52c7d707d172209b1fa9984ffc26631fa021b",
+    "simulation/profile_stage_0_5_performance.py": "79e9e3abc5c8cfe342b0114157d8fa7b3578461a8d3d3868d45b286f92fcaf95",
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/stage_0_6_retained_archive.py": "eed53bfd67771c7cabecceabe2b0a01143e3c716135ae9808a1b7137ed2bd94b",
+    "simulation/stage_0_6_retained_launch.py": "99f4099bfaf9aa93f0407fae7ab60c633df603a8f257c2ede74898b0a942a3f6",
+    "simulation/stage_0_6_retained_producer.py": "f6ce0cf2327f39559b868a662f7c385ccd4156df950e01ef9277ad9eff70de9e",
+    "simulation/stage_0_6_retained_transport.py": "4fc7af7f20eb9242754a342ab3c015090c0150f8ff4a6281b0b4a0887b486abe"
+  },
+  "workflow": ".github/workflows/stage-0-6-proof-mature-preflight.yml",
+  "scope": "Readonly mature input inventory; no World restore, step, save, conversion or performance acceptance",
+  "bounds": {
+    "job_minutes": 45,
+    "command_minutes": 35,
+    "inventory_seconds": 900,
+    "namespace_groups_per_table": 4096
+  },
+  "hosted": "pending one benchmark-only inventory; no full-suite rerun"
+}

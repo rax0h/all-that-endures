@@ -1,0 +1,30 @@
+{
+  "run_id": 42561091501,
+  "head": "b9196f9885fed0323c473bcc148f6b9dad9da9eb",
+  "runtime_tree": "6ca23be5208e8c198081c73b40806b42a4eb8626",
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/42561091501",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 128977443520,
+      "name": "full-suite",
+      "conclusion": "success",
+      "passed": 4960,
+      "subtests": 2,
+      "warnings": 1,
+      "warning": "deliberate duplicate-ZIP negative control",
+      "seconds": 9233.81,
+      "artifact_id": 13655600455
+    },
+    {
+      "id": 128977443691,
+      "name": "proof-map",
+      "conclusion": "success",
+      "new_opening_launcher_passed": 62,
+      "new_opening_launcher_seconds": 90.07,
+      "complete_proof_only_year_command": "success",
+      "artifact_id": 13651504022
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 One independent whole-package review of276d323 follows integrated generated-year
 validation. Its two findings and same-seat closure verification belong to this
-work group. The bundled hosted gate remains pending.
+work group. The bundled hosted gate is verified green atb9196f9/run42561091501.
 
 | ID | Origin and finding | Concrete action | Evidence/status |
 |---|---|---|---|
@@ -34,4 +34,4 @@ Final current-source regression113passed78.38s covers49opening/13launcher and
 51existing default-store cases. Independent final production/test hashes match
 final-source.json; closure-final.md confirms R1/R2 closed with no remaining
 concrete issue. All author and independent findings, including Minor, are closed.
-The final clean serial year and bundled hosted result remain separate gates.
+The final clean serial year and hosted full/proof gates both pass; hosted-acceptance.json records exact bindings.

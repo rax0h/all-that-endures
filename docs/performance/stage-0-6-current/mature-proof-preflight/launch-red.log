@@ -1,0 +1,46 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_________________ test_launch_rejects_before_transport[source] _________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:114: in test_launch_rejects_before_transport
+    with pytest.raises(ValueError):m.launch(tmp_path,c,expected_sha='a'*40)
+                                   ^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'launch'
+________________ test_launch_rejects_before_transport[database] ________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:114: in test_launch_rejects_before_transport
+    with pytest.raises(ValueError):m.launch(tmp_path,c,expected_sha='a'*40)
+                                   ^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'launch'
+__________________ test_launch_rejects_before_transport[disk] __________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:114: in test_launch_rejects_before_transport
+    with pytest.raises(ValueError):m.launch(tmp_path,c,expected_sha='a'*40)
+                                   ^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'launch'
+_________________ test_launch_rejects_before_transport[rerun] __________________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:114: in test_launch_rejects_before_transport
+    with pytest.raises(ValueError):m.launch(tmp_path,c,expected_sha='a'*40)
+                                   ^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'launch'
+__________ test_launch_reuses_transport_and_actual_readonly_inventory __________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:133: in test_launch_reuses_transport_and_actual_readonly_inventory
+    result=m.launch(root,c,expected_sha='a'*40)
+           ^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'launch'
+______________ test_command_timeout_does_not_fabricate_inventory _______________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:140: in test_command_timeout_does_not_fabricate_inventory
+    row=mod().record_exit(tmp_path,124)
+        ^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'record_exit'
+_____________ test_successful_command_requires_complete_inventory ______________
+.github/tests/test_stage_0_6_proof_mature_preflight.py:146: in test_successful_command_requires_complete_inventory
+    with pytest.raises(ValueError):mod().record_exit(tmp_path,0)
+                                   ^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'simulation.stage_0_6_proof_mature_preflight' has no attribute 'record_exit'
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_launch_rejects_before_transport[source]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_launch_rejects_before_transport[database]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_launch_rejects_before_transport[disk]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_launch_rejects_before_transport[rerun]
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_launch_reuses_transport_and_actual_readonly_inventory
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_command_timeout_does_not_fabricate_inventory
+FAILED .github/tests/test_stage_0_6_proof_mature_preflight.py::test_successful_command_requires_complete_inventory
+7 failed, 15 deselected in 0.83s

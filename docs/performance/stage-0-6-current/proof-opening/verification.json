@@ -26,7 +26,7 @@
     "seconds": 920.82,
     "qualification": "Loaded pre-cancellation handler; final current-source failure/ownership paths covered by final regression and independent closure"
   },
-  "hosted_gate": "Pending one dedicated-branch full/proof validation; do not infer hosted acceptance",
+  "hosted_gate": "Verified success at b9196f9/run42561091501: both jobs,4960tests+2subtests9233.81s,1deliberate ZIP warning",
   "limits": [
     "small generated world",
     "returned BLOBs are not physical I/O",

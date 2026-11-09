@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="13" time="8.401" timestamp="2026-11-09T01:34:45.274158-06:00" hostname="1b4d917590b5"><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_real_inventory_aggregates_lengths_without_decoding_or_changes" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="19" time="0.664"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_real_inventory_aggregates0/inventory.json">simulation/stage_0_6_proof_mature_preflight.py:98: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_real_inventory_aggregates0/inventory.json
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:28: in test_real_inventory_aggregates_lengths_without_decoding_or_changes
+    result=mod().inspect_database(path,authority,output=tmp_path/'inventory.json')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_real_inventory_aggregates0/inventory.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_wrong_source_binding_cannot_complete_inventory[hash]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="40" time="0.545"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann0/failure.json">simulation/stage_0_6_proof_mature_preflight.py:44: in inspect_database
+    raise ValueError('inventory source hash or size differs')
+E   ValueError: inventory source hash or size differs
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann0/failure.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_wrong_source_binding_cannot_complete_inventory[size]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="40" time="0.646"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann1/failure.json">simulation/stage_0_6_proof_mature_preflight.py:44: in inspect_database
+    raise ValueError('inventory source hash or size differs')
+E   ValueError: inventory source hash or size differs
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann1/failure.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_wrong_source_binding_cannot_complete_inventory[pin]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="40" time="0.621"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann2/failure.json">simulation/stage_0_6_proof_mature_preflight.py:67: in inspect_database
+    or metadata['rules_id']!=authority['rules_id']):raise ValueError('inventory metadata context differs')
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: inventory metadata context differs
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann2/failure.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_wrong_source_binding_cannot_complete_inventory[rules]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="40" time="0.607"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann3/failure.json">simulation/stage_0_6_proof_mature_preflight.py:67: in inspect_database
+    or metadata['rules_id']!=authority['rules_id']):raise ValueError('inventory metadata context differs')
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: inventory metadata context differs
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann3/failure.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_wrong_source_binding_cannot_complete_inventory[generation]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="40" time="0.549"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann4/failure.json">simulation/stage_0_6_proof_mature_preflight.py:71: in inspect_database
+    raise ValueError('inventory head context differs')
+E   ValueError: inventory head context differs
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann4/failure.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_wrong_source_binding_cannot_complete_inventory[seed]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="40" time="0.765"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann5/failure.json">simulation/stage_0_6_proof_mature_preflight.py:71: in inspect_database
+    raise ValueError('inventory head context differs')
+E   ValueError: inventory head context differs
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:51: in test_wrong_source_binding_cannot_complete_inventory
+    with pytest.raises(ValueError):mod().inspect_database(path,bad,output=output)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_wrong_source_binding_cann5/failure.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_live_or_indirect_source_is_rejected[symlink]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="55" time="0.638" /><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_live_or_indirect_source_is_rejected[journal]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="55" time="0.669" /><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_live_or_indirect_source_is_rejected[wal]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="55" time="0.617" /><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_live_or_indirect_source_is_rejected[shm]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="55" time="0.577" /><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_namespace_budget_fails_closed" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="64" time="0.568"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_namespace_budget_fails_cl0/budget.json">simulation/stage_0_6_proof_mature_preflight.py:88: in inspect_database
+    if len(rows)&gt;MAX_NAMESPACES:raise ValueError('inventory namespace budget exceeded')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: inventory namespace budget exceeded
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:68: in test_namespace_budget_fails_closed
+    mod().inspect_database(path,authority,output=tmp_path/'budget.json')
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_namespace_budget_fails_cl0/budget.json</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_expired_inventory_is_not_complete" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="71" time="0.602"><failure message="FileExistsError: /tmp/pytest-of-root/pytest-1/test_expired_inventory_is_not_0/timeout.json">simulation/stage_0_6_proof_mature_preflight.py:45: in inspect_database
+    check_time()
+simulation/stage_0_6_proof_mature_preflight.py:32: in check_time
+    if time.monotonic()&gt;=deadline:raise TimeoutError('inventory budget exhausted')
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: inventory budget exhausted
+
+During handling of the above exception, another exception occurred:
+.github/tests/test_stage_0_6_proof_mature_preflight.py:75: in test_expired_inventory_is_not_complete
+    mod().inspect_database(path,authority,budget_seconds=1e-9,output=tmp_path/'timeout.json')
+simulation/stage_0_6_proof_mature_preflight.py:113: in inspect_database
+    publish()
+simulation/stage_0_6_proof_mature_preflight.py:30: in publish
+    if output is not None:r.publish_receipt(output,result)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/continuation_receipts.py:126: in publish_receipt
+    raise FileExistsError(path)
+E   FileExistsError: /tmp/pytest-of-root/pytest-1/test_expired_inventory_is_not_0/timeout.json</failure></testcase></testsuite></testsuites>

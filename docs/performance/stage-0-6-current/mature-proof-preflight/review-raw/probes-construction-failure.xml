@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="4.182" timestamp="2026-11-09T01:51:46.689622-06:00" hostname="1b4d917590b5"><testcase classname="test_independent_probes" name="test_malformed_selected_metadata_fails_closed[metadata-key]" file="test_independent_probes.py" line="17" time="0.590" /><testcase classname="test_independent_probes" name="test_malformed_selected_metadata_fails_closed[metadata-value]" file="test_independent_probes.py" line="17" time="0.493" /><testcase classname="test_independent_probes" name="test_malformed_selected_metadata_fails_closed[namespace]" file="test_independent_probes.py" line="17" time="0.480"><failure message="sqlite3.IntegrityError: UNIQUE constraint failed: records.namespace, records.typed_key">source = (PosixPath('/tmp/pytest-of-root/pytest-9/test_malformed_selected_metada2/complete.sqlite'), {'schema': 'ate-performanc...ad29-8a85-43f4-84fb-8f1a3f939d48', 'store_identity': 'a7cf8867-cd84-46c6-bc83-01ce0772bb5a', 'captured_head': 3}, ...})
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_malformed_selected_metada2')
+bad = 'namespace'
+
+    @pytest.mark.parametrize('bad',['metadata-key','metadata-value','namespace','generation','seed'])
+    def test_malformed_selected_metadata_fails_closed(source,tmp_path,bad):
+        path,authority=source
+        db=sqlite3.connect(path)
+        if bad=='metadata-key':db.execute("UPDATE store_metadata SET key=? WHERE key='codec_version'",('x'*129,))
+        elif bad=='metadata-value':db.execute("UPDATE store_metadata SET value=? WHERE key='codec_version'",('x'*4097,))
+&gt;       elif bad=='namespace':db.execute("UPDATE records SET namespace=?",('x'*1025,))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.IntegrityError: UNIQUE constraint failed: records.namespace, records.typed_key
+
+/tmp/ate-mature-preflight-review/test_independent_probes.py:24: IntegrityError</failure></testcase><testcase classname="test_independent_probes" name="test_malformed_selected_metadata_fails_closed[generation]" file="test_independent_probes.py" line="17" time="0.530" /><testcase classname="test_independent_probes" name="test_malformed_selected_metadata_fails_closed[seed]" file="test_independent_probes.py" line="17" time="0.492" /><testcase classname="test_independent_probes" name="test_connection_owns_readonly_transaction_and_closes" file="test_independent_probes.py" line="33" time="0.504" /><testcase classname="test_independent_probes" name="test_collision_preserves_original_journal_and_final_error" file="test_independent_probes.py" line="50" time="0.414" /><testcase classname="test_independent_probes" name="test_after_sql_change_is_not_complete" file="test_independent_probes.py" line="58" time="0.491" /></testsuite></testsuites>

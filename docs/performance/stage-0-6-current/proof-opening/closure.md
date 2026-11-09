@@ -87,8 +87,10 @@ runtime fingerprints are reverified in runtime-verification-final.json.
 Local source943bb86 has the identical complete source tree
 ff5a594e35fe7ad9426b5808bda0df453a4122ab as API source checkpoint
 1ce7bb091f3328bf5c7ce3b7a3ee112dbbde4ef0. Only commit metadata differs.
-The dedicated branch's one bundled hosted full/proof gate remains pending;
-no hosted success is inferred from these local gates.
+Hosted acceptance verified atb9196f9/run42561091501: full4960tests+2subtests
+pass9233.81s, one deliberate duplicate-ZIP warning; proof job also passes,
+including62new opening/launcher cases90.07s and the complete proof-only year.
+See hosted-acceptance.json for exact run/job/artifact bindings.
 Mature10sopening/2ssave/1syear and final architecture
 acceptance remain separate Stage0.6 gates. No main merge, default activation or
 endurance run is part of this package.

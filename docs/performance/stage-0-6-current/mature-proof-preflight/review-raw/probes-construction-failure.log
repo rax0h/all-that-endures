@@ -1,0 +1,22 @@
+..F.....                                                                 [100%]
+=================================== FAILURES ===================================
+___________ test_malformed_selected_metadata_fails_closed[namespace] ___________
+
+source = (PosixPath('/tmp/pytest-of-root/pytest-9/test_malformed_selected_metada2/complete.sqlite'), {'schema': 'ate-performanc...ad29-8a85-43f4-84fb-8f1a3f939d48', 'store_identity': 'a7cf8867-cd84-46c6-bc83-01ce0772bb5a', 'captured_head': 3}, ...})
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_malformed_selected_metada2')
+bad = 'namespace'
+
+    @pytest.mark.parametrize('bad',['metadata-key','metadata-value','namespace','generation','seed'])
+    def test_malformed_selected_metadata_fails_closed(source,tmp_path,bad):
+        path,authority=source
+        db=sqlite3.connect(path)
+        if bad=='metadata-key':db.execute("UPDATE store_metadata SET key=? WHERE key='codec_version'",('x'*129,))
+        elif bad=='metadata-value':db.execute("UPDATE store_metadata SET value=? WHERE key='codec_version'",('x'*4097,))
+>       elif bad=='namespace':db.execute("UPDATE records SET namespace=?",('x'*1025,))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.IntegrityError: UNIQUE constraint failed: records.namespace, records.typed_key
+
+/tmp/ate-mature-preflight-review/test_independent_probes.py:24: IntegrityError
+=========================== short test summary info ============================
+FAILED ../../../../tmp/ate-mature-preflight-review/test_independent_probes.py::test_malformed_selected_metadata_fails_closed[namespace]
+1 failed, 7 passed in 4.18s

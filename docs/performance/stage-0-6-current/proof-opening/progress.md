@@ -140,3 +140,9 @@ preserved separately; prior276d323 receipt remains historical evidence.
 API source checkpoint1ce7bb091f3328bf5c7ce3b7a3ee112dbbde4ef0 has exact local
 complete treeff5a594e35fe7ad9426b5808bda0df453a4122ab; commit metadata differs.
 One evidence child/ref publication and hosted acceptance remain; no mature claim.
+
+Hosted gate verified green atb9196f9/run42561091501, exact runtime6ca23be:
+4960tests+2subtests9233.81s, one deliberate ZIP warning; both jobs successful.
+Proof opening/launcher62cases90.07s and full proof-only year command pass.
+This work group is closed. Next group is authenticated mature fixture preparation;
+old benchmark config/default opener cannot measure the new proof-backed path.

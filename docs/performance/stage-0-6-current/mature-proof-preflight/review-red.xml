@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="0" tests="11" time="0.360" timestamp="2026-11-09T01:55:14.043531-06:00" hostname="1b4d917590b5"><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[seed]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.036"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[year]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[store]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[head]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[missing_seed]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[missing_head]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[missing_world]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[missing_pin]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[extra_world]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[year_type]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase><testcase classname=".github.tests.test_stage_0_6_proof_mature_preflight" name="test_world_pin_request_rejects_before_transport[head_type]" file=".github/tests/test_stage_0_6_proof_mature_preflight.py" line="179" time="0.004"><failure message="AssertionError: large transport reached">.github/tests/test_stage_0_6_proof_mature_preflight.py:200: in test_world_pin_request_rejects_before_transport
+    with pytest.raises(ValueError,match='world/pin'):m.launch(tmp_path,c,expected_sha='a'*40)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_proof_mature_preflight.py:156: in launch
+    performance,transport=prepare_retained(root,config,identity,
+.github/tests/test_stage_0_6_proof_mature_preflight.py:187: in transport
+    def transport(*a):calls.append(True);raise AssertionError('large transport reached')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: large transport reached</failure></testcase></testsuite></testsuites>
