@@ -116,9 +116,8 @@ def _load(store,g):
 
 def bootstrap_inventory(store,pin):
     _require_closed_codec(store,allow_typed=True)
-    if store.db.in_transaction or store._active_read_transaction:raise StoreError('inventory construction requires owned transaction')
-    store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
-    try:
+    from .persistence_genesis_transaction import bootstrap_stage
+    with bootstrap_stage(store,pin):
         _preflight(store);g=store._require_pin(pin);h=_physical_head(store,g);_guard_construction(store,g,MAX_BODY_BYTES,MAX_METADATA_BYTES);source._audit_namespace_inventory(store,g);store.verify_all()
         names,counts=_head(h);m=OrderedSeekMap(store.db,domain(store.store_identity,store.codec.version));m.create_schema()
         root=m.build((_key(ns),_member(m.domain,ns,counts.get(ns,(0,0)))) for ns in names)
@@ -127,11 +126,8 @@ def bootstrap_inventory(store,pin):
         if store.db.execute('SELECT 1 FROM ate_inventory_generations WHERE generation=?',(g,)).fetchone():
             if _load(store,g)[0]!=(c,e):raise StoreIntegrityError('cannot repair divergent inventory')
         else:_write(store,c)
-        store.db.commit();return c,e
-    except BaseException:
-        if store.db.in_transaction:store.db.rollback()
-        raise
-    finally:store._active_read_transaction=False
+        return c,e
+
 
 def _authority(store,pin,c,e):
     _require_closed_codec(store,allow_typed=True)

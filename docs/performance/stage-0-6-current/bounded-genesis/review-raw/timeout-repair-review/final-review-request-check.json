@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "staged_runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "request_id": "bounded-mature-proof-genesis-2026-11-10-timeout-repair-1",
+  "green_commit": "85f87e172be7dc8bd4b206737118ecb96194a382",
+  "request_fingerprint_count": 17,
+  "all_fingerprints_match": true,
+  "construction_budget_seconds": 12600,
+  "source_fence_files": 188,
+  "source_fence_unchanged": true,
+  "validation": "request authority/metadata and staged-source checks only; final complete scenario and mature acceptance remain separate"
+}

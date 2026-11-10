@@ -1,0 +1,23 @@
+F.............                                                           [100%]
+=================================== FAILURES ===================================
+_____ test_one_owned_transaction_reuses_source_audit_and_commits_all_roots _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:40: in test_one_owned_transaction_reuses_source_audit_and_commits_all_roots
+    manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:74: in bootstrap_world_manifest
+    proof=world._audit_world(store,pin,content_authority,scope_authority,inventory_authority,record_authority,directory_authority)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:446: in _audit_world
+    _acyclic_backings(store)
+simulation/ate_sim/persistence_proof_world.py:265: in _acyclic_backings
+    db.execute('CREATE INDEX ate_world_degree_zero ON ate_world_degree(degree,inc)')
+simulation/ate_sim/persistence_sqlite_guard.py:134: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:43: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_one_owned_transaction_reuses_source_audit_and_commits_all_roots
+1 failed, 13 passed in 4.70s

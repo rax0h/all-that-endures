@@ -41,6 +41,10 @@ def _checked_value(store, pin, incarnation, *, required=True):
         if not required:
             return None
         raise StoreIntegrityError('mandatory backing dependency authority is absent') from exc
+    return _validate_value(value)
+
+
+def _validate_value(value):
     if (type(value) is not tuple or len(value) != 3 or value[0] != TAG
             or value[1] not in KINDS or type(value[2]) is not tuple
             or len(value[2]) > MAX_PINS

@@ -200,9 +200,8 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
     if type(include_children) is not bool or type(include_sequence) is not bool or include_sequence and not include_children:raise StoreIntegrityError('invalid child/sequence construction option')
     if type(include_rank) is not bool or include_rank and not include_sequence:raise StoreIntegrityError('rank construction requires sequence authority')
     if type(max_metadata_bytes) is not int or not 1<=max_metadata_bytes<=64*1024*1024:raise StoreIntegrityError('invalid scope metadata budget')
-    if store.db.in_transaction or store._active_read_transaction:raise StoreError('scope construction requires owned transaction')
-    store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
-    try:
+    from .persistence_genesis_transaction import bootstrap_stage
+    with bootstrap_stage(store,pin):
         if include_children:
             from .persistence_proof_collection_directory import _source_schemas
             _source_schemas(store.db);_guard_child_keys(store)
@@ -219,11 +218,8 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
         if store.db.execute('SELECT 1 FROM ate_scope_generations WHERE generation=?',(generation,)).fetchone() is not None:raise StoreIntegrityError('scope constructor cannot replace existing generation')
         roots=_construct_roots(store,generation,allocator,include_children=include_children,include_sequence=include_sequence,include_rank=include_rank)
         result=_write_root(store,ScopeDirectoryCertificate(store.store_identity,generation,store.codec.version,allocator,tuple(roots)))
-        store.db.commit();return result
-    except BaseException:
-        if store.db.in_transaction:store.db.rollback()
-        raise
-    finally:store._active_read_transaction=False
+        return result
+
 
 
 

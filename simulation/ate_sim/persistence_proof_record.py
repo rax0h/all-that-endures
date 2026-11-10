@@ -133,9 +133,8 @@ def bootstrap_record_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metada
     _require_closed_codec(store,allow_typed=True)
     if type(max_body_bytes) is not int or not 1<=max_body_bytes<=MAX_BODY_BYTES:raise StoreIntegrityError('invalid record construction body budget')
     if type(max_metadata_bytes) is not int or not 1<=max_metadata_bytes<=64*1024*1024:raise StoreIntegrityError('invalid record construction metadata budget')
-    if store.db.in_transaction or store._active_read_transaction:raise StoreError('record bootstrap requires owned transaction')
-    store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
-    try:
+    from .persistence_genesis_transaction import bootstrap_stage
+    with bootstrap_stage(store,pin):
         _closed_snapshot_preflight(store,max_metadata_bytes);generation=store._require_pin(pin)
         if generation!=int(store._checked_head_row()[0]):raise StoreConflictError('record bootstrap requires current generation')
         # Do not let the inherited full audit transfer unsupported bodies first.
@@ -168,11 +167,8 @@ def bootstrap_record_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metada
         finally:delta.close()
         store.db.execute('DROP TABLE ate_record_delta')
         result=_write_root(store,RecordCertificate(store.store_identity,generation,store.codec.version,root))
-        store.db.commit();return result
-    except BaseException:
-        if store.db.in_transaction:store.db.rollback()
-        raise
-    finally:store._active_read_transaction=False
+        return result
+
 
 
 def read_record_proof_bytes(store,pin,certificate,expected,namespace,typed_key,*,expected_record_schema,max_bytes=1048576,max_metadata_bytes=1048576):

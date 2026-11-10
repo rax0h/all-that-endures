@@ -166,24 +166,39 @@ def _verify_sequences(store, pin, workspace):
 
 def _verify_catalog(store, pin, workspace=None):
     if workspace is None:
-        with ConversionWorkspace(store.codec, directory=store.path.parent) as temporary:
+        from .persistence_genesis_transaction import catalog_snapshot
+        with ConversionWorkspace(store.codec, directory=store.path.parent) as temporary, catalog_snapshot(store, pin):
             return _verify_catalog(store, pin, temporary)
     catalog = IdentityCatalog(store)
     descriptor = catalog._descriptor(pin)
     links, expected_nodes, live_owners = 0, DiskSet(workspace), DiskSet(workspace)
-    for incarnation in store.iter_keys(pin, GROUP_NAMESPACE):
+    _copy_phase('catalog.groups',store.path)
+    for number,incarnation in enumerate(store.iter_keys(pin, GROUP_NAMESPACE),1):
+        if number%100000==0:_copy_phase('catalog.groups.'+str(number),store.path)
         group = catalog.read_identity_group(pin, incarnation)
         links += len(group.links)
         for values in (group.occurrences, group.links):
             if hasattr(values, 'close'):
                 values.close()
-    for owner in store.iter_keys(pin, OWNER_NAMESPACE):
-        checked = catalog.read_owner_identity(pin, owner)
+    _copy_phase('catalog.owners',store.path)
+    for number,owner in enumerate(store.iter_keys(pin, OWNER_NAMESPACE),1):
+        if number%100000==0:_copy_phase('catalog.owners.'+str(number),store.path)
+        from .persistence_genesis_transaction import _FrozenScope
+        scope=getattr(store,'_validation_scope',None)
+        frozen=type(scope) is _FrozenScope and scope.can_reuse(store,pin)
+        def collect(prefix):
+            marker=store.codec.encode((*owner,prefix))
+            if marker in expected_nodes:
+                raise StoreIntegrityError('duplicate identity owner tree node')
+            expected_nodes.add(marker)
+        checked = catalog.read_owner_identity(pin, owner, _node_inventory=collect) if frozen else catalog.read_owner_identity(pin, owner)
         if hasattr(checked.occurrences, 'close'):
             checked.occurrences.close()
-        header = catalog._owner(pin, owner)
-        if header[1]:
+        if checked.exists:
             live_owners.add(store.codec.encode(owner))
+        if frozen:
+            continue
+        header = catalog._owner(pin, owner)
         pending = [header[6:]] if header[6] is not None else []
         while pending:
             prefix, count, checksum = pending.pop()
@@ -194,6 +209,7 @@ def _verify_catalog(store, pin, workspace=None):
             node = catalog._node(pin, owner, prefix, count, checksum)
             if node[0] == 'owner-branch/v1':
                 pending.extend(child[1:] for child in node[2])
+    _copy_phase('catalog.inventories',store.path)
     if links != store.namespace_size(pin, LINK_NAMESPACE):
         raise StoreIntegrityError('identity link inventory is incomplete or extra')
     if not live_owners.equals(store.codec.encode((v.namespace, v.key)) for v in _iter_owner_sources(store, pin)):
@@ -204,7 +220,9 @@ def _verify_catalog(store, pin, workspace=None):
         from .persistence_lazy_identity_retired import RetiredIdentityRanges
         RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub(
             workspace=workspace if _CONVERSION_AUDITS.get() else None)
+    _copy_phase('catalog.member_types',store.path)
     verify_type_witnesses(store, pin, workspace=workspace if _CONVERSION_AUDITS.get() else None)
+    _copy_phase('catalog.sequences',store.path)
     _verify_sequences(store, pin, workspace)
     if store._namespace_state_at('world.event_ids',pin.captured_head) is None:
         envelope=store.read_record('world.event_ids',0,expected_record_schema=1)
@@ -545,27 +563,31 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
             'store_identity': identity, 'source_preserved': True, 'complete_format': complete_format}
 
 
-def _copy_current_checked_catalog(source, destination, *, rules_id):
+def _copy_current_checked_catalog(source, destination, *, rules_id, _for_proof_genesis=False):
     """Copy already backed current authority without relabeling or format claims.
 
     Existing catalog commitments/retired intervals and physical rows remain
     unchanged. The destination's existing commit installs empty backing leases
     and its coherent cold commit descriptor after a source-preserving capture.
     """
+    from .persistence_genesis_transaction import catalog_snapshot
     from .persistence_history_dependencies import _checked_value as checked_dependency
+    if type(_for_proof_genesis) is not bool or _for_proof_genesis and not _CONVERSION_AUDITS.get():
+        raise StoreIntegrityError('proof-copy staging requires explicit private construction')
     source, destination = _preflight_conversion_paths(source, destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     codec = WorldCodec(identity_links_recorded=True)
     with tempfile.TemporaryDirectory(prefix='.ate-checked-current-copy-', dir=destination.parent) as directory:
         private = Path(directory) / 'destination.sqlite'
         copied = LazyRecordStore.copy_current_head(source, private, codec=codec,
-            expected_simulation_schema=SCHEMA, expected_rules_id=rules_id)
+            expected_simulation_schema=SCHEMA, expected_rules_id=rules_id,
+            _defer_target_audit=_for_proof_genesis)
         _copy_phase('after_private_copy', private)
         with LazyRecordStore.open(private, codec=codec, expected_simulation_schema=SCHEMA,
                                   expected_rules_id=rules_id) as target, ConversionWorkspace(codec, directory=directory) as workspace:
             pin = target.capture_pin()
             try:
-                with target.read_snapshot(pin):
+                with catalog_snapshot(target, pin):
                     if target._namespace_state_at(CATALOG_NAMESPACE, pin.captured_head) is None:
                         raise StoreFormatError('checked current copy requires an existing checked catalog')
                     floor = int(target.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
@@ -615,19 +637,24 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
                         check_compact_authority(authority)
                     _check_backing_graph(codec, versions(), rosters, workspace=workspace)
                     metadata = target.head_metadata()
-                token = uuid.uuid4().hex
-                _copy_phase('before_catalog_commit', private)
-                committed = target.commit(pin, commit_token=token,
-                    changes=(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
-                        (1, pin.captured_head + 1, token)),),
-                    version_changes=rosters, identity_changes=(), new_segments=(),
-                    required_format_version=floor, metadata=metadata, preparation_budget=(4096, 2*1024*1024))
-                pin = committed.pin
-                _copy_phase('after_catalog_commit', private)
-                target.verify_all()
-                _verify_catalog(target, pin)
-                generation, identity = target.generation, target.store_identity
-                _copy_phase('after_catalog_validation', private)
+                if _for_proof_genesis:
+                    # Rebase clears expired leases in its existing row rewrite.
+                    # Avoid a storage generation immediately discarded by it.
+                    generation, identity = target.generation, target.store_identity
+                else:
+                    token = uuid.uuid4().hex
+                    _copy_phase('before_catalog_commit', private)
+                    committed = target.commit(pin, commit_token=token,
+                        changes=(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
+                            (1, pin.captured_head + 1, token)),),
+                        version_changes=rosters, identity_changes=(), new_segments=(),
+                        required_format_version=floor, metadata=metadata, preparation_budget=(4096, 2*1024*1024))
+                    pin = committed.pin
+                    _copy_phase('after_catalog_commit', private)
+                    target.verify_all()
+                    _verify_catalog(target, pin)
+                    generation, identity = target.generation, target.store_identity
+                    _copy_phase('after_catalog_validation', private)
             except BaseException:
                 # The unpublished file is discarded, including ambiguous plans.
                 raise

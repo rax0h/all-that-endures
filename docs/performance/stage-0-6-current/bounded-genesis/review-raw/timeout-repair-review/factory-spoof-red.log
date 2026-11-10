@@ -1,0 +1,1 @@
+{"probe": "row_factory_hides_corrupt_reachable_record_root", "outcome": "committed", "spoofed_reads": 40, "real_reachable_root": "StoreIntegrityError: stored proof node digest disagreement"}

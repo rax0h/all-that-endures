@@ -5,6 +5,7 @@ The caller's existing authorizer remains active and is restored on every exit.
 """
 from contextlib import contextmanager
 import sqlite3
+import weakref
 from .incremental_store import StoreError
 
 _WRITES={getattr(sqlite3,'SQLITE_'+name) for name in (
@@ -49,11 +50,48 @@ class _NativeGuardCursor(sqlite3.Cursor):
         return super().executescript(*args,**kwargs)
 
 
+class _GuardedBlob:
+    """Track writable DB-API handles so source custody cannot borrow one."""
+    def __init__(self,connection,blob):
+        self._connection,self._blob=connection,blob
+    def __getattr__(self,name):return getattr(self._blob,name)
+    def __len__(self):return len(self._blob)
+    def __getitem__(self,key):return self._blob[key]
+    def _write_check(self):
+        guard=getattr(self._connection,'_native_write_guard',None)
+        if guard is not None:guard.reject('guarded source cannot mutate a writable BLOB')
+    def __setitem__(self,key,value):
+        self._write_check();self._blob[key]=value
+    def write(self,value):
+        self._write_check();return self._blob.write(value)
+    def close(self):
+        try:return self._blob.close()
+        finally:self._connection._writable_blobs.discard(self)
+    def __enter__(self):
+        self._blob.__enter__();return self
+    def __exit__(self,*args):self.close()
+
+
 class GuardedConnection(sqlite3.Connection):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self._known_authorizer=None
         self._callback_guard=False
+        self._writable_blobs=weakref.WeakSet()
+
+    def blobopen(self,table,column,row,/,*,readonly=False,name='main'):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None and not readonly:guard.reject('guarded source cannot open a writable BLOB')
+        blob=super().blobopen(table,column,row,readonly=readonly,name=name)
+        if readonly:return blob
+        wrapped=_GuardedBlob(self,blob)
+        self._writable_blobs.add(wrapped)
+        return wrapped
+
+    def deserialize(self,data,/,*,name='main'):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None:guard.reject('guarded source cannot deserialize a replacement database')
+        return super().deserialize(data,name=name)
 
     def __setattr__(self,name,value):
         if name in ('row_factory','text_factory'):
@@ -63,7 +101,8 @@ class GuardedConnection(sqlite3.Connection):
 
     def _reject_callback_factory_change(self):
         guard=getattr(self,'_native_write_guard',None)
-        if guard is not None and (getattr(self,'_native_sql_callback_depth',0) or self._callback_guard):
+        if guard is not None and (getattr(guard,'freeze_factories',False)
+                or getattr(self,'_native_sql_callback_depth',0) or self._callback_guard):
             guard.reject('native callback cannot replace SQLite factory')
 
     def _wrap_sql_callback(self,callback):

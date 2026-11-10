@@ -1,0 +1,20 @@
+{
+  "head": "85f87e172be7dc8bd4b206737118ecb96194a382",
+  "runtime_tree": "e68a2ea8b5f7c83a7aa4fd41e51f4cad4a60393e",
+  "source_hashes": {
+    "simulation/ate_sim/persistence_validation_scope.py": "fd16b2481575600ab76314a2b862664756251e3a23f256cd4b3a6ed30636a2f7",
+    "simulation/ate_sim/persistence_catalog_copy.py": "1d7ec4fde5d9f13e9e3c76044e07529a128db1f0109a3634327e08c220c7f1d6",
+    "simulation/ate_sim/persistence_lazy_identity_catalog.py": "adcc8719016f77c73929701d52943d0839fc63667df2a523dea22e32511ec71d",
+    "simulation/ate_sim/persistence_lazy_store.py": "1c8e08d0fdbb309b7ae6ad810795bff5f11ace22d5cace52aac7b4123971b377",
+    "simulation/ate_sim/persistence_sqlite_guard.py": "7e2aaa3c1a5637e2ee67bf56919a28a1105d0b30719e780e0257b1045df5842a",
+    "simulation/ate_sim/persistence_proof_native_guard.py": "903897949755900b0cc7407f23080b35847c0ddf38df3ba12a5d86d7b697c7bb",
+    "simulation/ate_sim/persistence_proof_world_copy.py": "c33726feadda709baf1682048d8927d5049bfde8bc68dfbe0bbb5f501f60beba",
+    "simulation/ate_sim/persistence_proof_world.py": "86744344b2f5363dd8afadc380eade25d37ee578417c167f96f896928d09d1f3",
+    "simulation/ate_sim/persistence_proof_record.py": "c8260b309cb108efd6c5f018b3cbbf15526ea34a82dca457aea0b433e1da7929",
+    "simulation/ate_sim/persistence_proof_scope.py": "a4d9003959e9cd57382a87f547c7c0b17539617435c771ef5c7061b1724c033d",
+    "simulation/ate_sim/persistence_proof_publication.py": "d02657c8e49643a1f2fd6b4fa1519872938b56d234bb71ff0ea1351adae3f063",
+    "simulation/ate_sim/persistence_proof_inventory.py": "7839f181c6db62dcc854cff05fef28bfc08e20f7a543e3964b43c3ac95128938",
+    "simulation/ate_sim/persistence_proof_collection_directory.py": "2f7b95562a9a1821408721486cedbfd7ebc236ba9b05d8d4a734fc082b3ae191"
+  },
+  "method": "static code and authenticated hosted artifact review; no persistence test/profile on changed local tuple"
+}

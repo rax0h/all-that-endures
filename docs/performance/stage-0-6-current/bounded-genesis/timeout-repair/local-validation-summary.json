@@ -1,0 +1,51 @@
+{
+  "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "qualified_runtime": "final-runtime-fingerprint.json",
+  "completed_suites": [
+    {
+      "log": "bootstrap-affected.log",
+      "passed": 408,
+      "seconds": 133.54,
+      "overlap": true,
+      "source_note": "Before final digest/transfer addition; exact final addition covered separately"
+    },
+    {
+      "log": "final-transfer-digest.log",
+      "passed": 77,
+      "seconds": 29.97,
+      "overlap": true
+    },
+    {
+      "log": "final-native-remaining.log",
+      "passed": 27,
+      "seconds": 0.61,
+      "overlap": true
+    },
+    {
+      "log": "final-genesis-harness.log",
+      "passed": 84,
+      "seconds": 19.86,
+      "overlap": true,
+      "warning": "deliberate duplicate ZIP entry rejection control"
+    }
+  ],
+  "interrupted_suite": {
+    "log": "final-native-affected.log",
+    "collected": 348,
+    "observed_completed_passes": 320,
+    "exit_status": 130,
+    "interrupted_case": "test_streaming_history_bounds_and_detach_cost_are_measured[400]",
+    "reason": "Unchanged cold archive backend tracemalloc benchmark outside changed GuardedConnection; retained in full hosted suite"
+  },
+  "independent": {
+    "report": "../review-raw/timeout-repair-review/final-ordinary-review.md",
+    "passed": 62,
+    "seconds": 18.5
+  },
+  "complete_driver": {
+    "receipt": "final-real-year-receipt.json",
+    "phases": 13,
+    "status": "complete"
+  },
+  "note": "Test sets overlap. Do not sum or present the interrupted suite as complete. Full hosted candidate and mature acceptance pending."
+}

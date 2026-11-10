@@ -39,13 +39,16 @@ def _bounded_rows(db, table, keys, fields):
                 raise StoreIntegrityError('private genesis row disappeared')
             yield row
 
-def _rebase_private_snapshot(store):
+def _rebase_private_snapshot(store, *, _defer_final_audit=False):
     """A new unpublished identity has no predecessor proof generation.
 
     Keep logical history and ordinal/allocator state. Only storage revisions,
     source binding checksums, leases and session publication metadata change.
     """
     from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
+    from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES, _validate_value, dependency_value
+    if type(_defer_final_audit) is not bool or _defer_final_audit and not lazy._CONVERSION_AUDITS.get():
+        raise StoreError('deferred rebase audit requires explicit construction')
     if store.db.in_transaction:raise StoreError('private genesis rebase requires owned construction')
     g=store.generation;db=store.db;codec=store.codec
     if db.execute('SELECT 1 FROM generation_pins LIMIT 1').fetchone():raise StoreError('private genesis cannot carry live publisher leases')
@@ -72,6 +75,9 @@ def _rebase_private_snapshot(store):
                     if h[1] and row is None:raise StoreIntegrityError('private genesis owner source missing')
                     if row is not None:h[5]=row[0]
                 payload=codec.encode(tuple(h))
+            if ns==DEPENDENCIES:
+                value=_validate_value(codec.decode(payload))
+                payload=codec.encode(dependency_value(value[1]))
             if ns==catalog.GROUP_NAMESPACE:
                 members=codec.encode(tuple((name,value,0 if name=='retired' else ordinal) for name,value,ordinal in codec.decode(members)))
             db.execute('UPDATE lazy_record_versions SET payload=?,payload_checksum=?,memberships=?,valid_from=0,valid_to=NULL,row_checksum=? WHERE namespace=? AND typed_key=?',
@@ -102,7 +108,10 @@ def _rebase_private_snapshot(store):
         for table in ('save_receipts','pin_receipts','pin_attempts'):db.execute('DELETE FROM '+table)
         row=store._checked_head_row();values=(0,None,*row[2:7])
         db.execute('UPDATE save_head SET generation=0,parent_generation=NULL,head_checksum=?',(_head_checksum(*values),))
-        db.commit();_genesis_phase('rebase.final_audit');store.verify_all()
+        db.commit()
+        if not _defer_final_audit:
+            _genesis_phase('rebase.final_audit');store.verify_all()
+        else:_genesis_phase('rebase.audit_pending_owned_bootstrap')
     except BaseException:
         if db.in_transaction:db.rollback()
         raise
@@ -131,33 +140,39 @@ def copy_world_with_proofs(source,destination,*,rules_id,rank_proofs=False):
         _genesis_phase('checked_current_copy')
         if floor==6:
             from .persistence_catalog_copy import _copy_current_checked_catalog
-            _copy_current_checked_catalog(source,private,rules_id=rules_id)
+            _copy_current_checked_catalog(source,private,rules_id=rules_id,_for_proof_genesis=True)
         elif floor<6:upgrade_lazy_snapshot(source,private,rules_id=rules_id)
         else:raise StoreError('proof copy source requires old checked reader authority')
         from .persistence_lazy import open_lazy_world_session
         from .core import _digest_world_unchecked
+        from .persistence_genesis_transaction import catalog_snapshot
         _genesis_phase('canonical_digest.before_rebase')
-        with open_lazy_world_session(private,rules_id=rules_id) as session:before=_digest_world_unchecked(session.world)
-        with LazyRecordStore.open(private,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as store:_rebase_private_snapshot(store)
+        with open_lazy_world_session(private,rules_id=rules_id) as session:
+            with catalog_snapshot(session.store,session.pin):
+                before=_digest_world_unchecked(session.world)
+        with LazyRecordStore.open(private,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as store:_rebase_private_snapshot(store,_defer_final_audit=True)
         _genesis_phase('canonical_digest.after_rebase')
         with open_lazy_world_session(private,rules_id=rules_id) as session:
-            if _digest_world_unchecked(session.world)!=before:raise StoreIntegrityError('proof genesis changed the canonical World digest')
+            with catalog_snapshot(session.store,session.pin):
+                if _digest_world_unchecked(session.world)!=before:raise StoreIntegrityError('proof genesis changed the canonical World digest')
         with LazyRecordStore.open(private,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as store:
             store.db.execute("UPDATE store_metadata SET value='7' WHERE key='format_version'");store.db.commit()
             pin=store.capture_pin()
             try:
-                _genesis_phase('bootstrap.records')
-                ra=bootstrap_record_proofs(store,pin)
-                _genesis_phase('bootstrap.scopes')
-                sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=rank_proofs)
-                _genesis_phase('bootstrap.content')
-                ca=bootstrap_content_proofs(store,pin)
-                _genesis_phase('bootstrap.directory')
-                da=bootstrap_collection_directory(store,pin)
-                _genesis_phase('bootstrap.inventory')
-                ia=bootstrap_inventory(store,pin)
-                _genesis_phase('bootstrap.World_manifest')
-                manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
+                from .persistence_genesis_transaction import ProofGenesisTransaction
+                with ProofGenesisTransaction(store,pin,rank=rank_proofs):
+                    _genesis_phase('bootstrap.records')
+                    ra=bootstrap_record_proofs(store,pin)
+                    _genesis_phase('bootstrap.scopes')
+                    sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=rank_proofs)
+                    _genesis_phase('bootstrap.content')
+                    ca=bootstrap_content_proofs(store,pin)
+                    _genesis_phase('bootstrap.directory')
+                    da=bootstrap_collection_directory(store,pin)
+                    _genesis_phase('bootstrap.inventory')
+                    ia=bootstrap_inventory(store,pin)
+                    _genesis_phase('bootstrap.World_manifest')
+                    manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
             finally:store.release_pin(pin)
         _genesis_phase('publish')
         _publish_private_cold_file(private,destination)

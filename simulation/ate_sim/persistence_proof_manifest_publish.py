@@ -66,19 +66,17 @@ def bootstrap_world_manifest(store,pin,content_authority,scope_authority,invento
     reference._components(store,pin,content_authority,scope_authority,inventory_authority,record_authority)
     if pin.captured_head!=0:raise StoreError('World proof genesis requires explicit new-identity generation0 copy')
     if store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()!=('7',):raise StoreError('World genesis requires fenced proof format')
-    if store.db.in_transaction:raise StoreError('World manifest construction requires owned operation')
-    store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
-    try:
+    from .persistence_genesis_transaction import bootstrap_stage
+    with bootstrap_stage(store,pin):
         for sql in (_SCHEMA,_CONTEXT):store.db.execute(sql.replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',1))
         _schemas(store)
         with store.read_snapshot(pin,_preflight=lambda:reference.target._preflight(store,1048576)):
             proof=world._audit_world(store,pin,content_authority,scope_authority,inventory_authority,record_authority,directory_authority)
             result=_write(store,_manifest(store,0,proof.roots),proof.facts)
-        store.db.commit();return result
-    except BaseException:
-        if store.db.in_transaction:store.db.rollback()
-        raise
-    finally:store._active_read_transaction=False
+            transaction=getattr(store,'_genesis_transaction',None)
+            if transaction is not None:transaction.seal_manifest()
+        return result
+
 
 
 @dataclass

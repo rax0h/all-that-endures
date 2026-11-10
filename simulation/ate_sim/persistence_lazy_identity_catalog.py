@@ -517,6 +517,12 @@ class IdentityCatalog:
             raise StoreIntegrityError(f'missing required identity authority in {namespace}') from exc
 
     def _descriptor(self, pin):
+        from .persistence_genesis_transaction import _FrozenScope
+        scope = getattr(self.store, '_validation_scope', None)
+        reusable = type(scope) is _FrozenScope and scope.can_reuse(self.store, pin)
+        cached = scope.lookup('descriptor', ()) if reusable else None
+        if cached is not None:
+            return cached
         value = self._read(pin, CATALOG_NAMESPACE, 0)
         legacy = type(value) is tuple and len(value) == 5 and value[0] == 'identity-catalog/v1'
         for ns in CATALOG_NAMESPACES[:-1] if legacy else CATALOG_NAMESPACES:
@@ -542,6 +548,7 @@ class IdentityCatalog:
                 raise StoreIntegrityError('retired identity exceeds allocator')
         if value[3] + retired_count != value[2] - 1 or self.store.namespace_size(pin, GROUP_NAMESPACE) != value[3]:
             raise StoreIntegrityError('identity group/retirement inventory count disagreement')
+        if reusable:scope.remember('descriptor', (), value)
         return value
 
     def _owner(self, pin, owner):
@@ -647,8 +654,13 @@ class IdentityCatalog:
             _, prefix, count, checksum = child
         raise StoreIntegrityError('identity group disagrees with exact owner membership')
 
-    def read_owner_identity(self, pin, owner):
+    def read_owner_identity(self, pin, owner, *, _node_inventory=None):
         self.store._ensure_open()
+        if _node_inventory is not None:
+            from .persistence_genesis_transaction import _FrozenScope
+            scope=getattr(self.store,'_validation_scope',None)
+            if type(scope) is not _FrozenScope or not scope.can_reuse(self.store,pin):
+                raise StoreConflictError('node inventory requires owned frozen construction')
         standalone = not self.store.db.in_transaction
         if not standalone:
             # total_changes is monotonic across rollback. Never retain or use
@@ -677,6 +689,7 @@ class IdentityCatalog:
             try:
                 def walk(prefix, count, checksum):
                     node = self._node(pin, owner, prefix, count, checksum)
+                    if _node_inventory is not None:_node_inventory(prefix)
                     if node[0] == 'owner-leaf/v1':
                         leaves.add(node[1:])
                     else:

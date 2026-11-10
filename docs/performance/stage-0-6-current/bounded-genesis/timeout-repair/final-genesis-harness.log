@@ -1,0 +1,9 @@
+........................................................................ [ 85%]
+............                                                             [100%]
+=============================== warnings summary ===============================
+.github/tests/test_stage_0_6_retained_archive.py::test_reject_missing_extra_traversal_or_duplicate[names4]
+  /usr/lib/python3.13/zipfile/__init__.py:1655: UserWarning: Duplicate name: 'source/candidate.sqlite'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+84 passed, 1 warning in 19.86s

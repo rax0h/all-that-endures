@@ -1,0 +1,3 @@
+{"probe": "rollback_to_pre_manifest_savepoint", "sealed_before_rollback": true, "manifest_rows_before": 1, "manifest_rows_after_rollback": 0, "outcome": "committed", "manifest_rows_after_commit": 0, "physical_checks": 1}
+{"probe": "trace_callback_source_write_at_commit", "outcome": "committed", "format_version": "6", "manifest_rows": 1, "callback_attempts": [{"guard_active": false, "source_write": "succeeded"}]}
+{"probe": "trace_callback_source_write_during_schema_setup", "outcome": "committed", "rules_id": "tampered-in-setup", "manifest_rules_id": "tampered-in-setup", "callback_attempts": [{"guard_active": false, "source_write": "succeeded"}]}

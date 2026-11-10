@@ -1,0 +1,436 @@
+FFFFFFFFFFFF..FFFFFFF..F                                                 [100%]
+=================================== FAILURES ===================================
+_____ test_one_owned_transaction_reuses_source_audit_and_commits_all_roots _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:34: in test_one_owned_transaction_reuses_source_audit_and_commits_all_roots
+    with bundle()(store,pin) as owned:
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM records] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[UPDATE save_head SET generation=0] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[UPDATE store_metadata SET value='6' WHERE key='format_version'] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM generation_pins] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM lazy_identity_occurrence_versions] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[CREATE TEMP TABLE records(x)] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[DROP TABLE records] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[ALTER TABLE records ADD COLUMN bad] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_____ test_caught_source_or_transaction_escape_poison_entire_build[COMMIT] _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+____ test_caught_source_or_transaction_escape_poison_entire_build[ROLLBACK] ____
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_ test_caught_source_or_transaction_escape_poison_entire_build[PRAGMA writable_schema=ON] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_______ test_incomplete_bundle_rolls_back_even_with_a_valid_source_audit _______
+simulation/tests/test_stage_0_6_genesis_transaction.py:96: in test_incomplete_bundle_rolls_back_even_with_a_valid_source_audit
+    with bundle()(store,pin):bootstrap_record_proofs(store,pin)
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_______________ test_external_writer_cannot_change_frozen_source _______________
+simulation/tests/test_stage_0_6_genesis_transaction.py:104: in test_external_writer_cannot_change_frozen_source
+    with bundle()(store,pin):
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+____ test_changed_custody_or_callback_write_cannot_keep_certificate[codec] _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:118: in test_changed_custody_or_callback_write_cannot_keep_certificate
+    with bundle()(store,pin) as owned:
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+____ test_changed_custody_or_callback_write_cannot_keep_certificate[phase] _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:118: in test_changed_custody_or_callback_write_cannot_keep_certificate
+    with bundle()(store,pin) as owned:
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+__ test_changed_custody_or_callback_write_cannot_keep_certificate[authorizer] __
+simulation/tests/test_stage_0_6_genesis_transaction.py:118: in test_changed_custody_or_callback_write_cannot_keep_certificate
+    with bundle()(store,pin) as owned:
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+___ test_changed_custody_or_callback_write_cannot_keep_certificate[callback] ___
+simulation/tests/test_stage_0_6_genesis_transaction.py:118: in test_changed_custody_or_callback_write_cannot_keep_certificate
+    with bundle()(store,pin) as owned:
+         ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+______ test_folded_roster_reset_preserves_validation_and_source[expired] _______
+simulation/tests/test_stage_0_6_genesis_transaction.py:158: in test_folded_roster_reset_preserves_validation_and_source
+    result=copy_world_with_proofs(source,dest,rules_id=RULES,rank_proofs=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/contextlib.py:85: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:159: in copy_world_with_proofs
+    with ProofGenesisTransaction(store,pin,rank=rank_proofs):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+_______ test_source_certificate_does_not_accept_corrupt_new_proof_nodes ________
+simulation/tests/test_stage_0_6_genesis_transaction.py:179: in test_source_certificate_does_not_accept_corrupt_new_proof_nodes
+    with pytest.raises(StoreError):copy_api.copy_world_with_proofs(source,dest,rules_id=RULES,rank_proofs=True)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/contextlib.py:85: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:159: in copy_world_with_proofs
+    with ProofGenesisTransaction(store,pin,rank=rank_proofs):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:212: in __enter__
+    super().__enter__()
+simulation/ate_sim/persistence_genesis_transaction.py:139: in __enter__
+    if self.proof:_prepare_schema(self.store,self.rank)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_genesis_transaction.py:34: in _prepare_schema
+    ProofNodeStore(store.db).create_schema()
+simulation/ate_sim/persistence_proof_store.py:16: in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_proof_nodes ('
+simulation/ate_sim/persistence_sqlite_guard.py:172: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_sqlite_guard.py:44: in execute
+    return super().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.DatabaseError: not authorized
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_one_owned_transaction_reuses_source_audit_and_commits_all_roots
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM records]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[UPDATE save_head SET generation=0]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[UPDATE store_metadata SET value='6' WHERE key='format_version']
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM generation_pins]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM lazy_identity_occurrence_versions]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[CREATE TEMP TABLE records(x)]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DROP TABLE records]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[ALTER TABLE records ADD COLUMN bad]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[COMMIT]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[ROLLBACK]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[PRAGMA writable_schema=ON]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_incomplete_bundle_rolls_back_even_with_a_valid_source_audit
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_external_writer_cannot_change_frozen_source
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_changed_custody_or_callback_write_cannot_keep_certificate[codec]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_changed_custody_or_callback_write_cannot_keep_certificate[phase]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_changed_custody_or_callback_write_cannot_keep_certificate[authorizer]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_changed_custody_or_callback_write_cannot_keep_certificate[callback]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_folded_roster_reset_preserves_validation_and_source[expired]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_source_certificate_does_not_accept_corrupt_new_proof_nodes
+20 failed, 4 passed in 7.30s

@@ -1,0 +1,28 @@
+{
+  "status": "complete",
+  "rows": [
+    {
+      "history_elements": 1000,
+      "cache_entries": 22,
+      "cache_bytes": 23431,
+      "operational_checks": 1,
+      "wall_seconds_instrumented": 0.1627569249999965,
+      "traced_peak_bytes": 1523795,
+      "database_bytes": 430080,
+      "process_high_water_kib_including_setup": 41516
+    },
+    {
+      "history_elements": 10000,
+      "cache_entries": 93,
+      "cache_bytes": 96630,
+      "operational_checks": 1,
+      "wall_seconds_instrumented": 0.37986045299999205,
+      "traced_peak_bytes": 246947,
+      "database_bytes": 942080,
+      "process_high_water_kib_including_setup": 44716
+    }
+  ],
+  "python": "3.13.5",
+  "sqlite": "3.46.1",
+  "limitation": "Catalog component under tracemalloc; setup, canonical sorting and native live World retention excluded. Disk inventory grows with rows. No mature timing extrapolation."
+}

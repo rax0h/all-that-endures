@@ -1,0 +1,2 @@
+{"probe": "preexisting_blob", "sqlite_in_transaction_before_enter": false, "outcome": "rejected", "exit_error": "OperationalError: database table is locked"}
+{"probe": "deserialize", "operation": "rejected", "error": "DatabaseError: not authorized", "outcome": "rejected", "exit_error": "StoreError: source/schema/transaction mutation during owned genesis validation"}

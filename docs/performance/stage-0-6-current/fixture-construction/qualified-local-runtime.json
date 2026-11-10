@@ -1,15 +1,16 @@
 {
-  "executable": "/workspace/scratch/d88f8db353e8/ate-qualified-python/bin/python",
-  "resolved_executable": "/usr/bin/python3.12",
-  "executable_sha256": "a92f0f95e883390c7256b2e441484aac06b1002dbe1d924141a77c8d82f96223",
-  "system_python_sha256": "a92f0f95e883390c7256b2e441484aac06b1002dbe1d924141a77c8d82f96223",
-  "python": "3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]",
-  "compiler": "GCC 13.3.0",
-  "sqlite": "3.45.1",
-  "sqlite_source_id": "2024-01-30 16:01:20 e876e51a0ed5c5b3126f52e532044363a014bc594cfefa87ffb5b82257ccalt1",
+  "executable": "/workspace/scratch/d88f8db353e8/ate-qualified-313/bin/python",
+  "resolved_executable": "/usr/bin/python3.13",
+  "executable_sha256": "889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9",
+  "system_python_sha256": "889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9",
+  "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+  "compiler": "GCC 14.2.0",
+  "sqlite": "3.46.1",
+  "sqlite_source_id": "2024-08-13 09:16:08 c9c2ab54ba1f5f46360f1b4f35d849cd3f080e6fc2b6c60e91b16c63f69aalt1",
   "sqlite_compile_options": [
+    "ALLOW_ROWID_IN_VIEW",
     "ATOMIC_INTRINSICS=1",
-    "COMPILER=gcc-13.3.0",
+    "COMPILER=gcc-14.2.0",
     "DEFAULT_AUTOVACUUM",
     "DEFAULT_CACHE_SIZE=-2000",
     "DEFAULT_FILE_FORMAT=4",
@@ -25,6 +26,7 @@
     "DEFAULT_WORKER_THREADS=0",
     "DIRECT_OVERFLOW_READ",
     "ENABLE_COLUMN_METADATA",
+    "ENABLE_DBPAGE_VTAB",
     "ENABLE_DBSTAT_VTAB",
     "ENABLE_FTS3",
     "ENABLE_FTS3_PARENTHESIS",
@@ -67,13 +69,14 @@
     "THREADSAFE=1",
     "USE_URI"
   ],
-  "sqlite_extension_path": "/usr/lib/python3.12/lib-dynload/_sqlite3.cpython-312-x86_64-linux-gnu.so",
-  "sqlite_extension_sha256": "96fd3ea2d885a19bdf3af9a54d65b9c529a47827e27375ff181c090f1d954ddf",
-  "runtime_tree": "d91d48cc36dc4fa822b1bf5a52bca6a218437a28",
+  "sqlite_extension_path": "/usr/lib/python3.13/lib-dynload/_sqlite3.cpython-313-x86_64-linux-gnu.so",
+  "sqlite_extension_sha256": "ad902edee2ed8dbbaec17309130436ffef1b69b1547a204e41e01e0d807a0c3d",
+  "runtime_tree": "e68a2ea8b5f7c83a7aa4fd41e51f4cad4a60393e",
   "loaded_sqlite_libraries": [
     {
       "path": "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
-      "sha256": "eac351cf84d688d1f9235e6165bd57555b31a491cd2f65e0dca67daa69036370"
+      "sha256": "14c4418a06c5c2e30f5fb57bc8add93762236ae17898c6708984cf15e680ca71"
     }
-  ]
+  ],
+  "qualification_receipt": "../bounded-genesis/timeout-repair/runtime-313-qualification.json"
 }

@@ -58,6 +58,15 @@ def test_exit_never_accepts_missing_result(tmp_path,status):
         assert row['acceptance']=='not-accepted' and row['censored']==(status in (124,137,143))
 
 
+def test_internal_phase_timeout_is_censored_even_when_python_exits_one(tmp_path):
+    path=tmp_path/'evidence/mature-genesis/result.json'
+    r.publish_receipt(path,dict(status='timeout',acceptance='not-accepted',
+        phases=dict(construction=dict(status='timeout',censored=True))))
+    g.record_exit(tmp_path,1)
+    row=r.load_receipt(path.with_name('command-exit.json'))
+    assert row['status']=='timeout' and row['censored'] is True
+
+
 @pytest.mark.parametrize('field,value',[('year',1003),('generation',0),('digest','wrong'),('world_audits',1)])
 def test_fresh_result_must_match_accepted_year_and_digest(monkeypatch,tmp_path,field,value):
     row=dict(year=1002,seed=843000,generation=1,digest=g.EXPECTED_DIGEST,world_audits=0)

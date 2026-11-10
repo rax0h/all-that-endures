@@ -7,17 +7,18 @@ Track findings in one consolidated closure register with origin, concrete action
 Batch related cleanup and validation. Do not create a separate hosted CI cycle per finding. Use one independent whole-package review and fix actionable findings, including Minors. The user permits brief CI status checks on the hour while long runs are active; do not busy-poll. Benchmark-only harness/workflow changes should use targeted validation without automatically launching the full simulation suite. Stage0.5 original scope is complete; subsequent persistence performance/stabilization is Stage0.6, retaining existing filenames. No main merge, default format activation or endurance run is authorized by cleanup work.
 
 For local persistence acceptance and profiling in this Work Mode workspace, use
-the runtime qualified by the unchanged complete generated-year scenario:
-system Python3.12.3/GCC13.3.0/SQLite3.45.1, or an isolated venv derived from it.
-Here it is available through /usr/bin/python3. Verify its full fingerprint against
-docs/performance/stage-0-6-current/fixture-construction/qualified-local-runtime.json;
-the pathname alone is not qualification after an OS/runtime update. If it changes,
-rerun the unchanged qualification scenario and record the new tuple before
-accepting its persistence evidence. The bundled
-Python3.12.14/Clang22.1.3/SQLite3.53.1 tuple remains unqualified for this complete
-open/year/save/restore scenario, including native save/rollback, with unresolved
-failures. Do not use that tuple's partial successes as complete acceptance.
-This is a workspace-local evidence contract, not a universal supported-version
-matrix, an engine-only causal diagnosis, or a repair/exoneration of application
-code. Keep hosted CI's separately recorded runtime and results authoritative for
-its own checks. Preserve all failure evidence and full audited opening.
+an unchanged complete generated-year qualified runtime and verify its full
+fingerprint against docs/performance/stage-0-6-current/fixture-construction/qualified-local-runtime.json.
+The November10 replacement OS tuple is Python3.13.5/GCC14.2.0/SQLite3.46.1;
+/usr/bin/python3 and the system-derived isolated
+/workspace/scratch/d88f8db353e8/ate-qualified-313/bin/python share it. The unchanged
+complete13phase driver passed at85f87e1/runtimee68a2ea8 before repair edits;
+evidence is bounded-genesis/timeout-repair/runtime-313-qualification.json.
+The earlier3.12.3/GCC13.3.0/3.45.1 qualification and later local failures remain
+historical evidence; its saved fingerprint is qualified-local-runtime-312-historical.json.
+The old ate-qualified-python pathname now resolves to3.13 and must not be used
+as a version assertion. If the tuple changes again, rerun complete qualification
+before accepting evidence. Bundled3.12.14/Clang22.1.3/SQLite3.53.1 remains
+unqualified with unresolved failures. These are scenario observations, not a
+universal version matrix or an engine-only diagnosis/application exoneration.
+Hosted CI records its separate runtime; preserve failures and full audited opening.

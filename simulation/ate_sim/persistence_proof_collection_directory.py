@@ -91,9 +91,8 @@ def _audit_namespace_inventory(store,g):
 
 def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
     _budget(max_metadata_bytes);_require_closed_codec(store,allow_typed=True)
-    if store.db.in_transaction or store._active_read_transaction:raise StoreError('directory construction requires owned transaction')
-    store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
-    try:
+    from .persistence_genesis_transaction import bootstrap_stage
+    with bootstrap_stage(store,pin):
         _source_schemas(store.db);_closed_snapshot_preflight(store,max_metadata_bytes);g=store._require_pin(pin)
         if g!=int(store._checked_head_row()[0]):raise StoreConflictError('directory construction requires current pin')
         collection._indexes(store);_source_indexes(store.db,create=True);_guard_construction(store,g,MAX_BODY_BYTES,max_metadata_bytes)
@@ -116,11 +115,8 @@ def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
         c=CollectionDirectoryCertificate(store.store_identity,g,store.codec.version,root);expected=certificate_commitment(c)
         from .persistence_proof_directory_publish import persist_bootstrap
         persist_bootstrap(store,c)
-        store.db.commit();return c,expected
-    except BaseException:
-        if store.db.in_transaction:store.db.rollback()
-        raise
-    finally:store._active_read_transaction=False
+        return c,expected
+
 
 def _preflight(store,pin,c,expected,budget):
     _budget(budget)

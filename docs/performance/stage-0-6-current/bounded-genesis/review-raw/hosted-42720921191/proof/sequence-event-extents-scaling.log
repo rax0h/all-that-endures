@@ -1,0 +1,3 @@
+1000 {'event-ids': 158.1, 'sequence': 76.1} ms; zero unrelated internal bodies
+10000 {'event-ids': 167.35, 'sequence': 83.92} ms; zero unrelated internal bodies
+100000 {'event-ids': 184.84, 'sequence': 93.16} ms; zero unrelated internal bodies

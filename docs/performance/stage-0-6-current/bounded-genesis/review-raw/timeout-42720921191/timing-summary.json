@@ -1,0 +1,59 @@
+{
+  "source_head": "85f87e1",
+  "artifact_id": 13738303791,
+  "artifact_sha256": "0abf6d7a4e8fc7cacf80897616c47b462125df660ba16d69d89949ccef7dae64",
+  "artifact_bytes": 41503,
+  "status": "timeout",
+  "source_unchanged": true,
+  "machine": {
+    "cpu_count": 4,
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "processor": "AMD EPYC 7763 64-Core Processor",
+    "python": "3.12.16",
+    "sqlite": "3.45.1"
+  },
+  "timeline": [
+    {
+      "phase": "checked_current_copy",
+      "unix_time": 1794276524.8969269,
+      "utc": "2026-11-10T02:08:44.896927+00:00",
+      "seconds_since_previous": 0.007702827453613281,
+      "seconds_since_start": 0.007702827453613281
+    },
+    {
+      "phase": "after_source_capture",
+      "unix_time": 1794279651.4042203,
+      "utc": "2026-11-10T03:00:51.404220+00:00",
+      "seconds_since_previous": 3126.5072934627533,
+      "seconds_since_start": 3126.514996290207
+    },
+    {
+      "phase": "before_publish",
+      "unix_time": 1794283300.0839446,
+      "utc": "2026-11-10T04:01:40.083945+00:00",
+      "seconds_since_previous": 3648.679724216461,
+      "seconds_since_start": 6775.194720506668
+    },
+    {
+      "phase": "after_private_copy",
+      "unix_time": 1794283300.1129534,
+      "utc": "2026-11-10T04:01:40.112953+00:00",
+      "seconds_since_previous": 0.029008865356445312,
+      "seconds_since_start": 6775.2237293720245
+    }
+  ],
+  "construction_wall_seconds": 12601.930159958,
+  "cpu_seconds": 9246.926636711,
+  "uncompleted_catalog_seconds": 5826.706430673599,
+  "process_io_delta": {
+    "cancelled_write_bytes": 3978301440,
+    "rchar": 1059100328583,
+    "read_bytes": 236992901120,
+    "syscr": 277823864,
+    "syscw": 16608075,
+    "wchar": 68005908829,
+    "write_bytes": 37795000320
+  },
+  "peak_rss_bytes": 406097920,
+  "censoring": "first catalog walk incomplete; no later rebase/bootstrap/digest timing observed"
+}

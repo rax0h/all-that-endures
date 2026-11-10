@@ -1,0 +1,105 @@
+FFFFFFFFFFFF.F                                                           [100%]
+=================================== FAILURES ===================================
+_____ test_one_owned_transaction_reuses_source_audit_and_commits_all_roots _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:34: in test_one_owned_transaction_reuses_source_audit_and_commits_all_roots
+    with bundle()(store,pin) as owned:
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM records] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[UPDATE save_head SET generation=0] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[UPDATE store_metadata SET value='6' WHERE key='format_version'] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM generation_pins] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM lazy_identity_occurrence_versions] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[CREATE TEMP TABLE records(x)] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[DROP TABLE records] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[ALTER TABLE records ADD COLUMN bad] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_____ test_caught_source_or_transaction_escape_poison_entire_build[COMMIT] _____
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+____ test_caught_source_or_transaction_escape_poison_entire_build[ROLLBACK] ____
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+_ test_caught_source_or_transaction_escape_poison_entire_build[PRAGMA writable_schema=ON] _
+simulation/tests/test_stage_0_6_genesis_transaction.py:58: in test_caught_source_or_transaction_escape_poison_entire_build
+    with bundle()(store,pin):
+         ^^^^^^^^
+simulation/tests/test_stage_0_6_genesis_transaction.py:20: in bundle
+    from ate_sim.persistence_genesis_transaction import ProofGenesisTransaction
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+___ test_catalog_scope_owns_and_blocks_writes_without_repeating_head_checks ____
+simulation/tests/test_stage_0_6_genesis_transaction.py:77: in test_catalog_scope_owns_and_blocks_writes_without_repeating_head_checks
+    from ate_sim.persistence_genesis_transaction import catalog_snapshot
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_genesis_transaction'
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_one_owned_transaction_reuses_source_audit_and_commits_all_roots
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM records]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[UPDATE save_head SET generation=0]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[UPDATE store_metadata SET value='6' WHERE key='format_version']
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM generation_pins]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DELETE FROM lazy_identity_occurrence_versions]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[CREATE TEMP TABLE records(x)]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[DROP TABLE records]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[ALTER TABLE records ADD COLUMN bad]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[COMMIT]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[ROLLBACK]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_caught_source_or_transaction_escape_poison_entire_build[PRAGMA writable_schema=ON]
+FAILED simulation/tests/test_stage_0_6_genesis_transaction.py::test_catalog_scope_owns_and_blocks_writes_without_repeating_head_checks
+13 failed, 1 passed in 4.36s

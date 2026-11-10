@@ -184,9 +184,8 @@ def _guard_construction(store,generation,body,metadata):
 
 def bootstrap_content_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metadata_bytes=1048576):
     _require_closed_codec(store,allow_typed=True);_budgets(max_body_bytes,max_metadata_bytes)
-    if store.db.in_transaction or store._active_read_transaction:raise StoreError('content construction requires owned transaction')
-    store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
-    try:
+    from .persistence_genesis_transaction import bootstrap_stage
+    with bootstrap_stage(store,pin):
         require_persistent_sources(store.db)
         _closed_snapshot_preflight(store,max_metadata_bytes);generation=store._require_pin(pin)
         if generation!=int(store._checked_head_row()[0]):raise StoreConflictError('content construction requires current pin')
@@ -217,11 +216,8 @@ def bootstrap_content_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metad
             try:roots.append(update_sorted(m,m.empty,cursor))
             finally:cursor.close()
         store.db.execute('DROP TABLE ate_content_delta');result=_write_root(store,ContentCertificate(store.store_identity,generation,store.codec.version,*roots))
-        store.db.commit();return result
-    except BaseException:
-        if store.db.in_transaction:store.db.rollback()
-        raise
-    finally:store._active_read_transaction=False
+        return result
+
 
 
 def version_certificate(store,pin,certificate,expected,*,max_metadata_bytes=1048576):

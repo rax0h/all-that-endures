@@ -1,0 +1,12 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_internal_phase_timeout_is_censored_even_when_python_exits_one ______
+.github/tests/test_stage_0_6_proof_mature_genesis.py:67: in test_internal_phase_timeout_is_censored_even_when_python_exits_one
+    assert row['status']=='timeout' and row['censored'] is True
+E   AssertionError: assert ('error' == 'timeout'
+E     
+E     - timeout
+E     + error)
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_proof_mature_genesis.py::test_internal_phase_timeout_is_censored_even_when_python_exits_one
+1 failed, 24 deselected in 0.22s

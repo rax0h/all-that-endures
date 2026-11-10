@@ -3343,6 +3343,13 @@ class LazyRecordStore:
 
     def verify_all(self) -> dict[str, int]:
         self._ensure_open()
+        transaction = getattr(self, '_genesis_transaction', None)
+        if transaction is not None:
+            from .persistence_genesis_transaction import ProofGenesisTransaction
+            if (type(transaction) is not ProofGenesisTransaction or transaction.store is not self
+                    or transaction.db is not self.db or transaction.codec is not self.codec):
+                raise StoreError('invalid source audit certificate')
+            return transaction.verify_sources()
         owns_snapshot = not self.db.in_transaction
         if owns_snapshot:
             self.db.execute("BEGIN")
@@ -3352,12 +3359,15 @@ class LazyRecordStore:
             if owns_snapshot and self.db.in_transaction:
                 self.db.rollback()
 
-    def _verify_all_in_snapshot(self) -> dict[str, int]:
+    def _verify_database_integrity(self):
         integrity = self.db.execute("PRAGMA integrity_check").fetchone()[0]
         if integrity != "ok":
             raise StoreIntegrityError(f"SQLite integrity check failed: {integrity}")
         if self.db.execute("PRAGMA foreign_key_check").fetchone() is not None:
             raise StoreIntegrityError("foreign key check failed")
+
+    def _verify_all_in_snapshot(self) -> dict[str, int]:
+        self._verify_database_integrity()
         head = self._checked_head_row()
         head_generation = int(head[0])
         inventory = set(self.codec.decode(head[5]))
@@ -3608,7 +3618,10 @@ class LazyRecordStore:
         codec: TypedCodec,
         expected_simulation_schema: str,
         expected_rules_id: str,
+        _defer_target_audit: bool = False,
     ) -> CopyResult:
+        if type(_defer_target_audit) is not bool or _defer_target_audit and not _CONVERSION_AUDITS.get():
+            raise StoreError('deferred copy validation requires private proof construction')
         source = Path(source)
         destination = Path(destination)
         if destination.exists():
@@ -3625,6 +3638,10 @@ class LazyRecordStore:
         try:
             # Pin one source snapshot, scrub that exact snapshot, then copy only current authority.
             source_store.db.execute("BEGIN")
+            if _defer_target_audit and source_store.db.execute(
+                    "SELECT value FROM store_metadata WHERE key='format_version'").fetchone()!=('6',):
+                raise StoreError('deferred copy validation requires complete format6 source')
+            cls._copy_phase_hook('source.full_audit')
             source_store.verify_all()
             head = source_store._checked_head_row()
             generation = int(head[0])
@@ -3668,6 +3685,7 @@ class LazyRecordStore:
                     ('lazy_namespace_state', 'namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum', True),
                     ('lazy_identity_occurrence_versions', 'owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum', True))
                 for table, columns, interval in tables:
+                    cls._copy_phase_hook('copy.'+table)
                     query = 'SELECT '+columns+' FROM '+table
                     if interval:
                         query += ' WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)'
@@ -3689,7 +3707,15 @@ class LazyRecordStore:
                 new_store.db.rollback()
                 raise
             source_store.db.rollback()
-            new_store.verify_all()
+            if _defer_target_audit:
+                # The source was fully checked in the same captured snapshot;
+                # native rows are copied unchanged. The unpublished genesis
+                # path must still run rebase's full pre-audit before rewriting.
+                cls._copy_phase_hook('copy.physical_validation')
+                new_store._verify_database_integrity()
+            else:
+                cls._copy_phase_hook('copy.full_validation')
+                new_store.verify_all()
             identity = new_store.store_identity
             new_store.close()
             new_store = None

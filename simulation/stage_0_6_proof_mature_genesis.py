@@ -182,9 +182,10 @@ def record_exit(root, status):
     result_path=Path(root)/'evidence/mature-genesis/result.json'
     result=r.load_receipt(result_path) if result_path.exists() else {}
     if status==0 and result.get('status')!='complete':raise ValueError('command succeeded without complete mature evidence')
+    timed_out=status in (124,137,143) or result.get('status')=='timeout'
     row=dict(schema='ate-stage06-mature-genesis-exit/1',exit_status=status,
-        status='complete' if status==0 else 'timeout' if status in (124,137,143) else 'error',
-        censored=status in (124,137,143),acceptance=result.get('acceptance','not-accepted'))
+        status='complete' if status==0 else 'timeout' if timed_out else 'error',
+        censored=timed_out,acceptance=result.get('acceptance','not-accepted'))
     r.publish_receipt(Path(root)/'evidence/mature-genesis/command-exit.json',row)
 
 
