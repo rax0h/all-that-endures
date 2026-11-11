@@ -1,0 +1,16 @@
+{
+  "raw_phase_seconds": {
+    "close": 0.011848136000011777,
+    "first_step": 14.328952831999999,
+    "open": 2.2137322359999985,
+    "save": 10.448474886999996,
+    "warm_step": 11.604163049000007,
+    "working_copy": 0.008106599000001324
+  },
+  "targets_met": {
+    "open": true,
+    "save": false,
+    "warm_step": false
+  },
+  "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56"
+}

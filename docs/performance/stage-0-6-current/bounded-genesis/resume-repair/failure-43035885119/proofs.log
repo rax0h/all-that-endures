@@ -1,0 +1,612 @@
+﻿2026-11-11T14:16:57.6698360Z Current runner version: '2.338.2'
+2026-11-11T14:16:57.6716724Z ##[group]Runner Image Provisioner
+2026-11-11T14:16:57.6717340Z Hosted Compute Agent
+2026-11-11T14:16:57.6717689Z Version: 20261028.624
+2026-11-11T14:16:57.6718043Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-11T14:16:57.6718540Z Build Date: 2026-10-28T21:51:42Z
+2026-11-11T14:16:57.6718949Z Worker ID: {cdae8569-8862-4479-b972-a363b2c886e4}
+2026-11-11T14:16:57.6719370Z Region: westus2
+2026-11-11T14:16:57.6719763Z Cloud: Azure
+2026-11-11T14:16:57.6720096Z ##[endgroup]
+2026-11-11T14:16:57.6720926Z ##[group]Operating System
+2026-11-11T14:16:57.6721284Z Ubuntu
+2026-11-11T14:16:57.6721621Z 24.04.5
+2026-11-11T14:16:57.6721940Z LTS
+2026-11-11T14:16:57.6722247Z ##[endgroup]
+2026-11-11T14:16:57.6722637Z ##[group]Runner Image
+2026-11-11T14:16:57.6722994Z Image: ubuntu-24.04
+2026-11-11T14:16:57.6723543Z Version: 20261101.360.1
+2026-11-11T14:16:57.6724383Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-11T14:16:57.6725286Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-11T14:16:57.6725832Z ##[endgroup]
+2026-11-11T14:16:57.6726567Z ##[group]GITHUB_TOKEN Permissions
+2026-11-11T14:16:57.6727798Z Actions: read
+2026-11-11T14:16:57.6728178Z Contents: read
+2026-11-11T14:16:57.6728551Z Metadata: read
+2026-11-11T14:16:57.6728879Z ##[endgroup]
+2026-11-11T14:16:57.6730590Z Secret source: Actions
+2026-11-11T14:16:57.6731156Z Cache mode: write
+2026-11-11T14:16:57.6731654Z Prepare workflow directory
+2026-11-11T14:16:57.7045249Z Prepare all required actions
+2026-11-11T14:16:57.7076597Z Getting action download info
+2026-11-11T14:16:58.0622791Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-11T14:16:58.1781611Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-11T14:16:58.2870369Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-11T14:16:58.4771608Z Complete job name: proofs
+2026-11-11T14:16:58.5309753Z ##[group]Run actions/checkout@v4
+2026-11-11T14:16:58.5310225Z with:
+2026-11-11T14:16:58.5310507Z   ref: 1692ee1caeb6a25c205fbf215f9b3dca1cf4909a
+2026-11-11T14:16:58.5310873Z   fetch-depth: 0
+2026-11-11T14:16:58.5311151Z   repository: rax0h/all-that-endures
+2026-11-11T14:16:58.5313410Z   token: ***
+2026-11-11T14:16:58.5313668Z   ssh-strict: true
+2026-11-11T14:16:58.5313927Z   ssh-user: git
+2026-11-11T14:16:58.5314183Z   persist-credentials: true
+2026-11-11T14:16:58.5314464Z   clean: true
+2026-11-11T14:16:58.5314738Z   sparse-checkout-cone-mode: true
+2026-11-11T14:16:58.5315036Z   fetch-tags: false
+2026-11-11T14:16:58.5315294Z   show-progress: true
+2026-11-11T14:16:58.5315565Z   lfs: false
+2026-11-11T14:16:58.5315819Z   submodules: false
+2026-11-11T14:16:58.5316086Z   set-safe-directory: true
+2026-11-11T14:16:58.5316376Z   allow-unsafe-pr-checkout: false
+2026-11-11T14:16:58.5316782Z env:
+2026-11-11T14:16:58.5317026Z   PYTHONPATH: .:simulation
+2026-11-11T14:16:58.5317356Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:16:58.5319270Z   GH_TOKEN: ***
+2026-11-11T14:16:58.5319521Z ##[endgroup]
+2026-11-11T14:16:58.7423594Z Syncing repository: rax0h/all-that-endures
+2026-11-11T14:16:58.7425977Z ##[group]Getting Git version info
+2026-11-11T14:16:58.7426970Z Working directory is '/home/runner/work/all-that-endures/all-that-endures'
+2026-11-11T14:16:58.7428267Z [command]/usr/bin/git version
+2026-11-11T14:16:58.7476744Z git version 2.56.0
+2026-11-11T14:16:58.7499108Z ##[endgroup]
+2026-11-11T14:16:58.7515107Z Temporarily overriding HOME='/home/runner/work/_temp/c851c6b7-e9cf-4197-abc4-a648a6abdcc1' before making global git config changes
+2026-11-11T14:16:58.7516884Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T14:16:58.7520022Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/all-that-endures/all-that-endures
+2026-11-11T14:16:58.7608089Z Deleting the contents of '/home/runner/work/all-that-endures/all-that-endures'
+2026-11-11T14:16:58.7609433Z ##[group]Initializing the repository
+2026-11-11T14:16:58.7610315Z [command]/usr/bin/git init /home/runner/work/all-that-endures/all-that-endures
+2026-11-11T14:16:58.7724611Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-11T14:16:58.7726151Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-11T14:16:58.7727342Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-11T14:16:58.7728244Z hint: call:
+2026-11-11T14:16:58.7728798Z hint:
+2026-11-11T14:16:58.7729443Z hint: 	git config --global init.defaultBranch <name>
+2026-11-11T14:16:58.7730167Z hint:
+2026-11-11T14:16:58.7730938Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-11T14:16:58.7732005Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-11T14:16:58.7733034Z hint:
+2026-11-11T14:16:58.7733779Z hint: 	git branch -m <name>
+2026-11-11T14:16:58.7734432Z hint:
+2026-11-11T14:16:58.7735295Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-11T14:16:58.7736857Z Initialized empty Git repository in /home/runner/work/all-that-endures/all-that-endures/.git/
+2026-11-11T14:16:58.7751525Z [command]/usr/bin/git remote add origin https://github.com/rax0h/all-that-endures
+2026-11-11T14:16:58.7825916Z ##[endgroup]
+2026-11-11T14:16:58.7827038Z ##[group]Disabling automatic garbage collection
+2026-11-11T14:16:58.7828055Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-11T14:16:58.7867047Z ##[endgroup]
+2026-11-11T14:16:58.7867803Z ##[group]Setting up auth
+2026-11-11T14:16:58.7873843Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T14:16:58.7924247Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T14:16:58.8247425Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T14:16:58.8286915Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T14:16:58.8491074Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T14:16:58.8529962Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T14:16:58.8721708Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-11T14:16:58.9840167Z ##[endgroup]
+2026-11-11T14:16:58.9841249Z ##[group]Fetching the repository
+2026-11-11T14:16:58.9853565Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-11T14:17:13.3421592Z From https://github.com/rax0h/all-that-endures
+2026-11-11T14:17:13.3422352Z  * [new branch]        astra/stage-0-5-continuation-recovery -> origin/astra/stage-0-5-continuation-recovery
+2026-11-11T14:17:13.3422844Z  * [new branch]        astra/stage-0-5-final-review-2026-10-20 -> origin/astra/stage-0-5-final-review-2026-10-20
+2026-11-11T14:17:13.3423452Z  * [new branch]        diagnostic/stage-0.5-profile -> origin/diagnostic/stage-0.5-profile
+2026-11-11T14:17:13.3424036Z  * [new branch]        docs/gameplay-living-world-vision -> origin/docs/gameplay-living-world-vision
+2026-11-11T14:17:13.3424702Z  * [new branch]        game-ready/stage-0.5-rearchitecture -> origin/game-ready/stage-0.5-rearchitecture
+2026-11-11T14:17:13.3425214Z  * [new branch]        main                    -> origin/main
+2026-11-11T14:17:13.3425689Z  * [new branch]        playground/person-explorer -> origin/playground/person-explorer
+2026-11-11T14:17:13.3426642Z  * [new branch]        research/stage-0.5-causal-rebuild -> origin/research/stage-0.5-causal-rebuild
+2026-11-11T14:17:13.3427261Z  * [new branch]        sim/canonical-magic-progression -> origin/sim/canonical-magic-progression
+2026-11-11T14:17:13.3427829Z  * [new branch]        sim/current-standard    -> origin/sim/current-standard
+2026-11-11T14:17:13.3428327Z  * [new branch]        sim/deep-history-systems -> origin/sim/deep-history-systems
+2026-11-11T14:17:13.3428915Z  * [new branch]        sim/game-ready-causal-architecture -> origin/sim/game-ready-causal-architecture
+2026-11-11T14:17:13.3429580Z  * [new branch]        sim/hwfwm-continuity-calibration -> origin/sim/hwfwm-continuity-calibration
+2026-11-11T14:17:13.3430207Z  * [new branch]        sim/magic-liquidity-exchange -> origin/sim/magic-liquidity-exchange
+2026-11-11T14:17:13.3430859Z  * [new branch]        sim/personhood-history-foundations -> origin/sim/personhood-history-foundations
+2026-11-11T14:17:13.3431474Z  * [new branch]        sim/ranked-threat-ecology -> origin/sim/ranked-threat-ecology
+2026-11-11T14:17:13.3432100Z  * [new branch]        sim/stage-0-5-astra-ownership-repair -> origin/sim/stage-0-5-astra-ownership-repair
+2026-11-11T14:17:13.3432724Z  * [new branch]        sim/stage-0-5-final-architecture -> origin/sim/stage-0-5-final-architecture
+2026-11-11T14:17:13.3433580Z  * [new branch]        sim/stage-0-5-household-living-selection -> origin/sim/stage-0-5-household-living-selection
+2026-11-11T14:17:13.3434337Z  * [new branch]        sim/stage-0-5-household-scoped-index -> origin/sim/stage-0-5-household-scoped-index
+2026-11-11T14:17:13.3435047Z  * [new branch]        sim/stage-0-5-household-tail-delete -> origin/sim/stage-0-5-household-tail-delete
+2026-11-11T14:17:13.3435783Z  * [new branch]        sim/stage-0-5-living-consumer-closeout -> origin/sim/stage-0-5-living-consumer-closeout
+2026-11-11T14:17:13.3436456Z  * [new branch]        sim/stage-0-5-r123-closeout-probes -> origin/sim/stage-0-5-r123-closeout-probes
+2026-11-11T14:17:13.3437374Z  * [new branch]        sim/stage-0-5-r1r2-final-short-gate -> origin/sim/stage-0-5-r1r2-final-short-gate
+2026-11-11T14:17:13.3438075Z  * [new branch]        sim/stage-0-5-r3-converged-validation -> origin/sim/stage-0-5-r3-converged-validation
+2026-11-11T14:17:13.3438765Z  * [new branch]        sim/stage-0-5-r3-cross-family-gate -> origin/sim/stage-0-5-r3-cross-family-gate
+2026-11-11T14:17:13.3439442Z  * [new branch]        sim/stage-0-5-r3-cross-family-v2 -> origin/sim/stage-0-5-r3-cross-family-v2
+2026-11-11T14:17:13.3440129Z  * [new branch]        sim/stage-0-5-r3-debug-split -> origin/sim/stage-0-5-r3-debug-split
+2026-11-11T14:17:13.3440878Z  * [new branch]        sim/stage-0-5-r3-default-mode -> origin/sim/stage-0-5-r3-default-mode
+2026-11-11T14:17:13.3441562Z  * [new branch]        sim/stage-0-5-r3-final-frozen -> origin/sim/stage-0-5-r3-final-frozen
+2026-11-11T14:17:13.3442140Z  * [new branch]        sim/stage-0-5-r3-final-suite-gate -> origin/sim/stage-0-5-r3-final-suite-gate
+2026-11-11T14:17:13.3442747Z  * [new branch]        sim/stage-0-5-r3-id-lifetime-fix -> origin/sim/stage-0-5-r3-id-lifetime-fix
+2026-11-11T14:17:13.3443570Z  * [new branch]        sim/stage-0-5-r3-identity-publication-fix -> origin/sim/stage-0-5-r3-identity-publication-fix
+2026-11-11T14:17:13.3444445Z  * [new branch]        sim/stage-0-5-r3-implementation -> origin/sim/stage-0-5-r3-implementation
+2026-11-11T14:17:13.3445056Z  * [new branch]        sim/stage-0-5-r3-independent-gates -> origin/sim/stage-0-5-r3-independent-gates
+2026-11-11T14:17:13.3445652Z  * [new branch]        sim/stage-0-5-r3-recovery-gate -> origin/sim/stage-0-5-r3-recovery-gate
+2026-11-11T14:17:13.3446239Z  * [new branch]        sim/stage-0-5-r3-release-candidate -> origin/sim/stage-0-5-r3-release-candidate
+2026-11-11T14:17:13.3446858Z  * [new branch]        sim/stage-0-5-r3-repaired-candidate -> origin/sim/stage-0-5-r3-repaired-candidate
+2026-11-11T14:17:13.3447508Z  * [new branch]        sim/stage-0-5-stabilization -> origin/sim/stage-0-5-stabilization
+2026-11-11T14:17:13.3448298Z  * [new branch]        sim/stage-0-5-touched-household-save -> origin/sim/stage-0-5-touched-household-save
+2026-11-11T14:17:13.3448886Z  * [new branch]        sim/stage-0.5-clean-recovery -> origin/sim/stage-0.5-clean-recovery
+2026-11-11T14:17:13.3449401Z  * [new branch]        sim/stage-0.5-gold-freeze -> origin/sim/stage-0.5-gold-freeze
+2026-11-11T14:17:13.3449974Z  * [new branch]        sim/stage-0.5-integrated-candidate -> origin/sim/stage-0.5-integrated-candidate
+2026-11-11T14:17:13.3450633Z  * [new branch]        sim/stage-0.5-magic-access-calibration -> origin/sim/stage-0.5-magic-access-calibration
+2026-11-11T14:17:13.3451321Z  * [new branch]        sim/stage-0.5-magic-access-diagnostics -> origin/sim/stage-0.5-magic-access-diagnostics
+2026-11-11T14:17:13.3451933Z  * [new branch]        sol-p4-10-skills-affected -> origin/sol-p4-10-skills-affected
+2026-11-11T14:17:13.3452442Z  * [new branch]        sol-p4-10-skills-focused -> origin/sol-p4-10-skills-focused
+2026-11-11T14:17:13.3453032Z  * [new branch]        sol-p4-10-skills-scaling -> origin/sol-p4-10-skills-scaling
+2026-11-11T14:17:13.3453843Z  * [new branch]        sol-p4-11a-lineage-affected -> origin/sol-p4-11a-lineage-affected
+2026-11-11T14:17:13.3454232Z  * [new branch]        sol-p4-11a-lineage-focused -> origin/sol-p4-11a-lineage-focused
+2026-11-11T14:17:13.3454576Z  * [new branch]        sol-p4-11a-lineage-scaling -> origin/sol-p4-11a-lineage-scaling
+2026-11-11T14:17:13.3454928Z  * [new branch]        sol-p4-12-genealogy-affected -> origin/sol-p4-12-genealogy-affected
+2026-11-11T14:17:13.3455288Z  * [new branch]        sol-p4-12a-genealogy-focused -> origin/sol-p4-12a-genealogy-focused
+2026-11-11T14:17:13.3455663Z  * [new branch]        sol-p4-12a-genealogy-focused-2 -> origin/sol-p4-12a-genealogy-focused-2
+2026-11-11T14:17:13.3456043Z  * [new branch]        sol-p4-12a-genealogy-focused-3 -> origin/sol-p4-12a-genealogy-focused-3
+2026-11-11T14:17:13.3456410Z  * [new branch]        sol-p4-12a-genealogy-scaling -> origin/sol-p4-12a-genealogy-scaling
+2026-11-11T14:17:13.3456907Z  * [new branch]        sol-p4-12b-genealogy-focused -> origin/sol-p4-12b-genealogy-focused
+2026-11-11T14:17:13.3457259Z  * [new branch]        sol-p4-12b-genealogy-scaling -> origin/sol-p4-12b-genealogy-scaling
+2026-11-11T14:17:13.3457611Z  * [new branch]        sol-p4-13-community-affected -> origin/sol-p4-13-community-affected
+2026-11-11T14:17:13.3457959Z  * [new branch]        sol-p4-13-community-focused -> origin/sol-p4-13-community-focused
+2026-11-11T14:17:13.3458301Z  * [new branch]        sol-p4-13-community-scaling -> origin/sol-p4-13-community-scaling
+2026-11-11T14:17:13.3458638Z  * [new branch]        sol-p4-14-import-patcher -> origin/sol-p4-14-import-patcher
+2026-11-11T14:17:13.3459019Z  * [new branch]        sol-p4-14-lineage-children-affected -> origin/sol-p4-14-lineage-children-affected
+2026-11-11T14:17:13.3459451Z  * [new branch]        sol-p4-14-lineage-children-affected-2 -> origin/sol-p4-14-lineage-children-affected-2
+2026-11-11T14:17:13.3459903Z  * [new branch]        sol-p4-14-lineage-children-focused -> origin/sol-p4-14-lineage-children-focused
+2026-11-11T14:17:13.3460392Z  * [new branch]        sol-p4-14-lineage-children-focused-2 -> origin/sol-p4-14-lineage-children-focused-2
+2026-11-11T14:17:13.3460814Z  * [new branch]        sol-p4-14-lineage-children-scaling -> origin/sol-p4-14-lineage-children-scaling
+2026-11-11T14:17:13.3461207Z  * [new branch]        sol-p4-14-lineage-overlay-fix -> origin/sol-p4-14-lineage-overlay-fix
+2026-11-11T14:17:13.3461589Z  * [new branch]        sol-p4-2-cold-detach-regression -> origin/sol-p4-2-cold-detach-regression
+2026-11-11T14:17:13.3461991Z  * [new branch]        sol-p4-2-cross-owner-transfer-gate -> origin/sol-p4-2-cross-owner-transfer-gate
+2026-11-11T14:17:13.3462410Z  * [new branch]        sol-p4-2-cross-person-affected-gate -> origin/sol-p4-2-cross-person-affected-gate
+2026-11-11T14:17:13.3462820Z  * [new branch]        sol-p4-2-cross-person-field-gate -> origin/sol-p4-2-cross-person-field-gate
+2026-11-11T14:17:13.3463507Z  * [new branch]        sol-p4-2-generated-cold-diagnostic -> origin/sol-p4-2-generated-cold-diagnostic
+2026-11-11T14:17:13.3463884Z  * [new branch]        sol-p4-2-hybrid-broad-gate -> origin/sol-p4-2-hybrid-broad-gate
+2026-11-11T14:17:13.3464268Z  * [new branch]        sol-p4-2-hybrid-digest-diagnostic -> origin/sol-p4-2-hybrid-digest-diagnostic
+2026-11-11T14:17:13.3464642Z  * [new branch]        sol-p4-2-hybrid-exact-repro -> origin/sol-p4-2-hybrid-exact-repro
+2026-11-11T14:17:13.3465126Z  * [new branch]        sol-p4-2-hybrid-exact-repro-2 -> origin/sol-p4-2-hybrid-exact-repro-2
+2026-11-11T14:17:13.3465756Z  * [new branch]        sol-p4-2-hybrid-journal-diagnostic -> origin/sol-p4-2-hybrid-journal-diagnostic
+2026-11-11T14:17:13.3466363Z  * [new branch]        sol-p4-2-hybrid-lifecycle-gate -> origin/sol-p4-2-hybrid-lifecycle-gate
+2026-11-11T14:17:13.3467013Z  * [new branch]        sol-p4-2-hybrid-lifecycle-gate-2 -> origin/sol-p4-2-hybrid-lifecycle-gate-2
+2026-11-11T14:17:13.3467463Z  * [new branch]        sol-p4-2-hybrid-reopen-fix-gate -> origin/sol-p4-2-hybrid-reopen-fix-gate
+2026-11-11T14:17:13.3467866Z  * [new branch]        sol-p4-2-hybrid-reopen-fix-gate-2 -> origin/sol-p4-2-hybrid-reopen-fix-gate-2
+2026-11-11T14:17:13.3468261Z  * [new branch]        sol-p4-2-hybrid-step-diagnostic -> origin/sol-p4-2-hybrid-step-diagnostic
+2026-11-11T14:17:13.3468618Z  * [new branch]        sol-p4-2-lazy-detach-gate -> origin/sol-p4-2-lazy-detach-gate
+2026-11-11T14:17:13.3468960Z  * [new branch]        sol-p4-2-lazy-detach-gate-2 -> origin/sol-p4-2-lazy-detach-gate-2
+2026-11-11T14:17:13.3469333Z  * [new branch]        sol-p4-2-owner-transfer-affected -> origin/sol-p4-2-owner-transfer-affected
+2026-11-11T14:17:13.3469701Z  * [new branch]        sol-p4-2-people-open-gate-2 -> origin/sol-p4-2-people-open-gate-2
+2026-11-11T14:17:13.3470042Z  * [new branch]        sol-p4-2-people-write-gate -> origin/sol-p4-2-people-write-gate
+2026-11-11T14:17:13.3470394Z  * [new branch]        sol-p4-2-people-write-gate-2 -> origin/sol-p4-2-people-write-gate-2
+2026-11-11T14:17:13.3470878Z  * [new branch]        sol-p4-2-people-write-gate-3 -> origin/sol-p4-2-people-write-gate-3
+2026-11-11T14:17:13.3471219Z  * [new branch]        sol-p4-2-reactivation-gate -> origin/sol-p4-2-reactivation-gate
+2026-11-11T14:17:13.3471602Z  * [new branch]        sol-p4-2-two-step-continuation-gate -> origin/sol-p4-2-two-step-continuation-gate
+2026-11-11T14:17:13.3471977Z  * [new branch]        sol-p4-5-soul-affected-gate -> origin/sol-p4-5-soul-affected-gate
+2026-11-11T14:17:13.3472329Z  * [new branch]        sol-p4-5-soul-affected-gate-2 -> origin/sol-p4-5-soul-affected-gate-2
+2026-11-11T14:17:13.3472673Z  * [new branch]        sol-p4-5-soul-focused-gate -> origin/sol-p4-5-soul-focused-gate
+2026-11-11T14:17:13.3473023Z  * [new branch]        sol-p4-6-advancement-affected -> origin/sol-p4-6-advancement-affected
+2026-11-11T14:17:13.3473538Z  * [new branch]        sol-p4-6-advancement-focused -> origin/sol-p4-6-advancement-focused
+2026-11-11T14:17:13.3473890Z  * [new branch]        sol-p4-6-advancement-scaling -> origin/sol-p4-6-advancement-scaling
+2026-11-11T14:17:13.3474226Z  * [new branch]        sol-p4-6-advancement-smoke -> origin/sol-p4-6-advancement-smoke
+2026-11-11T14:17:13.3474564Z  * [new branch]        sol-p4-6-advancement-smoke-2 -> origin/sol-p4-6-advancement-smoke-2
+2026-11-11T14:17:13.3474926Z  * [new branch]        sol-p4-7-institutions-affected -> origin/sol-p4-7-institutions-affected
+2026-11-11T14:17:13.3475293Z  * [new branch]        sol-p4-7-institutions-focused -> origin/sol-p4-7-institutions-focused
+2026-11-11T14:17:13.3475681Z  * [new branch]        sol-p4-7-institutions-scaling -> origin/sol-p4-7-institutions-scaling
+2026-11-11T14:17:13.3476202Z  * [new branch]        sol-p4-8-motive-regression -> origin/sol-p4-8-motive-regression
+2026-11-11T14:17:13.3476738Z  * [new branch]        sol-p4-8-scalar-affected -> origin/sol-p4-8-scalar-affected
+2026-11-11T14:17:13.3477110Z  * [new branch]        sol-p4-8-scalar-archives-affected -> origin/sol-p4-8-scalar-archives-affected
+2026-11-11T14:17:13.3477631Z  * [new branch]        sol-p4-8-scalar-archives-affected-2 -> origin/sol-p4-8-scalar-archives-affected-2
+2026-11-11T14:17:13.3478249Z  * [new branch]        sol-p4-8-scalar-archives-focused -> origin/sol-p4-8-scalar-archives-focused
+2026-11-11T14:17:13.3478880Z  * [new branch]        sol-p4-8-scalar-archives-scaling -> origin/sol-p4-8-scalar-archives-scaling
+2026-11-11T14:17:13.3479443Z  * [new branch]        sol-p4-8-scalar-focused -> origin/sol-p4-8-scalar-focused
+2026-11-11T14:17:13.3479907Z  * [new branch]        sol-p4-8-scalar-scaling -> origin/sol-p4-8-scalar-scaling
+2026-11-11T14:17:13.3480390Z  * [new branch]        sol-p4-9-social-affected -> origin/sol-p4-9-social-affected
+2026-11-11T14:17:13.3480888Z  * [new branch]        sol-p4-9-social-focused -> origin/sol-p4-9-social-focused
+2026-11-11T14:17:13.3481356Z  * [new branch]        sol-p4-9-social-scaling -> origin/sol-p4-9-social-scaling
+2026-11-11T14:17:13.3481956Z  * [new branch]        sol-p4-advancement-residual-measure -> origin/sol-p4-advancement-residual-measure
+2026-11-11T14:17:13.3482592Z  * [new branch]        sol-p4-aspiration-pilot-gate -> origin/sol-p4-aspiration-pilot-gate
+2026-11-11T14:17:13.3483377Z  * [new branch]        sol-p4-aspiration-pilot-gate-2 -> origin/sol-p4-aspiration-pilot-gate-2
+2026-11-11T14:17:13.3484093Z  * [new branch]        sol-p4-cross-boundary-aspiration-debug -> origin/sol-p4-cross-boundary-aspiration-debug
+2026-11-11T14:17:13.3484817Z  * [new branch]        sol-p4-cross-boundary-index-fix -> origin/sol-p4-cross-boundary-index-fix
+2026-11-11T14:17:13.3485550Z  * [new branch]        sol-p4-cross-boundary-indexed-alias-fix -> origin/sol-p4-cross-boundary-indexed-alias-fix
+2026-11-11T14:17:13.3486281Z  * [new branch]        sol-p4-currency-alias-regression -> origin/sol-p4-currency-alias-regression
+2026-11-11T14:17:13.3486953Z  * [new branch]        sol-p4-currency-alias-regression-2 -> origin/sol-p4-currency-alias-regression-2
+2026-11-11T14:17:13.3487833Z  * [new branch]        sol-p4-currency-alias-regression-3 -> origin/sol-p4-currency-alias-regression-3
+2026-11-11T14:17:13.3488304Z  * [new branch]        sol-p4-integrated-full-suite -> origin/sol-p4-integrated-full-suite
+2026-11-11T14:17:13.3488685Z  * [new branch]        sol-p4-lazy-resources-gate -> origin/sol-p4-lazy-resources-gate
+2026-11-11T14:17:13.3489099Z  * [new branch]        sol-p4-lazy-resources-gate-2 -> origin/sol-p4-lazy-resources-gate-2
+2026-11-11T14:17:13.3489543Z  * [new branch]        sol-p4-magic-family-residual-measure -> origin/sol-p4-magic-family-residual-measure
+2026-11-11T14:17:13.3489988Z  * [new branch]        sol-p4-materials-residual-measure -> origin/sol-p4-materials-residual-measure
+2026-11-11T14:17:13.3490340Z  * [new branch]        sol-p4-owner-index-gate -> origin/sol-p4-owner-index-gate
+2026-11-11T14:17:13.3490698Z  * [new branch]        sol-p4-owner-index-residual-after -> origin/sol-p4-owner-index-residual-after
+2026-11-11T14:17:13.3491111Z  * [new branch]        sol-p4-owner-index-residual-measure -> origin/sol-p4-owner-index-residual-measure
+2026-11-11T14:17:13.3491511Z  * [new branch]        sol-p4-residual-eager-inventory -> origin/sol-p4-residual-eager-inventory
+2026-11-11T14:17:13.3491905Z  * [new branch]        sol-p4-residual-eager-inventory-10 -> origin/sol-p4-residual-eager-inventory-10
+2026-11-11T14:17:13.3492303Z  * [new branch]        sol-p4-residual-eager-inventory-2 -> origin/sol-p4-residual-eager-inventory-2
+2026-11-11T14:17:13.3492693Z  * [new branch]        sol-p4-residual-eager-inventory-3 -> origin/sol-p4-residual-eager-inventory-3
+2026-11-11T14:17:13.3493077Z  * [new branch]        sol-p4-residual-eager-inventory-4 -> origin/sol-p4-residual-eager-inventory-4
+2026-11-11T14:17:13.3493637Z  * [new branch]        sol-p4-residual-eager-inventory-5 -> origin/sol-p4-residual-eager-inventory-5
+2026-11-11T14:17:13.3494024Z  * [new branch]        sol-p4-residual-eager-inventory-6 -> origin/sol-p4-residual-eager-inventory-6
+2026-11-11T14:17:13.3494514Z  * [new branch]        sol-p4-residual-eager-inventory-7 -> origin/sol-p4-residual-eager-inventory-7
+2026-11-11T14:17:13.3494898Z  * [new branch]        sol-p4-residual-eager-inventory-8 -> origin/sol-p4-residual-eager-inventory-8
+2026-11-11T14:17:13.3495287Z  * [new branch]        sol-p4-residual-eager-inventory-9 -> origin/sol-p4-residual-eager-inventory-9
+2026-11-11T14:17:13.3495675Z  * [new branch]        sol-p4-resource-cache-diagnostic -> origin/sol-p4-resource-cache-diagnostic
+2026-11-11T14:17:13.3496045Z  * [new branch]        sol-p4-resource-detach-gate -> origin/sol-p4-resource-detach-gate
+2026-11-11T14:17:13.3496404Z  * [new branch]        sol-p4-resource-detach-gate-2 -> origin/sol-p4-resource-detach-gate-2
+2026-11-11T14:17:13.3496780Z  * [new branch]        sol-p4-resource-order-diagnostic -> origin/sol-p4-resource-order-diagnostic
+2026-11-11T14:17:13.3497141Z  * [new branch]        sol-p4-resource-pilot-final -> origin/sol-p4-resource-pilot-final
+2026-11-11T14:17:13.3497483Z  * [new branch]        sol-p4-resource-pilot-gate -> origin/sol-p4-resource-pilot-gate
+2026-11-11T14:17:13.3497838Z  * [new branch]        sol-p4-resource-pilot-gate-2 -> origin/sol-p4-resource-pilot-gate-2
+2026-11-11T14:17:13.3498217Z  * [new branch]        sol-p4-resources-residual-measure -> origin/sol-p4-resources-residual-measure
+2026-11-11T14:17:13.3498577Z  * [new branch]        sol-p5-short-final-gates -> origin/sol-p5-short-final-gates
+2026-11-11T14:17:13.3498957Z  * [new branch]        sol-p5-short-integrated -> origin/sol-p5-short-integrated
+2026-11-11T14:17:13.3499373Z  * [new branch]        sol-stage-0-5-closeout-fixes -> origin/sol-stage-0-5-closeout-fixes
+2026-11-11T14:17:13.3499723Z  * [new branch]        sol-stage-0-5-closeout-short -> origin/sol-stage-0-5-closeout-short
+2026-11-11T14:17:13.3500059Z  * [new branch]        sol-stage-0-5-diagnose-260 -> origin/sol-stage-0-5-diagnose-260
+2026-11-11T14:17:13.3500387Z  * [new branch]        sol-stage-0-5-diagnose-500 -> origin/sol-stage-0-5-diagnose-500
+2026-11-11T14:17:13.3500874Z  * [new branch]        sol-stage-0-5-diagnose-transmission-251 -> origin/sol-stage-0-5-diagnose-transmission-251
+2026-11-11T14:17:13.3501270Z  * [new branch]        sol-stage-0-5-divergence-250 -> origin/sol-stage-0-5-divergence-250
+2026-11-11T14:17:13.3501616Z  * [new branch]        sol-stage-0-5-endurance-1000 -> origin/sol-stage-0-5-endurance-1000
+2026-11-11T14:17:13.3501967Z  * [new branch]        sol-stage-0-5-endurance-1000b -> origin/sol-stage-0-5-endurance-1000b
+2026-11-11T14:17:13.3502319Z  * [new branch]        sol-stage-0-5-final-closeout -> origin/sol-stage-0-5-final-closeout
+2026-11-11T14:17:13.3502695Z  * [new branch]        sol-stage-0-5-final-closeout-783ec -> origin/sol-stage-0-5-final-closeout-783ec
+2026-11-11T14:17:13.3503080Z  * [new branch]        sol-stage-0-5-final-closeout-v2 -> origin/sol-stage-0-5-final-closeout-v2
+2026-11-11T14:17:13.3503613Z  * [new branch]        sol-stage-0-5-final-endurance-5dd5 -> origin/sol-stage-0-5-final-endurance-5dd5
+2026-11-11T14:17:13.3504012Z  * [new branch]        sol-stage-0-5-final-sharded-suite -> origin/sol-stage-0-5-final-sharded-suite
+2026-11-11T14:17:13.3504468Z  * [new branch]        sol-stage-0-5-final-short-after-alias-fix -> origin/sol-stage-0-5-final-short-after-alias-fix
+2026-11-11T14:17:13.3504858Z  * [new branch]        sol-stage-0-5-gate-500b -> origin/sol-stage-0-5-gate-500b
+2026-11-11T14:17:13.3505167Z  * [new branch]        sol-stage-0-5-gate-500c -> origin/sol-stage-0-5-gate-500c
+2026-11-11T14:17:13.3505498Z  * [new branch]        sol-stage-0-5-hot-working-set -> origin/sol-stage-0-5-hot-working-set
+2026-11-11T14:17:13.3505872Z  * [new branch]        sol-stage-0-5-hot-working-set-250 -> origin/sol-stage-0-5-hot-working-set-250
+2026-11-11T14:17:13.3506268Z  * [new branch]        sol-stage-0-5-hot-working-set-250b -> origin/sol-stage-0-5-hot-working-set-250b
+2026-11-11T14:17:13.3506660Z  * [new branch]        sol-stage-0-5-hot-working-set-250c -> origin/sol-stage-0-5-hot-working-set-250c
+2026-11-11T14:17:13.3507143Z  * [new branch]        sol-stage-0-5-hot-working-set-250d -> origin/sol-stage-0-5-hot-working-set-250d
+2026-11-11T14:17:13.3507531Z  * [new branch]        sol-stage-0-5-hot-working-set-250e -> origin/sol-stage-0-5-hot-working-set-250e
+2026-11-11T14:17:13.3507918Z  * [new branch]        sol-stage-0-5-hot-working-set-250f -> origin/sol-stage-0-5-hot-working-set-250f
+2026-11-11T14:17:13.3508346Z  * [new branch]        sol-stage-0-5-hot-working-set-profile-100 -> origin/sol-stage-0-5-hot-working-set-profile-100
+2026-11-11T14:17:13.3508819Z  * [new branch]        sol-stage-0-5-hot-working-set-profile-100b -> origin/sol-stage-0-5-hot-working-set-profile-100b
+2026-11-11T14:17:13.3509216Z  * [new branch]        sol-stage-0-5-p5-endurance -> origin/sol-stage-0-5-p5-endurance
+2026-11-11T14:17:13.3509546Z  * [new branch]        sol-stage-0-5-p5-long-final -> origin/sol-stage-0-5-p5-long-final
+2026-11-11T14:17:13.3509878Z  * [new branch]        sol-stage-0-5-p5-long-prep -> origin/sol-stage-0-5-p5-long-prep
+2026-11-11T14:17:13.3510207Z  * [new branch]        sol-stage-0-5-profile-250 -> origin/sol-stage-0-5-profile-250
+2026-11-11T14:17:13.3510532Z  * [new branch]        sol-stage-0-5-profile-250b -> origin/sol-stage-0-5-profile-250b
+2026-11-11T14:17:13.3510851Z  * [new branch]        sol-stage-0-5-profile-250c -> origin/sol-stage-0-5-profile-250c
+2026-11-11T14:17:13.3511195Z  * [new branch]        sol-stage-0-5-profile-late-400 -> origin/sol-stage-0-5-profile-late-400
+2026-11-11T14:17:13.3511574Z  * [new branch]        sol-stage-0-5-profile-late-400b -> origin/sol-stage-0-5-profile-late-400b
+2026-11-11T14:17:13.3511909Z  * [new branch]        sol-stage-0-5-proof-251 -> origin/sol-stage-0-5-proof-251
+2026-11-11T14:17:13.3512282Z  * [new branch]        sol-stage-0-5-targeted-closeout-5dd5 -> origin/sol-stage-0-5-targeted-closeout-5dd5
+2026-11-11T14:17:13.3512636Z  * [new branch]        sol/durable-proof-map   -> origin/sol/durable-proof-map
+2026-11-11T14:17:13.3512963Z  * [new branch]        sol/incremental-state-proofs -> origin/sol/incremental-state-proofs
+2026-11-11T14:17:13.3513700Z  * [new branch]        sol/mature-benchmark-harness-repair -> origin/sol/mature-benchmark-harness-repair
+2026-11-11T14:17:13.3514173Z  * [new branch]        sol/millennium-history-843017 -> origin/sol/millennium-history-843017
+2026-11-11T14:17:13.3514680Z  * [new branch]        sol/multiseed-war-scan  -> origin/sol/multiseed-war-scan
+2026-11-11T14:17:13.3515164Z  * [new branch]        sol/p1-review-r1-r4     -> origin/sol/p1-review-r1-r4
+2026-11-11T14:17:13.3515679Z  * [new branch]        sol/p1-transactional-store -> origin/sol/p1-transactional-store
+2026-11-11T14:17:13.3516194Z  * [new branch]        sol/p2a-world-adapters  -> origin/sol/p2a-world-adapters
+2026-11-11T14:17:13.3516646Z  * [new branch]        sol/p2b-f1-f3           -> origin/sol/p2b-f1-f3
+2026-11-11T14:17:13.3517062Z  * [new branch]        sol/p2b-i1-i2           -> origin/sol/p2b-i1-i2
+2026-11-11T14:17:13.3517530Z  * [new branch]        sol/p2b-mutation-tracking -> origin/sol/p2b-mutation-tracking
+2026-11-11T14:17:13.3518015Z  * [new branch]        sol/p2b-r1-r6           -> origin/sol/p2b-r1-r6
+2026-11-11T14:17:13.3518468Z  * [new branch]        sol/p2c-current-links   -> origin/sol/p2c-current-links
+2026-11-11T14:17:13.3518974Z  * [new branch]        sol/p3a-sealed-event-prefix -> origin/sol/p3a-sealed-event-prefix
+2026-11-11T14:17:13.3519557Z  * [new branch]        sol/p3a-verify-full-cache-bypass -> origin/sol/p3a-verify-full-cache-bypass
+2026-11-11T14:17:13.3520159Z  * [new branch]        sol/p3b-cold-bootstrap-candidate -> origin/sol/p3b-cold-bootstrap-candidate
+2026-11-11T14:17:13.3520659Z  * [new branch]        sol/p3b-cold-bootstrap-scale -> origin/sol/p3b-cold-bootstrap-scale
+2026-11-11T14:17:13.3521001Z  * [new branch]        sol/p3b-cold-bootstrap-smoke -> origin/sol/p3b-cold-bootstrap-smoke
+2026-11-11T14:17:13.3521351Z  * [new branch]        sol/p3b-cold-capture-candidate -> origin/sol/p3b-cold-capture-candidate
+2026-11-11T14:17:13.3521758Z  * [new branch]        sol/p3b-cold-capture-followup-candidate -> origin/sol/p3b-cold-capture-followup-candidate
+2026-11-11T14:17:13.3522256Z  * [new branch]        sol/p3b-cold-save-candidate -> origin/sol/p3b-cold-save-candidate
+2026-11-11T14:17:13.3522605Z  * [new branch]        sol/p3b-cold-save-review-fixes -> origin/sol/p3b-cold-save-review-fixes
+2026-11-11T14:17:13.3522996Z  * [new branch]        sol/p3b-eventlog-component-candidate -> origin/sol/p3b-eventlog-component-candidate
+2026-11-11T14:17:13.3523611Z  * [new branch]        sol/p3b-eventlog-corrections-candidate -> origin/sol/p3b-eventlog-corrections-candidate
+2026-11-11T14:17:13.3524019Z  * [new branch]        sol/p3b-identity-bounded-20261003 -> origin/sol/p3b-identity-bounded-20261003
+2026-11-11T14:17:13.3524373Z  * [new branch]        sol/p3b-identity-candidate -> origin/sol/p3b-identity-candidate
+2026-11-11T14:17:13.3524734Z  * [new branch]        sol/p3b-identity-restore-candidate -> origin/sol/p3b-identity-restore-candidate
+2026-11-11T14:17:13.3525131Z  * [new branch]        sol/p3b-identity-reviewed-candidate -> origin/sol/p3b-identity-reviewed-candidate
+2026-11-11T14:17:13.3525496Z  * [new branch]        sol/p3b-lifecycle-candidate -> origin/sol/p3b-lifecycle-candidate
+2026-11-11T14:17:13.3525826Z  * [new branch]        sol/p3b-live-open-candidate -> origin/sol/p3b-live-open-candidate
+2026-11-11T14:17:13.3526174Z  * [new branch]        sol/p3b-live-open-review-fixes -> origin/sol/p3b-live-open-review-fixes
+2026-11-11T14:17:13.3526491Z  * [new branch]        sol/p4-1-apply          -> origin/sol/p4-1-apply
+2026-11-11T14:17:13.3526781Z  * [new branch]        sol/p4-1-foundation-full -> origin/sol/p4-1-foundation-full
+2026-11-11T14:17:13.3527086Z  * [new branch]        sol/p4-1-foundation-gate -> origin/sol/p4-1-foundation-gate
+2026-11-11T14:17:13.3527399Z  * [new branch]        sol/p4-1-foundation-gate-2 -> origin/sol/p4-1-foundation-gate-2
+2026-11-11T14:17:13.3527737Z  * [new branch]        sol/p4-2-identity-runtime-gate -> origin/sol/p4-2-identity-runtime-gate
+2026-11-11T14:17:13.3528259Z  * [new branch]        sol/p4-2-identity-runtime-gate-2 -> origin/sol/p4-2-identity-runtime-gate-2
+2026-11-11T14:17:13.3528618Z  * [new branch]        sol/p4-2-identity-storage-gate -> origin/sol/p4-2-identity-storage-gate
+2026-11-11T14:17:13.3528948Z  * [new branch]        sol/p4-2-people-open-gate -> origin/sol/p4-2-people-open-gate
+2026-11-11T14:17:13.3529269Z  * [new branch]        sol/p4-2-people-open-gate-2 -> origin/sol/p4-2-people-open-gate-2
+2026-11-11T14:17:13.3529580Z  * [new branch]        sol/p4-preparation      -> origin/sol/p4-preparation
+2026-11-11T14:17:13.3529877Z  * [new branch]        sol/resource-offer-index -> origin/sol/resource-offer-index
+2026-11-11T14:17:13.3530214Z  * [new branch]        sol/stage-0-5-complete-closeout -> origin/sol/stage-0-5-complete-closeout
+2026-11-11T14:17:13.3530587Z  * [new branch]        sol/stage-0-5-complete-validation -> origin/sol/stage-0-5-complete-validation
+2026-11-11T14:17:13.3530964Z  * [new branch]        sol/stage-0-5-construction-proof -> origin/sol/stage-0-5-construction-proof
+2026-11-11T14:17:13.3531370Z  * [new branch]        sol/stage-0-5-continuation-checkpoints -> origin/sol/stage-0-5-continuation-checkpoints
+2026-11-11T14:17:13.3531798Z  * [new branch]        sol/stage-0-5-final-release-validation -> origin/sol/stage-0-5-final-release-validation
+2026-11-11T14:17:13.3532178Z  * [new branch]        sol/stage-0-5-mature-catalog -> origin/sol/stage-0-5-mature-catalog
+2026-11-11T14:17:13.3532582Z  * [new branch]        sol/stage-0-5-mature-checkpoint-validation -> origin/sol/stage-0-5-mature-checkpoint-validation
+2026-11-11T14:17:13.3532970Z  * [new branch]        sol/stage-0-5-mature-commit -> origin/sol/stage-0-5-mature-commit
+2026-11-11T14:17:13.3533467Z  * [new branch]        sol/stage-0-5-mature-continuation-stage -> origin/sol/stage-0-5-mature-continuation-stage
+2026-11-11T14:17:13.3533853Z  * [new branch]        sol/stage-0-5-mature-continue -> origin/sol/stage-0-5-mature-continue
+2026-11-11T14:17:13.3534271Z  * [new branch]        sol/stage-0-5-mature-orders -> origin/sol/stage-0-5-mature-orders
+2026-11-11T14:17:13.3534637Z  * [new branch]        sol/stage-0-5-mature-prepare-source -> origin/sol/stage-0-5-mature-prepare-source
+2026-11-11T14:17:13.3535046Z  * [new branch]        sol/stage-0-5-mature-prepared-inputs -> origin/sol/stage-0-5-mature-prepared-inputs
+2026-11-11T14:17:13.3535414Z  * [new branch]        sol/stage-0-5-mature-publish -> origin/sol/stage-0-5-mature-publish
+2026-11-11T14:17:13.3535748Z  * [new branch]        sol/stage-0-5-mature-storage -> origin/sol/stage-0-5-mature-storage
+2026-11-11T14:17:13.3536129Z  * [new branch]        sol/stage-0-5-owner-witness-validation -> origin/sol/stage-0-5-owner-witness-validation
+2026-11-11T14:17:13.3536543Z  * [new branch]        sol/stage-0-5-ownership-gate-171b183 -> origin/sol/stage-0-5-ownership-gate-171b183
+2026-11-11T14:17:13.3536933Z  * [new branch]        sol/stage-0-5-performance-repair -> origin/sol/stage-0-5-performance-repair
+2026-11-11T14:17:13.3537352Z  * [new branch]        sol/stage-0-5-physical-owner-ci-cleanup -> origin/sol/stage-0-5-physical-owner-ci-cleanup
+2026-11-11T14:17:13.3537798Z  * [new branch]        sol/stage-0-5-physical-owner-continuation -> origin/sol/stage-0-5-physical-owner-continuation
+2026-11-11T14:17:13.3538245Z  * [new branch]        sol/stage-0-5-physical-owner-save-repair -> origin/sol/stage-0-5-physical-owner-save-repair
+2026-11-11T14:17:13.3538695Z  * [new branch]        sol/stage-0-5-repaired-continuation-source -> origin/sol/stage-0-5-repaired-continuation-source
+2026-11-11T14:17:13.3539194Z  * [new branch]        sol/stage-0-5-resumable-construction-source -> origin/sol/stage-0-5-resumable-construction-source
+2026-11-11T14:17:13.3539848Z  * [new branch]        sol/stage-0-5-reviewed-integration -> origin/sol/stage-0-5-reviewed-integration
+2026-11-11T14:17:13.3540479Z  * [new branch]        sol/stage-0-5-touched-owner-save-repair -> origin/sol/stage-0-5-touched-owner-save-repair
+2026-11-11T14:17:13.3541124Z  * [new branch]        spike/unreal-visual-world-lab -> origin/spike/unreal-visual-world-lab
+2026-11-11T14:17:13.3541913Z  * [new branch]        validation/stage05-multiseed-longrun-20260920 -> origin/validation/stage05-multiseed-longrun-20260920
+2026-11-11T14:17:13.3542676Z  * [new branch]        validation/stage05-release-candidate-20260920 -> origin/validation/stage05-release-candidate-20260920
+2026-11-11T14:17:13.3544661Z [command]/usr/bin/git rev-parse --verify --quiet 1692ee1caeb6a25c205fbf215f9b3dca1cf4909a^{object}
+2026-11-11T14:17:13.3545257Z 1692ee1caeb6a25c205fbf215f9b3dca1cf4909a
+2026-11-11T14:17:13.3546057Z ##[endgroup]
+2026-11-11T14:17:13.3546475Z ##[group]Determining the checkout info
+2026-11-11T14:17:13.3546884Z ##[endgroup]
+2026-11-11T14:17:13.3547143Z [command]/usr/bin/git sparse-checkout disable
+2026-11-11T14:17:13.3548334Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-11T14:17:13.3614385Z ##[group]Checking out the ref
+2026-11-11T14:17:13.3617299Z [command]/usr/bin/git checkout --progress --force 1692ee1caeb6a25c205fbf215f9b3dca1cf4909a
+2026-11-11T14:17:13.5986528Z Note: switching to '1692ee1caeb6a25c205fbf215f9b3dca1cf4909a'.
+2026-11-11T14:17:13.5986810Z 
+2026-11-11T14:17:13.5986961Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-11T14:17:13.5987256Z changes and commit them, and you can discard any commits you make in this
+2026-11-11T14:17:13.5987540Z state without impacting any branches by switching back to a branch.
+2026-11-11T14:17:13.5987700Z 
+2026-11-11T14:17:13.5987822Z If you want to create a new branch to retain commits you create, you may
+2026-11-11T14:17:13.5988095Z do so (now or later) by using -c with the switch command. Example:
+2026-11-11T14:17:13.5988244Z 
+2026-11-11T14:17:13.5988328Z   git switch -c <new-branch-name>
+2026-11-11T14:17:13.5988437Z 
+2026-11-11T14:17:13.5988520Z Or undo this operation with:
+2026-11-11T14:17:13.5988621Z 
+2026-11-11T14:17:13.5988689Z   git switch -
+2026-11-11T14:17:13.5988773Z 
+2026-11-11T14:17:13.5989128Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-11T14:17:13.5989309Z 
+2026-11-11T14:17:13.5989466Z HEAD is now at 1692ee1c Reuse the exact accepted source control before mature preparation
+2026-11-11T14:17:13.6014246Z ##[endgroup]
+2026-11-11T14:17:13.6063710Z [command]/usr/bin/git log -1 --format=%H
+2026-11-11T14:17:13.6095640Z 1692ee1caeb6a25c205fbf215f9b3dca1cf4909a
+2026-11-11T14:17:13.6301748Z ##[group]Run actions/setup-python@v5
+2026-11-11T14:17:13.6301949Z with:
+2026-11-11T14:17:13.6302098Z   python-version: 3.12.16
+2026-11-11T14:17:13.6302262Z   check-latest: false
+2026-11-11T14:17:13.6303667Z   token: ***
+2026-11-11T14:17:13.6303814Z   update-environment: true
+2026-11-11T14:17:13.6303982Z   allow-prereleases: false
+2026-11-11T14:17:13.6304138Z   freethreaded: false
+2026-11-11T14:17:13.6304282Z env:
+2026-11-11T14:17:13.6304417Z   PYTHONPATH: .:simulation
+2026-11-11T14:17:13.6304576Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:17:13.6305764Z   GH_TOKEN: ***
+2026-11-11T14:17:13.6305920Z ##[endgroup]
+2026-11-11T14:17:13.7229450Z ##[group]Installed versions
+2026-11-11T14:17:13.7258638Z (node:2142) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-11T14:17:13.7259271Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-11T14:17:13.7259670Z Successfully set up CPython (3.12.16)
+2026-11-11T14:17:13.7261708Z ##[endgroup]
+2026-11-11T14:17:13.7429538Z ##[group]Run python -m pip install pytest==9.2.0 pyyaml==6.0.3
+2026-11-11T14:17:13.7430057Z [36;1mpython -m pip install pytest==9.2.0 pyyaml==6.0.3[0m
+2026-11-11T14:17:13.7462953Z shell: /usr/bin/bash -e {0}
+2026-11-11T14:17:13.7463373Z env:
+2026-11-11T14:17:13.7463570Z   PYTHONPATH: .:simulation
+2026-11-11T14:17:13.7463744Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:17:13.7465286Z   GH_TOKEN: ***
+2026-11-11T14:17:13.7465477Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:13.7465757Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T14:17:13.7466033Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:13.7466270Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:13.7466506Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:13.7466741Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T14:17:13.7466947Z ##[endgroup]
+2026-11-11T14:17:14.4968089Z Collecting pytest==9.2.0
+2026-11-11T14:17:14.5655454Z   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+2026-11-11T14:17:14.6054210Z Collecting pyyaml==6.0.3
+2026-11-11T14:17:14.6128272Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-11-11T14:17:14.6305546Z Collecting iniconfig>=2 (from pytest==9.2.0)
+2026-11-11T14:17:14.6395473Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-11-11T14:17:14.6624435Z Collecting packaging>=24 (from pytest==9.2.0)
+2026-11-11T14:17:14.6711375Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-11-11T14:17:14.6896542Z Collecting pluggy<2,>=1.6 (from pytest==9.2.0)
+2026-11-11T14:17:14.6970492Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-11-11T14:17:14.7136695Z Collecting pygments>=2.15 (from pytest==9.2.0)
+2026-11-11T14:17:14.7204437Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-11-11T14:17:14.7306768Z Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+2026-11-11T14:17:14.7708651Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-11-11T14:17:14.8123932Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 20.9 MB/s  0:00:00
+2026-11-11T14:17:14.8194757Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-11-11T14:17:14.8278147Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-11-11T14:17:14.8359639Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-11-11T14:17:14.8482628Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-11-11T14:17:14.8983486Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 24.9 MB/s  0:00:00
+2026-11-11T14:17:14.9382974Z Installing collected packages: pyyaml, pygments, pluggy, packaging, iniconfig, pytest
+2026-11-11T14:17:15.7042828Z 
+2026-11-11T14:17:15.7052419Z Successfully installed iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 pyyaml-6.0.3
+2026-11-11T14:17:15.7058847Z 
+2026-11-11T14:17:15.7059255Z [notice] A new release of pip is available: 26.2.2 -> 26.3
+2026-11-11T14:17:15.7059595Z [notice] To update, run: pip install --upgrade pip
+2026-11-11T14:17:15.7702701Z ##[group]Run python -m simulation.stage_0_6_genesis_resume run-stage --stage proofs --mode "$MODE" --parent-artifact "$PARENT_ID" --parent-run "$PARENT_RUN"
+2026-11-11T14:17:15.7703460Z [36;1mpython -m simulation.stage_0_6_genesis_resume run-stage --stage proofs --mode "$MODE" --parent-artifact "$PARENT_ID" --parent-run "$PARENT_RUN"[0m
+2026-11-11T14:17:15.7720210Z shell: /usr/bin/bash -e {0}
+2026-11-11T14:17:15.7720424Z env:
+2026-11-11T14:17:15.7720594Z   PYTHONPATH: .:simulation
+2026-11-11T14:17:15.7720732Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:17:15.7739551Z   GH_TOKEN: ***
+2026-11-11T14:17:15.7739726Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:15.7739965Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T14:17:15.7740193Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:15.7740400Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:15.7740648Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:15.7740856Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T14:17:15.7741030Z   MODE: smoke
+2026-11-11T14:17:15.7741143Z   PARENT_ID: 13863213240
+2026-11-11T14:17:15.7741273Z   PARENT_RUN: 43035885119
+2026-11-11T14:17:15.7741396Z ##[endgroup]
+2026-11-11T14:17:23.6888166Z {"phase": "bootstrap.records", "time": 1794406643.6884694}
+2026-11-11T14:17:23.6905612Z {"phase": "bootstrap.full_source_audit", "time": 1794406643.6904845}
+2026-11-11T14:17:24.1142801Z {"phase": "bootstrap.records.build", "time": 1794406644.1140678}
+2026-11-11T14:17:24.1222349Z {"phase": "bootstrap.scopes", "time": 1794406644.1221087}
+2026-11-11T14:17:24.4491045Z {"phase": "bootstrap.content", "time": 1794406644.448927}
+2026-11-11T14:17:24.8151943Z {"phase": "bootstrap.directory", "time": 1794406644.814972}
+2026-11-11T14:17:25.0971992Z {"phase": "bootstrap.inventory", "time": 1794406645.096995}
+2026-11-11T14:17:25.1200043Z {"phase": "bootstrap.World_manifest", "time": 1794406645.1198506}
+2026-11-11T14:17:27.7875144Z {"phase": "catalog.groups", "time": 1794406647.7872994}
+2026-11-11T14:17:28.3475410Z {"phase": "catalog.owners", "time": 1794406648.3473172}
+2026-11-11T14:17:28.7666182Z {"phase": "catalog.inventories", "time": 1794406648.7664301}
+2026-11-11T14:17:28.9206899Z {"phase": "catalog.member_types", "time": 1794406648.9205127}
+2026-11-11T14:17:29.1301319Z {"phase": "catalog.sequences", "time": 1794406649.1299434}
+2026-11-11T14:17:29.5687643Z {"phase": "bootstrap.final_physical_audit", "time": 1794406649.568591}
+2026-11-11T14:17:29.7620715Z {"has_database": "true"}
+2026-11-11T14:17:29.8037814Z ##[group]Run actions/upload-artifact@v4
+2026-11-11T14:17:29.8037978Z with:
+2026-11-11T14:17:29.8038158Z   name: database-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1
+2026-11-11T14:17:29.8038381Z   path: resume-work/out/candidate.sqlite
+2026-11-11T14:17:29.8038524Z   retention-days: 30
+2026-11-11T14:17:29.8038645Z   if-no-files-found: error
+2026-11-11T14:17:29.8038774Z   compression-level: 1
+2026-11-11T14:17:29.8038895Z   overwrite: false
+2026-11-11T14:17:29.8039013Z   include-hidden-files: false
+2026-11-11T14:17:29.8039140Z env:
+2026-11-11T14:17:29.8039245Z   PYTHONPATH: .:simulation
+2026-11-11T14:17:29.8039367Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:17:29.8040688Z   GH_TOKEN: ***
+2026-11-11T14:17:29.8040982Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:29.8041211Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T14:17:29.8041431Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:29.8041653Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:29.8041850Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:29.8042049Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T14:17:29.8042219Z ##[endgroup]
+2026-11-11T14:17:29.9123501Z (node:2884) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-11T14:17:29.9124015Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-11T14:17:29.9155457Z With the provided path, there will be 1 file uploaded
+2026-11-11T14:17:29.9159486Z Artifact name is valid!
+2026-11-11T14:17:29.9159873Z Root directory input is valid!
+2026-11-11T14:17:30.3486530Z Beginning upload of artifact content to blob storage
+2026-11-11T14:17:30.5534827Z (node:2884) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-11T14:17:31.5927404Z Uploaded bytes 7401086
+2026-11-11T14:17:31.6736071Z Finished uploading artifact content to blob storage!
+2026-11-11T14:17:31.6736617Z SHA256 digest of uploaded artifact zip is f1e9d2f80f757a779c44729a8c2ddd088b760ebfc4164843c5f1791027e5bcfd
+2026-11-11T14:17:31.6737638Z Finalizing artifact upload
+2026-11-11T14:17:32.1204964Z Artifact database-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1.zip successfully finalized. Artifact ID 13862863845
+2026-11-11T14:17:32.1205984Z Artifact database-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1 has been successfully uploaded! Final size is 7401086 bytes. Artifact ID is 13862863845
+2026-11-11T14:17:32.1210898Z Artifact download URL: https://github.com/rax0h/all-that-endures/actions/runs/43035885119/artifacts/13862863845
+2026-11-11T14:17:32.1367874Z ##[group]Run python -m simulation.stage_0_6_genesis_resume seal --artifact-id "$DATA_ID"
+2026-11-11T14:17:32.1368211Z [36;1mpython -m simulation.stage_0_6_genesis_resume seal --artifact-id "$DATA_ID"[0m
+2026-11-11T14:17:32.1384526Z shell: /usr/bin/bash -e {0}
+2026-11-11T14:17:32.1384664Z env:
+2026-11-11T14:17:32.1384783Z   PYTHONPATH: .:simulation
+2026-11-11T14:17:32.1384920Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:17:32.1386171Z   GH_TOKEN: ***
+2026-11-11T14:17:32.1386324Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.1386563Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T14:17:32.1386789Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.1386995Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.1387201Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.1387426Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T14:17:32.1387621Z   DATA_ID: 13862863845
+2026-11-11T14:17:32.1387745Z ##[endgroup]
+2026-11-11T14:17:32.6023455Z Traceback (most recent call last):
+2026-11-11T14:17:32.6029644Z   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-11-11T14:17:32.6029912Z   File "<frozen runpy>", line 88, in _run_code
+2026-11-11T14:17:32.6030264Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_resume.py", line 422, in <module>
+2026-11-11T14:17:32.6030586Z     if __name__=='__main__':main()
+2026-11-11T14:17:32.6030740Z                             ^^^^^^
+2026-11-11T14:17:32.6031043Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_resume.py", line 417, in main
+2026-11-11T14:17:32.6031384Z     elif a.command=='seal':seal(root,work,artifact_id=a.artifact_id)
+2026-11-11T14:17:32.6031605Z                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6032284Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_resume.py", line 351, in seal
+2026-11-11T14:17:32.6032600Z     a=github._api(f'/actions/artifacts/{artifact_id}')
+2026-11-11T14:17:32.6032787Z       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6033078Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/checkpoint_artifacts.py", line 66, in _api
+2026-11-11T14:17:32.6033595Z     with urllib.request.urlopen(request, timeout=60) as response:
+2026-11-11T14:17:32.6033802Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6034075Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py", line 215, in urlopen
+2026-11-11T14:17:32.6311723Z     return opener.open(url, data, timeout)
+2026-11-11T14:17:32.6312020Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6312360Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py", line 521, in open
+2026-11-11T14:17:32.6354815Z     response = meth(req, response)
+2026-11-11T14:17:32.6355083Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6355662Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py", line 630, in http_response
+2026-11-11T14:17:32.6356351Z     response = self.parent.error(
+2026-11-11T14:17:32.6356813Z                ^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6357233Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py", line 559, in error
+2026-11-11T14:17:32.6357929Z     return self._call_chain(*args)
+2026-11-11T14:17:32.6358471Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T14:17:32.6358906Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py", line 492, in _call_chain
+2026-11-11T14:17:32.6359470Z     result = func(*args)
+2026-11-11T14:17:32.6359865Z              ^^^^^^^^^^^
+2026-11-11T14:17:32.6360299Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/urllib/request.py", line 639, in http_error_default
+2026-11-11T14:17:32.6361465Z     raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-11T14:17:32.6361774Z urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-11T14:17:32.6590510Z ##[error]Process completed with exit code 1.
+2026-11-11T14:17:32.6639086Z ##[group]Run actions/upload-artifact@v4
+2026-11-11T14:17:32.6639261Z with:
+2026-11-11T14:17:32.6639474Z   name: resume-evidence-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1
+2026-11-11T14:17:32.6639815Z   path: resume-work/*.json
+resume-work/evidence-*/**/*.json
+resume-work/transport/**/*.json
+2026-11-11T14:17:32.6640060Z   retention-days: 30
+2026-11-11T14:17:32.6640195Z   if-no-files-found: error
+2026-11-11T14:17:32.6640335Z   compression-level: 1
+2026-11-11T14:17:32.6640462Z   overwrite: false
+2026-11-11T14:17:32.6640590Z   include-hidden-files: false
+2026-11-11T14:17:32.6640733Z env:
+2026-11-11T14:17:32.6640849Z   PYTHONPATH: .:simulation
+2026-11-11T14:17:32.6641001Z   PYTHONUNBUFFERED: 1
+2026-11-11T14:17:32.6642319Z   GH_TOKEN: ***
+2026-11-11T14:17:32.6642485Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.6642732Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T14:17:32.6642997Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.6643326Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.6643544Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T14:17:32.6643768Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T14:17:32.6643953Z ##[endgroup]
+2026-11-11T14:17:32.7784118Z (node:2942) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-11T14:17:32.7784779Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-11T14:17:32.7862320Z With the provided path, there will be 19 files uploaded
+2026-11-11T14:17:32.7884160Z Artifact name is valid!
+2026-11-11T14:17:32.7884610Z Root directory input is valid!
+2026-11-11T14:17:33.1836349Z Beginning upload of artifact content to blob storage
+2026-11-11T14:17:33.2066472Z (node:2942) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-11T14:17:33.5107142Z Uploaded bytes 8229
+2026-11-11T14:17:33.5881168Z Finished uploading artifact content to blob storage!
+2026-11-11T14:17:33.5881539Z SHA256 digest of uploaded artifact zip is f5dd1d98e1bc788cd83ba56e354fa976cb58b70eefd467f80302749f76e3547b
+2026-11-11T14:17:33.5882259Z Finalizing artifact upload
+2026-11-11T14:17:34.0631317Z Artifact resume-evidence-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1.zip successfully finalized. Artifact ID 13862514969
+2026-11-11T14:17:34.0632276Z Artifact resume-evidence-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1 has been successfully uploaded! Final size is 8229 bytes. Artifact ID is 13862514969
+2026-11-11T14:17:34.0632996Z Artifact download URL: https://github.com/rax0h/all-that-endures/actions/runs/43035885119/artifacts/13862514969
+2026-11-11T14:17:34.0832715Z Post job cleanup.
+2026-11-11T14:17:34.1390755Z [command]/usr/bin/git version
+2026-11-11T14:17:34.1425921Z git version 2.56.0
+2026-11-11T14:17:34.1452723Z Temporarily overriding HOME='/home/runner/work/_temp/f6d49f1f-6272-48b0-a125-556a3df32f80' before making global git config changes
+2026-11-11T14:17:34.1453507Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T14:17:34.1457231Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/all-that-endures/all-that-endures
+2026-11-11T14:17:34.1495757Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T14:17:34.1526190Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T14:17:34.1752234Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T14:17:34.1781294Z http.https://github.com/.extraheader
+2026-11-11T14:17:34.1792739Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-11T14:17:34.1828809Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T14:17:34.2057041Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T14:17:34.2097770Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T14:17:34.2420883Z Evaluate and set job outputs
+2026-11-11T14:17:34.2425491Z Cleaning up orphan processes
+2026-11-11T14:17:34.2670612Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

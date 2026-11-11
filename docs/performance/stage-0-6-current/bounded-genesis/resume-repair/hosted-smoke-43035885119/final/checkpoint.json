@@ -1,0 +1,1886 @@
+{
+  "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+  "context": {
+    "critical_blobs": {
+      ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+      ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+      ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+      ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+      ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+      ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+      "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+      "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+      "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+      "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+      "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+      "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+      "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+      "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+      "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+      "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+      "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+      "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+      "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+      "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+      "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+      "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+      "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+      "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+      "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+      "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+      "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+      "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+      "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+      "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+      "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+      "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+      "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+      "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+      "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+      "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+      "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+      "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+      "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+      "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+      "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+      "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+      "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+      "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+    },
+    "execution_runtime": {
+      "python": "3.12.16",
+      "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+      "sqlite": "3.45.1"
+    },
+    "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+    "mode": "smoke",
+    "rank_proofs": true,
+    "rules_id": "stage-0-6-resume-smoke",
+    "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+    "source": {
+      "bytes": 17612800,
+      "format": 6,
+      "generation": 3,
+      "seed": 843000,
+      "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+      "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+      "year": 1
+    }
+  },
+  "data_ref": {
+    "archive_bytes": 8714617,
+    "archive_sha256": "bc51dafe9e90a5d5a084341f8766f8cef735ea6aaf4517cf0584010bbc208142",
+    "artifact_id": 13863134514,
+    "expires_at": "2026-12-11T14:25:11Z",
+    "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+    "job": "measure",
+    "kind": "github",
+    "name": "database-smoke-measure-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-2",
+    "run_id": 43035885119
+  },
+  "database": {
+    "bytes": 29892608,
+    "format": 7,
+    "generation": 1,
+    "seed": 843000,
+    "sha256": "eca65050523299311357888bb8b61b6d92af34c39e122c7b18f91e9c49495ef9",
+    "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+    "year": 2
+  },
+  "metrics": {
+    "compute": {
+      "budget_seconds": 7200,
+      "cpu_seconds": 0.009608654999999855,
+      "process_io_delta": {
+        "cancelled_write_bytes": 0,
+        "rchar": 252878934,
+        "read_bytes": 0,
+        "syscr": 75202,
+        "syscw": 671,
+        "wchar": 32208373,
+        "write_bytes": 34217984
+      },
+      "resource_delta": {
+        "block_inputs": 0,
+        "block_outputs": 58384,
+        "cpu_seconds": 0.009608654999999855,
+        "major_faults": 0,
+        "minor_faults": 0,
+        "peak_rss_bytes": 0,
+        "rss_bytes": 0
+      },
+      "resources_end": {
+        "block_inputs": 0,
+        "block_outputs": 134624,
+        "cpu_seconds": 1.780497619,
+        "major_faults": 0,
+        "minor_faults": 11238,
+        "peak_rss_bytes": 49979392,
+        "process_io": {
+          "cancelled_write_bytes": 8732672,
+          "rchar": 363748996,
+          "read_bytes": 0,
+          "syscr": 96081,
+          "syscw": 1350,
+          "wchar": 71247522,
+          "write_bytes": 73252864
+        },
+        "rss_bytes": 47230976
+      },
+      "resources_start": {
+        "block_inputs": 0,
+        "block_outputs": 76240,
+        "cpu_seconds": 1.770888964,
+        "major_faults": 0,
+        "minor_faults": 11238,
+        "peak_rss_bytes": 49979392,
+        "process_io": {
+          "cancelled_write_bytes": 8732672,
+          "rchar": 110870062,
+          "read_bytes": 0,
+          "syscr": 20879,
+          "syscw": 679,
+          "wchar": 39039149,
+          "write_bytes": 39034880
+        },
+        "rss_bytes": 47230976
+      },
+      "status": "complete",
+      "wall_seconds": 15.072579986999997
+    },
+    "restored": {
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+      "generation": 1,
+      "seed": 843000,
+      "world_audits": 0,
+      "year": 2
+    }
+  },
+  "parent": {
+    "receipt": {
+      "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+      "context": {
+        "critical_blobs": {
+          ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+          ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+          ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+          ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+          ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+          ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+          "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+          "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+          "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+          "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+          "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+          "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+          "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+          "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+          "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+          "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+          "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+          "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+          "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+          "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+          "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+          "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+          "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+          "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+          "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+          "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+          "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+          "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+          "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+          "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+          "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+          "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+          "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+          "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+          "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+          "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+          "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+          "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+          "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+          "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+          "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+          "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+          "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+          "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+        },
+        "execution_runtime": {
+          "python": "3.12.16",
+          "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+          "sqlite": "3.45.1"
+        },
+        "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+        "mode": "smoke",
+        "rank_proofs": true,
+        "rules_id": "stage-0-6-resume-smoke",
+        "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+        "source": {
+          "bytes": 17612800,
+          "format": 6,
+          "generation": 3,
+          "seed": 843000,
+          "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+          "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+          "year": 1
+        }
+      },
+      "data_ref": {
+        "archive_bytes": 8714617,
+        "archive_sha256": "bc51dafe9e90a5d5a084341f8766f8cef735ea6aaf4517cf0584010bbc208142",
+        "artifact_id": 13863134514,
+        "expires_at": "2026-12-11T14:25:11Z",
+        "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+        "job": "measure",
+        "kind": "github",
+        "name": "database-smoke-measure-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-2",
+        "run_id": 43035885119
+      },
+      "database": {
+        "bytes": 29892608,
+        "format": 7,
+        "generation": 1,
+        "seed": 843000,
+        "sha256": "eca65050523299311357888bb8b61b6d92af34c39e122c7b18f91e9c49495ef9",
+        "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+        "year": 2
+      },
+      "metrics": {
+        "benchmark": {
+          "fresh_restore": "pending separate durable stage",
+          "phases": {
+            "close": {
+              "budget_seconds": 60,
+              "cpu_seconds": 0.010653859999997906,
+              "io": {
+                "maintenance_removed_rows": 256,
+                "maintenance_rows": 512,
+                "metadata_rows": 1,
+                "payload_check_bytes": 0,
+                "payload_check_reads": 0,
+                "payload_read_bytes": 0,
+                "payload_reads": 0,
+                "payload_write_bytes": 0,
+                "payload_writes": 0,
+                "pin_rows": 6,
+                "query_rows": 0
+              },
+              "io_high_water": {
+                "temporary_keys_peak": {
+                  "after": 17,
+                  "before": 17
+                }
+              },
+              "process_io_delta": {
+                "cancelled_write_bytes": 262144,
+                "rchar": 381044,
+                "read_bytes": 0,
+                "syscr": 99,
+                "syscw": 366,
+                "wchar": 746724,
+                "write_bytes": 1363968
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 2664,
+                "cpu_seconds": 0.010653859999997906,
+                "major_faults": 0,
+                "minor_faults": 0,
+                "peak_rss_bytes": 0,
+                "rss_bytes": 0
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 206552,
+                "cpu_seconds": 41.124668676,
+                "major_faults": 5,
+                "minor_faults": 41127,
+                "peak_rss_bytes": 83914752,
+                "process_io": {
+                  "cancelled_write_bytes": 8392704,
+                  "rchar": 637754558,
+                  "read_bytes": 3334144,
+                  "syscr": 197944,
+                  "syscw": 17172,
+                  "wchar": 104548430,
+                  "write_bytes": 106471424
+                },
+                "rss_bytes": 84262912
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 203888,
+                "cpu_seconds": 41.114014816,
+                "major_faults": 5,
+                "minor_faults": 41127,
+                "peak_rss_bytes": 83914752,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 637373514,
+                  "read_bytes": 3334144,
+                  "syscr": 197845,
+                  "syscw": 16806,
+                  "wchar": 103801706,
+                  "write_bytes": 105107456
+                },
+                "rss_bytes": 84262912
+              },
+              "status": "complete",
+              "wall_seconds": 0.011848136000011777
+            },
+            "first_step": {
+              "budget_seconds": 300,
+              "cpu_seconds": 14.327126059000001,
+              "io": {
+                "maintenance_removed_rows": 0,
+                "maintenance_rows": 0,
+                "metadata_rows": 61171,
+                "payload_check_bytes": 3363366,
+                "payload_check_reads": 14754,
+                "payload_read_bytes": 1541028,
+                "payload_reads": 6942,
+                "payload_write_bytes": 0,
+                "payload_writes": 0,
+                "pin_rows": 51886,
+                "query_rows": 210
+              },
+              "io_high_water": {
+                "temporary_keys_peak": {
+                  "after": 17,
+                  "before": 0
+                }
+              },
+              "process_io_delta": {
+                "cancelled_write_bytes": 0,
+                "rchar": 174745646,
+                "read_bytes": 0,
+                "syscr": 69889,
+                "syscw": 1,
+                "wchar": 6130,
+                "write_bytes": 8192
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 16,
+                "cpu_seconds": 14.327126059000001,
+                "major_faults": 0,
+                "minor_faults": 1597,
+                "peak_rss_bytes": 2506752,
+                "rss_bytes": 6541312
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 128176,
+                "cpu_seconds": 19.077660162,
+                "major_faults": 5,
+                "minor_faults": 19767,
+                "peak_rss_bytes": 81162240,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 353528408,
+                  "read_bytes": 3334144,
+                  "syscr": 103480,
+                  "syscw": 898,
+                  "wchar": 65928212,
+                  "write_bytes": 66342912
+                },
+                "rss_bytes": 81453056
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 128160,
+                "cpu_seconds": 4.750534103,
+                "major_faults": 5,
+                "minor_faults": 18170,
+                "peak_rss_bytes": 78655488,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 178782762,
+                  "read_bytes": 3334144,
+                  "syscr": 33591,
+                  "syscw": 897,
+                  "wchar": 65922082,
+                  "write_bytes": 66334720
+                },
+                "rss_bytes": 74911744
+              },
+              "status": "complete",
+              "wall_seconds": 14.328952831999999
+            },
+            "open": {
+              "budget_seconds": 60,
+              "cpu_seconds": 2.206607136,
+              "process_io_delta": {
+                "cancelled_write_bytes": 0,
+                "rchar": 32515295,
+                "read_bytes": 0,
+                "syscr": 7997,
+                "syscw": 35,
+                "wchar": 352451,
+                "write_bytes": 376832
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 736,
+                "cpu_seconds": 2.206607136,
+                "major_faults": 0,
+                "minor_faults": 46,
+                "peak_rss_bytes": 0,
+                "rss_bytes": 188416
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 128144,
+                "cpu_seconds": 4.74896777,
+                "major_faults": 5,
+                "minor_faults": 18169,
+                "peak_rss_bytes": 78655488,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 178782571,
+                  "read_bytes": 3334144,
+                  "syscr": 33585,
+                  "syscw": 895,
+                  "wchar": 65918590,
+                  "write_bytes": 66326528
+                },
+                "rss_bytes": 74907648
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 127408,
+                "cpu_seconds": 2.542360634,
+                "major_faults": 5,
+                "minor_faults": 18123,
+                "peak_rss_bytes": 78655488,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 146267276,
+                  "read_bytes": 3334144,
+                  "syscr": 25588,
+                  "syscw": 860,
+                  "wchar": 65566139,
+                  "write_bytes": 65949696
+                },
+                "rss_bytes": 74719232
+              },
+              "status": "complete",
+              "wall_seconds": 2.2137322359999985
+            },
+            "save": {
+              "budget_seconds": 60,
+              "cpu_seconds": 10.427277463,
+              "io": {
+                "maintenance_removed_rows": 128,
+                "maintenance_rows": 256,
+                "metadata_rows": 24929,
+                "payload_check_bytes": 2185178,
+                "payload_check_reads": 11805,
+                "payload_read_bytes": 597087,
+                "payload_reads": 3062,
+                "payload_write_bytes": 239010,
+                "payload_writes": 1146,
+                "pin_rows": 36449,
+                "query_rows": 319
+              },
+              "io_high_water": {
+                "temporary_keys_peak": {
+                  "after": 17,
+                  "before": 17
+                }
+              },
+              "process_io_delta": {
+                "cancelled_write_bytes": 0,
+                "rchar": 155151234,
+                "read_bytes": 0,
+                "syscr": 40148,
+                "syscw": 15900,
+                "wchar": 37849520,
+                "write_bytes": 38723584
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 75632,
+                "cpu_seconds": 10.427277463,
+                "major_faults": 0,
+                "minor_faults": 21313,
+                "peak_rss_bytes": 2621440,
+                "rss_bytes": 2617344
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 203832,
+                "cpu_seconds": 29.506717266,
+                "major_faults": 5,
+                "minor_faults": 41080,
+                "peak_rss_bytes": 83783680,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 508679802,
+                  "read_bytes": 3334144,
+                  "syscr": 143632,
+                  "syscw": 16800,
+                  "wchar": 103783398,
+                  "write_bytes": 105078784
+                },
+                "rss_bytes": 84070400
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 128200,
+                "cpu_seconds": 19.079439803,
+                "major_faults": 5,
+                "minor_faults": 19767,
+                "peak_rss_bytes": 81162240,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 353528568,
+                  "read_bytes": 3334144,
+                  "syscr": 103484,
+                  "syscw": 900,
+                  "wchar": 65933878,
+                  "write_bytes": 66355200
+                },
+                "rss_bytes": 81453056
+              },
+              "status": "complete",
+              "wall_seconds": 10.448474886999996
+            },
+            "warm_step": {
+              "budget_seconds": 300,
+              "cpu_seconds": 11.603376852,
+              "io": {
+                "maintenance_removed_rows": 0,
+                "maintenance_rows": 0,
+                "metadata_rows": 51359,
+                "payload_check_bytes": 2713007,
+                "payload_check_reads": 10775,
+                "payload_read_bytes": 1246990,
+                "payload_reads": 5006,
+                "payload_write_bytes": 0,
+                "payload_writes": 0,
+                "pin_rows": 69793,
+                "query_rows": 216
+              },
+              "io_high_water": {
+                "temporary_keys_peak": {
+                  "after": 17,
+                  "before": 17
+                }
+              },
+              "process_io_delta": {
+                "cancelled_write_bytes": 0,
+                "rchar": 128693352,
+                "read_bytes": 0,
+                "syscr": 54203,
+                "syscw": 2,
+                "wchar": 407,
+                "write_bytes": 0
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 0,
+                "cpu_seconds": 11.603376852,
+                "major_faults": 0,
+                "minor_faults": 47,
+                "peak_rss_bytes": 131072,
+                "rss_bytes": 192512
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 203856,
+                "cpu_seconds": 41.112003703,
+                "major_faults": 5,
+                "minor_faults": 41127,
+                "peak_rss_bytes": 83914752,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 637373350,
+                  "read_bytes": 3334144,
+                  "syscr": 197841,
+                  "syscw": 16804,
+                  "wchar": 103791673,
+                  "write_bytes": 105091072
+                },
+                "rss_bytes": 84262912
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 203856,
+                "cpu_seconds": 29.508626851,
+                "major_faults": 5,
+                "minor_faults": 41080,
+                "peak_rss_bytes": 83783680,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 508679998,
+                  "read_bytes": 3334144,
+                  "syscr": 143638,
+                  "syscw": 16802,
+                  "wchar": 103791266,
+                  "write_bytes": 105091072
+                },
+                "rss_bytes": 84070400
+              },
+              "status": "complete",
+              "wall_seconds": 11.604163049000007
+            },
+            "working_copy": {
+              "budget_seconds": 899.8345928690001,
+              "cpu_seconds": 0.00810966699999982,
+              "process_io_delta": {
+                "cancelled_write_bytes": 0,
+                "rchar": 26275999,
+                "read_bytes": 0,
+                "syscr": 6,
+                "syscw": 2,
+                "wchar": 26275840,
+                "write_bytes": 26275840
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 51320,
+                "cpu_seconds": 0.00810966699999982,
+                "major_faults": 0,
+                "minor_faults": 0,
+                "peak_rss_bytes": 0,
+                "rss_bytes": 0
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 127392,
+                "cpu_seconds": 2.541061338,
+                "major_faults": 5,
+                "minor_faults": 18123,
+                "peak_rss_bytes": 78655488,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 146267117,
+                  "read_bytes": 3334144,
+                  "syscr": 25584,
+                  "syscw": 858,
+                  "wchar": 65564295,
+                  "write_bytes": 65941504
+                },
+                "rss_bytes": 74719232
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 76072,
+                "cpu_seconds": 2.532951671,
+                "major_faults": 5,
+                "minor_faults": 18123,
+                "peak_rss_bytes": 78655488,
+                "process_io": {
+                  "cancelled_write_bytes": 8130560,
+                  "rchar": 119991118,
+                  "read_bytes": 3334144,
+                  "syscr": 25578,
+                  "syscw": 856,
+                  "wchar": 39288455,
+                  "write_bytes": 39665664
+                },
+                "rss_bytes": 74719232
+              },
+              "status": "complete",
+              "wall_seconds": 0.008106599000001324
+            }
+          },
+          "saved_commitment": "b4b9fd0f093449c5e7321737a634ebac399d88c2a605bb91a964ca03d4874683",
+          "targets_met": {
+            "open": true,
+            "save": false,
+            "warm_step": false
+          },
+          "targets_seconds": {
+            "open": 10,
+            "save": 2,
+            "warm_step": 1
+          }
+        },
+        "compute": {
+          "budget_policy": "aggregate deadline across copy/open/step/save/warm/close",
+          "budget_seconds": 900,
+          "cpu_seconds": 38.759507232,
+          "process_io_delta": {
+            "cancelled_write_bytes": 262144,
+            "rchar": 518225934,
+            "read_bytes": 0,
+            "syscr": 172448,
+            "syscw": 16355,
+            "wchar": 66017260,
+            "write_bytes": 67661824
+          },
+          "resource_delta": {
+            "block_inputs": 0,
+            "block_outputs": 132152,
+            "cpu_seconds": 38.759507232,
+            "major_faults": 0,
+            "minor_faults": 23018,
+            "peak_rss_bytes": 5259264,
+            "rss_bytes": 9543680
+          },
+          "resources_end": {
+            "block_inputs": 6488,
+            "block_outputs": 206576,
+            "cpu_seconds": 41.126260578,
+            "major_faults": 5,
+            "minor_faults": 41127,
+            "peak_rss_bytes": 83914752,
+            "process_io": {
+              "cancelled_write_bytes": 8392704,
+              "rchar": 637754722,
+              "read_bytes": 3334144,
+              "syscr": 197948,
+              "syscw": 17173,
+              "wchar": 104560515,
+              "write_bytes": 106483712
+            },
+            "rss_bytes": 84262912
+          },
+          "resources_start": {
+            "block_inputs": 6488,
+            "block_outputs": 74424,
+            "cpu_seconds": 2.366753346,
+            "major_faults": 5,
+            "minor_faults": 18109,
+            "peak_rss_bytes": 78655488,
+            "process_io": {
+              "cancelled_write_bytes": 8130560,
+              "rchar": 119528788,
+              "read_bytes": 3334144,
+              "syscr": 25500,
+              "syscw": 818,
+              "wchar": 38543255,
+              "write_bytes": 38821888
+            },
+            "rss_bytes": 74719232
+          },
+          "status": "complete",
+          "wall_seconds": 38.80195951500001
+        }
+      },
+      "parent": {
+        "receipt": {
+          "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+          "context": {
+            "critical_blobs": {
+              ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+              ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+              ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+              ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+              ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+              ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+              "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+              "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+              "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+              "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+              "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+              "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+              "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+              "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+              "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+              "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+              "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+              "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+              "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+              "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+              "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+              "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+              "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+              "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+              "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+              "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+              "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+              "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+              "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+              "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+              "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+              "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+              "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+              "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+              "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+              "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+              "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+              "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+              "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+              "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+              "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+              "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+              "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+              "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+            },
+            "execution_runtime": {
+              "python": "3.12.16",
+              "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+              "sqlite": "3.45.1"
+            },
+            "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+            "mode": "smoke",
+            "rank_proofs": true,
+            "rules_id": "stage-0-6-resume-smoke",
+            "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+            "source": {
+              "bytes": 17612800,
+              "format": 6,
+              "generation": 3,
+              "seed": 843000,
+              "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+              "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+              "year": 1
+            }
+          },
+          "data_ref": {
+            "archive_bytes": 7401086,
+            "archive_sha256": "0282c143c66537821addc8c49b2365961cc88c58d5b23b0bb7c3d8bbc40b464b",
+            "artifact_id": 13863846747,
+            "expires_at": "2026-12-11T14:23:56Z",
+            "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+            "job": "proofs",
+            "kind": "github",
+            "name": "database-smoke-proofs-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-2",
+            "run_id": 43035885119
+          },
+          "database": {
+            "bytes": 26275840,
+            "format": 7,
+            "generation": 0,
+            "seed": 843000,
+            "sha256": "895c644565ed8bf0cc1ecc8489c7c09e143169463804e7772351ff3d8c0785d0",
+            "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+            "year": 1
+          },
+          "metrics": {
+            "compute": {
+              "budget_seconds": 12600,
+              "cpu_seconds": 13.385915251,
+              "process_io_delta": {
+                "cancelled_write_bytes": 4034560,
+                "rchar": 437778183,
+                "read_bytes": 0,
+                "syscr": 103389,
+                "syscw": 7439,
+                "wchar": 40819029,
+                "write_bytes": 36794368
+              },
+              "resource_delta": {
+                "block_inputs": 0,
+                "block_outputs": 71864,
+                "cpu_seconds": 13.385915251,
+                "major_faults": 0,
+                "minor_faults": 122,
+                "peak_rss_bytes": 0,
+                "rss_bytes": 499712
+              },
+              "resources_end": {
+                "block_inputs": 6488,
+                "block_outputs": 119032,
+                "cpu_seconds": 15.701773563,
+                "major_faults": 5,
+                "minor_faults": 18250,
+                "peak_rss_bytes": 78626816,
+                "process_io": {
+                  "cancelled_write_bytes": 7487488,
+                  "rchar": 524995825,
+                  "read_bytes": 3334144,
+                  "syscr": 128255,
+                  "syscw": 8247,
+                  "wchar": 65398171,
+                  "write_bytes": 61661184
+                },
+                "rss_bytes": 75067392
+              },
+              "resources_start": {
+                "block_inputs": 6488,
+                "block_outputs": 47168,
+                "cpu_seconds": 2.315858312,
+                "major_faults": 5,
+                "minor_faults": 18128,
+                "peak_rss_bytes": 78626816,
+                "process_io": {
+                  "cancelled_write_bytes": 3452928,
+                  "rchar": 87217642,
+                  "read_bytes": 3334144,
+                  "syscr": 24866,
+                  "syscw": 808,
+                  "wchar": 24579142,
+                  "write_bytes": 24866816
+                },
+                "rss_bytes": 74567680
+              },
+              "status": "complete",
+              "wall_seconds": 13.492144451999998
+            }
+          },
+          "parent": {
+            "receipt": {
+              "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+              "context": {
+                "critical_blobs": {
+                  ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+                  ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+                  ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+                  ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+                  ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+                  ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+                  "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+                  "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+                  "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+                  "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+                  "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+                  "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+                  "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+                  "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+                  "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+                  "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+                  "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+                  "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+                  "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+                  "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+                  "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+                  "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+                  "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+                  "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+                  "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+                  "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+                  "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+                  "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+                  "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+                  "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+                  "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+                  "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+                  "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+                  "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+                  "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+                  "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+                  "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+                  "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+                  "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+                  "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+                  "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+                  "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+                  "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+                  "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+                },
+                "execution_runtime": {
+                  "python": "3.12.16",
+                  "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+                  "sqlite": "3.45.1"
+                },
+                "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+                "mode": "smoke",
+                "rank_proofs": true,
+                "rules_id": "stage-0-6-resume-smoke",
+                "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                "source": {
+                  "bytes": 17612800,
+                  "format": 6,
+                  "generation": 3,
+                  "seed": 843000,
+                  "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                  "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                  "year": 1
+                }
+              },
+              "data_ref": {
+                "archive_bytes": 2722657,
+                "archive_sha256": "c21687ee852e2ca292e6afa7d4a97d7517c4f8e92ec2de8aab96e309bcb2d5d7",
+                "artifact_id": 13862244597,
+                "expires_at": "2026-12-11T14:16:14Z",
+                "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                "job": "rebase",
+                "kind": "github",
+                "name": "database-smoke-rebase-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1",
+                "run_id": 43035885119
+              },
+              "database": {
+                "bytes": 16994304,
+                "format": 6,
+                "generation": 0,
+                "seed": 843000,
+                "sha256": "526bc775491b6c9cf4cf76a9b832c36724f76f34ad9e68789ee708622a24d638",
+                "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+                "year": 1
+              },
+              "metrics": {
+                "compute": {
+                  "budget_seconds": 7200,
+                  "cpu_seconds": 1.817046447,
+                  "process_io_delta": {
+                    "cancelled_write_bytes": 0,
+                    "rchar": 23796466,
+                    "read_bytes": 0,
+                    "syscr": 1777,
+                    "syscw": 205,
+                    "wchar": 18074753,
+                    "write_bytes": 18444288
+                  },
+                  "resource_delta": {
+                    "block_inputs": 0,
+                    "block_outputs": 36024,
+                    "cpu_seconds": 1.817046447,
+                    "major_faults": 0,
+                    "minor_faults": 600,
+                    "peak_rss_bytes": 0,
+                    "rss_bytes": 2457600
+                  },
+                  "resources_end": {
+                    "block_inputs": 6488,
+                    "block_outputs": 83160,
+                    "cpu_seconds": 4.050059936,
+                    "major_faults": 5,
+                    "minor_faults": 18192,
+                    "peak_rss_bytes": 78524416,
+                    "process_io": {
+                      "cancelled_write_bytes": 3448832,
+                      "rchar": 105716852,
+                      "read_bytes": 3334144,
+                      "syscr": 24723,
+                      "syscw": 1013,
+                      "wchar": 42641812,
+                      "write_bytes": 43294720
+                    },
+                    "rss_bytes": 77754368
+                  },
+                  "resources_start": {
+                    "block_inputs": 6488,
+                    "block_outputs": 47136,
+                    "cpu_seconds": 2.233013489,
+                    "major_faults": 5,
+                    "minor_faults": 17592,
+                    "peak_rss_bytes": 78524416,
+                    "process_io": {
+                      "cancelled_write_bytes": 3448832,
+                      "rchar": 81920386,
+                      "read_bytes": 3334144,
+                      "syscr": 22946,
+                      "syscw": 808,
+                      "wchar": 24567059,
+                      "write_bytes": 24850432
+                    },
+                    "rss_bytes": 75296768
+                  },
+                  "status": "complete",
+                  "wall_seconds": 1.847917159000005
+                }
+              },
+              "parent": {
+                "receipt": {
+                  "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+                  "context": {
+                    "critical_blobs": {
+                      ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+                      ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+                      ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+                      ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+                      ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+                      ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+                      "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+                      "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+                      "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+                      "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+                      "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+                      "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+                      "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+                      "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+                      "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+                      "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+                      "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+                      "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+                      "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+                      "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+                      "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+                      "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+                      "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+                      "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+                      "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+                      "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+                      "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+                      "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+                      "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+                      "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+                      "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+                      "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+                      "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+                      "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+                      "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+                      "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+                      "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+                      "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+                      "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+                      "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+                      "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+                      "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+                      "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+                      "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+                    },
+                    "execution_runtime": {
+                      "python": "3.12.16",
+                      "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+                      "sqlite": "3.45.1"
+                    },
+                    "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+                    "mode": "smoke",
+                    "rank_proofs": true,
+                    "rules_id": "stage-0-6-resume-smoke",
+                    "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                    "source": {
+                      "bytes": 17612800,
+                      "format": 6,
+                      "generation": 3,
+                      "seed": 843000,
+                      "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                      "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                      "year": 1
+                    }
+                  },
+                  "data_ref": {
+                    "archive_bytes": 2722657,
+                    "archive_sha256": "c21687ee852e2ca292e6afa7d4a97d7517c4f8e92ec2de8aab96e309bcb2d5d7",
+                    "artifact_id": 13862244597,
+                    "expires_at": "2026-12-11T14:16:14Z",
+                    "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                    "job": "rebase",
+                    "kind": "github",
+                    "name": "database-smoke-rebase-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1",
+                    "run_id": 43035885119
+                  },
+                  "database": {
+                    "bytes": 16994304,
+                    "format": 6,
+                    "generation": 0,
+                    "seed": 843000,
+                    "sha256": "526bc775491b6c9cf4cf76a9b832c36724f76f34ad9e68789ee708622a24d638",
+                    "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+                    "year": 1
+                  },
+                  "metrics": {
+                    "compute": {
+                      "budget_seconds": 9000,
+                      "cpu_seconds": 1.8665113229999999,
+                      "process_io_delta": {
+                        "cancelled_write_bytes": 106496,
+                        "rchar": 246955303,
+                        "read_bytes": 0,
+                        "syscr": 56703,
+                        "syscw": 144170,
+                        "wchar": 312680831,
+                        "write_bytes": 36294656
+                      },
+                      "resource_delta": {
+                        "block_inputs": 0,
+                        "block_outputs": 70888,
+                        "cpu_seconds": 1.8665113229999999,
+                        "major_faults": 0,
+                        "minor_faults": 413,
+                        "peak_rss_bytes": 0,
+                        "rss_bytes": 1691648
+                      },
+                      "resources_end": {
+                        "block_inputs": 0,
+                        "block_outputs": 109472,
+                        "cpu_seconds": 3.102834417,
+                        "major_faults": 0,
+                        "minor_faults": 11613,
+                        "peak_rss_bytes": 50466816,
+                        "process_io": {
+                          "cancelled_write_bytes": 2830336,
+                          "rchar": 313837866,
+                          "read_bytes": 0,
+                          "syscr": 76595,
+                          "syscw": 144826,
+                          "wchar": 332449744,
+                          "write_bytes": 56049664
+                        },
+                        "rss_bytes": 46870528
+                      },
+                      "resources_start": {
+                        "block_inputs": 0,
+                        "block_outputs": 38584,
+                        "cpu_seconds": 1.236323094,
+                        "major_faults": 0,
+                        "minor_faults": 11200,
+                        "peak_rss_bytes": 50466816,
+                        "process_io": {
+                          "cancelled_write_bytes": 2723840,
+                          "rchar": 66882563,
+                          "read_bytes": 0,
+                          "syscr": 19892,
+                          "syscw": 656,
+                          "wchar": 19768913,
+                          "write_bytes": 19755008
+                        },
+                        "rss_bytes": 45178880
+                      },
+                      "status": "complete",
+                      "wall_seconds": 2.1174704160000033
+                    }
+                  },
+                  "parent": {
+                    "receipt": {
+                      "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+                      "context": {
+                        "critical_blobs": {
+                          ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+                          ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+                          ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+                          ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+                          ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+                          ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+                          "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+                          "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+                          "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+                          "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+                          "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+                          "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+                          "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+                          "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+                          "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+                          "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+                          "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+                          "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+                          "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+                          "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+                          "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+                          "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+                          "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+                          "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+                          "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+                          "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+                          "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+                          "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+                          "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+                          "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+                          "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+                          "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+                          "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+                          "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+                          "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+                          "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+                          "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+                          "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+                          "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+                          "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+                          "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+                          "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+                          "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+                          "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+                        },
+                        "execution_runtime": {
+                          "python": "3.12.16",
+                          "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+                          "sqlite": "3.45.1"
+                        },
+                        "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+                        "mode": "smoke",
+                        "rank_proofs": true,
+                        "rules_id": "stage-0-6-resume-smoke",
+                        "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                        "source": {
+                          "bytes": 17612800,
+                          "format": 6,
+                          "generation": 3,
+                          "seed": 843000,
+                          "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                          "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                          "year": 1
+                        }
+                      },
+                      "data_ref": {
+                        "archive_bytes": 2714979,
+                        "archive_sha256": "4133c01d7aafbb3043470323397dd710cbd55d9b6c72e7927592ad7479b040c0",
+                        "artifact_id": 13862928517,
+                        "expires_at": "2026-12-11T14:15:40Z",
+                        "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                        "job": "catalog",
+                        "kind": "github",
+                        "name": "database-smoke-catalog-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1",
+                        "run_id": 43035885119
+                      },
+                      "database": {
+                        "bytes": 16961536,
+                        "format": 6,
+                        "generation": 3,
+                        "seed": 843000,
+                        "sha256": "49cd6e490f2679b681043c5961cb81b73b6b88acfd5f5a73737405a813a65d96",
+                        "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+                        "year": 1
+                      },
+                      "metrics": {
+                        "compute": {
+                          "budget_seconds": 9000,
+                          "cpu_seconds": 3.679689056,
+                          "process_io_delta": {
+                            "cancelled_write_bytes": 40960,
+                            "rchar": 99976738,
+                            "read_bytes": 0,
+                            "syscr": 9301,
+                            "syscw": 1396,
+                            "wchar": 21871917,
+                            "write_bytes": 21688320
+                          },
+                          "resource_delta": {
+                            "block_inputs": 0,
+                            "block_outputs": 42360,
+                            "cpu_seconds": 3.679689056,
+                            "major_faults": 0,
+                            "minor_faults": 0,
+                            "peak_rss_bytes": 0,
+                            "rss_bytes": 0
+                          },
+                          "resources_end": {
+                            "block_inputs": 6488,
+                            "block_outputs": 89376,
+                            "cpu_seconds": 5.940360597,
+                            "major_faults": 5,
+                            "minor_faults": 18108,
+                            "peak_rss_bytes": 78901248,
+                            "process_io": {
+                              "cancelled_write_bytes": 3481600,
+                              "rchar": 186958055,
+                              "read_bytes": 3334144,
+                              "syscr": 33948,
+                              "syscw": 2204,
+                              "wchar": 46376430,
+                              "write_bytes": 46477312
+                            },
+                            "rss_bytes": 74719232
+                          },
+                          "resources_start": {
+                            "block_inputs": 6488,
+                            "block_outputs": 47016,
+                            "cpu_seconds": 2.260671541,
+                            "major_faults": 5,
+                            "minor_faults": 18108,
+                            "peak_rss_bytes": 78901248,
+                            "process_io": {
+                              "cancelled_write_bytes": 3440640,
+                              "rchar": 86981317,
+                              "read_bytes": 3334144,
+                              "syscr": 24647,
+                              "syscw": 808,
+                              "wchar": 24504513,
+                              "write_bytes": 24788992
+                            },
+                            "rss_bytes": 74719232
+                          },
+                          "status": "complete",
+                          "wall_seconds": 3.7058269609999996
+                        }
+                      },
+                      "parent": {
+                        "receipt": {
+                          "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+                          "context": {
+                            "critical_blobs": {
+                              ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+                              ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+                              ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+                              ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+                              ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+                              ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+                              "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+                              "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+                              "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+                              "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+                              "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+                              "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+                              "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+                              "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+                              "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+                              "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+                              "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+                              "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+                              "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+                              "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+                              "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+                              "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+                              "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+                              "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+                              "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+                              "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+                              "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+                              "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+                              "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+                              "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+                              "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+                              "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+                              "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+                              "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+                              "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+                              "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+                              "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+                              "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+                              "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+                              "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+                              "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+                              "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+                              "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+                              "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+                            },
+                            "execution_runtime": {
+                              "python": "3.12.16",
+                              "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+                              "sqlite": "3.45.1"
+                            },
+                            "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+                            "mode": "smoke",
+                            "rank_proofs": true,
+                            "rules_id": "stage-0-6-resume-smoke",
+                            "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                            "source": {
+                              "bytes": 17612800,
+                              "format": 6,
+                              "generation": 3,
+                              "seed": 843000,
+                              "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                              "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                              "year": 1
+                            }
+                          },
+                          "data_ref": {
+                            "archive_bytes": 2714984,
+                            "archive_sha256": "836a2d9d1e5f6f4b85253e3c4094b2cfba92c5f4f6f15ab5186211f0b320418e",
+                            "artifact_id": 13862599478,
+                            "expires_at": "2026-12-11T14:15:06Z",
+                            "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                            "job": "capture",
+                            "kind": "github",
+                            "name": "database-smoke-capture-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1",
+                            "run_id": 43035885119
+                          },
+                          "database": {
+                            "bytes": 16961536,
+                            "format": 6,
+                            "generation": 3,
+                            "seed": 843000,
+                            "sha256": "3325b037fe2cf86e8d00ac57551d3233b3ec41261c521ef5a02402916675e0aa",
+                            "store_identity": "633a6000-2994-41d3-a5bc-635624cfc9ac",
+                            "year": 1
+                          },
+                          "metrics": {
+                            "compute": {
+                              "budget_seconds": 9000,
+                              "cpu_seconds": 0.637435245,
+                              "process_io_delta": {
+                                "cancelled_write_bytes": 4096,
+                                "rchar": 109384880,
+                                "read_bytes": 0,
+                                "syscr": 27387,
+                                "syscw": 5783,
+                                "wchar": 20433586,
+                                "write_bytes": 21110784
+                              },
+                              "resource_delta": {
+                                "block_inputs": 0,
+                                "block_outputs": 41232,
+                                "cpu_seconds": 0.637435245,
+                                "major_faults": 0,
+                                "minor_faults": 0,
+                                "peak_rss_bytes": 0,
+                                "rss_bytes": 0
+                              },
+                              "resources_end": {
+                                "block_inputs": 6488,
+                                "block_outputs": 89432,
+                                "cpu_seconds": 2.081115391,
+                                "major_faults": 5,
+                                "minor_faults": 18115,
+                                "peak_rss_bytes": 78766080,
+                                "process_io": {
+                                  "cancelled_write_bytes": 2691072,
+                                  "rchar": 177494147,
+                                  "read_bytes": 3334144,
+                                  "syscr": 47521,
+                                  "syscw": 6584,
+                                  "wchar": 44834233,
+                                  "write_bytes": 45789184
+                                },
+                                "rss_bytes": 75309056
+                              },
+                              "resources_start": {
+                                "block_inputs": 6488,
+                                "block_outputs": 48200,
+                                "cpu_seconds": 1.443680146,
+                                "major_faults": 5,
+                                "minor_faults": 18115,
+                                "peak_rss_bytes": 78766080,
+                                "process_io": {
+                                  "cancelled_write_bytes": 2686976,
+                                  "rchar": 68109267,
+                                  "read_bytes": 3334144,
+                                  "syscr": 20134,
+                                  "syscw": 801,
+                                  "wchar": 24400647,
+                                  "write_bytes": 24678400
+                                },
+                                "rss_bytes": 75309056
+                              },
+                              "status": "complete",
+                              "wall_seconds": 0.8821279289999993
+                            }
+                          },
+                          "parent": {
+                            "receipt": {
+                              "baseline_digest": "92dbb6f7b2260e64cca35493d429cb2a855ec28697af65bc19c53074c7245172",
+                              "context": {
+                                "critical_blobs": {
+                                  ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+                                  ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+                                  ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+                                  ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+                                  ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+                                  ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+                                  "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+                                  "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+                                  "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+                                  "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+                                  "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+                                  "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+                                  "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+                                  "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+                                  "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+                                  "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+                                  "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+                                  "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+                                  "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+                                  "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+                                  "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+                                  "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+                                  "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+                                  "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+                                  "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+                                  "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+                                  "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+                                  "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+                                  "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+                                  "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+                                  "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+                                  "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+                                  "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+                                  "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+                                  "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+                                  "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+                                  "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+                                  "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+                                  "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+                                  "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+                                  "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+                                  "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+                                  "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+                                  "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+                                },
+                                "execution_runtime": {
+                                  "python": "3.12.16",
+                                  "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+                                  "sqlite": "3.45.1"
+                                },
+                                "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+                                "mode": "smoke",
+                                "rank_proofs": true,
+                                "rules_id": "stage-0-6-resume-smoke",
+                                "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                                "source": {
+                                  "bytes": 17612800,
+                                  "format": 6,
+                                  "generation": 3,
+                                  "seed": 843000,
+                                  "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                                  "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                                  "year": 1
+                                }
+                              },
+                              "data_ref": {
+                                "archive_bytes": 2682857,
+                                "archive_sha256": "04517a59ccd152033887daaad0ae04c8e5252598131258e60817955449defeaf",
+                                "artifact_id": 13862534320,
+                                "expires_at": "2026-12-11T14:14:15Z",
+                                "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                                "job": "gate",
+                                "kind": "github",
+                                "name": "database-smoke-source-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1",
+                                "run_id": 43035885119
+                              },
+                              "database": {
+                                "bytes": 17612800,
+                                "format": 6,
+                                "generation": 3,
+                                "seed": 843000,
+                                "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                                "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                                "year": 1
+                              },
+                              "metrics": {
+                                "compute": {
+                                  "budget_seconds": 3600,
+                                  "cpu_seconds": 1.805996795,
+                                  "process_io_delta": {
+                                    "cancelled_write_bytes": 0,
+                                    "rchar": 24005347,
+                                    "read_bytes": 0,
+                                    "syscr": 1677,
+                                    "syscw": 205,
+                                    "wchar": 18693243,
+                                    "write_bytes": 19062784
+                                  },
+                                  "resource_delta": {
+                                    "block_inputs": 0,
+                                    "block_outputs": 37232,
+                                    "cpu_seconds": 1.805996795,
+                                    "major_faults": 0,
+                                    "minor_faults": 578,
+                                    "peak_rss_bytes": 0,
+                                    "rss_bytes": 2367488
+                                  },
+                                  "resources_end": {
+                                    "block_inputs": 6488,
+                                    "block_outputs": 85416,
+                                    "cpu_seconds": 4.023033708,
+                                    "major_faults": 5,
+                                    "minor_faults": 18194,
+                                    "peak_rss_bytes": 78499840,
+                                    "process_io": {
+                                      "cancelled_write_bytes": 3403776,
+                                      "rchar": 101650602,
+                                      "read_bytes": 3334144,
+                                      "syscr": 23012,
+                                      "syscw": 1013,
+                                      "wchar": 43797328,
+                                      "write_bytes": 44449792
+                                    },
+                                    "rss_bytes": 77729792
+                                  },
+                                  "resources_start": {
+                                    "block_inputs": 6488,
+                                    "block_outputs": 48184,
+                                    "cpu_seconds": 2.217036913,
+                                    "major_faults": 5,
+                                    "minor_faults": 17616,
+                                    "peak_rss_bytes": 78499840,
+                                    "process_io": {
+                                      "cancelled_write_bytes": 3403776,
+                                      "rchar": 77645255,
+                                      "read_bytes": 3334144,
+                                      "syscr": 21335,
+                                      "syscw": 808,
+                                      "wchar": 25104085,
+                                      "write_bytes": 25387008
+                                    },
+                                    "rss_bytes": 75362304
+                                  },
+                                  "status": "complete",
+                                  "wall_seconds": 1.835095723000002
+                                }
+                              },
+                              "parent": {
+                                "receipt": {
+                                  "baseline_digest": null,
+                                  "context": {
+                                    "critical_blobs": {
+                                      ".github/tests/run_genesis_recovery_drill.py": "674a1195588e83603d9c44d8ad98585e082efa8f",
+                                      ".github/tests/test_stage_0_6_proof_mature_genesis.py": "474591b5c12f4d5175e2aff8ec1485a002a86c85",
+                                      ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1548ffca51c90784c1281379f3af852d575d936a",
+                                      ".github/workflows/stage-0-5-proof-map-validation.yml": "82f6d08978d10272c0bc7619f0922c0a2b781e03",
+                                      ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e2145fa9e836d29b49a6a5c19e2ded62f9fff555",
+                                      ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "4b759fa72ef321ca742fe6f8219cdd3de944e210",
+                                      "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+                                      "simulation/checkpoint_mature_capture.py": "c344bef0bce31ead6cd03055a466ebc7869a4d56",
+                                      "simulation/complete_upgrade_checkpoint.py": "a764e02cbc16c9e5e52aa9cb7f1cd4e84f57b8d4",
+                                      "simulation/construction_checkpoint.py": "c8cd47b64e93fb9664b800a79580b2ff87b44363",
+                                      "simulation/construction_mature_catalog.py": "c593bcffaa394011a1fa8afbda92c15d8dd21847",
+                                      "simulation/construction_mature_commit.py": "a52fa4b99ae2820ba5151bf9385dedf2f629b732",
+                                      "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+                                      "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+                                      "simulation/construction_mature_orders.py": "8174110a7142c17c636736be046cfed045c05930",
+                                      "simulation/construction_mature_prepare.py": "c4b170f6cb972b9b9a1712eda6931d18c58c7d89",
+                                      "simulation/construction_mature_publish.py": "8976b06c4a450f06856eb1cea6b7369fc137d5de",
+                                      "simulation/construction_mature_storage.py": "d532c427e2efb3c2625438d4393536c7ef7e4ea9",
+                                      "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+                                      "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+                                      "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+                                      "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+                                      "simulation/profile_stage_0_5_performance.py": "1dfe1d37dd123f33d017f6771293ea5d17c1dc10",
+                                      "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+                                      "simulation/scaling_telemetry.py": "b9b56813820a471e35dc85bf9d0c79261ec4f556",
+                                      "simulation/stage_0_5_mature_step_save.py": "0194ab79ba3990bdf21166d793608dbb871a3b13",
+                                      "simulation/stage_0_5_save1002_preflight.json": "45af2c81ad846b57574683f4d329f85b440ee368",
+                                      "simulation/stage_0_6_benchmark_launch.json": "753fcb74ba4238549fbd7eb3d555a1899d00f82a",
+                                      "simulation/stage_0_6_genesis_checkpoint.py": "2e9e315674ef6e06f8f3fa8484fa54234605706e",
+                                      "simulation/stage_0_6_genesis_control_compatibility.json": "ba7371881adb76cc6c95b3c9fcb7044f33239269",
+                                      "simulation/stage_0_6_genesis_resume.py": "48daae57e2e8355426b85537e7e6788451228e53",
+                                      "simulation/stage_0_6_genesis_source_control.py": "2e5948729849c30ed777ce02d4e30a2393f60b7d",
+                                      "simulation/stage_0_6_genesis_stages.py": "52efd68c61d0e8d497e3c127e511d81fb883ce55",
+                                      "simulation/stage_0_6_genesis_transport.py": "f9475ad4ed4547152d78cdaa908484eefbcdb9dd",
+                                      "simulation/stage_0_6_mature_benchmark.py": "cf1b842a52f420e59c2e98fbc78f873b4b9fd211",
+                                      "simulation/stage_0_6_proof_genesis_request.json": "de348ad1201ad73f2a8455fadde6623df6986c4e",
+                                      "simulation/stage_0_6_proof_mature_genesis.py": "ebd2778bd51c3909d48ef1990ca3f04c4ac48434",
+                                      "simulation/stage_0_6_proof_mature_preflight.py": "c12eac77c17ddb89459ea032c73b5d4e6a155779",
+                                      "simulation/stage_0_6_retained_archive.py": "d9481c7d7e7b62e60824734618f7047bfdc64b5a",
+                                      "simulation/stage_0_6_retained_launch.py": "906185d282a64f983d55626fabb98c3612e1deb4",
+                                      "simulation/stage_0_6_retained_producer.py": "08584ba0f8d9d4454feb15ff7a7731687bf1ef9f",
+                                      "simulation/stage_0_6_retained_transport.py": "8888c064e56cc0bd7b59080b6fd737a48c27474f",
+                                      "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400",
+                                      "simulation/tests/test_stage_0_5_performance_runner.py": "d408d94b79508a4b3fffe5b478c4d744d7f782a3"
+                                    },
+                                    "execution_runtime": {
+                                      "python": "3.12.16",
+                                      "signature": "dfdaf4f3b84c3e6ec6ac32ae4ca4483dc6a88b352e8937fe8502067bdf1fa8ca",
+                                      "sqlite": "3.45.1"
+                                    },
+                                    "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+                                    "mode": "smoke",
+                                    "rank_proofs": true,
+                                    "rules_id": "stage-0-6-resume-smoke",
+                                    "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                                    "source": {
+                                      "bytes": 17612800,
+                                      "format": 6,
+                                      "generation": 3,
+                                      "seed": 843000,
+                                      "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                                      "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                                      "year": 1
+                                    }
+                                  },
+                                  "data_ref": {
+                                    "archive_bytes": 2682857,
+                                    "archive_sha256": "04517a59ccd152033887daaad0ae04c8e5252598131258e60817955449defeaf",
+                                    "artifact_id": 13862534320,
+                                    "expires_at": "2026-12-11T14:14:15Z",
+                                    "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                                    "job": "gate",
+                                    "kind": "github",
+                                    "name": "database-smoke-source-1692ee1caeb6a25c205fbf215f9b3dca1cf4909a-1",
+                                    "run_id": 43035885119
+                                  },
+                                  "database": {
+                                    "bytes": 17612800,
+                                    "format": 6,
+                                    "generation": 3,
+                                    "seed": 843000,
+                                    "sha256": "46e5f0230816d9d9805a6d649d2f77c3c46d2e00914b89d3ea46a282e900c7e1",
+                                    "store_identity": "0d73cc52-5a6d-4899-a2b7-089e19838c7c",
+                                    "year": 1
+                                  },
+                                  "metrics": {
+                                    "green": {
+                                      "green_commit": "9e6f022fa556c25394dfd381f4d7d0356e5d8711",
+                                      "green_run": 42823293423,
+                                      "jobs": [
+                                        "full-suite",
+                                        "proof-map"
+                                      ],
+                                      "parent_conclusion": "failure",
+                                      "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+                                      "scope": "successful prerequisite jobs only"
+                                    },
+                                    "smoke_run_id": 0
+                                  },
+                                  "parent": null,
+                                  "producer": {
+                                    "attempt": 1,
+                                    "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                                    "job": "gate",
+                                    "run_id": 43035885119
+                                  },
+                                  "proof_commitment": null,
+                                  "schema": "ate-proof-genesis-checkpoint/1",
+                                  "stage": "source"
+                                },
+                                "sha256": "e94dd7ab7c7fe7f8e4390594456cfc2b6ce2f88649435e8360c3dc4168038308"
+                              },
+                              "producer": {
+                                "attempt": 1,
+                                "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                                "job": "source-digest",
+                                "run_id": 43035885119
+                              },
+                              "proof_commitment": null,
+                              "schema": "ate-proof-genesis-checkpoint/1",
+                              "stage": "source_digest"
+                            },
+                            "sha256": "f8a4b26a74c354324bf9e43644a6b50c44198862fff7ecc7dec4529afff03848"
+                          },
+                          "producer": {
+                            "attempt": 1,
+                            "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                            "job": "capture",
+                            "run_id": 43035885119
+                          },
+                          "proof_commitment": null,
+                          "schema": "ate-proof-genesis-checkpoint/1",
+                          "stage": "capture"
+                        },
+                        "sha256": "08c7943a16058d9b06c82cc9559c98de4335ba0b6bce34418e7a53f27b36e900"
+                      },
+                      "producer": {
+                        "attempt": 1,
+                        "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                        "job": "catalog",
+                        "run_id": 43035885119
+                      },
+                      "proof_commitment": null,
+                      "schema": "ate-proof-genesis-checkpoint/1",
+                      "stage": "catalog"
+                    },
+                    "sha256": "b5c62332337a2802235c15113963e287dfc681092684e519b43b294ffe43d43d"
+                  },
+                  "producer": {
+                    "attempt": 1,
+                    "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                    "job": "rebase",
+                    "run_id": 43035885119
+                  },
+                  "proof_commitment": null,
+                  "schema": "ate-proof-genesis-checkpoint/1",
+                  "stage": "rebase"
+                },
+                "sha256": "ff31e4301d807205171e021ec1bd9e72510c1a321273f99249f30493154a8127"
+              },
+              "producer": {
+                "attempt": 1,
+                "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+                "job": "after-digest",
+                "run_id": 43035885119
+              },
+              "proof_commitment": null,
+              "schema": "ate-proof-genesis-checkpoint/1",
+              "stage": "after_digest"
+            },
+            "sha256": "def0f2051bb95de013de5c8738d2cc044cc592d58658f786a5d99e6dd0055f6f"
+          },
+          "producer": {
+            "attempt": 2,
+            "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+            "job": "proofs",
+            "run_id": 43035885119
+          },
+          "proof_commitment": "1ab610a7a5b76e4df1e03ee9db1188753a713e306bfbd90e992044e2cb7fc696",
+          "schema": "ate-proof-genesis-checkpoint/1",
+          "stage": "proofs"
+        },
+        "sha256": "3533ce410fdda080eb0a07b03966567de8446387d21ac4457c2cce98cbf5a6bc"
+      },
+      "producer": {
+        "attempt": 2,
+        "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+        "job": "measure",
+        "run_id": 43035885119
+      },
+      "proof_commitment": "b4b9fd0f093449c5e7321737a634ebac399d88c2a605bb91a964ca03d4874683",
+      "schema": "ate-proof-genesis-checkpoint/1",
+      "stage": "measure"
+    },
+    "sha256": "655eabdf8ea61427dc3b857efa6cbe89b5c40f52b4d340c0834a3acc2e436da9"
+  },
+  "producer": {
+    "attempt": 2,
+    "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+    "job": "fresh-restore",
+    "run_id": 43035885119
+  },
+  "proof_commitment": "b4b9fd0f093449c5e7321737a634ebac399d88c2a605bb91a964ca03d4874683",
+  "schema": "ate-proof-genesis-checkpoint/1",
+  "stage": "fresh_restore"
+}

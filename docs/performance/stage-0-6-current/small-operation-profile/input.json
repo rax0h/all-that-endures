@@ -1,0 +1,26 @@
+{
+  "database": {
+    "bytes": 26206208,
+    "format": 7,
+    "generation": 0,
+    "seed": 843000,
+    "sha256": "2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554",
+    "store_identity": "c8c84501-6f16-4b67-aacb-8213e8f52c7e",
+    "year": 1
+  },
+  "data_ref": {
+    "archive_bytes": 7400318,
+    "archive_sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32",
+    "artifact_id": 13829902355,
+    "expires_at": "2026-12-11T05:02:15Z",
+    "head_sha": "b79039dbd026d20105702ade32533283b1efca0c",
+    "job": "proofs",
+    "kind": "github",
+    "name": "database-smoke-proofs-b79039dbd026d20105702ade32533283b1efca0c-1",
+    "run_id": 42961490569
+  },
+  "proof_commitment": "baeeb7a8e783cdff0bc537590be7f1cb6bd57f2968b13c3947ea14acd4e8eccc",
+  "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "rules_id": "stage-0-6-resume-smoke",
+  "expected_saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+}

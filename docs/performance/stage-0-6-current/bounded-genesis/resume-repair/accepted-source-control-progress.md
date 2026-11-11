@@ -42,3 +42,27 @@ dependencies included. Runtime94267 and old monolith/shared helpers unchanged.
 Source-control original-member positive remains an honest actual-worker gate,
 not a claimed local result. No deferred local finding. Publish one new smoke;
 only its compatible success can unlock the next protected mature request.
+
+
+Hosted1692 smoke43035885119:187tests passed177.77s; all preparation stages and
+proof construction/physical audit passed. First attemptfailedonlyduring seal:
+GitHubGETofjust-uploadedartifact13862863845returned404~0.5saftercompletion.
+RetryONLYfailedjobs succeeded inattempt2. Rawjobs prove gate/source/capture/
+catalog/rebase/aftertimestampsarecopiedfromattempt1; successfulprefixwasnotrerun.
+Attempt2exactfreshcontinuationpassed. This ispublished1692functionalacceptance,
+notvalidationofthenewunpublishedreadbackretryorMaturetargets.
+
+Ruling: pause the prepared mature dispatch. Earlier small raw save7.002s/warm7.913s
+and new raw10.448s/11.604s on unchangedengine941are readinesswarnings. They donot
+proveaMaturefailure, but a bounded small profile can identify avoidablework before
+hours of preparation. Rootshouldhaveusedtheearlierwarningsooner. Current config
+remainsSmoke; no newMature run launched. Profile input/graphs/exactfreshdigest are
+in ../small-operation-profile (relative stage0-6-current directory).
+
+Transientreadback correction: helper404-onlyfourGETswith1/2/4sdelays; otherHTTP,
+metadata/identitymismatchfailwithoutretry. Initialwiringmistakehitinspect_green;
+independentreviewcaughtit. Actualseal-levelregressionobserved2RED thenproperwire
+GREEN; inspect_greenrestoredsingleGET. Minorrequested/returnedartifactIDbinding
+alsoobservedREDandfixed. Finaltransport/resume61pass0.32s; finalaffected195pass
+93.22s/1deliberate duplicate-ZIP warning. Bothfindingsclosedlocallybyindependent
+review, published1692rerunkeptseparatefromnewretryimplementationclaims.

@@ -1,0 +1,87 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+______ test_new_upload_metadata_readback_retries_only_transient_not_found ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3467e3b490>
+
+    def test_new_upload_metadata_readback_retries_only_transient_not_found(monkeypatch):
+        import time
+        from urllib.error import HTTPError
+>       m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: new-upload metadata needs bounded readback retry
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_transport' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_transport.py'>, 'read_uploaded_artifact')
+
+.github/tests/test_stage_0_6_genesis_transport.py:31: AssertionError
+_ test_upload_readback_remains_bounded_and_does_not_hide_other_errors[404-4-delays0] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3467e3b230>
+code = 404, attempts = 4, delays = [1, 2, 4]
+
+    @pytest.mark.parametrize('code,attempts,delays',[(404,4,[1,2,4]),(401,1,[]),(403,1,[]),(500,1,[])])
+    def test_upload_readback_remains_bounded_and_does_not_hide_other_errors(monkeypatch,code,attempts,delays):
+        import time
+        from urllib.error import HTTPError
+>       m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: new-upload metadata needs bounded readback retry
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_transport' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_transport.py'>, 'read_uploaded_artifact')
+
+.github/tests/test_stage_0_6_genesis_transport.py:49: AssertionError
+_ test_upload_readback_remains_bounded_and_does_not_hide_other_errors[401-1-delays1] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3467e9e570>
+code = 401, attempts = 1, delays = []
+
+    @pytest.mark.parametrize('code,attempts,delays',[(404,4,[1,2,4]),(401,1,[]),(403,1,[]),(500,1,[])])
+    def test_upload_readback_remains_bounded_and_does_not_hide_other_errors(monkeypatch,code,attempts,delays):
+        import time
+        from urllib.error import HTTPError
+>       m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: new-upload metadata needs bounded readback retry
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_transport' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_transport.py'>, 'read_uploaded_artifact')
+
+.github/tests/test_stage_0_6_genesis_transport.py:49: AssertionError
+_ test_upload_readback_remains_bounded_and_does_not_hide_other_errors[403-1-delays2] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3467e91260>
+code = 403, attempts = 1, delays = []
+
+    @pytest.mark.parametrize('code,attempts,delays',[(404,4,[1,2,4]),(401,1,[]),(403,1,[]),(500,1,[])])
+    def test_upload_readback_remains_bounded_and_does_not_hide_other_errors(monkeypatch,code,attempts,delays):
+        import time
+        from urllib.error import HTTPError
+>       m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: new-upload metadata needs bounded readback retry
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_transport' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_transport.py'>, 'read_uploaded_artifact')
+
+.github/tests/test_stage_0_6_genesis_transport.py:49: AssertionError
+_ test_upload_readback_remains_bounded_and_does_not_hide_other_errors[500-1-delays3] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f34679de580>
+code = 500, attempts = 1, delays = []
+
+    @pytest.mark.parametrize('code,attempts,delays',[(404,4,[1,2,4]),(401,1,[]),(403,1,[]),(500,1,[])])
+    def test_upload_readback_remains_bounded_and_does_not_hide_other_errors(monkeypatch,code,attempts,delays):
+        import time
+        from urllib.error import HTTPError
+>       m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: new-upload metadata needs bounded readback retry
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_transport' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_transport.py'>, 'read_uploaded_artifact')
+
+.github/tests/test_stage_0_6_genesis_transport.py:49: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_new_upload_metadata_readback_retries_only_transient_not_found
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_upload_readback_remains_bounded_and_does_not_hide_other_errors[404-4-delays0]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_upload_readback_remains_bounded_and_does_not_hide_other_errors[401-1-delays1]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_upload_readback_remains_bounded_and_does_not_hide_other_errors[403-1-delays2]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_upload_readback_remains_bounded_and_does_not_hide_other_errors[500-1-delays3]
+5 failed, 26 deselected in 0.07s

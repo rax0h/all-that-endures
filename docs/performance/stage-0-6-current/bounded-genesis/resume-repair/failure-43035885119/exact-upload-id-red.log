@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_upload_readback_cannot_substitute_a_different_artifact_id ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa32692f490>
+
+    def test_upload_readback_cannot_substitute_a_different_artifact_id(monkeypatch):
+        m=api();artifact,_,_=metadata();artifact['id']=11;requests=[]
+        def fetch(path):requests.append(path);return artifact
+        monkeypatch.setattr(m.github,'_api',fetch)
+>       with pytest.raises(ValueError):m.read_uploaded_artifact(10)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:63: Failed
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_upload_readback_cannot_substitute_a_different_artifact_id
+1 failed, 31 deselected in 0.06s

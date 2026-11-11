@@ -85,6 +85,44 @@ def test_observed_full_scan_budget_keeps_restore_and_publication_reserve(tmp_pat
         assert cleanup.get('if')=="needs.gate.outputs.mode == 'mature'"
 
 
+@pytest.mark.parametrize('invalid_origin',[False,True])
+def test_seal_retries_fresh_upload_readback_and_preserves_validation(tmp_path,monkeypatch,invalid_origin):
+    from pathlib import Path
+    from urllib.error import HTTPError
+    import time
+    from simulation import stage_0_6_genesis_checkpoint as c
+    m=api();source=tmp_path/'closed.sqlite';source.write_bytes(b'closed transport fixture')
+    db=dict(bytes=source.stat().st_size,sha256=c.file_hash(source),store_identity='06d24556-2bb1-4086-93f7-448f23b7eb5a',generation=3,format=6,year=1,seed=843000)
+    runtime='a'*40;blobs={'fixture.py':'b'*40}
+    context=dict(mode='smoke',runtime_tree=runtime,critical_blobs=blobs,source=db,
+        rules_id='stage-0-6-resume-smoke',rank_proofs=True,execution_runtime=m.runtime_description()[0],expected_saved_digest='c'*64)
+    producer=dict(run_id=123,head_sha='e'*40,job='gate',attempt=1)
+    value=c.record('source',context,db,producer,data_ref={'kind':'local'})
+    work=tmp_path/'work';c.publish(work/'out',value,database=source)
+    before=(work/'out/checkpoint.json').read_bytes();calls=[]
+    for name,data in dict(GITHUB_RUN_ID='123',GITHUB_SHA='e'*40,GITHUB_JOB='gate',GITHUB_RUN_ATTEMPT='1').items():monkeypatch.setenv(name,data)
+    # The network and checkout identity are external boundaries; retain the
+    # actual context, byte, producer, reference and final publication validators.
+    monkeypatch.setattr(m,'fence',lambda _: (runtime,blobs))
+    monkeypatch.setattr(m,'git',lambda *_:runtime)
+    name='database-smoke-source-'+'e'*40+'-1'
+    artifact=dict(id=10,name=name,expired=False,size_in_bytes=100,digest='sha256:'+'d'*64,
+        expires_at='2026-12-11T00:00:00Z',workflow_run=dict(id=123,head_sha=('f' if invalid_origin else 'e')*40,head_branch='sol/durable-proof-map'))
+    def fetch(path):
+        calls.append(path)
+        if len(calls)<3:raise HTTPError(path,404,'not yet visible',{},None)
+        return artifact
+    monkeypatch.setattr(m.github,'_api',fetch);monkeypatch.setattr(time,'sleep',lambda _:None)
+    if invalid_origin:
+        with pytest.raises(ValueError):m.seal(tmp_path,work,artifact_id=10)
+        assert (work/'out/checkpoint.json').read_bytes()==before
+    else:
+        m.seal(tmp_path,work,artifact_id=10)
+        sealed=c.load(work/'out',require_remote=True)
+        assert sealed['data_ref']['artifact_id']==10 and sealed['database']==db
+    assert calls==['/actions/artifacts/10']*3 and c.file_hash(source)==db['sha256']
+
+
 def test_hosted_smoke_kills_a_worker_before_resuming_verified_catalog():
     from pathlib import Path
     import yaml

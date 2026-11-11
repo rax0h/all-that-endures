@@ -1,0 +1,700 @@
+{
+  "head": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+  "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "raw_hosted_wall_seconds": {
+    "close": 0.009669467000009035,
+    "first_step": 9.756462167999985,
+    "open": 1.6030453150000028,
+    "save": 7.001809379999997,
+    "warm_step": 7.912753848000023,
+    "working_copy": 0.006583597000002328
+  },
+  "raw_hosted_target_flags": {
+    "open": true,
+    "save": false,
+    "warm_step": false
+  },
+  "instrumented_local_wall_seconds": {
+    "open": 3.36443043700001,
+    "first_step": 22.059357380000165,
+    "save": 15.984883625999828,
+    "warm_step": 17.504022223999982,
+    "fresh_verify": 8.391845295000167
+  },
+  "source_database": {
+    "bytes": 26206208,
+    "format": 7,
+    "generation": 0,
+    "seed": 843000,
+    "sha256": "2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554",
+    "store_identity": "c8c84501-6f16-4b67-aacb-8213e8f52c7e",
+    "year": 1
+  },
+  "source_artifact": {
+    "archive_bytes": 7400318,
+    "archive_sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32",
+    "artifact_id": 13829902355,
+    "expires_at": "2026-12-11T05:02:15Z",
+    "head_sha": "b79039dbd026d20105702ade32533283b1efca0c",
+    "job": "proofs",
+    "kind": "github",
+    "name": "database-smoke-proofs-b79039dbd026d20105702ade32533283b1efca0c-1",
+    "run_id": 42961490569
+  },
+  "restored": {
+    "year": 2,
+    "seed": 843000,
+    "generation": 1,
+    "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+    "world_audits": 0
+  },
+  "hotspots": {
+    "save": [
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+        "line": 33,
+        "function": "_read",
+        "calls": 54080,
+        "own_seconds": 0.121431931,
+        "cumulative_seconds": 6.0385064790000005,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_batch.py",
+              71,
+              "merge"
+            ],
+            "values": [
+              2865,
+              2865,
+              0.006335149,
+              0.203374461
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+              54,
+              "get"
+            ],
+            "values": [
+              50046,
+              50046,
+              0.11250813300000001,
+              5.709263628
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+              73,
+              "set"
+            ],
+            "values": [
+              1169,
+              1169,
+              0.002588649,
+              0.12586839
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py",
+        "line": 16540,
+        "function": "_publish_committed_hybrid",
+        "calls": 1,
+        "own_seconds": 0.0016019530000000001,
+        "cumulative_seconds": 5.074391924,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy.py",
+              16735,
+              "_save_native"
+            ],
+            "values": [
+              1,
+              1,
+              0.0016019530000000001,
+              5.074391924
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_nodes.py",
+        "line": 90,
+        "function": "decode_node",
+        "calls": 112578,
+        "own_seconds": 0.5055007020000001,
+        "cumulative_seconds": 4.232886164,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_store.py",
+              47,
+              "write"
+            ],
+            "values": [
+              4132,
+              4132,
+              0.015362634000000002,
+              0.09111944200000001
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_store.py",
+              26,
+              "read"
+            ],
+            "values": [
+              54366,
+              54366,
+              0.26349441700000004,
+              2.153796395
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+              33,
+              "_read"
+            ],
+            "values": [
+              54080,
+              54080,
+              0.226643651,
+              1.9879703270000002
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+        "line": 513,
+        "function": "_read",
+        "calls": 1076,
+        "own_seconds": 0.001371824,
+        "cumulative_seconds": 1.2805706060000002,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              618,
+              "_node"
+            ],
+            "values": [
+              234,
+              234,
+              0.000248117,
+              0.26357388400000004
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              753,
+              "read_identity_group"
+            ],
+            "values": [
+              95,
+              95,
+              0.00016948400000000002,
+              0.106890019
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              519,
+              "_descriptor"
+            ],
+            "values": [
+              284,
+              284,
+              0.000345581,
+              0.311925518
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              554,
+              "_owner"
+            ],
+            "values": [
+              463,
+              463,
+              0.0006086420000000001,
+              0.5981811850000001
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+        "line": 519,
+        "function": "_descriptor",
+        "calls": 154,
+        "own_seconds": 0.0021681770000000003,
+        "cumulative_seconds": 1.0054210780000001,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              753,
+              "read_identity_group"
+            ],
+            "values": [
+              106,
+              106,
+              0.001535347,
+              0.69926542
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              902,
+              "validate_publication"
+            ],
+            "values": [
+              1,
+              1,
+              2.2835e-05,
+              0.008114647000000001
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              1039,
+              "_prepare_catalog_delta"
+            ],
+            "values": [
+              2,
+              2,
+              6.2025e-05,
+              0.007757237
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              657,
+              "read_owner_identity"
+            ],
+            "values": [
+              29,
+              29,
+              0.000358608,
+              0.18906398300000002
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              716,
+              "read_identity_membership"
+            ],
+            "values": [
+              16,
+              16,
+              0.00018936200000000002,
+              0.101219791
+            ]
+          }
+        ]
+      }
+    ],
+    "warm_step": [
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_history_runtime.py",
+        "line": 734,
+        "function": "decode",
+        "calls": 2801,
+        "own_seconds": 0.016526213,
+        "cumulative_seconds": 9.180760710000001,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_nested_history.py",
+              301,
+              "__getitem__"
+            ],
+            "values": [
+              309,
+              309,
+              0.003317061,
+              9.142369753
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_history_runtime.py",
+              519,
+              "load_record"
+            ],
+            "values": [
+              2424,
+              1616,
+              0.012465664000000001,
+              7.137571812
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_history_runtime.py",
+              1079,
+              "resolve_path"
+            ],
+            "values": [
+              55,
+              55,
+              0.0006896840000000001,
+              0.038320611000000004
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_nested_history.py",
+              913,
+              "__getitem__"
+            ],
+            "values": [
+              13,
+              13,
+              5.3804e-05,
+              7.034600000000001e-05
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_coordinator.py",
+        "line": 294,
+        "function": "_owner_changes",
+        "calls": 1295,
+        "own_seconds": 0.010088173,
+        "cumulative_seconds": 7.250778210000001,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_world_identity.py",
+              172,
+              "synchronize_event_id_placements"
+            ],
+            "values": [
+              18,
+              18,
+              8.665800000000001e-05,
+              0.030768177
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_coordinator.py",
+              344,
+              "_replace_scope"
+            ],
+            "values": [
+              37,
+              37,
+              0.000324475,
+              0.505969417
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_world_identity.py",
+              222,
+              "synchronize_packed_actions"
+            ],
+            "values": [
+              1,
+              1,
+              3.3542000000000005e-05,
+              0.089591137
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_world_identity.py",
+              351,
+              "_synchronize_owner"
+            ],
+            "values": [
+              148,
+              148,
+              0.001601014,
+              2.000565329
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_history_runtime.py",
+              734,
+              "decode"
+            ],
+            "values": [
+              1002,
+              1002,
+              0.007354717,
+              4.026661048
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_history_runtime.py",
+              966,
+              "synchronize"
+            ],
+            "values": [
+              89,
+              89,
+              0.000687767,
+              0.5972231020000001
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+        "line": 519,
+        "function": "_descriptor",
+        "calls": 913,
+        "own_seconds": 0.012668323,
+        "cumulative_seconds": 5.992304651,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              753,
+              "read_identity_group"
+            ],
+            "values": [
+              377,
+              377,
+              0.005421235,
+              2.2119597840000003
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              657,
+              "read_owner_identity"
+            ],
+            "values": [
+              356,
+              356,
+              0.0049385290000000005,
+              2.521284638
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              716,
+              "read_identity_membership"
+            ],
+            "values": [
+              180,
+              180,
+              0.002308559,
+              1.2590602290000001
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+        "line": 513,
+        "function": "_read",
+        "calls": 4547,
+        "own_seconds": 0.006041836,
+        "cumulative_seconds": 4.950205769,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              618,
+              "_node"
+            ],
+            "values": [
+              1431,
+              1431,
+              0.001662323,
+              1.5065823850000002
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              753,
+              "read_identity_group"
+            ],
+            "values": [
+              377,
+              377,
+              0.00044889400000000003,
+              0.355204334
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              519,
+              "_descriptor"
+            ],
+            "values": [
+              1826,
+              1826,
+              0.0025224450000000003,
+              1.838264434
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_identity_catalog.py",
+              554,
+              "_owner"
+            ],
+            "values": [
+              913,
+              913,
+              0.001408174,
+              1.250154616
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+        "line": 33,
+        "function": "_read",
+        "calls": 42840,
+        "own_seconds": 0.10486210900000001,
+        "cumulative_seconds": 4.944393033,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+              54,
+              "get"
+            ],
+            "values": [
+              42840,
+              42840,
+              0.10486210900000001,
+              4.944393033
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_nodes.py",
+        "line": 90,
+        "function": "decode_node",
+        "calls": 85680,
+        "own_seconds": 0.411378359,
+        "cumulative_seconds": 3.4339588300000004,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_store.py",
+              26,
+              "read"
+            ],
+            "values": [
+              42840,
+              42840,
+              0.222912778,
+              1.7859387940000002
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_map.py",
+              33,
+              "_read"
+            ],
+            "values": [
+              42840,
+              42840,
+              0.18846558100000002,
+              1.6480200360000001
+            ]
+          }
+        ]
+      },
+      {
+        "file": "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_seek.py",
+        "line": 113,
+        "function": "_read",
+        "calls": 56709,
+        "own_seconds": 0.20336741800000002,
+        "cumulative_seconds": 2.2085086190000003,
+        "callers": [
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_seek.py",
+              258,
+              "_successor"
+            ],
+            "values": [
+              2117,
+              2117,
+              0.007383841,
+              0.093815666
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_seek.py",
+              243,
+              "get"
+            ],
+            "values": [
+              53108,
+              53108,
+              0.190142102,
+              2.042961059
+            ]
+          },
+          {
+            "function": [
+              "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_seek.py",
+              252,
+              "_minimum"
+            ],
+            "values": [
+              1484,
+              1484,
+              0.0058414750000000005,
+              0.071731894
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "method": "Read-only review of saved evidence and source; no new operation run/profile.",
+  "source_sha256": {
+    "simulation/ate_sim/persistence_proof_map.py": "98bbce88bc2ea3b217ad14fea481a4ccb4c4a166344b1eac6dcefe00bf90a208",
+    "simulation/ate_sim/persistence_proof_nodes.py": "0f5ee3f9fdbed0433ceb9cd420ef154e35de039206b5cb27cdfefef9b3955fa3",
+    "simulation/ate_sim/persistence_proof_store.py": "ba7270864a24b339b6b068031e66dbd15cad979138feba31977c477a37ab042e",
+    "simulation/ate_sim/persistence_proof_native_sources.py": "5ceab732806f3df99d6ae28f95ecd15b900594801323eb4484d3c8075cfe9eab",
+    "simulation/ate_sim/persistence_proof_native_order.py": "b7ba4bc005f0872602426bd4ee4043edc994620c77d8256779afc412951cc335",
+    "simulation/ate_sim/persistence_validation_scope.py": "fd16b2481575600ab76314a2b862664756251e3a23f256cd4b3a6ed30636a2f7",
+    "simulation/ate_sim/persistence_lazy_identity_catalog.py": "648ebc0d6d6ac082edf16f9abe1fcd81ba4eb92add0fe6325cf89185f9b0a9b5",
+    "simulation/ate_sim/persistence_lazy_identity_coordinator.py": "da6a047686127049382d7285182368686a9bffd1227d1a6116ba918107bebc61",
+    "simulation/ate_sim/persistence_history_runtime.py": "ad437e986fbe63f88daa601a684c24001aaa16c3b9feaf4bee779a7e778a94b1",
+    "simulation/ate_sim/persistence_proof_world_session.py": "5811b96a9e157b873ca7414a5b2a65db19ed2bf44945b025b40dd871bdc6942c",
+    "simulation/ate_sim/persistence_lazy.py": "b9ddbd82d558b68cb17f5879271a188f06467634ef24b57a6adce5b88ae5e145",
+    "simulation/stage_0_6_genesis_transport.py": "5329b96b2cb23734e9eb27403d7ad3c261c7635d0122bbeab2886c1829be42bb",
+    "simulation/stage_0_6_genesis_resume.py": "d03f1f58ed2bcc199336dbae7bbd788ea8b0f636661d5bb298ae4dbdd54ad1aa"
+  }
+}

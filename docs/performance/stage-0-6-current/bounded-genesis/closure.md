@@ -198,3 +198,19 @@ one deliberate duplicate-ZIP warning. Suites overlap and are not summed. Actual
 original-member import and new hosted smoke remain worker gates;120min offline
 limits do not guarantee completion. No original source digest, current audit or
 mature timing is claimed by importing a historical expectation.
+
+
+## November11 small smoke/readiness follow-up
+
+| ID | Origin | Action/evidence | Status |
+|---|---|---|---|
+| W1 | New-upload metadata404 after successful proof build | New harness sealer retries only exact-ID metadataGET404, at most4attempts with1/2/4s waits. No stage recomputation during retries; all ordinary reference/hash/context checks remain. Actual seal regression caught wrong initial callsite and passes after correction. | Closed locally; future bundled hosted candidate still required |
+| W2 | Independent Minor exact-ID readback finding | Require response.id to be an integer exactly equal to upload output ID; a matching name/run/head cannot substitute a different artifact. No retry of a successful but invalid response. RED/GREEN retained; focused8controls independently pass. | Closed locally |
+| W3 | Successful smoke mistaken for performance readiness | Raw smallsave/warm targets miss on sameengine941; newMature request is paused. Authenticated small input profile plus exactfreshdigest preserves semantics and identifies duplicate node verification and identity-placement costs. No mature failure or target speedup inferred from instrumentation. | Bounded runtime performance investigation active; Stage0.6 OPEN |
+
+43035885119attempt2isgreenafterrerunningonlyfailedproof/downstreamjobs; earlier
+completedstagesretainedtheoriginaltimestamps. Newsmalloperationaltimes10.448ssave/
+11.604swarm arefunctional-only acceptance. Readbackfix195affectedtests pass93.22s,
+1deliberate duplicateZIPwarning; engineandoldtriggerpaths remainunchanged. The next
+runtimephasefactorsduplicatecanonicalnodeparsingwhilekeepingbothdomainhashes,
+thenmeasuresbeforebroadercachesoranynewexpensivematurepreparation.

@@ -6,6 +6,8 @@ import re
 import shutil
 import stat
 import tempfile
+import time
+from urllib.error import HTTPError
 import zipfile
 from simulation import checkpoint_artifacts as github
 from simulation import stage_0_6_genesis_checkpoint as c
@@ -16,6 +18,20 @@ BRANCH='sol/durable-proof-map'
 DATA_STEP='Publish closed checkpoint database'
 SEAL_STEP='Seal checkpoint provenance'
 METADATA_STEP='Publish sealed checkpoint metadata'
+
+
+def read_uploaded_artifact(artifact_id):
+    """Read back a just-completed upload without repeating its stage on a 404."""
+    c.integer(artifact_id,'uploaded artifact id',1)
+    for attempt in range(4):
+        try:
+            value=github._api(f'/actions/artifacts/{artifact_id}')
+            if type(value) is not dict or type(value.get('id')) is not int or value['id']!=artifact_id:
+                raise ValueError('uploaded artifact readback identity differs')
+            return value
+        except HTTPError as exc:
+            if exc.code!=404 or attempt==3:raise
+            time.sleep(2**attempt)
 
 
 def _publication(job,created,*,kind,mode,stage,attempt):

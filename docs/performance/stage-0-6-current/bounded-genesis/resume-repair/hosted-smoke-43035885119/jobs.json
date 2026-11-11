@@ -1,0 +1,2314 @@
+{
+  "total_count": 20,
+  "jobs": [
+    {
+      "id": 130574443516,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZtfj_A",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130574443516",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130574443516",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:10:14Z",
+      "started_at": "2026-11-11T14:10:17Z",
+      "completed_at": "2026-11-11T14:14:24Z",
+      "name": "gate",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:10:18Z",
+          "completed_at": "2026-11-11T14:10:19Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:10:19Z",
+          "completed_at": "2026-11-11T14:10:49Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:10:49Z",
+          "completed_at": "2026-11-11T14:10:49Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:10:49Z",
+          "completed_at": "2026-11-11T14:10:52Z"
+        },
+        {
+          "name": "Verify only new harness and affected transport boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-11T14:10:52Z",
+          "completed_at": "2026-11-11T14:13:50Z"
+        },
+        {
+          "name": "Authenticate green code and choose exact restart point",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:13:50Z",
+          "completed_at": "2026-11-11T14:14:15Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:14:15Z",
+          "completed_at": "2026-11-11T14:14:17Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:14:17Z",
+          "completed_at": "2026-11-11T14:14:18Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:14:18Z",
+          "completed_at": "2026-11-11T14:14:20Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:14:20Z",
+          "completed_at": "2026-11-11T14:14:21Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:14:21Z",
+          "completed_at": "2026-11-11T14:14:21Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:14:21Z",
+          "completed_at": "2026-11-11T14:14:21Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:14:21Z",
+          "completed_at": "2026-11-11T14:14:22Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130574443516",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001636,
+      "runner_name": "GitHub Actions 1000001636",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130576786259,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZvujUw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130576786259",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130576786259",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:14:25Z",
+      "started_at": "2026-11-11T14:14:27Z",
+      "completed_at": "2026-11-11T14:14:50Z",
+      "name": "source-digest",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:14:28Z",
+          "completed_at": "2026-11-11T14:14:28Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:14:28Z",
+          "completed_at": "2026-11-11T14:14:32Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:14:32Z",
+          "completed_at": "2026-11-11T14:14:32Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:14:32Z",
+          "completed_at": "2026-11-11T14:14:35Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:14:35Z",
+          "completed_at": "2026-11-11T14:14:35Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:14:35Z",
+          "completed_at": "2026-11-11T14:14:45Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-11T14:14:45Z",
+          "completed_at": "2026-11-11T14:14:45Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:14:45Z",
+          "completed_at": "2026-11-11T14:14:46Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:14:46Z",
+          "completed_at": "2026-11-11T14:14:47Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:14:47Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:14:48Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:14:48Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:14:48Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130576786259",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001637,
+      "runner_name": "GitHub Actions 1000001637",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130577026178,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZv9Mgg",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130577026178",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130577026178",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:14:50Z",
+      "started_at": "2026-11-11T14:14:52Z",
+      "completed_at": "2026-11-11T14:15:12Z",
+      "name": "capture",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:14:52Z",
+          "completed_at": "2026-11-11T14:14:53Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:14:53Z",
+          "completed_at": "2026-11-11T14:14:56Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:14:56Z",
+          "completed_at": "2026-11-11T14:14:56Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:14:56Z",
+          "completed_at": "2026-11-11T14:14:57Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:14:57Z",
+          "completed_at": "2026-11-11T14:14:57Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:14:57Z",
+          "completed_at": "2026-11-11T14:15:06Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:15:06Z",
+          "completed_at": "2026-11-11T14:15:07Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:15:07Z",
+          "completed_at": "2026-11-11T14:15:08Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:15:08Z",
+          "completed_at": "2026-11-11T14:15:09Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:15:09Z",
+          "completed_at": "2026-11-11T14:15:10Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:15:10Z",
+          "completed_at": "2026-11-11T14:15:10Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:15:10Z",
+          "completed_at": "2026-11-11T14:15:10Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:15:10Z",
+          "completed_at": "2026-11-11T14:15:11Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130577026178",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001638,
+      "runner_name": "GitHub Actions 1000001638",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130577236351,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZwKBfw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130577236351",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130577236351",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:15:13Z",
+      "started_at": "2026-11-11T14:15:17Z",
+      "completed_at": "2026-11-11T14:15:46Z",
+      "name": "catalog",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:15:18Z",
+          "completed_at": "2026-11-11T14:15:19Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:15:19Z",
+          "completed_at": "2026-11-11T14:15:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:15:23Z",
+          "completed_at": "2026-11-11T14:15:23Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:15:23Z",
+          "completed_at": "2026-11-11T14:15:28Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:15:28Z",
+          "completed_at": "2026-11-11T14:15:28Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:15:28Z",
+          "completed_at": "2026-11-11T14:15:40Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:15:40Z",
+          "completed_at": "2026-11-11T14:15:41Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:15:41Z",
+          "completed_at": "2026-11-11T14:15:42Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:15:42Z",
+          "completed_at": "2026-11-11T14:15:43Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:15:43Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:15:44Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:15:44Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:15:44Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130577236351",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001639,
+      "runner_name": "GitHub Actions 1000001639",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130577547311,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZwdALw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130577547311",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130577547311",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:15:46Z",
+      "started_at": "2026-11-11T14:15:48Z",
+      "completed_at": "2026-11-11T14:16:20Z",
+      "name": "rebase",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:15:49Z",
+          "completed_at": "2026-11-11T14:15:50Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:15:50Z",
+          "completed_at": "2026-11-11T14:15:52Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:15:52Z",
+          "completed_at": "2026-11-11T14:15:52Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:15:52Z",
+          "completed_at": "2026-11-11T14:15:55Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:15:55Z",
+          "completed_at": "2026-11-11T14:15:55Z"
+        },
+        {
+          "name": "Crash a small worker and retain its verified parent",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:15:55Z",
+          "completed_at": "2026-11-11T14:16:04Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:16:04Z",
+          "completed_at": "2026-11-11T14:16:14Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:16:14Z",
+          "completed_at": "2026-11-11T14:16:15Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:16:15Z",
+          "completed_at": "2026-11-11T14:16:16Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:16:16Z",
+          "completed_at": "2026-11-11T14:16:17Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-11T14:16:17Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:16:18Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-11T14:16:18Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-11T14:16:18Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130577547311",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001640,
+      "runner_name": "GitHub Actions 1000001640",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130577879172,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZwxQhA",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130577879172",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130577879172",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:16:21Z",
+      "started_at": "2026-11-11T14:16:23Z",
+      "completed_at": "2026-11-11T14:16:54Z",
+      "name": "after-digest",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:16:24Z",
+          "completed_at": "2026-11-11T14:16:25Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:16:25Z",
+          "completed_at": "2026-11-11T14:16:30Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:16:30Z",
+          "completed_at": "2026-11-11T14:16:30Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:16:30Z",
+          "completed_at": "2026-11-11T14:16:35Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:16:35Z",
+          "completed_at": "2026-11-11T14:16:35Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:16:35Z",
+          "completed_at": "2026-11-11T14:16:47Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-11T14:16:47Z",
+          "completed_at": "2026-11-11T14:16:47Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:16:47Z",
+          "completed_at": "2026-11-11T14:16:48Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:16:48Z",
+          "completed_at": "2026-11-11T14:16:49Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:16:49Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:16:51Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:16:51Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:16:51Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130577879172",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001641,
+      "runner_name": "GitHub Actions 1000001641",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130578191888,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZxEWEA",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130578191888",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130578191888",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-11T14:16:54Z",
+      "started_at": "2026-11-11T14:16:56Z",
+      "completed_at": "2026-11-11T14:17:36Z",
+      "name": "proofs",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:16:57Z",
+          "completed_at": "2026-11-11T14:16:58Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:16:58Z",
+          "completed_at": "2026-11-11T14:17:13Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:17:13Z",
+          "completed_at": "2026-11-11T14:17:13Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:17:13Z",
+          "completed_at": "2026-11-11T14:17:15Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:17:15Z",
+          "completed_at": "2026-11-11T14:17:15Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:17:15Z",
+          "completed_at": "2026-11-11T14:17:29Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:17:29Z",
+          "completed_at": "2026-11-11T14:17:32Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 8,
+          "started_at": "2026-11-11T14:17:32Z",
+          "completed_at": "2026-11-11T14:17:32Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-11-11T14:17:32Z",
+          "completed_at": "2026-11-11T14:17:32Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:17:32Z",
+          "completed_at": "2026-11-11T14:17:34Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-11T14:17:34Z",
+          "completed_at": "2026-11-11T14:17:34Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:17:34Z",
+          "completed_at": "2026-11-11T14:17:34Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:17:34Z",
+          "completed_at": "2026-11-11T14:17:34Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130578191888",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001642,
+      "runner_name": "GitHub Actions 1000001642",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130578584899,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZxcVQw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130578584899",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130578584899",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-11-11T14:17:37Z",
+      "started_at": "2026-11-11T14:17:37Z",
+      "completed_at": "2026-11-11T14:17:36Z",
+      "name": "measure",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130578584899",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 130578586442,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZxcbSg",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130578586442",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130578586442",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-11-11T14:17:37Z",
+      "started_at": "2026-11-11T14:17:37Z",
+      "completed_at": "2026-11-11T14:17:36Z",
+      "name": "fresh-restore",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130578586442",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 130578586608,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZxcb8A",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130578586608",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130578586608",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-11-11T14:17:37Z",
+      "started_at": "2026-11-11T14:17:37Z",
+      "completed_at": "2026-11-11T14:17:36Z",
+      "name": "acceptance",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130578586608",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 130581766254,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0egbg",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581766254",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581766254",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:13Z",
+      "started_at": "2026-11-11T14:10:17Z",
+      "completed_at": "2026-11-11T14:14:24Z",
+      "name": "gate",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:10:18Z",
+          "completed_at": "2026-11-11T14:10:19Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:10:19Z",
+          "completed_at": "2026-11-11T14:10:49Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:10:49Z",
+          "completed_at": "2026-11-11T14:10:49Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:10:49Z",
+          "completed_at": "2026-11-11T14:10:52Z"
+        },
+        {
+          "name": "Verify only new harness and affected transport boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-11T14:10:52Z",
+          "completed_at": "2026-11-11T14:13:50Z"
+        },
+        {
+          "name": "Authenticate green code and choose exact restart point",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:13:50Z",
+          "completed_at": "2026-11-11T14:14:15Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:14:15Z",
+          "completed_at": "2026-11-11T14:14:17Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:14:17Z",
+          "completed_at": "2026-11-11T14:14:18Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:14:18Z",
+          "completed_at": "2026-11-11T14:14:20Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:14:20Z",
+          "completed_at": "2026-11-11T14:14:21Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:14:21Z",
+          "completed_at": "2026-11-11T14:14:21Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:14:21Z",
+          "completed_at": "2026-11-11T14:14:21Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:14:21Z",
+          "completed_at": "2026-11-11T14:14:22Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581766254",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001636,
+      "runner_name": "GitHub Actions 1000001636",
+      "runner_group_id": null,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130581767857,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0emsQ",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581767857",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581767857",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:14Z",
+      "started_at": "2026-11-11T14:14:52Z",
+      "completed_at": "2026-11-11T14:15:12Z",
+      "name": "capture",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:14:52Z",
+          "completed_at": "2026-11-11T14:14:53Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:14:53Z",
+          "completed_at": "2026-11-11T14:14:56Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:14:56Z",
+          "completed_at": "2026-11-11T14:14:56Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:14:56Z",
+          "completed_at": "2026-11-11T14:14:57Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:14:57Z",
+          "completed_at": "2026-11-11T14:14:57Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:14:57Z",
+          "completed_at": "2026-11-11T14:15:06Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:15:06Z",
+          "completed_at": "2026-11-11T14:15:07Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:15:07Z",
+          "completed_at": "2026-11-11T14:15:08Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:15:08Z",
+          "completed_at": "2026-11-11T14:15:09Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:15:09Z",
+          "completed_at": "2026-11-11T14:15:10Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:15:10Z",
+          "completed_at": "2026-11-11T14:15:10Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:15:10Z",
+          "completed_at": "2026-11-11T14:15:10Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:15:10Z",
+          "completed_at": "2026-11-11T14:15:11Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581767857",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001638,
+      "runner_name": "GitHub Actions 1000001638",
+      "runner_group_id": null,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130581768031,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0enXw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581768031",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581768031",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:14Z",
+      "started_at": "2026-11-11T14:14:27Z",
+      "completed_at": "2026-11-11T14:14:50Z",
+      "name": "source-digest",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:14:28Z",
+          "completed_at": "2026-11-11T14:14:28Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:14:28Z",
+          "completed_at": "2026-11-11T14:14:32Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:14:32Z",
+          "completed_at": "2026-11-11T14:14:32Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:14:32Z",
+          "completed_at": "2026-11-11T14:14:35Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:14:35Z",
+          "completed_at": "2026-11-11T14:14:35Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:14:35Z",
+          "completed_at": "2026-11-11T14:14:45Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-11T14:14:45Z",
+          "completed_at": "2026-11-11T14:14:45Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:14:45Z",
+          "completed_at": "2026-11-11T14:14:46Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:14:46Z",
+          "completed_at": "2026-11-11T14:14:47Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:14:47Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:14:48Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:14:48Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:14:48Z",
+          "completed_at": "2026-11-11T14:14:48Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581768031",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001637,
+      "runner_name": "GitHub Actions 1000001637",
+      "runner_group_id": null,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130581769855,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0eufw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581769855",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581769855",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:14Z",
+      "started_at": "2026-11-11T14:15:17Z",
+      "completed_at": "2026-11-11T14:15:46Z",
+      "name": "catalog",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:15:18Z",
+          "completed_at": "2026-11-11T14:15:19Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:15:19Z",
+          "completed_at": "2026-11-11T14:15:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:15:23Z",
+          "completed_at": "2026-11-11T14:15:23Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:15:23Z",
+          "completed_at": "2026-11-11T14:15:28Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:15:28Z",
+          "completed_at": "2026-11-11T14:15:28Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:15:28Z",
+          "completed_at": "2026-11-11T14:15:40Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:15:40Z",
+          "completed_at": "2026-11-11T14:15:41Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:15:41Z",
+          "completed_at": "2026-11-11T14:15:42Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:15:42Z",
+          "completed_at": "2026-11-11T14:15:43Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:15:43Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:15:44Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:15:44Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:15:44Z",
+          "completed_at": "2026-11-11T14:15:44Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581769855",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001639,
+      "runner_name": "GitHub Actions 1000001639",
+      "runner_group_id": null,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130581770289,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0ewMQ",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581770289",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581770289",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:14Z",
+      "started_at": "2026-11-11T14:15:48Z",
+      "completed_at": "2026-11-11T14:16:20Z",
+      "name": "rebase",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:15:49Z",
+          "completed_at": "2026-11-11T14:15:50Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:15:50Z",
+          "completed_at": "2026-11-11T14:15:52Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:15:52Z",
+          "completed_at": "2026-11-11T14:15:52Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:15:52Z",
+          "completed_at": "2026-11-11T14:15:55Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:15:55Z",
+          "completed_at": "2026-11-11T14:15:55Z"
+        },
+        {
+          "name": "Crash a small worker and retain its verified parent",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:15:55Z",
+          "completed_at": "2026-11-11T14:16:04Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:16:04Z",
+          "completed_at": "2026-11-11T14:16:14Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:16:14Z",
+          "completed_at": "2026-11-11T14:16:15Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:16:15Z",
+          "completed_at": "2026-11-11T14:16:16Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:16:16Z",
+          "completed_at": "2026-11-11T14:16:17Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-11T14:16:17Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:16:18Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-11T14:16:18Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-11T14:16:18Z",
+          "completed_at": "2026-11-11T14:16:18Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581770289",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001640,
+      "runner_name": "GitHub Actions 1000001640",
+      "runner_group_id": null,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130581770582,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0exVg",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581770582",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581770582",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:14Z",
+      "started_at": "2026-11-11T14:23:17Z",
+      "completed_at": "2026-11-11T14:24:05Z",
+      "name": "proofs",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:23:18Z",
+          "completed_at": "2026-11-11T14:23:19Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:23:19Z",
+          "completed_at": "2026-11-11T14:23:24Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:23:24Z",
+          "completed_at": "2026-11-11T14:23:24Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:23:24Z",
+          "completed_at": "2026-11-11T14:23:29Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:23:29Z",
+          "completed_at": "2026-11-11T14:23:29Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:23:29Z",
+          "completed_at": "2026-11-11T14:23:56Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:23:56Z",
+          "completed_at": "2026-11-11T14:23:58Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:23:58Z",
+          "completed_at": "2026-11-11T14:23:59Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:23:59Z",
+          "completed_at": "2026-11-11T14:24:01Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:24:01Z",
+          "completed_at": "2026-11-11T14:24:02Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:24:02Z",
+          "completed_at": "2026-11-11T14:24:02Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:24:02Z",
+          "completed_at": "2026-11-11T14:24:03Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:24:03Z",
+          "completed_at": "2026-11-11T14:24:03Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581770582",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001643,
+      "runner_name": "GitHub Actions 1000001643",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130581771318,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ0e0Ng",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130581771318",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130581771318",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:23:14Z",
+      "started_at": "2026-11-11T14:16:23Z",
+      "completed_at": "2026-11-11T14:16:54Z",
+      "name": "after-digest",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:16:24Z",
+          "completed_at": "2026-11-11T14:16:25Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:16:25Z",
+          "completed_at": "2026-11-11T14:16:30Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:16:30Z",
+          "completed_at": "2026-11-11T14:16:30Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:16:30Z",
+          "completed_at": "2026-11-11T14:16:35Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:16:35Z",
+          "completed_at": "2026-11-11T14:16:35Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:16:35Z",
+          "completed_at": "2026-11-11T14:16:47Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-11T14:16:47Z",
+          "completed_at": "2026-11-11T14:16:47Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:16:47Z",
+          "completed_at": "2026-11-11T14:16:48Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:16:48Z",
+          "completed_at": "2026-11-11T14:16:49Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:16:49Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:16:51Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:16:51Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:16:51Z",
+          "completed_at": "2026-11-11T14:16:51Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130581771318",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001641,
+      "runner_name": "GitHub Actions 1000001641",
+      "runner_group_id": null,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130582256918,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ08dFg",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130582256918",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130582256918",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:24:05Z",
+      "started_at": "2026-11-11T14:24:08Z",
+      "completed_at": "2026-11-11T14:25:19Z",
+      "name": "measure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:24:09Z",
+          "completed_at": "2026-11-11T14:24:10Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:24:10Z",
+          "completed_at": "2026-11-11T14:24:13Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:24:13Z",
+          "completed_at": "2026-11-11T14:24:13Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:24:13Z",
+          "completed_at": "2026-11-11T14:24:17Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-11T14:24:17Z",
+          "completed_at": "2026-11-11T14:24:17Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-11T14:24:17Z",
+          "completed_at": "2026-11-11T14:25:10Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:25:10Z",
+          "completed_at": "2026-11-11T14:25:13Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-11T14:25:13Z",
+          "completed_at": "2026-11-11T14:25:14Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:25:14Z",
+          "completed_at": "2026-11-11T14:25:15Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:25:15Z",
+          "completed_at": "2026-11-11T14:25:16Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-11T14:25:16Z",
+          "completed_at": "2026-11-11T14:25:16Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-11T14:25:16Z",
+          "completed_at": "2026-11-11T14:25:17Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:25:17Z",
+          "completed_at": "2026-11-11T14:25:17Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130582256918",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001644,
+      "runner_name": "GitHub Actions 1000001644",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130582950300,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ1mxnA",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130582950300",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130582950300",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:25:19Z",
+      "started_at": "2026-11-11T14:25:21Z",
+      "completed_at": "2026-11-11T14:26:07Z",
+      "name": "fresh-restore",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:25:22Z",
+          "completed_at": "2026-11-11T14:25:23Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:25:23Z",
+          "completed_at": "2026-11-11T14:25:26Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:25:26Z",
+          "completed_at": "2026-11-11T14:25:26Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:25:26Z",
+          "completed_at": "2026-11-11T14:25:29Z"
+        },
+        {
+          "name": "Check measured targets before another large restore/digest",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-11T14:25:29Z",
+          "completed_at": "2026-11-11T14:25:37Z"
+        },
+        {
+          "name": "Reserve disposable stage disk before restore",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-11T14:25:37Z",
+          "completed_at": "2026-11-11T14:25:37Z"
+        },
+        {
+          "name": "Restore verified predecessor and execute only this stage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-11T14:25:37Z",
+          "completed_at": "2026-11-11T14:26:02Z"
+        },
+        {
+          "name": "Publish closed checkpoint database",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-11T14:26:02Z",
+          "completed_at": "2026-11-11T14:26:02Z"
+        },
+        {
+          "name": "Seal checkpoint provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:26:02Z",
+          "completed_at": "2026-11-11T14:26:03Z"
+        },
+        {
+          "name": "Publish sealed checkpoint metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:26:03Z",
+          "completed_at": "2026-11-11T14:26:04Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-11T14:26:04Z",
+          "completed_at": "2026-11-11T14:26:05Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-11T14:26:05Z",
+          "completed_at": "2026-11-11T14:26:05Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-11T14:26:05Z",
+          "completed_at": "2026-11-11T14:26:05Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-11T14:26:05Z",
+          "completed_at": "2026-11-11T14:26:05Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130582950300",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001645,
+      "runner_name": "GitHub Actions 1000001645",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 130583405843,
+      "run_id": 43035885119,
+      "workflow_name": "Stage 0.6 resumable proof genesis",
+      "head_branch": "sol/durable-proof-map",
+      "run_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/runs/43035885119",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOUTLkhs8AAAAeZ2ClEw",
+      "head_sha": "1692ee1caeb6a25c205fbf215f9b3dca1cf4909a",
+      "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/jobs/130583405843",
+      "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/43035885119/job/130583405843",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-11T14:26:07Z",
+      "started_at": "2026-11-11T14:26:14Z",
+      "completed_at": "2026-11-11T14:26:36Z",
+      "name": "acceptance",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-11T14:26:15Z",
+          "completed_at": "2026-11-11T14:26:16Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-11T14:26:16Z",
+          "completed_at": "2026-11-11T14:26:21Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-11T14:26:21Z",
+          "completed_at": "2026-11-11T14:26:21Z"
+        },
+        {
+          "name": "Run python -m pip install pytest==9.2.0 pyyaml==6.0.3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-11T14:26:21Z",
+          "completed_at": "2026-11-11T14:26:25Z"
+        },
+        {
+          "name": "Accept exact fresh continuation and mature targets where applicable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-11T14:26:25Z",
+          "completed_at": "2026-11-11T14:26:33Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-11T14:26:33Z",
+          "completed_at": "2026-11-11T14:26:33Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-11T14:26:33Z",
+          "completed_at": "2026-11-11T14:26:34Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-11T14:26:34Z",
+          "completed_at": "2026-11-11T14:26:34Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/rax0h/all-that-endures/check-runs/130583405843",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001646,
+      "runner_name": "GitHub Actions 1000001646",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

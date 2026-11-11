@@ -348,7 +348,7 @@ def seal(root,workspace,*,artifact_id=0):
     db=directory/'candidate.sqlite'
     if db.exists():
         if not artifact_id:raise ValueError('closed database was not uploaded')
-        a=github._api(f'/actions/artifacts/{artifact_id}')
+        a=t.read_uploaded_artifact(artifact_id)
         value['data_ref']=t.reference(a,name=t.name_for('database',value['context']['mode'],value['stage'],p['head_sha'],p['attempt']),
             job=p['job'],head=p['head_sha'],run_id=p['run_id'])
         c.verify_database(db,value['database'])

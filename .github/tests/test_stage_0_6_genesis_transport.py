@@ -25,6 +25,45 @@ def metadata():
     return artifact,run,jobs
 
 
+def test_new_upload_metadata_readback_retries_only_transient_not_found(monkeypatch):
+    import time
+    from urllib.error import HTTPError
+    m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+    artifact,_,_=metadata();requests=[];delays=[]
+    def fetch(path):
+        requests.append(path)
+        if len(requests)<3:raise HTTPError(path,404,'not yet visible',{},None)
+        return artifact
+    monkeypatch.setattr(m.github,'_api',fetch)
+    monkeypatch.setattr(time,'sleep',delays.append)
+    actual=m.read_uploaded_artifact(10)
+    reference=m.reference(actual,name=artifact['name'],job='capture',head='a'*40,run_id=20)
+    assert reference['artifact_id']==10 and reference['archive_sha256']=='b'*64
+    assert requests==['/actions/artifacts/10']*3 and delays==[1,2]
+
+
+@pytest.mark.parametrize('code,attempts,delays',[(404,4,[1,2,4]),(401,1,[]),(403,1,[]),(500,1,[])])
+def test_upload_readback_remains_bounded_and_does_not_hide_other_errors(monkeypatch,code,attempts,delays):
+    import time
+    from urllib.error import HTTPError
+    m=api();assert hasattr(m,'read_uploaded_artifact'),'new-upload metadata needs bounded readback retry'
+    requests=[];waits=[]
+    def fetch(path):
+        requests.append(path);raise HTTPError(path,code,'controlled failure',{},None)
+    monkeypatch.setattr(m.github,'_api',fetch)
+    monkeypatch.setattr(time,'sleep',waits.append)
+    with pytest.raises(HTTPError) as actual:m.read_uploaded_artifact(10)
+    assert actual.value.code==code and len(requests)==attempts and waits==delays
+
+
+def test_upload_readback_cannot_substitute_a_different_artifact_id(monkeypatch):
+    m=api();artifact,_,_=metadata();artifact['id']=11;requests=[]
+    def fetch(path):requests.append(path);return artifact
+    monkeypatch.setattr(m.github,'_api',fetch)
+    with pytest.raises(ValueError):m.read_uploaded_artifact(10)
+    assert requests==['/actions/artifacts/10']
+
+
 def auth(a,r,j):
     return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
         now=datetime(2026,11,11,tzinfo=timezone.utc))
