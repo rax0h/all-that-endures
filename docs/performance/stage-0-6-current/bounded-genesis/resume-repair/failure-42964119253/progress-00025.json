@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.people",
+  "resources": {
+    "block_inputs": 246478728,
+    "block_outputs": 125631016,
+    "cpu_seconds": 3082.075799033,
+    "major_faults": 5,
+    "minor_faults": 127478,
+    "peak_rss_bytes": 427446272,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 165527419168,
+      "read_bytes": 126197121024,
+      "syscr": 9050143,
+      "syscw": 204047,
+      "wchar": 64967699525,
+      "write_bytes": 64323784704
+    },
+    "rss_bytes": 405975040
+  },
+  "time": 1794377913.7047992
+}

@@ -66,7 +66,7 @@ Stage0.6 is open until these real mature gates pass. No main merge, default
 activation or endurance execution is included.
 
 
-## Live execution checkpoint
+## Historical execution checkpoint (failed)
 
 Published mature request78bf9b1b6033c789078446c08f5d371e6120b805 launched
 [run42964119253](https://github.com/rax0h/all-that-endures/actions/runs/42964119253).
@@ -80,3 +80,11 @@ Use this run's compatible committed checkpoints for any explicit resume; do not
 restart the old monolithic workflow. The complete gate log is
 mature-gate-42964119253.log. A later documentation-only commit does not change the
 worker's pinned78bf9b1producer source or its42critical dependencies.
+
+Run42964119253 subsequently stopped in source_digest at3600s. No capture/catalog/
+rebase/proof/operational phase ran. CodecError wrapped the owned budget exception;
+raw failure evidence is failure-42964119253. The November11 accepted-source-control
+design supersedes repeating this historical scan. Its new candidate must pass a
+compatible hosted smoke before another protected mature request; Stage0.6 remains
+open. The actual post-rebase/fresh deep verification budget is now120min with a
+180min worker limit, based on the observed incomplete60min original scan.

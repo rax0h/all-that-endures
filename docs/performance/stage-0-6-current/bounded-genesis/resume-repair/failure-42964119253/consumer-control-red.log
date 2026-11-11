@@ -1,0 +1,137 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+______ test_mature_import_requires_the_actual_original_member_and_source _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-9/test_mature_import_requires_th0/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-9/saved-verifiers0/saved/candidate.sqlite'))
+
+    def test_mature_import_requires_the_actual_original_member_and_source(accepted_case):
+>       m=api();assert hasattr(m,'mature_control'),'mature accepted-member integration is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: mature accepted-member integration is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'mature_control')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:47: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+{"complete_format": true, "elapsed_seconds": 6.463499994424637e-05, "initialization": "mature", "milestones": [1, 2], "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "independent_control_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"bootstrap_year": 0, "complete_format": true, "elapsed_seconds": 0.052447661999849515, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "bootstrap_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"complete_format": true, "elapsed_seconds": 0.06671290399981444, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "cold_save_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"complete_format": true, "elapsed_seconds": 0.19013079199999083, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "lazy_conversion_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"checkpoint_stage": "lazy", "complete_format": true, "database_sha256": "58be9d7ad22e9564e2211f8d24359084acf1f3bfd0d95caff7927761ffbc1047", "elapsed_seconds": 0.6877669189998414, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "checkpoint_ready", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"stage": "storage_verified", "seconds": 0.3439138090000142}
+{"stage": "catalog_verified", "seconds": 2.805088279000074}
+{"checkpoint_product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "checkpoint_stage": "lazy", "complete_format": true, "elapsed_seconds": 0.0026817610000762215, "initialization": "mature", "origin_workflow_sha": "cccccccccccccccccccccccccccccccccccccccc", "product_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "source_database_sha256": "58be9d7ad22e9564e2211f8d24359084acf1f3bfd0d95caff7927761ffbc1047", "stage": "checkpoint_verified", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"complete_format": true, "elapsed_seconds": 0.0027647829999750684, "initialization": "mature", "product_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "stage": "complete_upgrade_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"checkpoint_stage": "complete", "complete_format": true, "database_sha256": "4478a988118f622e6ed2ea8ea9e163a08f1706918fd98403fdcf6fa00681be16", "elapsed_seconds": 0.04698944799997662, "initialization": "mature", "product_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "stage": "checkpoint_ready", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"phase": "copy_started"}
+{"cpu_seconds": 0.0332877490000012, "phase": "copy_finished", "wall_seconds": 0.03331019400002333}
+{"phase": "open_started"}
+{"cpu_seconds": 0.0415510269999988, "phase": "open_finished", "wall_seconds": 0.04269593000003624}
+{"phase": "simulation_started"}
+{"cpu_seconds": 2.5271634580000004, "phase": "simulation_finished", "wall_seconds": 2.528211050999971}
+{"phase": "after_simulation", "year": 1}
+{"phase": "save_started"}
+{"cpu_seconds": 1.5970429900000003, "phase": "save_finished", "wall_seconds": 1.5971563499999775}
+{"generation": 4, "phase": "after_save", "year": 1}
+{"phase": "before_close"}
+{"phase": "close_started"}
+{"cpu_seconds": 0.005764017999998927, "phase": "close_finished", "wall_seconds": 0.005763560999866968}
+{"phase": "after_close"}
+{"phase": "before_hash"}
+{"phase": "hash_started"}
+{"cpu_seconds": 0.02179276400000063, "phase": "hash_finished", "wall_seconds": 0.021791622000137068}
+{"phase": "before_publish"}
+{"checkpoint_sha256": "c6f1084e5680ae25c6a18bbd3557b94a0154b8f7f93e781b17ad94530ffd715f", "database": {"bytes": 17842176, "name": "candidate.sqlite", "sha256": "125f739febb1a4077bc80a9610dde80ca7afb64502aca0b307b7d193516a2e0d"}, "generation": 4, "phase": "save_bundle_published", "save_sha256": "abe8182bc709b9fb71bd171bbc57db517dc94250eeb2f0f11cc329e02c1c8c83", "year": 1}
+{"phase": "copy_started"}
+{"cpu_seconds": 0.029925077999999772, "phase": "copy_finished", "wall_seconds": 0.02992432199994255}
+{"phase": "open_started"}
+{"cpu_seconds": 0.058416734999999775, "phase": "open_finished", "wall_seconds": 0.05842029700011153}
+{"phase": "audit_started"}
+{"cpu_seconds": 1.2363689660000006, "phase": "audit_finished", "wall_seconds": 1.2368107790000522}
+{"generation": 4, "phase": "after_audit", "year": 1}
+{"phase": "close_started"}
+{"cpu_seconds": 0.007322420999999579, "phase": "close_finished", "wall_seconds": 0.007324855999968349}
+{"phase": "audit_receipt_published", "year": 1}
+{"phase": "copy_started"}
+{"cpu_seconds": 0.0031639170000001826, "phase": "copy_finished", "wall_seconds": 0.003164056000059645}
+{"phase": "open_started"}
+{"cpu_seconds": 0.05646273499999843, "phase": "open_finished", "wall_seconds": 0.05646064400002615}
+{"phase": "digest_started"}
+{"cpu_seconds": 1.2764838760000004, "phase": "digest_finished", "wall_seconds": 1.2768942420000258}
+{"generation": 4, "phase": "after_digest", "year": 1}
+{"phase": "close_started"}
+{"cpu_seconds": 0.006819194000000195, "phase": "close_finished", "wall_seconds": 0.0068177949999608245}
+{"phase": "digest_receipt_published", "year": 1}
+___ test_checkpoint_consumption_rejects_relabelled_imported_control[digest] ____
+
+damage = 'digest'
+
+    @pytest.mark.parametrize('damage',['digest','method','source_artifact','member','compatibility'])
+    def test_checkpoint_consumption_rejects_relabelled_imported_control(damage):
+>       m=api();assert hasattr(m,'validate_control_chain'),'imported baseline authority is not checked on consumption'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: imported baseline authority is not checked on consumption
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'validate_control_chain')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:64: AssertionError
+___ test_checkpoint_consumption_rejects_relabelled_imported_control[method] ____
+
+damage = 'method'
+
+    @pytest.mark.parametrize('damage',['digest','method','source_artifact','member','compatibility'])
+    def test_checkpoint_consumption_rejects_relabelled_imported_control(damage):
+>       m=api();assert hasattr(m,'validate_control_chain'),'imported baseline authority is not checked on consumption'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: imported baseline authority is not checked on consumption
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'validate_control_chain')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:64: AssertionError
+_ test_checkpoint_consumption_rejects_relabelled_imported_control[source_artifact] _
+
+damage = 'source_artifact'
+
+    @pytest.mark.parametrize('damage',['digest','method','source_artifact','member','compatibility'])
+    def test_checkpoint_consumption_rejects_relabelled_imported_control(damage):
+>       m=api();assert hasattr(m,'validate_control_chain'),'imported baseline authority is not checked on consumption'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: imported baseline authority is not checked on consumption
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'validate_control_chain')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:64: AssertionError
+___ test_checkpoint_consumption_rejects_relabelled_imported_control[member] ____
+
+damage = 'member'
+
+    @pytest.mark.parametrize('damage',['digest','method','source_artifact','member','compatibility'])
+    def test_checkpoint_consumption_rejects_relabelled_imported_control(damage):
+>       m=api();assert hasattr(m,'validate_control_chain'),'imported baseline authority is not checked on consumption'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: imported baseline authority is not checked on consumption
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'validate_control_chain')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:64: AssertionError
+_ test_checkpoint_consumption_rejects_relabelled_imported_control[compatibility] _
+
+damage = 'compatibility'
+
+    @pytest.mark.parametrize('damage',['digest','method','source_artifact','member','compatibility'])
+    def test_checkpoint_consumption_rejects_relabelled_imported_control(damage):
+>       m=api();assert hasattr(m,'validate_control_chain'),'imported baseline authority is not checked on consumption'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: imported baseline authority is not checked on consumption
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'validate_control_chain')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:64: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_mature_import_requires_the_actual_original_member_and_source
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[digest]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[method]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[source_artifact]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[member]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[compatibility]
+6 failed, 19 deselected in 15.88s

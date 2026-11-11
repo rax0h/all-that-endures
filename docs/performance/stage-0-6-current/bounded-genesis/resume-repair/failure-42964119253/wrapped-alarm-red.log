@@ -1,0 +1,64 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_wrapped_decoder_alarm_remains_a_censored_timeout _____________
+
+args = ('null',), kwargs = {}
+
+    def slow_decode(*args,**kwargs):
+>       time.sleep(0.2)
+
+.github/tests/test_stage_0_6_genesis_stages.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ = (14, <frame at 0x7f78e1540e40, file '/workspace/scratch/d88f8db353e8/ate/.github/tests/test_stage_0_6_genesis_stages.py', line 26, code slow_decode>)
+
+    def expired(*_):
+        if on_budget_expiry is not None:on_budget_expiry()
+>       raise base.BudgetExpired(name+' phase budget exhausted')
+E       simulation.profile_stage_0_5_performance.BudgetExpired: decode phase budget exhausted
+
+simulation/stage_0_6_mature_benchmark.py:61: BudgetExpired
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_wrapped_decoder_alarm_rem0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f78e238f490>
+
+    def test_wrapped_decoder_alarm_remains_a_censored_timeout(tmp_path,monkeypatch):
+        import time
+        from ate_sim import incremental_store
+        from simulation.profile_stage_0_5_performance import BudgetExpired
+        m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':0.05})
+        original=incremental_store.json.loads
+        def slow_decode(*args,**kwargs):
+            time.sleep(0.2)
+            return original(*args,**kwargs)
+        with monkeypatch.context() as change:
+            change.setattr(incremental_store.json,'loads',slow_decode)
+            with pytest.raises(BudgetExpired):
+>               rec.measure('decode',lambda:incremental_store.TypedCodec().decode(b'null'))
+
+.github/tests/test_stage_0_6_genesis_stages.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+.github/tests/test_stage_0_6_genesis_stages.py:31: in <lambda>
+    rec.measure('decode',lambda:incremental_store.TypedCodec().decode(b'null'))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.incremental_store.TypedCodec object at 0x7f78e16a6270>
+payload = b'null'
+
+    def decode(self, payload: bytes) -> Any:
+        try:
+            node = json.loads(payload.decode("utf-8"))
+        except Exception as exc:
+>           raise CodecError("invalid typed payload") from exc
+E           ate_sim.incremental_store.CodecError: invalid typed payload
+
+simulation/ate_sim/incremental_store.py:145: CodecError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_wrapped_decoder_alarm_remains_a_censored_timeout
+1 failed, 1 passed, 9 deselected in 0.70s

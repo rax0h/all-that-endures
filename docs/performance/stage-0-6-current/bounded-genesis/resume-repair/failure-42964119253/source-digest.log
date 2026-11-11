@@ -1,0 +1,857 @@
+﻿2026-11-11T05:13:42.5263744Z Current runner version: '2.338.2'
+2026-11-11T05:13:42.5289090Z ##[group]Runner Image Provisioner
+2026-11-11T05:13:42.5290336Z Hosted Compute Agent
+2026-11-11T05:13:42.5291074Z Version: 20261028.624
+2026-11-11T05:13:42.5291733Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-11T05:13:42.5292471Z Build Date: 2026-10-28T21:51:42Z
+2026-11-11T05:13:42.5293293Z Worker ID: {c05fe48e-eeef-4db4-ae38-27968b16693a}
+2026-11-11T05:13:42.5294019Z Region: westus
+2026-11-11T05:13:42.5294632Z Cloud: Azure
+2026-11-11T05:13:42.5295542Z ##[endgroup]
+2026-11-11T05:13:42.5297399Z ##[group]Operating System
+2026-11-11T05:13:42.5298393Z Ubuntu
+2026-11-11T05:13:42.5299076Z 24.04.5
+2026-11-11T05:13:42.5300183Z LTS
+2026-11-11T05:13:42.5300863Z ##[endgroup]
+2026-11-11T05:13:42.5301615Z ##[group]Runner Image
+2026-11-11T05:13:42.5302351Z Image: ubuntu-24.04
+2026-11-11T05:13:42.5303138Z Version: 20261101.360.1
+2026-11-11T05:13:42.5304723Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-11T05:13:42.5306709Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-11T05:13:42.5307919Z ##[endgroup]
+2026-11-11T05:13:42.5309388Z ##[group]GITHUB_TOKEN Permissions
+2026-11-11T05:13:42.5311723Z Actions: read
+2026-11-11T05:13:42.5312389Z Contents: read
+2026-11-11T05:13:42.5313163Z Metadata: read
+2026-11-11T05:13:42.5313742Z ##[endgroup]
+2026-11-11T05:13:42.5315819Z Secret source: Actions
+2026-11-11T05:13:42.5316838Z Cache mode: write
+2026-11-11T05:13:42.5317537Z Prepare workflow directory
+2026-11-11T05:13:42.5904073Z Prepare all required actions
+2026-11-11T05:13:42.5952371Z Getting action download info
+2026-11-11T05:13:42.9726343Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-11T05:13:43.0823160Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-11T05:13:43.1606066Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-11T05:13:43.3766470Z Complete job name: source-digest
+2026-11-11T05:13:43.4599932Z ##[group]Run actions/checkout@v4
+2026-11-11T05:13:43.4600873Z with:
+2026-11-11T05:13:43.4601364Z   ref: 78bf9b1b6033c789078446c08f5d371e6120b805
+2026-11-11T05:13:43.4601954Z   fetch-depth: 0
+2026-11-11T05:13:43.4602423Z   repository: rax0h/all-that-endures
+2026-11-11T05:13:43.4606287Z   token: ***
+2026-11-11T05:13:43.4606730Z   ssh-strict: true
+2026-11-11T05:13:43.4607177Z   ssh-user: git
+2026-11-11T05:13:43.4607624Z   persist-credentials: true
+2026-11-11T05:13:43.4608108Z   clean: true
+2026-11-11T05:13:43.4608551Z   sparse-checkout-cone-mode: true
+2026-11-11T05:13:43.4609080Z   fetch-tags: false
+2026-11-11T05:13:43.4609730Z   show-progress: true
+2026-11-11T05:13:43.4610206Z   lfs: false
+2026-11-11T05:13:43.4610628Z   submodules: false
+2026-11-11T05:13:43.4611088Z   set-safe-directory: true
+2026-11-11T05:13:43.4611596Z   allow-unsafe-pr-checkout: false
+2026-11-11T05:13:43.4612408Z env:
+2026-11-11T05:13:43.4612848Z   PYTHONPATH: .:simulation
+2026-11-11T05:13:43.4613368Z   PYTHONUNBUFFERED: 1
+2026-11-11T05:13:43.4617120Z   GH_TOKEN: ***
+2026-11-11T05:13:43.4617555Z ##[endgroup]
+2026-11-11T05:13:43.7452289Z Syncing repository: rax0h/all-that-endures
+2026-11-11T05:13:43.7454519Z ##[group]Getting Git version info
+2026-11-11T05:13:43.7455803Z Working directory is '/home/runner/work/all-that-endures/all-that-endures'
+2026-11-11T05:13:43.7457014Z [command]/usr/bin/git version
+2026-11-11T05:13:43.7547508Z git version 2.56.0
+2026-11-11T05:13:43.7573491Z ##[endgroup]
+2026-11-11T05:13:43.7590664Z Temporarily overriding HOME='/home/runner/work/_temp/e98f8a81-c93f-46e0-8f44-4ca0d96b56b1' before making global git config changes
+2026-11-11T05:13:43.7593726Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T05:13:43.7598252Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/all-that-endures/all-that-endures
+2026-11-11T05:13:43.7660315Z Deleting the contents of '/home/runner/work/all-that-endures/all-that-endures'
+2026-11-11T05:13:43.7673896Z ##[group]Initializing the repository
+2026-11-11T05:13:43.7679257Z [command]/usr/bin/git init /home/runner/work/all-that-endures/all-that-endures
+2026-11-11T05:13:43.7801160Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-11T05:13:43.7802971Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-11T05:13:43.7803970Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-11T05:13:43.7804717Z hint: call:
+2026-11-11T05:13:43.7805124Z hint:
+2026-11-11T05:13:43.7805630Z hint: 	git config --global init.defaultBranch <name>
+2026-11-11T05:13:43.7806235Z hint:
+2026-11-11T05:13:43.7806809Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-11T05:13:43.7807738Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-11T05:13:43.7808494Z hint:
+2026-11-11T05:13:43.7808933Z hint: 	git branch -m <name>
+2026-11-11T05:13:43.7809405Z hint:
+2026-11-11T05:13:43.7810753Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-11T05:13:43.7822488Z Initialized empty Git repository in /home/runner/work/all-that-endures/all-that-endures/.git/
+2026-11-11T05:13:43.7836890Z [command]/usr/bin/git remote add origin https://github.com/rax0h/all-that-endures
+2026-11-11T05:13:43.7890446Z ##[endgroup]
+2026-11-11T05:13:43.7891254Z ##[group]Disabling automatic garbage collection
+2026-11-11T05:13:43.7895718Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-11T05:13:43.7930764Z ##[endgroup]
+2026-11-11T05:13:43.7931515Z ##[group]Setting up auth
+2026-11-11T05:13:43.7940119Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T05:13:43.7982747Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T05:13:43.8422330Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T05:13:43.8471593Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T05:13:43.8732498Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T05:13:43.8781333Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T05:13:43.9057798Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-11T05:13:43.9112494Z ##[endgroup]
+2026-11-11T05:13:43.9113896Z ##[group]Fetching the repository
+2026-11-11T05:13:43.9127014Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-11T05:13:45.6097331Z From https://github.com/rax0h/all-that-endures
+2026-11-11T05:13:45.6179994Z  * [new branch]        astra/stage-0-5-continuation-recovery -> origin/astra/stage-0-5-continuation-recovery
+2026-11-11T05:13:45.6183899Z  * [new branch]        astra/stage-0-5-final-review-2026-10-20 -> origin/astra/stage-0-5-final-review-2026-10-20
+2026-11-11T05:13:45.6186917Z  * [new branch]        diagnostic/stage-0.5-profile -> origin/diagnostic/stage-0.5-profile
+2026-11-11T05:13:45.6188859Z  * [new branch]        docs/gameplay-living-world-vision -> origin/docs/gameplay-living-world-vision
+2026-11-11T05:13:45.6192179Z  * [new branch]        game-ready/stage-0.5-rearchitecture -> origin/game-ready/stage-0.5-rearchitecture
+2026-11-11T05:13:45.6195190Z  * [new branch]        main                    -> origin/main
+2026-11-11T05:13:45.6198082Z  * [new branch]        playground/person-explorer -> origin/playground/person-explorer
+2026-11-11T05:13:45.6201807Z  * [new branch]        research/stage-0.5-causal-rebuild -> origin/research/stage-0.5-causal-rebuild
+2026-11-11T05:13:45.6204254Z  * [new branch]        sim/canonical-magic-progression -> origin/sim/canonical-magic-progression
+2026-11-11T05:13:45.6206446Z  * [new branch]        sim/current-standard    -> origin/sim/current-standard
+2026-11-11T05:13:45.6208378Z  * [new branch]        sim/deep-history-systems -> origin/sim/deep-history-systems
+2026-11-11T05:13:45.6211413Z  * [new branch]        sim/game-ready-causal-architecture -> origin/sim/game-ready-causal-architecture
+2026-11-11T05:13:45.6214405Z  * [new branch]        sim/hwfwm-continuity-calibration -> origin/sim/hwfwm-continuity-calibration
+2026-11-11T05:13:45.6217301Z  * [new branch]        sim/magic-liquidity-exchange -> origin/sim/magic-liquidity-exchange
+2026-11-11T05:13:45.6220526Z  * [new branch]        sim/personhood-history-foundations -> origin/sim/personhood-history-foundations
+2026-11-11T05:13:45.6223283Z  * [new branch]        sim/ranked-threat-ecology -> origin/sim/ranked-threat-ecology
+2026-11-11T05:13:45.6226042Z  * [new branch]        sim/stage-0-5-astra-ownership-repair -> origin/sim/stage-0-5-astra-ownership-repair
+2026-11-11T05:13:45.6229064Z  * [new branch]        sim/stage-0-5-final-architecture -> origin/sim/stage-0-5-final-architecture
+2026-11-11T05:13:45.6232538Z  * [new branch]        sim/stage-0-5-household-living-selection -> origin/sim/stage-0-5-household-living-selection
+2026-11-11T05:13:45.6235811Z  * [new branch]        sim/stage-0-5-household-scoped-index -> origin/sim/stage-0-5-household-scoped-index
+2026-11-11T05:13:45.6239058Z  * [new branch]        sim/stage-0-5-household-tail-delete -> origin/sim/stage-0-5-household-tail-delete
+2026-11-11T05:13:45.6243580Z  * [new branch]        sim/stage-0-5-living-consumer-closeout -> origin/sim/stage-0-5-living-consumer-closeout
+2026-11-11T05:13:45.6248755Z  * [new branch]        sim/stage-0-5-r123-closeout-probes -> origin/sim/stage-0-5-r123-closeout-probes
+2026-11-11T05:13:45.6253426Z  * [new branch]        sim/stage-0-5-r1r2-final-short-gate -> origin/sim/stage-0-5-r1r2-final-short-gate
+2026-11-11T05:13:45.6256736Z  * [new branch]        sim/stage-0-5-r3-converged-validation -> origin/sim/stage-0-5-r3-converged-validation
+2026-11-11T05:13:45.6260631Z  * [new branch]        sim/stage-0-5-r3-cross-family-gate -> origin/sim/stage-0-5-r3-cross-family-gate
+2026-11-11T05:13:45.6263711Z  * [new branch]        sim/stage-0-5-r3-cross-family-v2 -> origin/sim/stage-0-5-r3-cross-family-v2
+2026-11-11T05:13:45.6266512Z  * [new branch]        sim/stage-0-5-r3-debug-split -> origin/sim/stage-0-5-r3-debug-split
+2026-11-11T05:13:45.6269260Z  * [new branch]        sim/stage-0-5-r3-default-mode -> origin/sim/stage-0-5-r3-default-mode
+2026-11-11T05:13:45.6272414Z  * [new branch]        sim/stage-0-5-r3-final-frozen -> origin/sim/stage-0-5-r3-final-frozen
+2026-11-11T05:13:45.6275331Z  * [new branch]        sim/stage-0-5-r3-final-suite-gate -> origin/sim/stage-0-5-r3-final-suite-gate
+2026-11-11T05:13:45.6278437Z  * [new branch]        sim/stage-0-5-r3-id-lifetime-fix -> origin/sim/stage-0-5-r3-id-lifetime-fix
+2026-11-11T05:13:45.6282127Z  * [new branch]        sim/stage-0-5-r3-identity-publication-fix -> origin/sim/stage-0-5-r3-identity-publication-fix
+2026-11-11T05:13:45.6285483Z  * [new branch]        sim/stage-0-5-r3-implementation -> origin/sim/stage-0-5-r3-implementation
+2026-11-11T05:13:45.6289906Z  * [new branch]        sim/stage-0-5-r3-independent-gates -> origin/sim/stage-0-5-r3-independent-gates
+2026-11-11T05:13:45.6293480Z  * [new branch]        sim/stage-0-5-r3-recovery-gate -> origin/sim/stage-0-5-r3-recovery-gate
+2026-11-11T05:13:45.6296547Z  * [new branch]        sim/stage-0-5-r3-release-candidate -> origin/sim/stage-0-5-r3-release-candidate
+2026-11-11T05:13:45.6300019Z  * [new branch]        sim/stage-0-5-r3-repaired-candidate -> origin/sim/stage-0-5-r3-repaired-candidate
+2026-11-11T05:13:45.6303141Z  * [new branch]        sim/stage-0-5-stabilization -> origin/sim/stage-0-5-stabilization
+2026-11-11T05:13:45.6306473Z  * [new branch]        sim/stage-0-5-touched-household-save -> origin/sim/stage-0-5-touched-household-save
+2026-11-11T05:13:45.6309661Z  * [new branch]        sim/stage-0.5-clean-recovery -> origin/sim/stage-0.5-clean-recovery
+2026-11-11T05:13:45.6312459Z  * [new branch]        sim/stage-0.5-gold-freeze -> origin/sim/stage-0.5-gold-freeze
+2026-11-11T05:13:45.6315257Z  * [new branch]        sim/stage-0.5-integrated-candidate -> origin/sim/stage-0.5-integrated-candidate
+2026-11-11T05:13:45.6320038Z  * [new branch]        sim/stage-0.5-magic-access-calibration -> origin/sim/stage-0.5-magic-access-calibration
+2026-11-11T05:13:45.6323555Z  * [new branch]        sim/stage-0.5-magic-access-diagnostics -> origin/sim/stage-0.5-magic-access-diagnostics
+2026-11-11T05:13:45.6326522Z  * [new branch]        sol-p4-10-skills-affected -> origin/sol-p4-10-skills-affected
+2026-11-11T05:13:45.6328962Z  * [new branch]        sol-p4-10-skills-focused -> origin/sol-p4-10-skills-focused
+2026-11-11T05:13:45.6331578Z  * [new branch]        sol-p4-10-skills-scaling -> origin/sol-p4-10-skills-scaling
+2026-11-11T05:13:45.6334036Z  * [new branch]        sol-p4-11a-lineage-affected -> origin/sol-p4-11a-lineage-affected
+2026-11-11T05:13:45.6336566Z  * [new branch]        sol-p4-11a-lineage-focused -> origin/sol-p4-11a-lineage-focused
+2026-11-11T05:13:45.6339023Z  * [new branch]        sol-p4-11a-lineage-scaling -> origin/sol-p4-11a-lineage-scaling
+2026-11-11T05:13:45.6341878Z  * [new branch]        sol-p4-12-genealogy-affected -> origin/sol-p4-12-genealogy-affected
+2026-11-11T05:13:45.6344511Z  * [new branch]        sol-p4-12a-genealogy-focused -> origin/sol-p4-12a-genealogy-focused
+2026-11-11T05:13:45.6347215Z  * [new branch]        sol-p4-12a-genealogy-focused-2 -> origin/sol-p4-12a-genealogy-focused-2
+2026-11-11T05:13:45.6350250Z  * [new branch]        sol-p4-12a-genealogy-focused-3 -> origin/sol-p4-12a-genealogy-focused-3
+2026-11-11T05:13:45.6352971Z  * [new branch]        sol-p4-12a-genealogy-scaling -> origin/sol-p4-12a-genealogy-scaling
+2026-11-11T05:13:45.6355791Z  * [new branch]        sol-p4-12b-genealogy-focused -> origin/sol-p4-12b-genealogy-focused
+2026-11-11T05:13:45.6358404Z  * [new branch]        sol-p4-12b-genealogy-scaling -> origin/sol-p4-12b-genealogy-scaling
+2026-11-11T05:13:45.6361457Z  * [new branch]        sol-p4-13-community-affected -> origin/sol-p4-13-community-affected
+2026-11-11T05:13:45.6364065Z  * [new branch]        sol-p4-13-community-focused -> origin/sol-p4-13-community-focused
+2026-11-11T05:13:45.6366583Z  * [new branch]        sol-p4-13-community-scaling -> origin/sol-p4-13-community-scaling
+2026-11-11T05:13:45.6369032Z  * [new branch]        sol-p4-14-import-patcher -> origin/sol-p4-14-import-patcher
+2026-11-11T05:13:45.6372064Z  * [new branch]        sol-p4-14-lineage-children-affected -> origin/sol-p4-14-lineage-children-affected
+2026-11-11T05:13:45.6375315Z  * [new branch]        sol-p4-14-lineage-children-affected-2 -> origin/sol-p4-14-lineage-children-affected-2
+2026-11-11T05:13:45.6378505Z  * [new branch]        sol-p4-14-lineage-children-focused -> origin/sol-p4-14-lineage-children-focused
+2026-11-11T05:13:45.6381756Z  * [new branch]        sol-p4-14-lineage-children-focused-2 -> origin/sol-p4-14-lineage-children-focused-2
+2026-11-11T05:13:45.6384900Z  * [new branch]        sol-p4-14-lineage-children-scaling -> origin/sol-p4-14-lineage-children-scaling
+2026-11-11T05:13:45.6387762Z  * [new branch]        sol-p4-14-lineage-overlay-fix -> origin/sol-p4-14-lineage-overlay-fix
+2026-11-11T05:13:45.6390789Z  * [new branch]        sol-p4-2-cold-detach-regression -> origin/sol-p4-2-cold-detach-regression
+2026-11-11T05:13:45.6393775Z  * [new branch]        sol-p4-2-cross-owner-transfer-gate -> origin/sol-p4-2-cross-owner-transfer-gate
+2026-11-11T05:13:45.6396837Z  * [new branch]        sol-p4-2-cross-person-affected-gate -> origin/sol-p4-2-cross-person-affected-gate
+2026-11-11T05:13:45.6400119Z  * [new branch]        sol-p4-2-cross-person-field-gate -> origin/sol-p4-2-cross-person-field-gate
+2026-11-11T05:13:45.6403383Z  * [new branch]        sol-p4-2-generated-cold-diagnostic -> origin/sol-p4-2-generated-cold-diagnostic
+2026-11-11T05:13:45.6406150Z  * [new branch]        sol-p4-2-hybrid-broad-gate -> origin/sol-p4-2-hybrid-broad-gate
+2026-11-11T05:13:45.6408886Z  * [new branch]        sol-p4-2-hybrid-digest-diagnostic -> origin/sol-p4-2-hybrid-digest-diagnostic
+2026-11-11T05:13:45.6411829Z  * [new branch]        sol-p4-2-hybrid-exact-repro -> origin/sol-p4-2-hybrid-exact-repro
+2026-11-11T05:13:45.6414436Z  * [new branch]        sol-p4-2-hybrid-exact-repro-2 -> origin/sol-p4-2-hybrid-exact-repro-2
+2026-11-11T05:13:45.6417418Z  * [new branch]        sol-p4-2-hybrid-journal-diagnostic -> origin/sol-p4-2-hybrid-journal-diagnostic
+2026-11-11T05:13:45.6420562Z  * [new branch]        sol-p4-2-hybrid-lifecycle-gate -> origin/sol-p4-2-hybrid-lifecycle-gate
+2026-11-11T05:13:45.6423375Z  * [new branch]        sol-p4-2-hybrid-lifecycle-gate-2 -> origin/sol-p4-2-hybrid-lifecycle-gate-2
+2026-11-11T05:13:45.6426241Z  * [new branch]        sol-p4-2-hybrid-reopen-fix-gate -> origin/sol-p4-2-hybrid-reopen-fix-gate
+2026-11-11T05:13:45.6429295Z  * [new branch]        sol-p4-2-hybrid-reopen-fix-gate-2 -> origin/sol-p4-2-hybrid-reopen-fix-gate-2
+2026-11-11T05:13:45.6432430Z  * [new branch]        sol-p4-2-hybrid-step-diagnostic -> origin/sol-p4-2-hybrid-step-diagnostic
+2026-11-11T05:13:45.6434998Z  * [new branch]        sol-p4-2-lazy-detach-gate -> origin/sol-p4-2-lazy-detach-gate
+2026-11-11T05:13:45.6437387Z  * [new branch]        sol-p4-2-lazy-detach-gate-2 -> origin/sol-p4-2-lazy-detach-gate-2
+2026-11-11T05:13:45.6440364Z  * [new branch]        sol-p4-2-owner-transfer-affected -> origin/sol-p4-2-owner-transfer-affected
+2026-11-11T05:13:45.6442989Z  * [new branch]        sol-p4-2-people-open-gate-2 -> origin/sol-p4-2-people-open-gate-2
+2026-11-11T05:13:45.6445422Z  * [new branch]        sol-p4-2-people-write-gate -> origin/sol-p4-2-people-write-gate
+2026-11-11T05:13:45.6447850Z  * [new branch]        sol-p4-2-people-write-gate-2 -> origin/sol-p4-2-people-write-gate-2
+2026-11-11T05:13:45.6450792Z  * [new branch]        sol-p4-2-people-write-gate-3 -> origin/sol-p4-2-people-write-gate-3
+2026-11-11T05:13:45.6453273Z  * [new branch]        sol-p4-2-reactivation-gate -> origin/sol-p4-2-reactivation-gate
+2026-11-11T05:13:45.6455957Z  * [new branch]        sol-p4-2-two-step-continuation-gate -> origin/sol-p4-2-two-step-continuation-gate
+2026-11-11T05:13:45.6458644Z  * [new branch]        sol-p4-5-soul-affected-gate -> origin/sol-p4-5-soul-affected-gate
+2026-11-11T05:13:45.6461463Z  * [new branch]        sol-p4-5-soul-affected-gate-2 -> origin/sol-p4-5-soul-affected-gate-2
+2026-11-11T05:13:45.6463928Z  * [new branch]        sol-p4-5-soul-focused-gate -> origin/sol-p4-5-soul-focused-gate
+2026-11-11T05:13:45.6466405Z  * [new branch]        sol-p4-6-advancement-affected -> origin/sol-p4-6-advancement-affected
+2026-11-11T05:13:45.6468934Z  * [new branch]        sol-p4-6-advancement-focused -> origin/sol-p4-6-advancement-focused
+2026-11-11T05:13:45.6471800Z  * [new branch]        sol-p4-6-advancement-scaling -> origin/sol-p4-6-advancement-scaling
+2026-11-11T05:13:45.6474245Z  * [new branch]        sol-p4-6-advancement-smoke -> origin/sol-p4-6-advancement-smoke
+2026-11-11T05:13:45.6476649Z  * [new branch]        sol-p4-6-advancement-smoke-2 -> origin/sol-p4-6-advancement-smoke-2
+2026-11-11T05:13:45.6479177Z  * [new branch]        sol-p4-7-institutions-affected -> origin/sol-p4-7-institutions-affected
+2026-11-11T05:13:45.6481925Z  * [new branch]        sol-p4-7-institutions-focused -> origin/sol-p4-7-institutions-focused
+2026-11-11T05:13:45.6484460Z  * [new branch]        sol-p4-7-institutions-scaling -> origin/sol-p4-7-institutions-scaling
+2026-11-11T05:13:45.6486864Z  * [new branch]        sol-p4-8-motive-regression -> origin/sol-p4-8-motive-regression
+2026-11-11T05:13:45.6489123Z  * [new branch]        sol-p4-8-scalar-affected -> origin/sol-p4-8-scalar-affected
+2026-11-11T05:13:45.6491716Z  * [new branch]        sol-p4-8-scalar-archives-affected -> origin/sol-p4-8-scalar-archives-affected
+2026-11-11T05:13:45.6494745Z  * [new branch]        sol-p4-8-scalar-archives-affected-2 -> origin/sol-p4-8-scalar-archives-affected-2
+2026-11-11T05:13:45.6497528Z  * [new branch]        sol-p4-8-scalar-archives-focused -> origin/sol-p4-8-scalar-archives-focused
+2026-11-11T05:13:45.6500551Z  * [new branch]        sol-p4-8-scalar-archives-scaling -> origin/sol-p4-8-scalar-archives-scaling
+2026-11-11T05:13:45.6503035Z  * [new branch]        sol-p4-8-scalar-focused -> origin/sol-p4-8-scalar-focused
+2026-11-11T05:13:45.6505121Z  * [new branch]        sol-p4-8-scalar-scaling -> origin/sol-p4-8-scalar-scaling
+2026-11-11T05:13:45.6507270Z  * [new branch]        sol-p4-9-social-affected -> origin/sol-p4-9-social-affected
+2026-11-11T05:13:45.6509385Z  * [new branch]        sol-p4-9-social-focused -> origin/sol-p4-9-social-focused
+2026-11-11T05:13:45.6511765Z  * [new branch]        sol-p4-9-social-scaling -> origin/sol-p4-9-social-scaling
+2026-11-11T05:13:45.6514292Z  * [new branch]        sol-p4-advancement-residual-measure -> origin/sol-p4-advancement-residual-measure
+2026-11-11T05:13:45.6516975Z  * [new branch]        sol-p4-aspiration-pilot-gate -> origin/sol-p4-aspiration-pilot-gate
+2026-11-11T05:13:45.6519669Z  * [new branch]        sol-p4-aspiration-pilot-gate-2 -> origin/sol-p4-aspiration-pilot-gate-2
+2026-11-11T05:13:45.6522534Z  * [new branch]        sol-p4-cross-boundary-aspiration-debug -> origin/sol-p4-cross-boundary-aspiration-debug
+2026-11-11T05:13:45.6525395Z  * [new branch]        sol-p4-cross-boundary-index-fix -> origin/sol-p4-cross-boundary-index-fix
+2026-11-11T05:13:45.6528272Z  * [new branch]        sol-p4-cross-boundary-indexed-alias-fix -> origin/sol-p4-cross-boundary-indexed-alias-fix
+2026-11-11T05:13:45.6531289Z  * [new branch]        sol-p4-currency-alias-regression -> origin/sol-p4-currency-alias-regression
+2026-11-11T05:13:45.6534043Z  * [new branch]        sol-p4-currency-alias-regression-2 -> origin/sol-p4-currency-alias-regression-2
+2026-11-11T05:13:45.6537062Z  * [new branch]        sol-p4-currency-alias-regression-3 -> origin/sol-p4-currency-alias-regression-3
+2026-11-11T05:13:45.6539889Z  * [new branch]        sol-p4-integrated-full-suite -> origin/sol-p4-integrated-full-suite
+2026-11-11T05:13:45.6542241Z  * [new branch]        sol-p4-lazy-resources-gate -> origin/sol-p4-lazy-resources-gate
+2026-11-11T05:13:45.6544562Z  * [new branch]        sol-p4-lazy-resources-gate-2 -> origin/sol-p4-lazy-resources-gate-2
+2026-11-11T05:13:45.6547217Z  * [new branch]        sol-p4-magic-family-residual-measure -> origin/sol-p4-magic-family-residual-measure
+2026-11-11T05:13:45.6550212Z  * [new branch]        sol-p4-materials-residual-measure -> origin/sol-p4-materials-residual-measure
+2026-11-11T05:13:45.6552630Z  * [new branch]        sol-p4-owner-index-gate -> origin/sol-p4-owner-index-gate
+2026-11-11T05:13:45.6555021Z  * [new branch]        sol-p4-owner-index-residual-after -> origin/sol-p4-owner-index-residual-after
+2026-11-11T05:13:45.6557821Z  * [new branch]        sol-p4-owner-index-residual-measure -> origin/sol-p4-owner-index-residual-measure
+2026-11-11T05:13:45.6560689Z  * [new branch]        sol-p4-residual-eager-inventory -> origin/sol-p4-residual-eager-inventory
+2026-11-11T05:13:45.6563370Z  * [new branch]        sol-p4-residual-eager-inventory-10 -> origin/sol-p4-residual-eager-inventory-10
+2026-11-11T05:13:45.6566120Z  * [new branch]        sol-p4-residual-eager-inventory-2 -> origin/sol-p4-residual-eager-inventory-2
+2026-11-11T05:13:45.6568816Z  * [new branch]        sol-p4-residual-eager-inventory-3 -> origin/sol-p4-residual-eager-inventory-3
+2026-11-11T05:13:45.6571654Z  * [new branch]        sol-p4-residual-eager-inventory-4 -> origin/sol-p4-residual-eager-inventory-4
+2026-11-11T05:13:45.6574376Z  * [new branch]        sol-p4-residual-eager-inventory-5 -> origin/sol-p4-residual-eager-inventory-5
+2026-11-11T05:13:45.6577081Z  * [new branch]        sol-p4-residual-eager-inventory-6 -> origin/sol-p4-residual-eager-inventory-6
+2026-11-11T05:13:45.6580071Z  * [new branch]        sol-p4-residual-eager-inventory-7 -> origin/sol-p4-residual-eager-inventory-7
+2026-11-11T05:13:45.6582777Z  * [new branch]        sol-p4-residual-eager-inventory-8 -> origin/sol-p4-residual-eager-inventory-8
+2026-11-11T05:13:45.6585547Z  * [new branch]        sol-p4-residual-eager-inventory-9 -> origin/sol-p4-residual-eager-inventory-9
+2026-11-11T05:13:45.6588204Z  * [new branch]        sol-p4-resource-cache-diagnostic -> origin/sol-p4-resource-cache-diagnostic
+2026-11-11T05:13:45.6590798Z  * [new branch]        sol-p4-resource-detach-gate -> origin/sol-p4-resource-detach-gate
+2026-11-11T05:13:45.6593166Z  * [new branch]        sol-p4-resource-detach-gate-2 -> origin/sol-p4-resource-detach-gate-2
+2026-11-11T05:13:45.6595664Z  * [new branch]        sol-p4-resource-order-diagnostic -> origin/sol-p4-resource-order-diagnostic
+2026-11-11T05:13:45.6598118Z  * [new branch]        sol-p4-resource-pilot-final -> origin/sol-p4-resource-pilot-final
+2026-11-11T05:13:45.6600568Z  * [new branch]        sol-p4-resource-pilot-gate -> origin/sol-p4-resource-pilot-gate
+2026-11-11T05:13:45.6602869Z  * [new branch]        sol-p4-resource-pilot-gate-2 -> origin/sol-p4-resource-pilot-gate-2
+2026-11-11T05:13:45.6605391Z  * [new branch]        sol-p4-resources-residual-measure -> origin/sol-p4-resources-residual-measure
+2026-11-11T05:13:45.6607782Z  * [new branch]        sol-p5-short-final-gates -> origin/sol-p5-short-final-gates
+2026-11-11T05:13:45.6609967Z  * [new branch]        sol-p5-short-integrated -> origin/sol-p5-short-integrated
+2026-11-11T05:13:45.6612142Z  * [new branch]        sol-stage-0-5-closeout-fixes -> origin/sol-stage-0-5-closeout-fixes
+2026-11-11T05:13:45.6614465Z  * [new branch]        sol-stage-0-5-closeout-short -> origin/sol-stage-0-5-closeout-short
+2026-11-11T05:13:45.6616720Z  * [new branch]        sol-stage-0-5-diagnose-260 -> origin/sol-stage-0-5-diagnose-260
+2026-11-11T05:13:45.6618869Z  * [new branch]        sol-stage-0-5-diagnose-500 -> origin/sol-stage-0-5-diagnose-500
+2026-11-11T05:13:45.6621728Z  * [new branch]        sol-stage-0-5-diagnose-transmission-251 -> origin/sol-stage-0-5-diagnose-transmission-251
+2026-11-11T05:13:45.6624409Z  * [new branch]        sol-stage-0-5-divergence-250 -> origin/sol-stage-0-5-divergence-250
+2026-11-11T05:13:45.6626679Z  * [new branch]        sol-stage-0-5-endurance-1000 -> origin/sol-stage-0-5-endurance-1000
+2026-11-11T05:13:45.6628988Z  * [new branch]        sol-stage-0-5-endurance-1000b -> origin/sol-stage-0-5-endurance-1000b
+2026-11-11T05:13:45.6631493Z  * [new branch]        sol-stage-0-5-final-closeout -> origin/sol-stage-0-5-final-closeout
+2026-11-11T05:13:45.6633967Z  * [new branch]        sol-stage-0-5-final-closeout-783ec -> origin/sol-stage-0-5-final-closeout-783ec
+2026-11-11T05:13:45.6636523Z  * [new branch]        sol-stage-0-5-final-closeout-v2 -> origin/sol-stage-0-5-final-closeout-v2
+2026-11-11T05:13:45.6639091Z  * [new branch]        sol-stage-0-5-final-endurance-5dd5 -> origin/sol-stage-0-5-final-endurance-5dd5
+2026-11-11T05:13:45.6641903Z  * [new branch]        sol-stage-0-5-final-sharded-suite -> origin/sol-stage-0-5-final-sharded-suite
+2026-11-11T05:13:45.6644749Z  * [new branch]        sol-stage-0-5-final-short-after-alias-fix -> origin/sol-stage-0-5-final-short-after-alias-fix
+2026-11-11T05:13:45.6647290Z  * [new branch]        sol-stage-0-5-gate-500b -> origin/sol-stage-0-5-gate-500b
+2026-11-11T05:13:45.6649280Z  * [new branch]        sol-stage-0-5-gate-500c -> origin/sol-stage-0-5-gate-500c
+2026-11-11T05:13:45.6651569Z  * [new branch]        sol-stage-0-5-hot-working-set -> origin/sol-stage-0-5-hot-working-set
+2026-11-11T05:13:45.6654052Z  * [new branch]        sol-stage-0-5-hot-working-set-250 -> origin/sol-stage-0-5-hot-working-set-250
+2026-11-11T05:13:45.6656667Z  * [new branch]        sol-stage-0-5-hot-working-set-250b -> origin/sol-stage-0-5-hot-working-set-250b
+2026-11-11T05:13:45.6659320Z  * [new branch]        sol-stage-0-5-hot-working-set-250c -> origin/sol-stage-0-5-hot-working-set-250c
+2026-11-11T05:13:45.6662274Z  * [new branch]        sol-stage-0-5-hot-working-set-250d -> origin/sol-stage-0-5-hot-working-set-250d
+2026-11-11T05:13:45.6664928Z  * [new branch]        sol-stage-0-5-hot-working-set-250e -> origin/sol-stage-0-5-hot-working-set-250e
+2026-11-11T05:13:45.6667579Z  * [new branch]        sol-stage-0-5-hot-working-set-250f -> origin/sol-stage-0-5-hot-working-set-250f
+2026-11-11T05:13:45.6670604Z  * [new branch]        sol-stage-0-5-hot-working-set-profile-100 -> origin/sol-stage-0-5-hot-working-set-profile-100
+2026-11-11T05:13:45.6673787Z  * [new branch]        sol-stage-0-5-hot-working-set-profile-100b -> origin/sol-stage-0-5-hot-working-set-profile-100b
+2026-11-11T05:13:45.6676453Z  * [new branch]        sol-stage-0-5-p5-endurance -> origin/sol-stage-0-5-p5-endurance
+2026-11-11T05:13:45.6678627Z  * [new branch]        sol-stage-0-5-p5-long-final -> origin/sol-stage-0-5-p5-long-final
+2026-11-11T05:13:45.6681142Z  * [new branch]        sol-stage-0-5-p5-long-prep -> origin/sol-stage-0-5-p5-long-prep
+2026-11-11T05:13:45.6683355Z  * [new branch]        sol-stage-0-5-profile-250 -> origin/sol-stage-0-5-profile-250
+2026-11-11T05:13:45.6685491Z  * [new branch]        sol-stage-0-5-profile-250b -> origin/sol-stage-0-5-profile-250b
+2026-11-11T05:13:45.6687653Z  * [new branch]        sol-stage-0-5-profile-250c -> origin/sol-stage-0-5-profile-250c
+2026-11-11T05:13:45.6690236Z  * [new branch]        sol-stage-0-5-profile-late-400 -> origin/sol-stage-0-5-profile-late-400
+2026-11-11T05:13:45.6692720Z  * [new branch]        sol-stage-0-5-profile-late-400b -> origin/sol-stage-0-5-profile-late-400b
+2026-11-11T05:13:45.6694957Z  * [new branch]        sol-stage-0-5-proof-251 -> origin/sol-stage-0-5-proof-251
+2026-11-11T05:13:45.6697358Z  * [new branch]        sol-stage-0-5-targeted-closeout-5dd5 -> origin/sol-stage-0-5-targeted-closeout-5dd5
+2026-11-11T05:13:45.6699861Z  * [new branch]        sol/durable-proof-map   -> origin/sol/durable-proof-map
+2026-11-11T05:13:45.6702016Z  * [new branch]        sol/incremental-state-proofs -> origin/sol/incremental-state-proofs
+2026-11-11T05:13:45.6704746Z  * [new branch]        sol/mature-benchmark-harness-repair -> origin/sol/mature-benchmark-harness-repair
+2026-11-11T05:13:45.6707317Z  * [new branch]        sol/millennium-history-843017 -> origin/sol/millennium-history-843017
+2026-11-11T05:13:45.6709649Z  * [new branch]        sol/multiseed-war-scan  -> origin/sol/multiseed-war-scan
+2026-11-11T05:13:45.6711591Z  * [new branch]        sol/p1-review-r1-r4     -> origin/sol/p1-review-r1-r4
+2026-11-11T05:13:45.6713606Z  * [new branch]        sol/p1-transactional-store -> origin/sol/p1-transactional-store
+2026-11-11T05:13:45.6715683Z  * [new branch]        sol/p2a-world-adapters  -> origin/sol/p2a-world-adapters
+2026-11-11T05:13:45.6717583Z  * [new branch]        sol/p2b-f1-f3           -> origin/sol/p2b-f1-f3
+2026-11-11T05:13:45.6719310Z  * [new branch]        sol/p2b-i1-i2           -> origin/sol/p2b-i1-i2
+2026-11-11T05:13:45.6721574Z  * [new branch]        sol/p2b-mutation-tracking -> origin/sol/p2b-mutation-tracking
+2026-11-11T05:13:45.6723529Z  * [new branch]        sol/p2b-r1-r6           -> origin/sol/p2b-r1-r6
+2026-11-11T05:13:45.6725340Z  * [new branch]        sol/p2c-current-links   -> origin/sol/p2c-current-links
+2026-11-11T05:13:45.6727398Z  * [new branch]        sol/p3a-sealed-event-prefix -> origin/sol/p3a-sealed-event-prefix
+2026-11-11T05:13:45.6730047Z  * [new branch]        sol/p3a-verify-full-cache-bypass -> origin/sol/p3a-verify-full-cache-bypass
+2026-11-11T05:13:45.6732633Z  * [new branch]        sol/p3b-cold-bootstrap-candidate -> origin/sol/p3b-cold-bootstrap-candidate
+2026-11-11T05:13:45.6735041Z  * [new branch]        sol/p3b-cold-bootstrap-scale -> origin/sol/p3b-cold-bootstrap-scale
+2026-11-11T05:13:45.6737307Z  * [new branch]        sol/p3b-cold-bootstrap-smoke -> origin/sol/p3b-cold-bootstrap-smoke
+2026-11-11T05:13:45.6739772Z  * [new branch]        sol/p3b-cold-capture-candidate -> origin/sol/p3b-cold-capture-candidate
+2026-11-11T05:13:45.6742657Z  * [new branch]        sol/p3b-cold-capture-followup-candidate -> origin/sol/p3b-cold-capture-followup-candidate
+2026-11-11T05:13:45.6745236Z  * [new branch]        sol/p3b-cold-save-candidate -> origin/sol/p3b-cold-save-candidate
+2026-11-11T05:13:45.6747513Z  * [new branch]        sol/p3b-cold-save-review-fixes -> origin/sol/p3b-cold-save-review-fixes
+2026-11-11T05:13:45.6750260Z  * [new branch]        sol/p3b-eventlog-component-candidate -> origin/sol/p3b-eventlog-component-candidate
+2026-11-11T05:13:45.6753185Z  * [new branch]        sol/p3b-eventlog-corrections-candidate -> origin/sol/p3b-eventlog-corrections-candidate
+2026-11-11T05:13:45.6755910Z  * [new branch]        sol/p3b-identity-bounded-20261003 -> origin/sol/p3b-identity-bounded-20261003
+2026-11-11T05:13:45.6758227Z  * [new branch]        sol/p3b-identity-candidate -> origin/sol/p3b-identity-candidate
+2026-11-11T05:13:45.6760742Z  * [new branch]        sol/p3b-identity-restore-candidate -> origin/sol/p3b-identity-restore-candidate
+2026-11-11T05:13:45.6763407Z  * [new branch]        sol/p3b-identity-reviewed-candidate -> origin/sol/p3b-identity-reviewed-candidate
+2026-11-11T05:13:45.6765895Z  * [new branch]        sol/p3b-lifecycle-candidate -> origin/sol/p3b-lifecycle-candidate
+2026-11-11T05:13:45.6768083Z  * [new branch]        sol/p3b-live-open-candidate -> origin/sol/p3b-live-open-candidate
+2026-11-11T05:13:45.6770490Z  * [new branch]        sol/p3b-live-open-review-fixes -> origin/sol/p3b-live-open-review-fixes
+2026-11-11T05:13:45.6772604Z  * [new branch]        sol/p4-1-apply          -> origin/sol/p4-1-apply
+2026-11-11T05:13:45.6774455Z  * [new branch]        sol/p4-1-foundation-full -> origin/sol/p4-1-foundation-full
+2026-11-11T05:13:45.6776450Z  * [new branch]        sol/p4-1-foundation-gate -> origin/sol/p4-1-foundation-gate
+2026-11-11T05:13:45.6778492Z  * [new branch]        sol/p4-1-foundation-gate-2 -> origin/sol/p4-1-foundation-gate-2
+2026-11-11T05:13:45.6780864Z  * [new branch]        sol/p4-2-identity-runtime-gate -> origin/sol/p4-2-identity-runtime-gate
+2026-11-11T05:13:45.6783421Z  * [new branch]        sol/p4-2-identity-runtime-gate-2 -> origin/sol/p4-2-identity-runtime-gate-2
+2026-11-11T05:13:45.6785858Z  * [new branch]        sol/p4-2-identity-storage-gate -> origin/sol/p4-2-identity-storage-gate
+2026-11-11T05:13:45.6788083Z  * [new branch]        sol/p4-2-people-open-gate -> origin/sol/p4-2-people-open-gate
+2026-11-11T05:13:45.6790400Z  * [new branch]        sol/p4-2-people-open-gate-2 -> origin/sol/p4-2-people-open-gate-2
+2026-11-11T05:13:45.6792449Z  * [new branch]        sol/p4-preparation      -> origin/sol/p4-preparation
+2026-11-11T05:13:45.6794399Z  * [new branch]        sol/resource-offer-index -> origin/sol/resource-offer-index
+2026-11-11T05:13:45.6796621Z  * [new branch]        sol/stage-0-5-complete-closeout -> origin/sol/stage-0-5-complete-closeout
+2026-11-11T05:13:45.6799098Z  * [new branch]        sol/stage-0-5-complete-validation -> origin/sol/stage-0-5-complete-validation
+2026-11-11T05:13:45.6801741Z  * [new branch]        sol/stage-0-5-construction-proof -> origin/sol/stage-0-5-construction-proof
+2026-11-11T05:13:45.6804447Z  * [new branch]        sol/stage-0-5-continuation-checkpoints -> origin/sol/stage-0-5-continuation-checkpoints
+2026-11-11T05:13:45.6807295Z  * [new branch]        sol/stage-0-5-final-release-validation -> origin/sol/stage-0-5-final-release-validation
+2026-11-11T05:13:45.6809940Z  * [new branch]        sol/stage-0-5-mature-catalog -> origin/sol/stage-0-5-mature-catalog
+2026-11-11T05:13:45.6812599Z  * [new branch]        sol/stage-0-5-mature-checkpoint-validation -> origin/sol/stage-0-5-mature-checkpoint-validation
+2026-11-11T05:13:45.6815191Z  * [new branch]        sol/stage-0-5-mature-commit -> origin/sol/stage-0-5-mature-commit
+2026-11-11T05:13:45.6817707Z  * [new branch]        sol/stage-0-5-mature-continuation-stage -> origin/sol/stage-0-5-mature-continuation-stage
+2026-11-11T05:13:45.6820381Z  * [new branch]        sol/stage-0-5-mature-continue -> origin/sol/stage-0-5-mature-continue
+2026-11-11T05:13:45.6822749Z  * [new branch]        sol/stage-0-5-mature-orders -> origin/sol/stage-0-5-mature-orders
+2026-11-11T05:13:45.6825152Z  * [new branch]        sol/stage-0-5-mature-prepare-source -> origin/sol/stage-0-5-mature-prepare-source
+2026-11-11T05:13:45.6827831Z  * [new branch]        sol/stage-0-5-mature-prepared-inputs -> origin/sol/stage-0-5-mature-prepared-inputs
+2026-11-11T05:13:45.6830438Z  * [new branch]        sol/stage-0-5-mature-publish -> origin/sol/stage-0-5-mature-publish
+2026-11-11T05:13:45.6832650Z  * [new branch]        sol/stage-0-5-mature-storage -> origin/sol/stage-0-5-mature-storage
+2026-11-11T05:13:45.6835152Z  * [new branch]        sol/stage-0-5-owner-witness-validation -> origin/sol/stage-0-5-owner-witness-validation
+2026-11-11T05:13:45.6838336Z  * [new branch]        sol/stage-0-5-ownership-gate-171b183 -> origin/sol/stage-0-5-ownership-gate-171b183
+2026-11-11T05:13:45.6841115Z  * [new branch]        sol/stage-0-5-performance-repair -> origin/sol/stage-0-5-performance-repair
+2026-11-11T05:13:45.6843844Z  * [new branch]        sol/stage-0-5-physical-owner-ci-cleanup -> origin/sol/stage-0-5-physical-owner-ci-cleanup
+2026-11-11T05:13:45.6846805Z  * [new branch]        sol/stage-0-5-physical-owner-continuation -> origin/sol/stage-0-5-physical-owner-continuation
+2026-11-11T05:13:45.6849938Z  * [new branch]        sol/stage-0-5-physical-owner-save-repair -> origin/sol/stage-0-5-physical-owner-save-repair
+2026-11-11T05:13:45.6853023Z  * [new branch]        sol/stage-0-5-repaired-continuation-source -> origin/sol/stage-0-5-repaired-continuation-source
+2026-11-11T05:13:45.6856112Z  * [new branch]        sol/stage-0-5-resumable-construction-source -> origin/sol/stage-0-5-resumable-construction-source
+2026-11-11T05:13:45.6858967Z  * [new branch]        sol/stage-0-5-reviewed-integration -> origin/sol/stage-0-5-reviewed-integration
+2026-11-11T05:13:45.6862018Z  * [new branch]        sol/stage-0-5-touched-owner-save-repair -> origin/sol/stage-0-5-touched-owner-save-repair
+2026-11-11T05:13:45.6864610Z  * [new branch]        spike/unreal-visual-world-lab -> origin/spike/unreal-visual-world-lab
+2026-11-11T05:13:45.6867515Z  * [new branch]        validation/stage05-multiseed-longrun-20260920 -> origin/validation/stage05-multiseed-longrun-20260920
+2026-11-11T05:13:45.6871020Z  * [new branch]        validation/stage05-release-candidate-20260920 -> origin/validation/stage05-release-candidate-20260920
+2026-11-11T05:13:45.6875378Z [command]/usr/bin/git rev-parse --verify --quiet 78bf9b1b6033c789078446c08f5d371e6120b805^{object}
+2026-11-11T05:13:45.6877265Z 78bf9b1b6033c789078446c08f5d371e6120b805
+2026-11-11T05:13:45.6880312Z ##[endgroup]
+2026-11-11T05:13:45.6881840Z ##[group]Determining the checkout info
+2026-11-11T05:13:45.6883532Z ##[endgroup]
+2026-11-11T05:13:45.6884525Z [command]/usr/bin/git sparse-checkout disable
+2026-11-11T05:13:45.6887453Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-11T05:13:45.6890966Z ##[group]Checking out the ref
+2026-11-11T05:13:45.6892643Z [command]/usr/bin/git checkout --progress --force 78bf9b1b6033c789078446c08f5d371e6120b805
+2026-11-11T05:13:45.9632459Z Note: switching to '78bf9b1b6033c789078446c08f5d371e6120b805'.
+2026-11-11T05:13:45.9633023Z 
+2026-11-11T05:13:45.9633410Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-11T05:13:45.9634249Z changes and commit them, and you can discard any commits you make in this
+2026-11-11T05:13:45.9635060Z state without impacting any branches by switching back to a branch.
+2026-11-11T05:13:45.9635529Z 
+2026-11-11T05:13:45.9635859Z If you want to create a new branch to retain commits you create, you may
+2026-11-11T05:13:45.9636626Z do so (now or later) by using -c with the switch command. Example:
+2026-11-11T05:13:45.9637070Z 
+2026-11-11T05:13:45.9637256Z   git switch -c <new-branch-name>
+2026-11-11T05:13:45.9637586Z 
+2026-11-11T05:13:45.9637770Z Or undo this operation with:
+2026-11-11T05:13:45.9638084Z 
+2026-11-11T05:13:45.9638256Z   git switch -
+2026-11-11T05:13:45.9639028Z 
+2026-11-11T05:13:45.9639433Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-11T05:13:45.9640317Z 
+2026-11-11T05:13:45.9640719Z HEAD is now at 78bf9b1b Launch protected mature stages after hosted recovery proof
+2026-11-11T05:13:45.9716429Z ##[endgroup]
+2026-11-11T05:13:45.9720285Z [command]/usr/bin/git log -1 --format=%H
+2026-11-11T05:13:45.9754389Z 78bf9b1b6033c789078446c08f5d371e6120b805
+2026-11-11T05:13:46.0035246Z ##[group]Run actions/setup-python@v5
+2026-11-11T05:13:46.0035632Z with:
+2026-11-11T05:13:46.0035901Z   python-version: 3.12.16
+2026-11-11T05:13:46.0036200Z   check-latest: false
+2026-11-11T05:13:46.0038815Z   token: ***
+2026-11-11T05:13:46.0039097Z   update-environment: true
+2026-11-11T05:13:46.0039415Z   allow-prereleases: false
+2026-11-11T05:13:46.0040067Z   freethreaded: false
+2026-11-11T05:13:46.0040346Z env:
+2026-11-11T05:13:46.0040598Z   PYTHONPATH: .:simulation
+2026-11-11T05:13:46.0040900Z   PYTHONUNBUFFERED: 1
+2026-11-11T05:13:46.0043445Z   GH_TOKEN: ***
+2026-11-11T05:13:46.0043733Z ##[endgroup]
+2026-11-11T05:13:46.1452325Z ##[group]Installed versions
+2026-11-11T05:13:46.1496581Z (node:2265) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-11T05:13:46.1497627Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-11T05:13:46.1498628Z Successfully set up CPython (3.12.16)
+2026-11-11T05:13:46.1500110Z ##[endgroup]
+2026-11-11T05:13:46.1664712Z ##[group]Run python -m pip install pytest==9.2.0 pyyaml==6.0.3
+2026-11-11T05:13:46.1665565Z [36;1mpython -m pip install pytest==9.2.0 pyyaml==6.0.3[0m
+2026-11-11T05:13:46.1705998Z shell: /usr/bin/bash -e {0}
+2026-11-11T05:13:46.1706397Z env:
+2026-11-11T05:13:46.1706666Z   PYTHONPATH: .:simulation
+2026-11-11T05:13:46.1707060Z   PYTHONUNBUFFERED: 1
+2026-11-11T05:13:46.1711001Z   GH_TOKEN: ***
+2026-11-11T05:13:46.1711404Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:46.1712143Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T05:13:46.1712698Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:46.1713310Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:46.1713776Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:46.1714400Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T05:13:46.1714869Z ##[endgroup]
+2026-11-11T05:13:48.3875510Z Collecting pytest==9.2.0
+2026-11-11T05:13:48.4379891Z   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+2026-11-11T05:13:48.4989137Z Collecting pyyaml==6.0.3
+2026-11-11T05:13:48.5092877Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-11-11T05:13:48.5395913Z Collecting iniconfig>=2 (from pytest==9.2.0)
+2026-11-11T05:13:48.5448585Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-11-11T05:13:48.5781309Z Collecting packaging>=24 (from pytest==9.2.0)
+2026-11-11T05:13:48.5817254Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-11-11T05:13:48.6121011Z Collecting pluggy<2,>=1.6 (from pytest==9.2.0)
+2026-11-11T05:13:48.6166540Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-11-11T05:13:48.6528167Z Collecting pygments>=2.15 (from pytest==9.2.0)
+2026-11-11T05:13:48.6565506Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-11-11T05:13:48.6653174Z Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+2026-11-11T05:13:48.6986389Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-11-11T05:13:48.7124478Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 64.0 MB/s  0:00:00
+2026-11-11T05:13:48.7163350Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-11-11T05:13:48.7223483Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-11-11T05:13:48.7274820Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-11-11T05:13:48.7358488Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-11-11T05:13:48.7511772Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 95.7 MB/s  0:00:00
+2026-11-11T05:13:48.9006784Z Installing collected packages: pyyaml, pygments, pluggy, packaging, iniconfig, pytest
+2026-11-11T05:13:50.1309826Z 
+2026-11-11T05:13:50.1327245Z Successfully installed iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 pyyaml-6.0.3
+2026-11-11T05:13:50.1336885Z 
+2026-11-11T05:13:50.1337526Z [notice] A new release of pip is available: 26.2.2 -> 26.3
+2026-11-11T05:13:50.1338992Z [notice] To update, run: pip install --upgrade pip
+2026-11-11T05:13:50.1833707Z ##[group]Run set -euo pipefail
+2026-11-11T05:13:50.1834064Z [36;1mset -euo pipefail[0m
+2026-11-11T05:13:50.1834638Z [36;1msudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell[0m
+2026-11-11T05:13:50.1835265Z [36;1msudo docker image prune -af[0m
+2026-11-11T05:13:50.1835568Z [36;1mdf -h .[0m
+2026-11-11T05:13:50.1859025Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-11T05:13:50.1859409Z env:
+2026-11-11T05:13:50.1859909Z   PYTHONPATH: .:simulation
+2026-11-11T05:13:50.1860157Z   PYTHONUNBUFFERED: 1
+2026-11-11T05:13:50.1862728Z   GH_TOKEN: ***
+2026-11-11T05:13:50.1863030Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:50.1863463Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T05:13:50.1863880Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:50.1864297Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:50.1864668Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:13:50.1865043Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T05:13:50.1865363Z ##[endgroup]
+2026-11-11T05:14:47.8588076Z Deleted Images:
+2026-11-11T05:14:47.8588705Z untagged: ghcr.io/github/gh-aw-firewall/api-proxy:latest
+2026-11-11T05:14:47.8590361Z untagged: ghcr.io/github/gh-aw-firewall/api-proxy@sha256:f36a9fc78aef0509ed5fa280819848cbdf099f60d7b338455ea54a5def18d6b1
+2026-11-11T05:14:47.8591689Z deleted: sha256:a98c768e5b7637fd6304e52ead38cbb5bcc19991d338a4d22d2b1b1ce9aa2fd5
+2026-11-11T05:14:47.8592656Z deleted: sha256:05e467c374f6726bd8f2fe681c7a4767fc2eb0809947c77843d494b61b5f1843
+2026-11-11T05:14:47.8593423Z deleted: sha256:aa38195a74aea620046b40847ef8a8a8853d98845c7a63cff338f0284c6bf301
+2026-11-11T05:14:47.8594133Z deleted: sha256:59d25fec560c38533c878d1a3065ef30648dbf6fd228a1141a34841222c06792
+2026-11-11T05:14:47.8594864Z deleted: sha256:1c2af7dc573ae284a75a48b580396a264dbc0d0e088960bfe3c8bc9d43e6dce3
+2026-11-11T05:14:47.8595575Z deleted: sha256:c521dfd291301c3c925083b0b0c831a9db036685f0bcb43e5125e3b32434b29b
+2026-11-11T05:14:47.8596288Z deleted: sha256:d4ef6f4be478015eae4ee2a35c7d684a239d877bddf69ad7acb4402573ecc0a8
+2026-11-11T05:14:47.8597153Z deleted: sha256:1403a4f40d7afb12e964718e02eafff685d21717ec39f42dffc591905fc304cc
+2026-11-11T05:14:47.8597870Z deleted: sha256:930366789cb044393065f3ec3b553c313f01f946b4af55247923bce3b3f567e0
+2026-11-11T05:14:47.8598582Z deleted: sha256:2c1eef2f1f5bfb979da046156c9b8d0f9032ead80dc7f0d0fa9808f276b106d7
+2026-11-11T05:14:47.8599302Z deleted: sha256:fe6fff3c2bb2a85955504fd1f79350460cee2ac988201815065909e54220a4ac
+2026-11-11T05:14:47.8600296Z deleted: sha256:060f91b0872de59eb67f7d745908a0c0caa9309f3094c9c91bf9f484a42955ca
+2026-11-11T05:14:47.8601014Z deleted: sha256:f80bf75f16280363a2e032582f2fc16d27432c5f8b723df782b6bcbfb7e27924
+2026-11-11T05:14:47.8601574Z deleted: sha256:9ac373ada57ffc27dcc3394207b9ad1d5c5f01c043a8a5402696532556e352da
+2026-11-11T05:14:47.8602113Z deleted: sha256:2f861ab5a2cf99d08875a9f545a2471c19e91c93769c3a3cc7175c530a3970ec
+2026-11-11T05:14:47.8602650Z deleted: sha256:352b00e6763d6ebaab8cb99a3bac61fc65a5a1ff5cb48d539a0c353574d7f03a
+2026-11-11T05:14:47.8603112Z untagged: ghcr.io/github/gh-aw-firewall/squid:latest
+2026-11-11T05:14:47.8603981Z untagged: ghcr.io/github/gh-aw-firewall/squid@sha256:34260cb89ea5d6d55b93ce13a5fe1772dbe8e1592e1200370160b7f5a0bd2ecd
+2026-11-11T05:14:47.8604676Z deleted: sha256:ceba3de0cc73ccb8d76055b6f4ff404a1f556c398b0c85038c5016f005d11bcb
+2026-11-11T05:14:47.8605215Z deleted: sha256:37cb58e0bfb4c148b36bdd6a1e540b0b8c2f28a8f9d281f7d2e3728c86c58d61
+2026-11-11T05:14:47.8605752Z deleted: sha256:f855a6188d1921e2c40b83e4db179844783988895a195abef6cf98bd73bf15b9
+2026-11-11T05:14:47.8606284Z deleted: sha256:72e88ce23c556a10fc021d13dc79028d769008e14542e1639438c3788cfb736d
+2026-11-11T05:14:47.8606804Z deleted: sha256:4f0183f634b4b9589f0d4ebbaa3c4fea25289e3888913b3404267afccb81751b
+2026-11-11T05:14:47.8607524Z deleted: sha256:2cf336166cfb412c1393d59cec3dc02407b9a0e7c1b0e6a5dfef1b03473270a0
+2026-11-11T05:14:47.8608070Z deleted: sha256:17b0094a813d97c34ca729739326189c9afdd4610bc44d121b69608ca549051f
+2026-11-11T05:14:47.8608603Z deleted: sha256:8ccd9236e1fc745540569864e5e03aa2976fda968ebc44d2bfbe7a2a2cc3824c
+2026-11-11T05:14:47.8609060Z untagged: ghcr.io/github/gh-aw-mcpg:latest
+2026-11-11T05:14:47.8626145Z untagged: ghcr.io/github/gh-aw-mcpg@sha256:3719f62df6229fc6670098c3df6d7ff792a7a67ddf9c7e016a5653f39b72e1a4
+2026-11-11T05:14:47.8626890Z deleted: sha256:eacd6ee6b337225d9d0d18d31787590fff169fc27d0021e3021049520c319453
+2026-11-11T05:14:47.8627449Z deleted: sha256:46a214cc8f95204d4ef2e08e4b7b966b99dfc4288b8a5cd17298b5872bb94e6c
+2026-11-11T05:14:47.8628307Z deleted: sha256:8e33c09bc9b2ca2c5aa794116b7a793c361476771ff50fa8a2ec56de079b0269
+2026-11-11T05:14:47.8629217Z deleted: sha256:43967d788b7ef05eacbb1b00885604200cf836bad3fb412ddd988671242675a6
+2026-11-11T05:14:47.8630417Z deleted: sha256:419e430001716b929fb81ca7f2f6c33ac52f3c77d225d960c8ffac07d7e2e01f
+2026-11-11T05:14:47.8631351Z deleted: sha256:e4707ec8f688c6776667fe39a22e750ef0cb608530bcf9e4b99170086cf03e03
+2026-11-11T05:14:47.8631951Z deleted: sha256:076fa2779acee36fe423d7a96b35f9ee3669e369097ee039acf59e96197fcb84
+2026-11-11T05:14:47.8632475Z deleted: sha256:f4be26f88c84ae4994b8f72039b3a31e4177c1676751f4e51521cb99f00ba7ee
+2026-11-11T05:14:47.8633027Z deleted: sha256:3b0abdfd3c94e7bc73093f7488b4d6e7b164dfdf43193edaa6ba8df32def333a
+2026-11-11T05:14:47.8633580Z deleted: sha256:afa44dee9a0a5460f9bb4c303a6a93d323ad0d0decbf8f3dddea61b2ea31a06c
+2026-11-11T05:14:47.8634115Z deleted: sha256:b120877a8c6acddb44283da821e1eb98ad3ba9dba9954b6a89510661576ec1db
+2026-11-11T05:14:47.8634637Z deleted: sha256:a1ab8e74cca4db0e2c77a634e30586adfd4cf1e081268545aa8b185df216d11c
+2026-11-11T05:14:47.8635156Z deleted: sha256:74d97c428c51a828f9051a7a40a53ff1fc99e54fc30323ce36760701b0b7f711
+2026-11-11T05:14:47.8635630Z untagged: ghcr.io/dependabot/dependabot-updater-core:latest
+2026-11-11T05:14:47.8636283Z untagged: ghcr.io/dependabot/dependabot-updater-core@sha256:57ad85c77c5f48eeb75f4e75497bb59ea3952f16107aec618947f0bf3cae584d
+2026-11-11T05:14:47.8636988Z deleted: sha256:f4aec6b5f30a94c5579d63adab17d66683d3118cbc3ac3c7aff9a5c06c6060b3
+2026-11-11T05:14:47.8637530Z deleted: sha256:9ef73ae26794fd0686554aa4399fe07748768d350d58f44cc704dec38de1e8db
+2026-11-11T05:14:47.8638059Z deleted: sha256:b934334e7dbd20f6fc725b8a8cb3ec44b959a74a816b611197434ccd51a52d63
+2026-11-11T05:14:47.8638581Z deleted: sha256:95480d49da3f4d74cd595dc74da9f4bb021f8b7be717a8a033f40288373b0c7a
+2026-11-11T05:14:47.8639103Z deleted: sha256:3087339e688b4bf6db9cf7a600d7b29d940438abf05f1461d0f50db4a12ca02d
+2026-11-11T05:14:47.8639956Z deleted: sha256:07ee710eb8e2562dd77b550027f87ba78ff4deb887a5f4ebec9be858645d7f80
+2026-11-11T05:14:47.8640646Z deleted: sha256:77eebd254f1d23d64a395d7165836d038052e21403c92df5a4fb3025e9da42f0
+2026-11-11T05:14:47.8641172Z deleted: sha256:0bd3f2c9cc2763d5a4076579d40d672a8fcf39fa425afbd6a8ec087eb6ed9edc
+2026-11-11T05:14:47.8641696Z deleted: sha256:59ba1a8423bcb2bd26c9dc08d5be3013be5c25b239f9f4a1c75923c29930452e
+2026-11-11T05:14:47.8642222Z deleted: sha256:21a6aa6d5b48a68c8375aeb8ddf6b804b99560e29fd9f5432db04e7c709e1cb0
+2026-11-11T05:14:47.8642738Z deleted: sha256:361c7ab37f39f15d5590d568f971c22baa55668dfd76e9fe60c7b216dd6e162b
+2026-11-11T05:14:47.8643770Z deleted: sha256:7a978acce86a5832ce021c8269fd903fd8d15adc0d8009e7df52766e1fdced64
+2026-11-11T05:14:47.8644302Z deleted: sha256:bec87777bc2fb2edcdf9af11df1531469e7df911309c1413082b18fcb8610278
+2026-11-11T05:14:47.8644760Z untagged: ghcr.io/github/gh-aw-firewall/agent:latest
+2026-11-11T05:14:47.8645352Z untagged: ghcr.io/github/gh-aw-firewall/agent@sha256:921e50aed7b2a67265f42ab03c7d54a32c641922cc64f0875a5ae2bcb8b37532
+2026-11-11T05:14:47.8646012Z deleted: sha256:200c0f2889185e7a2d4b0960734b33c0c52e43069fb74241a52531d614216f3e
+2026-11-11T05:14:47.8646532Z deleted: sha256:1b125d2125be6e6cfea131ab9145bb1512e7e97089171c3c6f28fc1ea5cf660e
+2026-11-11T05:14:47.8647204Z deleted: sha256:20a3d2678c83a147d1ac519b991b59808369549c5177b5a1d87944e90f6cab66
+2026-11-11T05:14:47.8647719Z deleted: sha256:7944b5986f23b186520b056b5cdc5aa4c2ea822e971000704931cf23f7540516
+2026-11-11T05:14:47.8648229Z deleted: sha256:f7a6d4e1b76978d44e0e0ab921db8640c56101fb388a9e5a65fc8af93f944247
+2026-11-11T05:14:47.8648752Z deleted: sha256:6f0aa48cf07f2c1f910e7f852bd912e5bad8a4434a72a2078603dcd9e13a0504
+2026-11-11T05:14:47.8649274Z deleted: sha256:d20eab489c26ddd2149fb937ce0904f0e18578311fcabb5cb00a0a040e56ab00
+2026-11-11T05:14:47.8654388Z deleted: sha256:4f4d0f16838cd281064848be7cf25c727dd24b7474a0c2848a3960370b3237ad
+2026-11-11T05:14:47.8655230Z deleted: sha256:2ade3d2d2c87148bb542de11ed9c65b88bb64e3ae72308668b3dfba517c81425
+2026-11-11T05:14:47.8656032Z deleted: sha256:eab216415be375a3f1ddde3d1dac447d848887d17718b23657e7f6bddd4259e5
+2026-11-11T05:14:47.8656658Z deleted: sha256:3e9d2aedcbc7d4b4761125212e0c9b1446438acb7692418aeac4380ebcc2bb00
+2026-11-11T05:14:47.8657230Z deleted: sha256:bfffcc9ff0e0260210135233aef491bee012a323750101f3b4a9f8deead9cdc0
+2026-11-11T05:14:47.8657910Z deleted: sha256:23f073d3d17b6915b5301d5848ca9cf87ca53d8ca8dc259b7bc35da652bf4a52
+2026-11-11T05:14:47.8658844Z deleted: sha256:886470a8ada2bcadfb428774037ef42b70d12b97ff992cbc81a6432253eadab1
+2026-11-11T05:14:47.8660274Z deleted: sha256:759ca0da8575801b4b2b78018bef7ad8ce666c733a6b7df77f4bcca08de01c21
+2026-11-11T05:14:47.8660847Z deleted: sha256:d2657c92ddec4255591ab2f5b9257d31bed8662f231939da1312074bc704e0ab
+2026-11-11T05:14:47.8661364Z deleted: sha256:43f936c3045122b147ae16a04f7f78acd61cd80437e26de2ddc42fe07061d125
+2026-11-11T05:14:47.8661885Z deleted: sha256:c6d1aa812940f029f129f7887e2ed0ea99dc8273566a42445c6589f7f0956bf5
+2026-11-11T05:14:47.8662583Z deleted: sha256:a2d60a7128b59194213545778b989e507fcae1e4321c12111e8db7ac2d56666a
+2026-11-11T05:14:47.8663589Z deleted: sha256:6865ad8f7a30a8966287e9d1793cadb32cf1be9d492f16d4ca99e01bea28b6d5
+2026-11-11T05:14:47.8664595Z deleted: sha256:e1605e86b381b120e04a784c916c8694e3055e62af6d947a6f7f66520fbbbef4
+2026-11-11T05:14:47.8665549Z deleted: sha256:f6e0e88dd8e11c81dba77d657b271e1ed7c33882e8f4dfaa7768cbaee94d94fc
+2026-11-11T05:14:47.8666328Z untagged: ghcr.io/github/github-mcp-server:latest
+2026-11-11T05:14:47.8667283Z untagged: ghcr.io/github/github-mcp-server@sha256:250bc6ce70788207608ef74cef4397230ff2e8481218da74d6093e4bd9101132
+2026-11-11T05:14:47.8668497Z deleted: sha256:4d955ee421ef7194cbef8a50bfe034a27d1e682875a6e8049023ab55bf80a8ec
+2026-11-11T05:14:47.8669474Z deleted: sha256:7beebe31d1d8200dde3d1d5025547bd66be6a16fb1ec36d4d6612d3c10bbe031
+2026-11-11T05:14:47.8670731Z deleted: sha256:1e1cabb4a65e50fb84bc4612619b0025e4a1d06d5e38699d1e67e5a8e4f333db
+2026-11-11T05:14:47.8671674Z deleted: sha256:86766d6a6e947f4a599c6e23307470f8f75732fc3d143ec1f3260e4406202bee
+2026-11-11T05:14:47.8672600Z deleted: sha256:2944471a0bbdfb4985f84f8d287edb5cd982d1060589e707a6cb0cbe82cdfe89
+2026-11-11T05:14:47.8673544Z deleted: sha256:5e555e7975e2202f21fb93d460d701a340ade876f3afccb70d702f1dc5ab80db
+2026-11-11T05:14:47.8674495Z deleted: sha256:2a080d78a1c5e3615170178f1c6f4c726340da9d5ff2926cb66e2fd97851da9d
+2026-11-11T05:14:47.8675469Z deleted: sha256:af4a114029fbf94a3cf75c5cfaa5e947019cd6faae4b800c9306ac9079363def
+2026-11-11T05:14:47.8676419Z deleted: sha256:c7b875d3de914680ec64ba55be5865955ec595e7370812894ee68a502e2e8391
+2026-11-11T05:14:47.8677608Z deleted: sha256:85d9b4c1ef131ee259952a35027e942f79626303ab143eff7ef00d55201bd06f
+2026-11-11T05:14:47.8678579Z deleted: sha256:492c6420fd79f4cd4e761bec1e74db6044d45adb5b073a82289af68aa3162e3f
+2026-11-11T05:14:47.8679493Z deleted: sha256:14b282df61c0316a80216cec27e753777da93de1d7e062072ef3b517f984fcf1
+2026-11-11T05:14:47.8680647Z deleted: sha256:fdaace00fc3f072b9060f703047b30a2c14d8bde7dbbf31a396802c032923732
+2026-11-11T05:14:47.8681534Z deleted: sha256:7f73eafc455b691b504d4d3c3f3c7be90e135c1d0ba4988b2cac29579cd6b567
+2026-11-11T05:14:47.8682083Z deleted: sha256:32a12b65383df6b6553c8d59f691675ca1980f8cec9c51cce163c3c8f7665a41
+2026-11-11T05:14:47.8682788Z deleted: sha256:5217b01660b515ac25ea055a8bd04a20790c7d6bd6085374b59b9081283911af
+2026-11-11T05:14:47.8683328Z deleted: sha256:7223ea1323e8c1159ec17f07d35acc27bdd1cc2bc3ed425b44ef21dac9915db0
+2026-11-11T05:14:47.8683648Z 
+2026-11-11T05:14:47.8683767Z Total reclaimed space: 2.488GB
+2026-11-11T05:14:47.8684087Z Filesystem      Size  Used Avail Use% Mounted on
+2026-11-11T05:14:47.8684405Z /dev/root       145G   31G  114G  22% /
+2026-11-11T05:14:47.8722335Z ##[group]Run python -m simulation.stage_0_6_genesis_resume run-stage --stage source_digest --mode "$MODE" --parent-artifact "$PARENT_ID" --parent-run "$PARENT_RUN"
+2026-11-11T05:14:47.8723473Z [36;1mpython -m simulation.stage_0_6_genesis_resume run-stage --stage source_digest --mode "$MODE" --parent-artifact "$PARENT_ID" --parent-run "$PARENT_RUN"[0m
+2026-11-11T05:14:47.8742985Z shell: /usr/bin/bash -e {0}
+2026-11-11T05:14:47.8743235Z env:
+2026-11-11T05:14:47.8743434Z   PYTHONPATH: .:simulation
+2026-11-11T05:14:47.8743681Z   PYTHONUNBUFFERED: 1
+2026-11-11T05:14:47.8746198Z   GH_TOKEN: ***
+2026-11-11T05:14:47.8746488Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:14:47.8746925Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T05:14:47.8747347Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:14:47.8747723Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:14:47.8748134Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T05:14:47.8748515Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T05:14:47.8748833Z   MODE: mature
+2026-11-11T05:14:47.8749030Z   PARENT_ID: 13830492089
+2026-11-11T05:14:47.8749251Z   PARENT_RUN: 42964119253
+2026-11-11T05:14:47.8749466Z ##[endgroup]
+2026-11-11T05:23:44.3790927Z {"heartbeat": "start", "resources": {"cpu_seconds": 130.744620414, "rss_bytes": 74854400, "peak_rss_bytes": 78503936, "minor_faults": 18343, "major_faults": 5, "block_inputs": 142529368, "block_outputs": 67084008, "process_io": {"rchar": 86317434193, "wchar": 34347394372, "syscr": 997426, "syscw": 33490, "read_bytes": 72975310848, "write_bytes": 34347716608, "cancelled_write_bytes": 4096}}, "time": 1794374624.3782105}
+2026-11-11T05:24:14.3791754Z {"heartbeat": "start", "resources": {"cpu_seconds": 140.922071481, "rss_bytes": 74854400, "peak_rss_bytes": 78503936, "minor_faults": 18346, "major_faults": 5, "block_inputs": 166714200, "block_outputs": 67084008, "process_io": {"rchar": 98703738364, "wchar": 34347394794, "syscr": 1044680, "syscw": 33492, "read_bytes": 85357682688, "write_bytes": 34347716608, "cancelled_write_bytes": 4096}}, "time": 1794374654.3787184}
+2026-11-11T05:24:44.3798423Z {"heartbeat": "start", "resources": {"cpu_seconds": 147.017086166, "rss_bytes": 74854400, "peak_rss_bytes": 78503936, "minor_faults": 18346, "major_faults": 5, "block_inputs": 184558752, "block_outputs": 76380672, "process_io": {"rchar": 107376015233, "wchar": 38642363155, "syscr": 1061395, "syscw": 33501, "read_bytes": 94494093312, "write_bytes": 39107608576, "cancelled_write_bytes": 4096}}, "time": 1794374684.3792226}
+2026-11-11T05:25:14.3800251Z {"heartbeat": "start", "resources": {"cpu_seconds": 150.672629122, "rss_bytes": 74854400, "peak_rss_bytes": 78503936, "minor_faults": 18346, "major_faults": 5, "block_inputs": 195709344, "block_outputs": 89249512, "process_io": {"rchar": 113818454062, "wchar": 45084802235, "syscr": 1061402, "syscw": 33506, "read_bytes": 100203196416, "write_bytes": 45696454656, "cancelled_write_bytes": 4096}}, "time": 1794374714.3796465}
+2026-11-11T05:25:44.3806139Z {"heartbeat": "start", "resources": {"cpu_seconds": 154.365421173, "rss_bytes": 74854400, "peak_rss_bytes": 78503936, "minor_faults": 18346, "major_faults": 5, "block_inputs": 207857568, "block_outputs": 101414096, "process_io": {"rchar": 120260892892, "wchar": 51527241316, "syscr": 1061409, "syscw": 33511, "read_bytes": 106423218176, "write_bytes": 51924983808, "cancelled_write_bytes": 4096}}, "time": 1794374744.3801317}
+2026-11-11T05:26:14.3810242Z {"heartbeat": "start", "resources": {"cpu_seconds": 157.947509435, "rss_bytes": 74862592, "peak_rss_bytes": 78503936, "minor_faults": 18347, "major_faults": 5, "block_inputs": 219937184, "block_outputs": 113497784, "process_io": {"rchar": 126703331722, "wchar": 57969680398, "syscr": 1061416, "syscw": 33516, "read_bytes": 112607850496, "write_bytes": 58111569920, "cancelled_write_bytes": 4096}}, "time": 1794374774.3805985}
+2026-11-11T05:26:44.3815738Z {"heartbeat": "start", "resources": {"cpu_seconds": 161.596249008, "rss_bytes": 74862592, "peak_rss_bytes": 78503936, "minor_faults": 18348, "major_faults": 5, "block_inputs": 231965456, "block_outputs": 125526552, "process_io": {"rchar": 133003619847, "wchar": 64269956399, "syscr": 1061462, "syscw": 33543, "read_bytes": 118766325760, "write_bytes": 64270299136, "cancelled_write_bytes": 4096}}, "time": 1794374804.3811052}
+2026-11-11T05:27:14.4387819Z {"heartbeat": "start", "resources": {"cpu_seconds": 187.369551097, "rss_bytes": 245030912, "peak_rss_bytes": 244903936, "minor_faults": 62272, "major_faults": 5, "block_inputs": 232028792, "block_outputs": 125617656, "process_io": {"rchar": 134867413602, "wchar": 64924247730, "syscr": 1555485, "syscw": 193258, "read_bytes": 118798753792, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794374834.432775}
+2026-11-11T05:27:44.4456834Z {"heartbeat": "start", "resources": {"cpu_seconds": 217.247427436, "rss_bytes": 264863744, "peak_rss_bytes": 264564736, "minor_faults": 67275, "major_faults": 5, "block_inputs": 232034752, "block_outputs": 125617656, "process_io": {"rchar": 136424051767, "wchar": 64924248162, "syscr": 1935961, "syscw": 193260, "read_bytes": 118801805312, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794374864.4450636}
+2026-11-11T05:28:14.4462727Z {"heartbeat": "start", "resources": {"cpu_seconds": 247.219297741, "rss_bytes": 268124160, "peak_rss_bytes": 267841536, "minor_faults": 68071, "major_faults": 5, "block_inputs": 232035328, "block_outputs": 125617656, "process_io": {"rchar": 137929362476, "wchar": 64924248595, "syscr": 2303909, "syscw": 193262, "read_bytes": 118802100224, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794374894.4457715}
+2026-11-11T05:28:44.4487420Z {"heartbeat": "start", "resources": {"cpu_seconds": 277.218803338, "rss_bytes": 272605184, "peak_rss_bytes": 272297984, "minor_faults": 69165, "major_faults": 5, "block_inputs": 232035328, "block_outputs": 125617656, "process_io": {"rchar": 139433262053, "wchar": 64924249028, "syscr": 2671514, "syscw": 193264, "read_bytes": 118802100224, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794374924.4482791}
+2026-11-11T05:29:14.4513713Z {"heartbeat": "start", "resources": {"cpu_seconds": 307.218129758, "rss_bytes": 277278720, "peak_rss_bytes": 277016576, "minor_faults": 70305, "major_faults": 5, "block_inputs": 232035328, "block_outputs": 125617656, "process_io": {"rchar": 140940383039, "wchar": 64924249461, "syscr": 3039904, "syscw": 193266, "read_bytes": 118802100224, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794374954.4510176}
+2026-11-11T05:29:44.4545600Z {"heartbeat": "start", "resources": {"cpu_seconds": 337.218835219, "rss_bytes": 281894912, "peak_rss_bytes": 281604096, "minor_faults": 71433, "major_faults": 5, "block_inputs": 232035328, "block_outputs": 125617656, "process_io": {"rchar": 142437478539, "wchar": 64924249894, "syscr": 3405849, "syscw": 193268, "read_bytes": 118802100224, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794374984.4542055}
+2026-11-11T05:30:14.4559352Z {"heartbeat": "start", "resources": {"cpu_seconds": 367.22053914, "rss_bytes": 289144832, "peak_rss_bytes": 288944128, "minor_faults": 73203, "major_faults": 5, "block_inputs": 232035328, "block_outputs": 125617656, "process_io": {"rchar": 143937524867, "wchar": 64924250327, "syscr": 3772506, "syscw": 193270, "read_bytes": 118802100224, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375014.4552207}
+2026-11-11T05:30:44.4587885Z {"heartbeat": "start", "resources": {"cpu_seconds": 397.221237897, "rss_bytes": 293801984, "peak_rss_bytes": 293531648, "minor_faults": 74340, "major_faults": 5, "block_inputs": 232035344, "block_outputs": 125617656, "process_io": {"rchar": 145450899497, "wchar": 64924250759, "syscr": 4142426, "syscw": 193272, "read_bytes": 118802108416, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375044.4581914}
+2026-11-11T05:31:14.4600644Z {"heartbeat": "start", "resources": {"cpu_seconds": 427.220861753, "rss_bytes": 296079360, "peak_rss_bytes": 297857024, "minor_faults": 75408, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 146966571685, "wchar": 64924251192, "syscr": 4512887, "syscw": 193274, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375074.4595957}
+2026-11-11T05:31:44.4632787Z {"heartbeat": "start", "resources": {"cpu_seconds": 457.222576014, "rss_bytes": 296079360, "peak_rss_bytes": 297857024, "minor_faults": 75408, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 148421482355, "wchar": 64924251625, "syscr": 4868518, "syscw": 193276, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375104.4628384}
+2026-11-11T05:32:14.4645193Z {"heartbeat": "start", "resources": {"cpu_seconds": 487.222363109, "rss_bytes": 296091648, "peak_rss_bytes": 297857024, "minor_faults": 75411, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 149856865401, "wchar": 64924252058, "syscr": 5219374, "syscw": 193278, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375134.4639118}
+2026-11-11T05:32:44.4657379Z {"heartbeat": "start", "resources": {"cpu_seconds": 517.222556066, "rss_bytes": 296456192, "peak_rss_bytes": 297857024, "minor_faults": 75500, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 151309815396, "wchar": 64924252491, "syscr": 5574524, "syscw": 193280, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375164.4653137}
+2026-11-11T05:33:14.4671823Z {"heartbeat": "start", "resources": {"cpu_seconds": 547.222588393, "rss_bytes": 296456192, "peak_rss_bytes": 297857024, "minor_faults": 75500, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 152763511045, "wchar": 64924252924, "syscr": 5929860, "syscw": 193282, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375194.466625}
+2026-11-11T05:33:44.4705379Z {"heartbeat": "start", "resources": {"cpu_seconds": 577.224549116, "rss_bytes": 296456192, "peak_rss_bytes": 297857024, "minor_faults": 75500, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 154221946078, "wchar": 64924253356, "syscr": 6286347, "syscw": 193284, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375224.4700668}
+2026-11-11T05:34:14.4727593Z {"heartbeat": "start", "resources": {"cpu_seconds": 607.224505121, "rss_bytes": 296456192, "peak_rss_bytes": 297857024, "minor_faults": 75500, "major_faults": 5, "block_inputs": 232035360, "block_outputs": 125617656, "process_io": {"rchar": 155682571159, "wchar": 64924253789, "syscr": 6643374, "syscw": 193286, "read_bytes": 118802116608, "write_bytes": 64316944384, "cancelled_write_bytes": 26361856}}, "time": 1794375254.4723203}
+2026-11-11T05:34:26.9322990Z {"phase": "canonical.field.advancement", "time": 1794375266.9320843}
+2026-11-11T05:34:44.4733624Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 632.843799899, "rss_bytes": 296456192, "peak_rss_bytes": 297857024, "minor_faults": 75500, "major_faults": 5, "block_inputs": 232300504, "block_outputs": 125618776, "process_io": {"rchar": 156464192485, "wchar": 64924755049, "syscr": 6834403, "syscw": 193324, "read_bytes": 118937870336, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375284.472939}
+2026-11-11T05:35:14.4737501Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 657.263724811, "rss_bytes": 296456192, "peak_rss_bytes": 297857024, "minor_faults": 75500, "major_faults": 5, "block_inputs": 232624000, "block_outputs": 125618776, "process_io": {"rchar": 156694662296, "wchar": 64924755503, "syscr": 6890674, "syscw": 193326, "read_bytes": 119103500288, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375314.4733377}
+2026-11-11T05:35:44.4749171Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 683.479136805, "rss_bytes": 297721856, "peak_rss_bytes": 297857024, "minor_faults": 75808, "major_faults": 5, "block_inputs": 232856712, "block_outputs": 125618776, "process_io": {"rchar": 156869037387, "wchar": 64924755958, "syscr": 6933250, "syscw": 193328, "read_bytes": 119222648832, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375344.4744678}
+2026-11-11T05:36:14.4762484Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 710.065733054, "rss_bytes": 312651776, "peak_rss_bytes": 312270848, "minor_faults": 79454, "major_faults": 5, "block_inputs": 233064304, "block_outputs": 125618776, "process_io": {"rchar": 157025074686, "wchar": 64924756413, "syscr": 6971349, "syscw": 193330, "read_bytes": 119328935936, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375374.4757118}
+2026-11-11T05:36:44.4767897Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 736.657712253, "rss_bytes": 313819136, "peak_rss_bytes": 313450496, "minor_faults": 79739, "major_faults": 5, "block_inputs": 233271608, "block_outputs": 125618776, "process_io": {"rchar": 157180083889, "wchar": 64924756868, "syscr": 7009197, "syscw": 193332, "read_bytes": 119435075584, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375404.4763515}
+2026-11-11T05:37:14.4773623Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 763.318002641, "rss_bytes": 313872384, "peak_rss_bytes": 313450496, "minor_faults": 79752, "major_faults": 5, "block_inputs": 233477880, "block_outputs": 125618776, "process_io": {"rchar": 157338034020, "wchar": 64924757323, "syscr": 7047763, "syscw": 193334, "read_bytes": 119540686848, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375434.4769104}
+2026-11-11T05:37:44.4785394Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 790.421458941, "rss_bytes": 314081280, "peak_rss_bytes": 313712640, "minor_faults": 79803, "major_faults": 5, "block_inputs": 233658496, "block_outputs": 125618776, "process_io": {"rchar": 157471629335, "wchar": 64924757778, "syscr": 7080383, "syscw": 193336, "read_bytes": 119633166336, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375464.4780917}
+2026-11-11T05:38:14.4791968Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 817.716177577, "rss_bytes": 314093568, "peak_rss_bytes": 313712640, "minor_faults": 79806, "major_faults": 5, "block_inputs": 233820944, "block_outputs": 125618776, "process_io": {"rchar": 157580017866, "wchar": 64924758233, "syscr": 7106849, "syscw": 193338, "read_bytes": 119716335616, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375494.4787533}
+2026-11-11T05:38:44.4799418Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 845.43239881, "rss_bytes": 314093568, "peak_rss_bytes": 313712640, "minor_faults": 79806, "major_faults": 5, "block_inputs": 233967984, "block_outputs": 125618776, "process_io": {"rchar": 157684093309, "wchar": 64924758688, "syscr": 7132262, "syscw": 193340, "read_bytes": 119791624192, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375524.479521}
+2026-11-11T05:39:14.4813597Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 873.361049086, "rss_bytes": 314093568, "peak_rss_bytes": 313712640, "minor_faults": 79806, "major_faults": 5, "block_inputs": 234103928, "block_outputs": 125618776, "process_io": {"rchar": 157783429680, "wchar": 64924759141, "syscr": 7156518, "syscw": 193342, "read_bytes": 119861223424, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375554.4808707}
+2026-11-11T05:39:44.4819952Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 901.196794554, "rss_bytes": 314159104, "peak_rss_bytes": 313843712, "minor_faults": 79822, "major_faults": 5, "block_inputs": 234252904, "block_outputs": 125618776, "process_io": {"rchar": 157886657251, "wchar": 64924759596, "syscr": 7181724, "syscw": 193344, "read_bytes": 119937503232, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375584.4815161}
+2026-11-11T05:40:14.4825557Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 929.224447366, "rss_bytes": 319401984, "peak_rss_bytes": 319086592, "minor_faults": 81102, "major_faults": 5, "block_inputs": 234390264, "block_outputs": 125618776, "process_io": {"rchar": 157989245846, "wchar": 64924760051, "syscr": 7206774, "syscw": 193346, "read_bytes": 120007827456, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375614.482097}
+2026-11-11T05:40:44.4839057Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 957.160245796, "rss_bytes": 319406080, "peak_rss_bytes": 319086592, "minor_faults": 81103, "major_faults": 5, "block_inputs": 234532016, "block_outputs": 125618776, "process_io": {"rchar": 158095004746, "wchar": 64924760505, "syscr": 7232598, "syscw": 193348, "read_bytes": 120080404480, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375644.483432}
+2026-11-11T05:41:14.4857761Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 985.033458866, "rss_bytes": 319406080, "peak_rss_bytes": 319086592, "minor_faults": 81103, "major_faults": 5, "block_inputs": 234668992, "block_outputs": 125618776, "process_io": {"rchar": 158205015294, "wchar": 64924760959, "syscr": 7259460, "syscw": 193350, "read_bytes": 120150536192, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375674.485432}
+2026-11-11T05:41:44.4868515Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1013.178863909, "rss_bytes": 319406080, "peak_rss_bytes": 319086592, "minor_faults": 81103, "major_faults": 5, "block_inputs": 234803712, "block_outputs": 125618776, "process_io": {"rchar": 158311826866, "wchar": 64924761413, "syscr": 7285541, "syscw": 193352, "read_bytes": 120219512832, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375704.4864435}
+2026-11-11T05:42:14.4882319Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1041.371665162, "rss_bytes": 319406080, "peak_rss_bytes": 319086592, "minor_faults": 81103, "major_faults": 5, "block_inputs": 234930080, "block_outputs": 125618776, "process_io": {"rchar": 158408255078, "wchar": 64924761869, "syscr": 7309087, "syscw": 193354, "read_bytes": 120284213248, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375734.4878016}
+2026-11-11T05:42:44.5519160Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1069.771013016, "rss_bytes": 319447040, "peak_rss_bytes": 319086592, "minor_faults": 81113, "major_faults": 5, "block_inputs": 235041440, "block_outputs": 125618776, "process_io": {"rchar": 158486480666, "wchar": 64924762325, "syscr": 7328189, "syscw": 193356, "read_bytes": 120341229568, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375764.5512197}
+2026-11-11T05:43:14.5521459Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1098.161077734, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235145400, "block_outputs": 125618776, "process_io": {"rchar": 158566565838, "wchar": 64924762781, "syscr": 7347745, "syscw": 193358, "read_bytes": 120394461184, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375794.5517151}
+2026-11-11T05:43:44.5530890Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1126.599984313, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235252952, "block_outputs": 125618776, "process_io": {"rchar": 158645090434, "wchar": 64924763237, "syscr": 7366920, "syscw": 193360, "read_bytes": 120449527808, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375824.5525777}
+2026-11-11T05:44:14.5538387Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1154.857140138, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235363288, "block_outputs": 125618776, "process_io": {"rchar": 158726441270, "wchar": 64924763693, "syscr": 7386785, "syscw": 193362, "read_bytes": 120506015744, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375854.5534642}
+2026-11-11T05:44:44.5551314Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1183.112663955, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235473944, "block_outputs": 125618776, "process_io": {"rchar": 158808025578, "wchar": 64924764149, "syscr": 7406707, "syscw": 193364, "read_bytes": 120562671616, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375884.5547922}
+2026-11-11T05:45:14.5560011Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1211.453330752, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235579384, "block_outputs": 125618776, "process_io": {"rchar": 158888381086, "wchar": 64924764605, "syscr": 7426329, "syscw": 193366, "read_bytes": 120616660992, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375914.555585}
+2026-11-11T05:45:44.5569920Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1239.763022679, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235682064, "block_outputs": 125618776, "process_io": {"rchar": 158965783378, "wchar": 64924765060, "syscr": 7445230, "syscw": 193368, "read_bytes": 120669229056, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375944.5564942}
+2026-11-11T05:46:14.5582231Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1268.097783228, "rss_bytes": 319459328, "peak_rss_bytes": 319086592, "minor_faults": 81116, "major_faults": 5, "block_inputs": 235781368, "block_outputs": 125618776, "process_io": {"rchar": 159048043526, "wchar": 64924765516, "syscr": 7465317, "syscw": 193370, "read_bytes": 120720072704, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794375974.5578356}
+2026-11-11T05:46:44.5586547Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1296.47308084, "rss_bytes": 319713280, "peak_rss_bytes": 319479808, "minor_faults": 81178, "major_faults": 5, "block_inputs": 235881808, "block_outputs": 125618776, "process_io": {"rchar": 159143804090, "wchar": 64924765972, "syscr": 7488700, "syscw": 193372, "read_bytes": 120771497984, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376004.5582533}
+2026-11-11T05:47:14.5611152Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1324.715003512, "rss_bytes": 320061440, "peak_rss_bytes": 319873024, "minor_faults": 81263, "major_faults": 5, "block_inputs": 236003992, "block_outputs": 125618776, "process_io": {"rchar": 159226088814, "wchar": 64924766427, "syscr": 7508793, "syscw": 193374, "read_bytes": 120834056192, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376034.56074}
+2026-11-11T05:47:44.5620608Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1352.718906252, "rss_bytes": 320090112, "peak_rss_bytes": 319873024, "minor_faults": 81270, "major_faults": 5, "block_inputs": 236139024, "block_outputs": 125618776, "process_io": {"rchar": 159314193954, "wchar": 64924766881, "syscr": 7530307, "syscw": 193376, "read_bytes": 120903192576, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376064.5613837}
+2026-11-11T05:48:14.5634361Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1380.782781879, "rss_bytes": 320110592, "peak_rss_bytes": 319873024, "minor_faults": 81275, "major_faults": 5, "block_inputs": 236266656, "block_outputs": 125618776, "process_io": {"rchar": 159396310742, "wchar": 64924767337, "syscr": 7550359, "syscw": 193378, "read_bytes": 120968540160, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376094.5630503}
+2026-11-11T05:48:44.5649179Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1408.640283992, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 236397016, "block_outputs": 125618776, "process_io": {"rchar": 159478718346, "wchar": 64924767793, "syscr": 7570482, "syscw": 193380, "read_bytes": 121035284480, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376124.564468}
+2026-11-11T05:49:14.5660291Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1436.786090872, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 236514552, "block_outputs": 125618776, "process_io": {"rchar": 159559610430, "wchar": 64924768248, "syscr": 7590235, "syscw": 193382, "read_bytes": 121095462912, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376154.5654774}
+2026-11-11T05:49:44.5670563Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1464.827432974, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 236643512, "block_outputs": 125618776, "process_io": {"rchar": 159642714354, "wchar": 64924768704, "syscr": 7610528, "syscw": 193384, "read_bytes": 121161490432, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376184.5667255}
+2026-11-11T05:50:14.5685326Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1492.881925452, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 236771360, "block_outputs": 125618776, "process_io": {"rchar": 159725461926, "wchar": 64924769160, "syscr": 7630734, "syscw": 193386, "read_bytes": 121226948608, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376214.5681212}
+2026-11-11T05:50:44.5691320Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1521.08157338, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 236886640, "block_outputs": 125618776, "process_io": {"rchar": 159802901082, "wchar": 64924769616, "syscr": 7649644, "syscw": 193388, "read_bytes": 121285971968, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376244.568798}
+2026-11-11T05:51:14.5696488Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1549.03583197, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237027224, "block_outputs": 125618776, "process_io": {"rchar": 159891489550, "wchar": 64924770070, "syscr": 7671276, "syscw": 193390, "read_bytes": 121357950976, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376274.5692055}
+2026-11-11T05:51:44.5714334Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1577.153324054, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237159544, "block_outputs": 125618776, "process_io": {"rchar": 159974196162, "wchar": 64924770525, "syscr": 7691472, "syscw": 193392, "read_bytes": 121425698816, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376304.5705898}
+2026-11-11T05:52:14.5727703Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1605.317522116, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237275152, "block_outputs": 125618776, "process_io": {"rchar": 160052257910, "wchar": 64924770981, "syscr": 7710534, "syscw": 193394, "read_bytes": 121484890112, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376334.572315}
+2026-11-11T05:52:44.5734630Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1633.387851318, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237405312, "block_outputs": 125618776, "process_io": {"rchar": 160136193322, "wchar": 64924771436, "syscr": 7731030, "syscw": 193396, "read_bytes": 121551532032, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376364.5730207}
+2026-11-11T05:53:14.5738872Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1661.564599795, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237520672, "block_outputs": 125618776, "process_io": {"rchar": 160214627806, "wchar": 64924771892, "syscr": 7750183, "syscw": 193398, "read_bytes": 121610596352, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376394.5734296}
+2026-11-11T05:53:44.5754786Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1689.70221251, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237636384, "block_outputs": 125618776, "process_io": {"rchar": 160295642770, "wchar": 64924772348, "syscr": 7769966, "syscw": 193400, "read_bytes": 121669840896, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376424.5750911}
+2026-11-11T05:54:14.5761498Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1717.936215988, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237752824, "block_outputs": 125618776, "process_io": {"rchar": 160374871878, "wchar": 64924772803, "syscr": 7789313, "syscw": 193402, "read_bytes": 121729458176, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376454.5757465}
+2026-11-11T05:54:44.5772271Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1745.872890807, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237878944, "block_outputs": 125618776, "process_io": {"rchar": 160458180602, "wchar": 64924773259, "syscr": 7809656, "syscw": 193404, "read_bytes": 121794031616, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376484.5767982}
+2026-11-11T05:55:14.5782337Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1774.049138481, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 237992680, "block_outputs": 125618776, "process_io": {"rchar": 160536131758, "wchar": 64924773715, "syscr": 7828691, "syscw": 193406, "read_bytes": 121852268544, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376514.577804}
+2026-11-11T05:55:44.5792030Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1802.133964118, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238117784, "block_outputs": 125618776, "process_io": {"rchar": 160617711970, "wchar": 64924774170, "syscr": 7848612, "syscw": 193408, "read_bytes": 121916317696, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376544.5787964}
+2026-11-11T05:56:14.5815127Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1830.262755653, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238243184, "block_outputs": 125618776, "process_io": {"rchar": 160700221974, "wchar": 64924774626, "syscr": 7868760, "syscw": 193410, "read_bytes": 121980522496, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376574.5810227}
+2026-11-11T05:56:44.5826567Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1858.412889397, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238369816, "block_outputs": 125618776, "process_io": {"rchar": 160782125770, "wchar": 64924775082, "syscr": 7888760, "syscw": 193412, "read_bytes": 122045358080, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376604.5822198}
+2026-11-11T05:57:14.5841887Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1886.64399512, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238489480, "block_outputs": 125618776, "process_io": {"rchar": 160862976894, "wchar": 64924775538, "syscr": 7908503, "syscw": 193414, "read_bytes": 122106626048, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376634.5837715}
+2026-11-11T05:57:44.5844541Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1914.848248335, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238617224, "block_outputs": 125618776, "process_io": {"rchar": 160944311346, "wchar": 64924775993, "syscr": 7928364, "syscw": 193416, "read_bytes": 122172030976, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376664.5841405}
+2026-11-11T05:58:14.5859889Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1943.076755486, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238726552, "block_outputs": 125618776, "process_io": {"rchar": 161021209830, "wchar": 64924776449, "syscr": 7947142, "syscw": 193418, "read_bytes": 122228051968, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376694.5855563}
+2026-11-11T05:58:44.5865441Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1971.267091093, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238847928, "block_outputs": 125618776, "process_io": {"rchar": 161103416730, "wchar": 64924776905, "syscr": 7967216, "syscw": 193420, "read_bytes": 122290151424, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376724.5861526}
+2026-11-11T05:59:14.5877172Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 1999.401415045, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 238970960, "block_outputs": 125618776, "process_io": {"rchar": 161187380814, "wchar": 64924777361, "syscr": 7987719, "syscw": 193422, "read_bytes": 122353143808, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376754.587245}
+2026-11-11T05:59:44.5884676Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 2027.526435266, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 239099200, "block_outputs": 125618776, "process_io": {"rchar": 161271361282, "wchar": 64924777816, "syscr": 8008226, "syscw": 193424, "read_bytes": 122418802688, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376784.5880632}
+2026-11-11T06:00:14.5925785Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 2055.717738724, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 239225008, "block_outputs": 125618776, "process_io": {"rchar": 161354219446, "wchar": 64924778272, "syscr": 8028459, "syscw": 193426, "read_bytes": 122483216384, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376814.5922272}
+2026-11-11T06:00:44.5943495Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 2083.864339532, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 239354520, "block_outputs": 125618776, "process_io": {"rchar": 161438789738, "wchar": 64924778728, "syscr": 8049110, "syscw": 193428, "read_bytes": 122549526528, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376844.5938108}
+2026-11-11T06:01:14.5948605Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 2111.985014341, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 239474296, "block_outputs": 125618776, "process_io": {"rchar": 161522131230, "wchar": 64924779184, "syscr": 8069461, "syscw": 193430, "read_bytes": 122610851840, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376874.5944822}
+2026-11-11T06:01:44.5958054Z {"heartbeat": "canonical.field.advancement", "resources": {"cpu_seconds": 2140.174451414, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 239597600, "block_outputs": 125618776, "process_io": {"rchar": 161608868306, "wchar": 64924779640, "syscr": 8090641, "syscw": 193432, "read_bytes": 122673983488, "write_bytes": 64317517824, "cancelled_write_bytes": 26361856}}, "time": 1794376904.5953884}
+2026-11-11T06:02:09.0434741Z {"phase": "canonical.field.agency", "time": 1794376929.0432823}
+2026-11-11T06:02:14.5964856Z {"heartbeat": "canonical.field.agency", "resources": {"cpu_seconds": 2168.53436705, "rss_bytes": 320114688, "peak_rss_bytes": 319873024, "minor_faults": 81276, "major_faults": 5, "block_inputs": 239739104, "block_outputs": 125618784, "process_io": {"rchar": 161701888718, "wchar": 64924780699, "syscr": 8113435, "syscw": 193437, "read_bytes": 122746433536, "write_bytes": 64317521920, "cancelled_write_bytes": 26361856}}, "time": 1794376934.596066}
+2026-11-11T06:02:24.9323432Z {"phase": "canonical.field.ambient_magic", "time": 1794376944.932118}
+2026-11-11T06:02:24.9335339Z {"phase": "canonical.field.cells", "time": 1794376944.9334183}
+2026-11-11T06:02:24.9439885Z {"phase": "canonical.field.communities", "time": 1794376944.943833}
+2026-11-11T06:02:44.5976720Z {"heartbeat": "canonical.field.communities", "resources": {"cpu_seconds": 2194.575597063, "rss_bytes": 331059200, "peak_rss_bytes": 339140608, "minor_faults": 85996, "major_faults": 5, "block_inputs": 240010576, "block_outputs": 125618824, "process_io": {"rchar": 161876883990, "wchar": 64924787080, "syscr": 8156822, "syscw": 193451, "read_bytes": 122885427200, "write_bytes": 64317542400, "cancelled_write_bytes": 26361856}}, "time": 1794376964.5973544}
+2026-11-11T06:03:04.1380606Z {"phase": "canonical.field.culture", "time": 1794376984.1378706}
+2026-11-11T06:03:04.3246634Z {"phase": "canonical.field.currency", "time": 1794376984.3245122}
+2026-11-11T06:03:13.6772159Z {"phase": "canonical.field.divinity", "time": 1794376993.677067}
+2026-11-11T06:03:14.5991447Z {"heartbeat": "canonical.field.divinity", "resources": {"cpu_seconds": 2223.406008304, "rss_bytes": 340381696, "peak_rss_bytes": 340152320, "minor_faults": 88792, "major_faults": 5, "block_inputs": 240093336, "block_outputs": 125618848, "process_io": {"rchar": 161999016230, "wchar": 64924789353, "syscr": 8186684, "syscw": 193462, "read_bytes": 122927800320, "write_bytes": 64317554688, "cancelled_write_bytes": 26361856}}, "time": 1794376994.5984602}
+2026-11-11T06:03:15.2867290Z {"phase": "canonical.field.economy", "time": 1794376995.2865386}
+2026-11-11T06:03:42.4528926Z {"phase": "canonical.field.event_ids", "time": 1794377022.4526553}
+2026-11-11T06:03:43.4057653Z {"phase": "canonical.field.events", "time": 1794377023.4055893}
+2026-11-11T06:03:44.6344937Z {"heartbeat": "canonical.field.events", "resources": {"cpu_seconds": 2251.424872409, "rss_bytes": 369070080, "peak_rss_bytes": 427446272, "minor_faults": 110312, "major_faults": 5, "block_inputs": 240273992, "block_outputs": 125618872, "process_io": {"rchar": 162088564429, "wchar": 64924791623, "syscr": 8208603, "syscw": 193473, "read_bytes": 123020296192, "write_bytes": 64317566976, "cancelled_write_bytes": 26361856}}, "time": 1794377024.6339831}
+2026-11-11T06:04:14.7302566Z {"heartbeat": "canonical.field.events", "resources": {"cpu_seconds": 2281.343826249, "rss_bytes": 375218176, "peak_rss_bytes": 427446272, "minor_faults": 111933, "major_faults": 5, "block_inputs": 240597320, "block_outputs": 125618872, "process_io": {"rchar": 162254458235, "wchar": 64924792075, "syscr": 8249112, "syscw": 193475, "read_bytes": 123185840128, "write_bytes": 64317566976, "cancelled_write_bytes": 26361856}}, "time": 1794377054.7298157}
+2026-11-11T06:04:44.7817482Z {"heartbeat": "canonical.field.events", "resources": {"cpu_seconds": 2311.261364777, "rss_bytes": 376266752, "peak_rss_bytes": 427446272, "minor_faults": 112189, "major_faults": 5, "block_inputs": 240914496, "block_outputs": 125618872, "process_io": {"rchar": 162417302656, "wchar": 64924792527, "syscr": 8288876, "syscw": 193477, "read_bytes": 123348234240, "write_bytes": 64317566976, "cancelled_write_bytes": 26361856}}, "time": 1794377084.7813282}
+2026-11-11T06:05:14.8232952Z {"heartbeat": "canonical.field.events", "resources": {"cpu_seconds": 2341.163946594, "rss_bytes": 376905728, "peak_rss_bytes": 427446272, "minor_faults": 112346, "major_faults": 5, "block_inputs": 241222208, "block_outputs": 125618872, "process_io": {"rchar": 162575154139, "wchar": 64924792979, "syscr": 8327421, "syscw": 193479, "read_bytes": 123505782784, "write_bytes": 64317566976, "cancelled_write_bytes": 26361856}}, "time": 1794377114.8176882}
+2026-11-11T06:05:45.1410533Z {"heartbeat": "canonical.field.events", "resources": {"cpu_seconds": 2371.344687246, "rss_bytes": 376905728, "peak_rss_bytes": 427446272, "minor_faults": 112347, "major_faults": 5, "block_inputs": 241527368, "block_outputs": 125618872, "process_io": {"rchar": 162731804587, "wchar": 64924793431, "syscr": 8365673, "syscw": 193481, "read_bytes": 123662024704, "write_bytes": 64317566976, "cancelled_write_bytes": 26361856}}, "time": 1794377145.1405854}
+2026-11-11T06:06:15.2070219Z {"heartbeat": "canonical.field.events", "resources": {"cpu_seconds": 2401.243837661, "rss_bytes": 376905728, "peak_rss_bytes": 427446272, "minor_faults": 112347, "major_faults": 5, "block_inputs": 241838912, "block_outputs": 125618872, "process_io": {"rchar": 162891654780, "wchar": 64924793883, "syscr": 8404706, "syscw": 193483, "read_bytes": 123821535232, "write_bytes": 64317566976, "cancelled_write_bytes": 26361856}}, "time": 1794377175.1937265}
+2026-11-11T06:06:23.6672727Z {"phase": "canonical.field.genealogy", "time": 1794377183.6670277}
+2026-11-11T06:06:40.2218594Z {"phase": "canonical.field.households", "time": 1794377200.221675}
+2026-11-11T06:06:45.2116930Z {"heartbeat": "canonical.field.households", "resources": {"cpu_seconds": 2429.271128063, "rss_bytes": 377245696, "peak_rss_bytes": 427446272, "minor_faults": 118630, "major_faults": 5, "block_inputs": 242051856, "block_outputs": 125618888, "process_io": {"rchar": 163007025700, "wchar": 64924795555, "syscr": 8433069, "syscw": 193491, "read_bytes": 123930566656, "write_bytes": 64317575168, "cancelled_write_bytes": 26361856}}, "time": 1794377205.2113118}
+2026-11-11T06:07:01.6504835Z {"phase": "canonical.field.infrastructure", "time": 1794377221.6503108}
+2026-11-11T06:07:01.6916214Z {"phase": "canonical.field.institutions", "time": 1794377221.6914983}
+2026-11-11T06:07:15.2124470Z {"heartbeat": "canonical.field.institutions", "resources": {"cpu_seconds": 2456.727272736, "rss_bytes": 378003456, "peak_rss_bytes": 427446272, "minor_faults": 118815, "major_faults": 5, "block_inputs": 242238184, "block_outputs": 125619392, "process_io": {"rchar": 163104761316, "wchar": 64925154122, "syscr": 8456988, "syscw": 193588, "read_bytes": 124025962496, "write_bytes": 64317833216, "cancelled_write_bytes": 26361856}}, "time": 1794377235.2120414}
+2026-11-11T06:07:22.0230263Z {"phase": "canonical.field.knowledge", "time": 1794377242.02282}
+2026-11-11T06:07:22.5327532Z {"phase": "canonical.field.lineage", "time": 1794377242.5325687}
+2026-11-11T06:07:45.2135697Z {"heartbeat": "canonical.field.lineage", "resources": {"cpu_seconds": 2484.647061351, "rss_bytes": 386367488, "peak_rss_bytes": 427446272, "minor_faults": 120857, "major_faults": 5, "block_inputs": 242496296, "block_outputs": 125619544, "process_io": {"rchar": 163220646424, "wchar": 64925401552, "syscr": 8485437, "syscw": 193656, "read_bytes": 124158115840, "write_bytes": 64317911040, "cancelled_write_bytes": 26361856}}, "time": 1794377265.2130818}
+2026-11-11T06:08:15.2147913Z {"heartbeat": "canonical.field.lineage", "resources": {"cpu_seconds": 2512.250851862, "rss_bytes": 384462848, "peak_rss_bytes": 427446272, "minor_faults": 121672, "major_faults": 5, "block_inputs": 242789032, "block_outputs": 125619544, "process_io": {"rchar": 163358639068, "wchar": 64925402005, "syscr": 8519291, "syscw": 193658, "read_bytes": 124307996672, "write_bytes": 64317911040, "cancelled_write_bytes": 26361856}}, "time": 1794377295.2143757}
+2026-11-11T06:08:40.9863120Z {"phase": "canonical.field.local", "time": 1794377320.9860983}
+2026-11-11T06:08:40.9874435Z {"phase": "canonical.field.magic_resources", "time": 1794377320.98733}
+2026-11-11T06:08:45.2156239Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2540.630933395, "rss_bytes": 382193664, "peak_rss_bytes": 427446272, "minor_faults": 121672, "major_faults": 5, "block_inputs": 242918288, "block_outputs": 125619560, "process_io": {"rchar": 163506328972, "wchar": 64925403680, "syscr": 8555436, "syscw": 193666, "read_bytes": 124374175744, "write_bytes": 64317919232, "cancelled_write_bytes": 26361856}}, "time": 1794377325.2152648}
+2026-11-11T06:09:15.2168304Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2567.565370477, "rss_bytes": 387436544, "peak_rss_bytes": 427446272, "minor_faults": 122952, "major_faults": 5, "block_inputs": 243365136, "block_outputs": 125620176, "process_io": {"rchar": 163700458340, "wchar": 64930765805, "syscr": 8603282, "syscw": 194977, "read_bytes": 124602961920, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377355.2164423}
+2026-11-11T06:09:45.2180595Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2595.414592449, "rss_bytes": 388481024, "peak_rss_bytes": 427446272, "minor_faults": 123207, "major_faults": 5, "block_inputs": 243491168, "block_outputs": 125620176, "process_io": {"rchar": 163780912152, "wchar": 64930766266, "syscr": 8622928, "syscw": 194979, "read_bytes": 124667490304, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377385.2175503}
+2026-11-11T06:10:15.2192803Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2623.209170354, "rss_bytes": 388489216, "peak_rss_bytes": 427446272, "minor_faults": 123209, "major_faults": 5, "block_inputs": 243614392, "block_outputs": 125620176, "process_io": {"rchar": 163859346636, "wchar": 64930766727, "syscr": 8642081, "syscw": 194981, "read_bytes": 124730580992, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377415.2186885}
+2026-11-11T06:10:45.2201064Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2650.94818511, "rss_bytes": 388489216, "peak_rss_bytes": 427446272, "minor_faults": 123209, "major_faults": 5, "block_inputs": 243739184, "block_outputs": 125620176, "process_io": {"rchar": 163937027456, "wchar": 64930767188, "syscr": 8661050, "syscw": 194983, "read_bytes": 124794474496, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377445.2196195}
+2026-11-11T06:11:15.2214457Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2678.703575499, "rss_bytes": 388489216, "peak_rss_bytes": 427446272, "minor_faults": 123209, "major_faults": 5, "block_inputs": 243859712, "block_outputs": 125620176, "process_io": {"rchar": 164016928308, "wchar": 64930767648, "syscr": 8680561, "syscw": 194985, "read_bytes": 124856184832, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377475.2209268}
+2026-11-11T06:11:45.2229423Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2706.471969622, "rss_bytes": 388489216, "peak_rss_bytes": 427446272, "minor_faults": 123209, "major_faults": 5, "block_inputs": 243977424, "block_outputs": 125620176, "process_io": {"rchar": 164095772392, "wchar": 64930768109, "syscr": 8699814, "syscw": 194987, "read_bytes": 124916453376, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377505.2223136}
+2026-11-11T06:12:15.2243557Z {"heartbeat": "canonical.field.magic_resources", "resources": {"cpu_seconds": 2734.257590177, "rss_bytes": 388591616, "peak_rss_bytes": 427446272, "minor_faults": 123234, "major_faults": 5, "block_inputs": 244098376, "block_outputs": 125620176, "process_io": {"rchar": 164176848796, "wchar": 64930768570, "syscr": 8719612, "syscw": 194989, "read_bytes": 124978380800, "write_bytes": 64318234624, "cancelled_write_bytes": 26361856}}, "time": 1794377535.2240064}
+2026-11-11T06:12:23.0674873Z {"phase": "canonical.field.materials", "time": 1794377543.0672433}
+2026-11-11T06:12:45.2249038Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2760.973691581, "rss_bytes": 388694016, "peak_rss_bytes": 427446272, "minor_faults": 123259, "major_faults": 5, "block_inputs": 244367608, "block_outputs": 125625720, "process_io": {"rchar": 164396789616, "wchar": 64958065385, "syscr": 8773317, "syscw": 201658, "read_bytes": 125116231680, "write_bytes": 64321073152, "cancelled_write_bytes": 26361856}}, "time": 1794377565.2244477}
+2026-11-11T06:13:15.2262591Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2788.942387176, "rss_bytes": 388694016, "peak_rss_bytes": 427446272, "minor_faults": 123259, "major_faults": 5, "block_inputs": 244641304, "block_outputs": 125630976, "process_io": {"rchar": 164576615488, "wchar": 64967691440, "syscr": 8817380, "syscw": 204010, "read_bytes": 125256359936, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377595.2258613}
+2026-11-11T06:13:45.2270007Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2815.161750593, "rss_bytes": 388706304, "peak_rss_bytes": 427446272, "minor_faults": 123262, "major_faults": 5, "block_inputs": 245222440, "block_outputs": 125630976, "process_io": {"rchar": 164771150752, "wchar": 64967691895, "syscr": 8865367, "syscw": 204012, "read_bytes": 125553901568, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377625.226521}
+2026-11-11T06:14:15.2281018Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2843.124609418, "rss_bytes": 394436608, "peak_rss_bytes": 427446272, "minor_faults": 124661, "major_faults": 5, "block_inputs": 245343096, "block_outputs": 125630976, "process_io": {"rchar": 164850175060, "wchar": 64967692349, "syscr": 8884664, "syscw": 204014, "read_bytes": 125615677440, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377655.2276146}
+2026-11-11T06:14:45.2286848Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2870.937231294, "rss_bytes": 394706944, "peak_rss_bytes": 427446272, "minor_faults": 124727, "major_faults": 5, "block_inputs": 245458976, "block_outputs": 125630976, "process_io": {"rchar": 164925660424, "wchar": 64967692804, "syscr": 8903097, "syscw": 204016, "read_bytes": 125675012096, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377685.2282302}
+2026-11-11T06:15:15.2297510Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2898.795063683, "rss_bytes": 395485184, "peak_rss_bytes": 427446272, "minor_faults": 124917, "major_faults": 5, "block_inputs": 245575480, "block_outputs": 125630976, "process_io": {"rchar": 165003156924, "wchar": 64967693259, "syscr": 8922021, "syscw": 204018, "read_bytes": 125734658048, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377715.2290926}
+2026-11-11T06:15:45.2313178Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2926.720080931, "rss_bytes": 395489280, "peak_rss_bytes": 427446272, "minor_faults": 124918, "major_faults": 5, "block_inputs": 245693264, "block_outputs": 125630976, "process_io": {"rchar": 165078113904, "wchar": 64967693714, "syscr": 8940325, "syscw": 204020, "read_bytes": 125794963456, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377745.2306776}
+2026-11-11T06:16:15.2323964Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2954.548802113, "rss_bytes": 395489280, "peak_rss_bytes": 427446272, "minor_faults": 124918, "major_faults": 5, "block_inputs": 245815600, "block_outputs": 125630976, "process_io": {"rchar": 165156486948, "wchar": 64967694169, "syscr": 8959463, "syscw": 204022, "read_bytes": 125857599488, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377775.2318795}
+2026-11-11T06:16:45.6605043Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 2982.744001168, "rss_bytes": 395489280, "peak_rss_bytes": 427446272, "minor_faults": 124918, "major_faults": 5, "block_inputs": 245934848, "block_outputs": 125630976, "process_io": {"rchar": 165234180056, "wchar": 64967694624, "syscr": 8978435, "syscw": 204024, "read_bytes": 125918654464, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377805.653977}
+2026-11-11T06:17:15.6672610Z {"heartbeat": "canonical.field.materials", "resources": {"cpu_seconds": 3010.50454653, "rss_bytes": 395489280, "peak_rss_bytes": 427446272, "minor_faults": 124918, "major_faults": 5, "block_inputs": 246050096, "block_outputs": 125630976, "process_io": {"rchar": 165311467660, "wchar": 64967695078, "syscr": 8997308, "syscw": 204026, "read_bytes": 125977661440, "write_bytes": 64323764224, "cancelled_write_bytes": 26361856}}, "time": 1794377835.6669116}
+2026-11-11T06:17:17.6653216Z {"phase": "canonical.field.metaphysics", "time": 1794377837.6651595}
+2026-11-11T06:17:45.6690359Z {"heartbeat": "canonical.field.metaphysics", "resources": {"cpu_seconds": 3038.007127889, "rss_bytes": 405975040, "peak_rss_bytes": 427446272, "minor_faults": 127478, "major_faults": 5, "block_inputs": 246239512, "block_outputs": 125630984, "process_io": {"rchar": 165403849960, "wchar": 64967696146, "syscr": 9019951, "syscw": 204031, "read_bytes": 126074642432, "write_bytes": 64323768320, "cancelled_write_bytes": 26361856}}, "time": 1794377865.668497}
+2026-11-11T06:18:15.6706035Z {"heartbeat": "canonical.field.metaphysics", "resources": {"cpu_seconds": 3065.587645273, "rss_bytes": 405975040, "peak_rss_bytes": 427446272, "minor_faults": 127478, "major_faults": 5, "block_inputs": 246393144, "block_outputs": 125630984, "process_io": {"rchar": 165483160988, "wchar": 64967696602, "syscr": 9039318, "syscw": 204033, "read_bytes": 126153302016, "write_bytes": 64323768320, "cancelled_write_bytes": 26361856}}, "time": 1794377895.6700332}
+2026-11-11T06:18:33.7014371Z {"phase": "canonical.field.next_event", "time": 1794377913.7012794}
+2026-11-11T06:18:33.7024961Z {"phase": "canonical.field.next_household", "time": 1794377913.7024088}
+2026-11-11T06:18:33.7036284Z {"phase": "canonical.field.next_person", "time": 1794377913.7035449}
+2026-11-11T06:18:33.7048484Z {"phase": "canonical.field.next_settlement", "time": 1794377913.704764}
+2026-11-11T06:18:33.7060053Z {"phase": "canonical.field.people", "time": 1794377913.705902}
+2026-11-11T06:18:45.6718375Z {"heartbeat": "canonical.field.people", "resources": {"cpu_seconds": 3093.284423552, "rss_bytes": 405975040, "peak_rss_bytes": 427446272, "minor_faults": 127478, "major_faults": 5, "block_inputs": 246577688, "block_outputs": 125631024, "process_io": {"rchar": 165579529416, "wchar": 64967700128, "syscr": 9062950, "syscw": 204050, "read_bytes": 126247788544, "write_bytes": 64323788800, "cancelled_write_bytes": 26361856}}, "time": 1794377925.671469}
+2026-11-11T06:18:52.9344687Z {"phase": "canonical.field.seed", "time": 1794377932.9342723}
+2026-11-11T06:18:52.9355320Z {"phase": "canonical.field.settlements", "time": 1794377932.935413}
+2026-11-11T06:18:53.2091067Z {"phase": "canonical.field.skills", "time": 1794377933.2088368}
+2026-11-11T06:19:15.6729923Z {"heartbeat": "canonical.field.skills", "resources": {"cpu_seconds": 3120.517024876, "rss_bytes": 413892608, "peak_rss_bytes": 427446272, "minor_faults": 129411, "major_faults": 5, "block_inputs": 246849096, "block_outputs": 125631048, "process_io": {"rchar": 165734716566, "wchar": 64967702394, "syscr": 9101133, "syscw": 204061, "read_bytes": 126386749440, "write_bytes": 64323801088, "cancelled_write_bytes": 26361856}}, "time": 1794377955.6725466}
+2026-11-11T06:19:45.6735975Z {"heartbeat": "canonical.field.skills", "resources": {"cpu_seconds": 3148.002917739, "rss_bytes": 415412224, "peak_rss_bytes": 427446272, "minor_faults": 129782, "major_faults": 5, "block_inputs": 246966832, "block_outputs": 125631048, "process_io": {"rchar": 165846234444, "wchar": 64967702846, "syscr": 9128363, "syscw": 204063, "read_bytes": 126447030272, "write_bytes": 64323801088, "cancelled_write_bytes": 26361856}}, "time": 1794377985.673206}
+2026-11-11T06:20:15.6744276Z {"heartbeat": "canonical.field.skills", "resources": {"cpu_seconds": 3175.478735265, "rss_bytes": 415412224, "peak_rss_bytes": 427446272, "minor_faults": 129782, "major_faults": 5, "block_inputs": 247084616, "block_outputs": 125631048, "process_io": {"rchar": 165950576130, "wchar": 64967703297, "syscr": 9153841, "syscw": 204065, "read_bytes": 126507335680, "write_bytes": 64323801088, "cancelled_write_bytes": 26361856}}, "time": 1794378015.6740224}
+2026-11-11T06:20:45.9893497Z {"heartbeat": "canonical.field.skills", "resources": {"cpu_seconds": 3203.216093698, "rss_bytes": 415412224, "peak_rss_bytes": 427446272, "minor_faults": 129782, "major_faults": 5, "block_inputs": 247201656, "block_outputs": 125631048, "process_io": {"rchar": 166059275960, "wchar": 64967703749, "syscr": 9180383, "syscw": 204067, "read_bytes": 126567260160, "write_bytes": 64323801088, "cancelled_write_bytes": 26361856}}, "time": 1794378045.9838681}
+2026-11-11T06:21:15.9962521Z {"heartbeat": "canonical.field.skills", "resources": {"cpu_seconds": 3230.638527177, "rss_bytes": 417026048, "peak_rss_bytes": 427446272, "minor_faults": 130176, "major_faults": 5, "block_inputs": 247319576, "block_outputs": 125631048, "process_io": {"rchar": 166171809646, "wchar": 64967704201, "syscr": 9207861, "syscw": 204069, "read_bytes": 126627635200, "write_bytes": 64323801088, "cancelled_write_bytes": 26361856}}, "time": 1794378075.995748}
+2026-11-11T06:21:43.1672218Z {"phase": "canonical.field.social", "time": 1794378103.1669388}
+2026-11-11T06:21:45.9970834Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3258.133695704, "rss_bytes": 417026048, "peak_rss_bytes": 427446272, "minor_faults": 130176, "major_faults": 5, "block_inputs": 247462912, "block_outputs": 125631064, "process_io": {"rchar": 166287141838, "wchar": 64967709351, "syscr": 9236107, "syscw": 204075, "read_bytes": 126701023232, "write_bytes": 64323809280, "cancelled_write_bytes": 26361856}}, "time": 1794378105.9966495}
+2026-11-11T06:22:15.9977857Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3286.092325175, "rss_bytes": 417026048, "peak_rss_bytes": 427446272, "minor_faults": 130176, "major_faults": 5, "block_inputs": 247793368, "block_outputs": 125631080, "process_io": {"rchar": 166385532036, "wchar": 64967717995, "syscr": 9260132, "syscw": 204079, "read_bytes": 126870216704, "write_bytes": 64323817472, "cancelled_write_bytes": 26361856}}, "time": 1794378135.997363}
+2026-11-11T06:22:45.9986134Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3314.005614168, "rss_bytes": 421015552, "peak_rss_bytes": 427446272, "minor_faults": 131150, "major_faults": 5, "block_inputs": 248111768, "block_outputs": 125631096, "process_io": {"rchar": 166480780602, "wchar": 64967726638, "syscr": 9283390, "syscw": 204083, "read_bytes": 127033237504, "write_bytes": 64323825664, "cancelled_write_bytes": 26361856}}, "time": 1794378165.9982553}
+2026-11-11T06:23:15.9995837Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3341.984085661, "rss_bytes": 421220352, "peak_rss_bytes": 427446272, "minor_faults": 131200, "major_faults": 5, "block_inputs": 248452816, "block_outputs": 125631096, "process_io": {"rchar": 166580230856, "wchar": 64967727090, "syscr": 9307675, "syscw": 204085, "read_bytes": 127207858176, "write_bytes": 64323825664, "cancelled_write_bytes": 26361856}}, "time": 1794378195.9988592}
+2026-11-11T06:23:46.1634659Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3365.95492306, "rss_bytes": 432746496, "peak_rss_bytes": 435949568, "minor_faults": 135417, "major_faults": 5, "block_inputs": 248928576, "block_outputs": 125631096, "process_io": {"rchar": 166879956170, "wchar": 64967727542, "syscr": 9381415, "syscw": 204087, "read_bytes": 127451443200, "write_bytes": 64323825664, "cancelled_write_bytes": 26361856}}, "time": 1794378226.1580572}
+2026-11-11T06:24:16.1700115Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3393.26014423, "rss_bytes": 432746496, "peak_rss_bytes": 435949568, "minor_faults": 135417, "major_faults": 5, "block_inputs": 249069328, "block_outputs": 125631096, "process_io": {"rchar": 167046593920, "wchar": 64967727993, "syscr": 9422102, "syscw": 204089, "read_bytes": 127523508224, "write_bytes": 64323825664, "cancelled_write_bytes": 26361856}}, "time": 1794378256.1695228}
+2026-11-11T06:24:46.1703400Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3408.94735455, "rss_bytes": 431697920, "peak_rss_bytes": 435949568, "minor_faults": 135417, "major_faults": 5, "block_inputs": 265927544, "block_outputs": 125634336, "process_io": {"rchar": 175707059624, "wchar": 64969059192, "syscr": 9467642, "syscw": 204740, "read_bytes": 136154914816, "write_bytes": 64325484544, "cancelled_write_bytes": 26361856}}, "time": 1794378286.169999}
+2026-11-11T06:25:16.1708728Z {"heartbeat": "canonical.field.social", "resources": {"cpu_seconds": 3419.685270573, "rss_bytes": 431697920, "peak_rss_bytes": 435949568, "minor_faults": 135417, "major_faults": 5, "block_inputs": 289903992, "block_outputs": 125634336, "process_io": {"rchar": 188871669342, "wchar": 64969059642, "syscr": 9517865, "syscw": 204742, "read_bytes": 148431118336, "write_bytes": 64325484544, "cancelled_write_bytes": 26361856}}, "time": 1794378316.170465}
+2026-11-11T06:25:36.7696741Z Traceback (most recent call last):
+2026-11-11T06:25:36.7714673Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/incremental_store.py", line 143, in decode
+2026-11-11T06:25:36.7715869Z     node = json.loads(payload.decode("utf-8"))
+2026-11-11T06:25:36.7716477Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.7717430Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/json/__init__.py", line 346, in loads
+2026-11-11T06:25:36.8302790Z     return _default_decoder.decode(s)
+2026-11-11T06:25:36.8303344Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8304329Z   File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/json/decoder.py", line 339, in decode
+2026-11-11T06:25:36.8392736Z     end = _w(s, end).end()
+2026-11-11T06:25:36.8393291Z           ^^^^^^^^^^
+2026-11-11T06:25:36.8394340Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_mature_benchmark.py", line 61, in expired
+2026-11-11T06:25:36.8395529Z     raise base.BudgetExpired(name+' phase budget exhausted')
+2026-11-11T06:25:36.8396458Z simulation.profile_stage_0_5_performance.BudgetExpired: source_digest phase budget exhausted
+2026-11-11T06:25:36.8397125Z 
+2026-11-11T06:25:36.8397461Z The above exception was the direct cause of the following exception:
+2026-11-11T06:25:36.8398024Z 
+2026-11-11T06:25:36.8398215Z Traceback (most recent call last):
+2026-11-11T06:25:36.8398876Z   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-11-11T06:25:36.8399805Z   File "<frozen runpy>", line 88, in _run_code
+2026-11-11T06:25:36.8400898Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_resume.py", line 411, in <module>
+2026-11-11T06:25:36.8402378Z     if __name__=='__main__':main()
+2026-11-11T06:25:36.8410906Z                             ^^^^^^
+2026-11-11T06:25:36.8412329Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_resume.py", line 405, in main
+2026-11-11T06:25:36.8413789Z     elif a.command=='run-stage':run(root,work,stage=a.stage,mode=a.mode,parent_run=a.parent_run,parent_artifact=a.parent_artifact)
+2026-11-11T06:25:36.8414917Z                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8416088Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_resume.py", line 324, in run
+2026-11-11T06:25:36.8417769Z     run_stage(stage,value,database,workspace/'out',producer=producer(stage),budget=cfg['budgets'][stage],progress=progress)
+2026-11-11T06:25:36.8419327Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_stages.py", line 202, in run_stage
+2026-11-11T06:25:36.8420583Z     rec.measure(stage,action)
+2026-11-11T06:25:36.8421618Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_mature_benchmark.py", line 64, in measure
+2026-11-11T06:25:36.8422731Z     value=operation();row['status']='complete';return value
+2026-11-11T06:25:36.8423244Z           ^^^^^^^^^^^
+2026-11-11T06:25:36.8424142Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_stages.py", line 190, in action
+2026-11-11T06:25:36.8425141Z     result=_digest(working,rules,progress)
+2026-11-11T06:25:36.8425632Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8426589Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_stages.py", line 63, in _digest
+2026-11-11T06:25:36.8428046Z     with catalog_snapshot(session.store,session.pin):return canonical_digest(session.world,progress)
+2026-11-11T06:25:36.8429039Z                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8430490Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/stage_0_6_genesis_stages.py", line 25, in canonical_digest
+2026-11-11T06:25:36.8431549Z     return digest(world,_canonical,fields)
+2026-11-11T06:25:36.8432039Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8432968Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/canonical_stream.py", line 48, in digest
+2026-11-11T06:25:36.8433980Z     for piece in pieces(value):
+2026-11-11T06:25:36.8434417Z                  ^^^^^^^^^^^^^
+2026-11-11T06:25:36.8435401Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/canonical_stream.py", line 31, in pieces
+2026-11-11T06:25:36.8436524Z     yield encode_basestring(key);yield ':';yield from pieces(getattr(v,name))
+2026-11-11T06:25:36.8437299Z                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8438793Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/canonical_stream.py", line 31, in pieces
+2026-11-11T06:25:36.8440180Z     yield encode_basestring(key);yield ':';yield from pieces(getattr(v,name))
+2026-11-11T06:25:36.8441089Z                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8442162Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/canonical_stream.py", line 37, in pieces
+2026-11-11T06:25:36.8443515Z     yield encode_basestring(repr(key));yield ':';yield from pieces(v[key])
+2026-11-11T06:25:36.8444231Z                                                                    ~^^^^^
+2026-11-11T06:25:36.8445524Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy.py", line 5178, in __getitem__
+2026-11-11T06:25:36.8450123Z     checked = self._store.read_version(
+2026-11-11T06:25:36.8450804Z               ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8452164Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py", line 1465, in read_version
+2026-11-11T06:25:36.8458548Z     value, schema, valid_from, valid_to, _ = self._check_record_row(
+2026-11-11T06:25:36.8460443Z                                              ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8461684Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/persistence_lazy_store.py", line 1440, in _check_record_row
+2026-11-11T06:25:36.8464284Z     value = self.codec.decode(payload)
+2026-11-11T06:25:36.8468399Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-11T06:25:36.8481184Z   File "/home/runner/work/all-that-endures/all-that-endures/simulation/ate_sim/incremental_store.py", line 145, in decode
+2026-11-11T06:25:36.8482446Z     raise CodecError("invalid typed payload") from exc
+2026-11-11T06:25:36.8483221Z ate_sim.incremental_store.CodecError: invalid typed payload
+2026-11-11T06:25:37.7156482Z ##[error]Process completed with exit code 1.
+2026-11-11T06:25:37.7303277Z ##[group]Run actions/upload-artifact@v4
+2026-11-11T06:25:37.7303583Z with:
+2026-11-11T06:25:37.7303949Z   name: resume-evidence-mature-source_digest-78bf9b1b6033c789078446c08f5d371e6120b805-1
+2026-11-11T06:25:37.7304570Z   path: resume-work/*.json
+resume-work/evidence-*/**/*.json
+resume-work/transport/**/*.json
+2026-11-11T06:25:37.7305000Z   retention-days: 30
+2026-11-11T06:25:37.7305230Z   if-no-files-found: error
+2026-11-11T06:25:37.7305464Z   compression-level: 1
+2026-11-11T06:25:37.7305678Z   overwrite: false
+2026-11-11T06:25:37.7305890Z   include-hidden-files: false
+2026-11-11T06:25:37.7306119Z env:
+2026-11-11T06:25:37.7306304Z   PYTHONPATH: .:simulation
+2026-11-11T06:25:37.7306533Z   PYTHONUNBUFFERED: 1
+2026-11-11T06:25:37.7309089Z   GH_TOKEN: ***
+2026-11-11T06:25:37.7309381Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T06:25:37.7310190Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-11T06:25:37.7310666Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T06:25:37.7311059Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T06:25:37.7311440Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-11T06:25:37.7311822Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-11T06:25:37.7312142Z ##[endgroup]
+2026-11-11T06:25:37.9092093Z (node:3580) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-11T06:25:37.9093753Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-11T06:25:37.9305226Z With the provided path, there will be 36 files uploaded
+2026-11-11T06:25:37.9312321Z Artifact name is valid!
+2026-11-11T06:25:37.9312745Z Root directory input is valid!
+2026-11-11T06:25:38.4297382Z Beginning upload of artifact content to blob storage
+2026-11-11T06:25:38.5030551Z (node:3580) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-11T06:25:38.8507124Z Uploaded bytes 15996
+2026-11-11T06:25:38.9296928Z Finished uploading artifact content to blob storage!
+2026-11-11T06:25:38.9298200Z SHA256 digest of uploaded artifact zip is e9ce93bbeffd30dbf4629fbba9ac2098d1cea62d3b298f44a1d0659fa40a2a12
+2026-11-11T06:25:38.9301181Z Finalizing artifact upload
+2026-11-11T06:25:39.4708382Z Artifact resume-evidence-mature-source_digest-78bf9b1b6033c789078446c08f5d371e6120b805-1.zip successfully finalized. Artifact ID 13834241594
+2026-11-11T06:25:39.4711441Z Artifact resume-evidence-mature-source_digest-78bf9b1b6033c789078446c08f5d371e6120b805-1 has been successfully uploaded! Final size is 15996 bytes. Artifact ID is 13834241594
+2026-11-11T06:25:39.4717220Z Artifact download URL: https://github.com/rax0h/all-that-endures/actions/runs/42964119253/artifacts/13834241594
+2026-11-11T06:25:39.4982896Z Post job cleanup.
+2026-11-11T06:25:39.5951109Z [command]/usr/bin/git version
+2026-11-11T06:25:39.6000651Z git version 2.56.0
+2026-11-11T06:25:39.6048926Z Temporarily overriding HOME='/home/runner/work/_temp/cc646868-598b-4d62-add4-bf0ef2864f1c' before making global git config changes
+2026-11-11T06:25:39.6051135Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T06:25:39.6056630Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/all-that-endures/all-that-endures
+2026-11-11T06:25:39.6103590Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T06:25:39.6142228Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T06:25:39.6461563Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T06:25:39.6495828Z http.https://github.com/.extraheader
+2026-11-11T06:25:39.6510007Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-11T06:25:39.6565838Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T06:25:39.6870635Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T06:25:39.6940550Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T06:25:39.7377127Z Evaluate and set job outputs
+2026-11-11T06:25:39.7384312Z Cleaning up orphan processes
+2026-11-11T06:25:39.7905888Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

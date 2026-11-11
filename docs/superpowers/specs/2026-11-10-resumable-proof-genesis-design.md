@@ -29,8 +29,13 @@ failure is review-raw/timeout-42823293423. No repeat of that monolithic request.
 ## Stage contract
 
 Format6 only. Stages: source_digest -> capture -> catalog -> rebase ->
-after_digest -> proofs -> measure -> fresh_restore. Move the baseline canonical control to the
-original authenticated source working COPY. Native current capture and catalog
+after_digest -> proofs -> measure -> fresh_restore. The baseline canonical control
+belongs to the original authenticated source. November11 correction: mature
+source_digest reuses only the exact actual accepted-year member's historical
+canonical expectation under the reviewed76dee→94267 compatibility contract; it
+does not repeat the original World walk or claim a new current digest. See
+2026-11-11-accepted-source-control-design.md. Smoke still computes its actual
+original-source digest. Native current capture and catalog
 checks preserve logical World data; post-rebase digest must equal this stronger
 original-source control. A digest receipt grants no source/catalog authority.
 No legacy conversion/normalization is admitted by this harness.
@@ -51,8 +56,8 @@ processes. The six-builder transaction is one indivisible failure unit; failure
 can discard that stage, while earlier checkpoints remain reusable.
 
 Canonical field progress adapter yields exactly the original field pairs, reads
-no values and changes no byte ordering or digest. First source digest is bounded
-before the~198min preparation prefix. Budget expiry is censored and prevents
+no values and changes no byte ordering or digest. Original-source control is
+authenticated before the~198min preparation prefix. Budget expiry is censored and prevents
 later jobs from starting. It is not a successful canonical control.
 
 ## Durable inputs, receipts and provenance
@@ -107,8 +112,8 @@ A real small hosted smoke must exercise upload/download and continuation before
 mature dispatch. Smoke verifies exact original-source vs post-rebase digest,
 shared identity, no replay of completed work, output fresh-process continuation,
 and failure/recovery; it does not establish mature latency. New mature attempt
-must reuse green engine validation and start with the known blocked digest stage,
-not repeat the expensive capture/catalog prefix blindly. It remains outside
+must reuse green engine validation and import the already accepted source control
+before capture/catalog; actual current post-rebase digest remains mandatory. It remains outside
 Stage0.6 acceptance until10sopen/2ssave/1swarm targets and exact saved1002digest pass.
 
 ## Non-goals

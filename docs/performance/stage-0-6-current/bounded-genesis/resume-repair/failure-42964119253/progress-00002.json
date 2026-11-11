@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.ambient_magic",
+  "resources": {
+    "block_inputs": 239776488,
+    "block_outputs": 125618784,
+    "cpu_seconds": 2178.369593398,
+    "major_faults": 5,
+    "minor_faults": 81276,
+    "peak_rss_bytes": 319873024,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 161729139586,
+      "read_bytes": 122765574144,
+      "syscr": 8120092,
+      "syscw": 193439,
+      "wchar": 64924781148,
+      "write_bytes": 64317521920
+    },
+    "rss_bytes": 320114688
+  },
+  "time": 1794376944.9306753
+}

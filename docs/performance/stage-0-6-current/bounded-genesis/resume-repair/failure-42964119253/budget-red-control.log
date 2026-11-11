@@ -1,0 +1,39 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_observed_full_scan_budget_keeps_restore_and_publication_reserve _____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-7/test_observed_full_scan_budget0')
+
+    def test_observed_full_scan_budget_keeps_restore_and_publication_reserve(tmp_path):
+        import json,yaml
+        from pathlib import Path
+        from simulation import stage_0_6_genesis_checkpoint as c
+        m=api();root=Path(__file__).resolve().parents[2]
+        request=json.loads((root/m.REQUEST).read_text())
+        request['budgets'].update(after_digest=7200,fresh_restore=7200)
+        path=tmp_path/m.REQUEST;path.parent.mkdir(parents=True);path.write_text(json.dumps(request))
+>       actual=m.config(tmp_path)
+               ^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/tmp/pytest-of-agent/pytest-7/test_observed_full_scan_budget0')
+
+    def config(root):
+        value=json.loads((Path(root)/REQUEST).read_text())
+        c.exact(value,{'schema','request_id','mode','smoke_run_id','resume_run_id','budgets'},'resume request')
+        if value['schema']!='ate-proof-genesis-resume-request/1' or value['mode'] not in ('smoke','mature'):raise ValueError('invalid resume request')
+        if type(value['request_id']) is not str or re.fullmatch('[a-zA-Z0-9_-]{1,96}',value['request_id']) is None:raise ValueError('invalid request id')
+        for k in ('smoke_run_id','resume_run_id'):c.integer(value[k],k)
+        c.exact(value['budgets'],c.STAGES,'phase budgets')
+        for stage,budget in value['budgets'].items():
+            c.integer(budget,'budget',1)
+>           if budget>12600 or budget/60+30>TIMEOUTS[stage]:raise ValueError('phase lacks compute/upload reserve')
+                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: phase lacks compute/upload reserve
+
+simulation/stage_0_6_genesis_resume.py:164: ValueError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_observed_full_scan_budget_keeps_restore_and_publication_reserve
+1 failed in 0.11s

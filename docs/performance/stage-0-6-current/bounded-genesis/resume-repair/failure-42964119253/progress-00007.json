@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.divinity",
+  "resources": {
+    "block_inputs": 240085184,
+    "block_outputs": 125618840,
+    "cpu_seconds": 2222.566191464,
+    "major_faults": 5,
+    "minor_faults": 88792,
+    "peak_rss_bytes": 340152320,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 161995834266,
+      "read_bytes": 122923626496,
+      "syscr": 8185902,
+      "syscw": 193459,
+      "wchar": 64924788748,
+      "write_bytes": 64317550592
+    },
+    "rss_bytes": 340381696
+  },
+  "time": 1794376993.675715
+}

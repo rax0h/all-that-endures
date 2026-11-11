@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.genealogy",
+  "resources": {
+    "block_inputs": 241914280,
+    "block_outputs": 125618872,
+    "cpu_seconds": 2409.20522432,
+    "major_faults": 5,
+    "minor_faults": 112347,
+    "peak_rss_bytes": 427446272,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 162930181836,
+      "read_bytes": 123860123648,
+      "syscr": 8414116,
+      "syscw": 193485,
+      "wchar": 64924794335,
+      "write_bytes": 64317566976
+    },
+    "rss_bytes": 376905728
+  },
+  "time": 1794377183.6655507
+}

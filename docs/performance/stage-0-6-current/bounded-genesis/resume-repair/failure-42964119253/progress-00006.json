@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.currency",
+  "resources": {
+    "block_inputs": 240034376,
+    "block_outputs": 125618832,
+    "cpu_seconds": 2213.899660247,
+    "major_faults": 5,
+    "minor_faults": 86004,
+    "peak_rss_bytes": 339140608,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 161954996714,
+      "read_bytes": 122897612800,
+      "syscr": 8175901,
+      "syscw": 193456,
+      "wchar": 64924788141,
+      "write_bytes": 64317546496
+    },
+    "rss_bytes": 328962048
+  },
+  "time": 1794376984.3231187
+}

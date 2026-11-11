@@ -67,6 +67,24 @@ def test_hosted_software_change_fails_before_reusing_engine_validation():
     with pytest.raises(ValueError):m.check_software(dict(python='3.13.5',sqlite='3.46.1',signature='b'*64))
 
 
+def test_observed_full_scan_budget_keeps_restore_and_publication_reserve(tmp_path):
+    import json,yaml
+    from pathlib import Path
+    from simulation import stage_0_6_genesis_checkpoint as c
+    m=api();root=Path(__file__).resolve().parents[2]
+    request=json.loads((root/m.REQUEST).read_text())
+    request['budgets'].update(after_digest=7200,fresh_restore=7200)
+    path=tmp_path/m.REQUEST;path.parent.mkdir(parents=True);path.write_text(json.dumps(request))
+    actual=m.config(tmp_path)
+    jobs=yaml.safe_load((root/c.WORKFLOW).read_text())['jobs']
+    for stage in ('after_digest','fresh_restore'):
+        assert jobs[c.JOB[stage]]['timeout-minutes']>=actual['budgets'][stage]/60+30+5+5
+    for stage in c.STAGES:
+        steps=jobs[c.JOB[stage]]['steps']
+        cleanup=next(s for s in steps if s.get('name')=='Reserve disposable stage disk before restore')
+        assert cleanup.get('if')=="needs.gate.outputs.mode == 'mature'"
+
+
 def test_hosted_smoke_kills_a_worker_before_resuming_verified_catalog():
     from pathlib import Path
     import yaml

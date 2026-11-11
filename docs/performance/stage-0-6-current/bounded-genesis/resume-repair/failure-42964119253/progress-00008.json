@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.economy",
+  "resources": {
+    "block_inputs": 240098672,
+    "block_outputs": 125618848,
+    "cpu_seconds": 2224.04918585,
+    "major_faults": 5,
+    "minor_faults": 88792,
+    "peak_rss_bytes": 340152320,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 162000853062,
+      "read_bytes": 122930532352,
+      "syscr": 8187137,
+      "syscw": 193464,
+      "wchar": 64924789806,
+      "write_bytes": 64317554688
+    },
+    "rss_bytes": 340381696
+  },
+  "time": 1794376995.2850776
+}

@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.culture",
+  "resources": {
+    "block_inputs": 240032864,
+    "block_outputs": 125618824,
+    "cpu_seconds": 2213.732207501,
+    "major_faults": 5,
+    "minor_faults": 86004,
+    "peak_rss_bytes": 339140608,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 161953884874,
+      "read_bytes": 122896838656,
+      "syscr": 8175625,
+      "syscw": 193453,
+      "wchar": 64924787536,
+      "write_bytes": 64317542400
+    },
+    "rss_bytes": 328962048
+  },
+  "time": 1794376984.1365786
+}

@@ -1,0 +1,30 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_reviewed_compatibility_pair_checks_all_model_and_codec_bytes _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6/test_reviewed_compatibility_pa0')
+
+    def test_reviewed_compatibility_pair_checks_all_model_and_codec_bytes(tmp_path):
+        import json,shutil
+>       m=api();assert hasattr(m,'check_compatibility'),'reviewed canonical compatibility fence is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: reviewed canonical compatibility fence is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_source_control' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_source_control.py'>, 'check_compatibility')
+
+.github/tests/test_stage_0_6_genesis_source_control.py:23: AssertionError
+_____ test_observed_full_scan_budget_keeps_restore_and_publication_reserve _____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6/test_observed_full_scan_budget0')
+
+    def test_observed_full_scan_budget_keeps_restore_and_publication_reserve(tmp_path):
+        import json,yaml
+>       m=api();root=Path(__file__).resolve().parents[2]
+                     ^^^^
+E       NameError: name 'Path' is not defined
+
+.github/tests/test_stage_0_6_genesis_resume.py:72: NameError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_reviewed_compatibility_pair_checks_all_model_and_codec_bytes
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_observed_full_scan_budget_keeps_restore_and_publication_reserve
+2 failed in 0.21s

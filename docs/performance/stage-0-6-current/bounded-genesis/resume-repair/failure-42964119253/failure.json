@@ -1,0 +1,18 @@
+{
+  "error": "CodecError: invalid typed payload",
+  "last_phase": "canonical.field.social",
+  "notes": [],
+  "prior_checkpoint": {
+    "archive_bytes": 2535,
+    "archive_sha256": "477ff5726b7c4ea19f2e5761686c61882eadb07bbdec1d8b1a64326516da8654",
+    "artifact_id": 13830492089,
+    "expires_at": "2026-12-11T05:13:35Z",
+    "head_sha": "78bf9b1b6033c789078446c08f5d371e6120b805",
+    "job": "gate",
+    "kind": "github",
+    "name": "checkpoint-mature-source-78bf9b1b6033c789078446c08f5d371e6120b805-1",
+    "run_id": 42964119253
+  },
+  "stage": "source_digest",
+  "status": "error"
+}

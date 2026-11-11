@@ -11,7 +11,28 @@ import tempfile
 import time
 from unittest.mock import patch
 from simulation import stage_0_6_genesis_checkpoint as c
-from simulation.stage_0_6_mature_benchmark import Recorder
+from simulation.stage_0_6_mature_benchmark import Recorder as _Recorder
+
+
+class Recorder(_Recorder):
+    """Keep this harness's fired deadline authoritative through decoder wrappers."""
+    def measure(self,name,operation,*,on_budget_expiry=None):
+        from simulation.profile_stage_0_5_performance import BudgetExpired
+        fired=False
+        def expired():
+            nonlocal fired
+            fired=True
+            if on_budget_expiry is not None:on_budget_expiry()
+        def guarded():
+            try:
+                value=operation()
+            except BaseException as exc:
+                if fired and not isinstance(exc,BudgetExpired):
+                    raise BudgetExpired(name+' phase budget exhausted (wrapped)') from exc
+                raise
+            if fired:raise BudgetExpired(name+' phase budget exhausted (consumed)')
+            return value
+        return super().measure(name,guarded,on_budget_expiry=expired)
 
 
 def canonical_digest(world,progress):
@@ -145,7 +166,7 @@ def _measure(source,path,receipt,output,deadline):
         saved_commitment=commitment.hex(),fresh_restore='pending separate durable stage')
 
 
-def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,progress=lambda _:None):
+def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,progress=lambda _:None,source_control=None):
     """Caller must authenticate remote provenance before supplying its receipt.
 
     Successful publication is the only completion marker. A failure discards
@@ -159,6 +180,14 @@ def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,p
     if stage not in c.STAGES or input_receipt['stage']!=c.ORDER[c.ORDER.index(stage)-1]:raise ValueError('stage requires its exact predecessor')
     c.integer(budget,'stage budget',1)
     if budget>12600:raise ValueError('stage compute budget exceeds bound')
+    if source_control is not None:
+        if (stage!='source_digest' or source_control.get('method')!='historical-control-reused'
+                or source_control.get('source')!=input_receipt['database']
+                or source_control.get('rules_id')!=input_receipt['context']['rules_id']):
+            raise ValueError('accepted source control differs from stage input')
+        c.hexadecimal(source_control.get('digest'),64,'accepted source digest')
+    if stage=='source_digest' and input_receipt['context']['mode']=='mature' and source_control is None:
+        raise ValueError('mature source requires its authenticated accepted control')
     source,destination=Path(input_database),Path(destination)
     if destination.exists() or destination.is_symlink():raise FileExistsError(destination)
     c.verify_database(source,input_receipt['database'])
@@ -172,6 +201,9 @@ def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,p
         private=Path(directory);working=private/'working.sqlite'
         def action():
             nonlocal result
+            if source_control is not None:
+                result=source_control['digest'];metrics['source_control']=copy.deepcopy(source_control)
+                return
             if stage=='measure':
                 # Subphases own the one alarm, using the remaining aggregate.
                 rec.phases[stage]['budget_seconds']=budget

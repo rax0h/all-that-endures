@@ -1,17 +1,17 @@
 {
   "schema": "ate-proof-genesis-resume-request/1",
-  "request_id": "resumable-genesis-mature-2026-11-10-1",
-  "mode": "mature",
-  "smoke_run_id": 42961490569,
+  "request_id": "accepted-source-control-smoke-2026-11-11-1",
+  "mode": "smoke",
+  "smoke_run_id": 0,
   "resume_run_id": 0,
   "budgets": {
     "source_digest": 3600,
     "capture": 9000,
     "catalog": 9000,
     "rebase": 9000,
-    "after_digest": 3600,
+    "after_digest": 7200,
     "proofs": 12600,
     "measure": 900,
-    "fresh_restore": 3600
+    "fresh_restore": 7200
   }
 }

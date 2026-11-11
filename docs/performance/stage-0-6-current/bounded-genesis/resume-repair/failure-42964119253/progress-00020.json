@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.metaphysics",
+  "resources": {
+    "block_inputs": 246059232,
+    "block_outputs": 125630976,
+    "cpu_seconds": 3012.341916251,
+    "major_faults": 5,
+    "minor_faults": 124918,
+    "peak_rss_bytes": 427446272,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 165316825408,
+      "read_bytes": 125982339072,
+      "syscr": 8998620,
+      "syscw": 204028,
+      "wchar": 64967695532,
+      "write_bytes": 64323764224
+    },
+    "rss_bytes": 395489280
+  },
+  "time": 1794377837.6636853
+}

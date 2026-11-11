@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.institutions",
+  "resources": {
+    "block_inputs": 242127832,
+    "block_outputs": 125618896,
+    "cpu_seconds": 2444.55326602,
+    "major_faults": 5,
+    "minor_faults": 118815,
+    "peak_rss_bytes": 427446272,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 163048843768,
+      "read_bytes": 123969462272,
+      "syscr": 8443287,
+      "syscw": 193496,
+      "wchar": 64924796631,
+      "write_bytes": 64317579264
+    },
+    "rss_bytes": 378003456
+  },
+  "time": 1794377221.6902192
+}

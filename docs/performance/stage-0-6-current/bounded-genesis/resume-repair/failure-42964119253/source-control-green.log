@@ -1,0 +1,1330 @@
+.FFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+______ test_control_rejects_unaccepted_or_differently_bound_values[hash] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte0/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte0')
+damage = 'hash'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260242249728: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1657b10>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+______ test_control_rejects_unaccepted_or_differently_bound_values[size] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte1/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte1')
+damage = 'size'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260243231168: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1657250>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+___ test_control_rejects_unaccepted_or_differently_bound_values[source_hash] ___
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte2/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte2')
+damage = 'source_hash'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260238591680: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1ce3820>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+__ test_control_rejects_unaccepted_or_differently_bound_values[source_bytes] ___
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte3/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte3')
+damage = 'source_bytes'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260236046592: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1ce3e10>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+______ test_control_rejects_unaccepted_or_differently_bound_values[uuid] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte4/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte4')
+damage = 'uuid'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260245023616: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1aae9f0>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+___ test_control_rejects_unaccepted_or_differently_bound_values[generation] ____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte5/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte5')
+damage = 'generation'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260242271168: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1abf790>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+______ test_control_rejects_unaccepted_or_differently_bound_values[year] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte6/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte6')
+damage = 'year'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260231208832: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1abee00>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+______ test_control_rejects_unaccepted_or_differently_bound_values[seed] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte7/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte7')
+damage = 'seed'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260231302976: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1acc350>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+______ test_control_rejects_unaccepted_or_differently_bound_values[rules] ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte8/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte8')
+damage = 'rules'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260245070912: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1acd450>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+_____ test_control_rejects_unaccepted_or_differently_bound_values[format] ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte9/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte9')
+damage = 'format'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260232405632: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1f63b60>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+_ test_control_rejects_unaccepted_or_differently_bound_values[acceptance_producer] _
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte10/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte10')
+damage = 'acceptance_producer'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260244461248: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1f62a80>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+____ test_control_rejects_unaccepted_or_differently_bound_values[candidate] ____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte11/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte11')
+damage = 'candidate'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260240744896: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1db2350>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+_____ test_control_rejects_unaccepted_or_differently_bound_values[digest] ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte12/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte12')
+damage = 'digest'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260232673280: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1db0bb0>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+__ test_control_rejects_unaccepted_or_differently_bound_values[digest_proof] ___
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte13/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte13')
+damage = 'digest_proof'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260234856768: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e1dd25b0>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+____ test_control_rejects_unaccepted_or_differently_bound_values[original] _____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte14/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte14')
+damage = 'original'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260242255808: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e22499d0>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+_____ test_control_rejects_unaccepted_or_differently_bound_values[symlink] _____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte15/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_control_rejects_unaccepte15')
+damage = 'symlink'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:163: in deepcopy
+    y = _reconstruct(x, memo, *rv)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:260: in _reconstruct
+    state = deepcopy(state, memo)
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:137: in deepcopy
+    y = copier(x, memo)
+        ^^^^^^^^^^^^^^^
+/usr/lib/python3.13/copy.py:222: in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+x = mappingproxy({'runtime_sha': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'harness_sha': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeee...proxy({'id': 17, 'run_id': 23, 'archive_sha256': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'})})
+memo = {140260240908800: {'source': {'bytes': 17842176, 'sha256': '14e30dabd805dea4e4ffa8cbf56bf8ca87724eb5e4473b7dca03ce1381...("'Authority' object has no attribute 'checkpoint_sha256'") raised in repr()] Authority object at 0x7f90e277c050>, ...}
+_nil = []
+
+    def deepcopy(x, memo=None, _nil=[]):
+        """Deep copy operation on arbitrary Python objects.
+    
+        See the module's __doc__ string for more info.
+        """
+    
+        d = id(x)
+        if memo is None:
+            memo = {}
+        else:
+            y = memo.get(d, _nil)
+            if y is not _nil:
+                return y
+    
+        cls = type(x)
+    
+        copier = _deepcopy_dispatch.get(cls)
+        if copier is not None:
+            y = copier(x, memo)
+        else:
+            if issubclass(cls, type):
+                y = _deepcopy_atomic(x, memo)
+            else:
+                copier = getattr(x, "__deepcopy__", None)
+                if copier is not None:
+                    y = copier(memo)
+                else:
+                    reductor = dispatch_table.get(cls)
+                    if reductor:
+                        rv = reductor(x)
+                    else:
+                        reductor = getattr(x, "__reduce_ex__", None)
+                        if reductor is not None:
+>                           rv = reductor(4)
+                                 ^^^^^^^^^^^
+E                           TypeError: cannot pickle 'mappingproxy' object
+
+/usr/lib/python3.13/copy.py:152: TypeError
+___________ test_imported_control_preserves_actual_post_rebase_check ___________
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-4/test_imported_control_preserve0/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-4/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_imported_control_preserve0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f90e1ce3ce0>
+
+    def test_imported_control_preserves_actual_post_rebase_check(accepted_case,tmp_path,monkeypatch):
+        m=api();member,accepted,options,source=accepted_case
+        from simulation import stage_0_6_genesis_stages as stages
+        control=m.read_accepted_control(member,**options)
+        ctx=dict(mode='smoke',runtime_tree='a'*40,critical_blobs={'test.py':'b'*40},source=options['source'],
+            rules_id=options['rules_id'],rank_proofs=True,execution_runtime=dict(python='test',sqlite='test',signature='a'*64),expected_saved_digest='d'*64)
+        producer=lambda stage:dict(run_id=1,head_sha='e'*40,job=c.JOB[stage],attempt=1)
+        row=c.record('source',ctx,options['source'],producer('source'),data_ref={'kind':'local'})
+        before=c.file_hash(source)
+        original=stages._digest
+        def forbidden(*a,**k):raise AssertionError('source digest repeated despite accepted control')
+        with monkeypatch.context() as change:
+            change.setattr(stages,'_digest',forbidden)
+            row=stages.run_stage('source_digest',row,source,tmp_path/'source-control',producer=producer('source_digest'),budget=60,source_control=control)
+        assert row['baseline_digest']==accepted['digest']['observation']['digest']
+        assert row['metrics']['source_control']['method']=='historical-control-reused' and c.file_hash(source)==before
+        for stage in ('capture','catalog','rebase'):
+            out=tmp_path/stage
+>           row=stages.run_stage(stage,row,source,out,producer=producer(stage),budget=60)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_genesis_stages.py:234: in run_stage
+    rec.measure(stage,action)
+simulation/stage_0_6_genesis_stages.py:35: in measure
+    return super().measure(name,guarded,on_budget_expiry=expired)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:28: in guarded
+    value=operation()
+          ^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:218: in action
+    catalog._copy_current_checked_catalog(source,working,rules_id=rules,_for_proof_genesis=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = PosixPath('/tmp/pytest-of-agent/pytest-4/test_imported_control_preserve0/capture/candidate.sqlite')
+destination = PosixPath('/tmp/pytest-of-agent/pytest-4/test_imported_control_preserve0/.proof-stage-_j4pzxyy/working.sqlite')
+rules_id = 'continuation-proof', _for_proof_genesis = True
+
+    def _copy_current_checked_catalog(source, destination, *, rules_id, _for_proof_genesis=False):
+        """Copy already backed current authority without relabeling or format claims.
+    
+        Existing catalog commitments/retired intervals and physical rows remain
+        unchanged. The destination's existing commit installs empty backing leases
+        and its coherent cold commit descriptor after a source-preserving capture.
+        """
+        from .persistence_genesis_transaction import catalog_snapshot
+        from .persistence_history_dependencies import _checked_value as checked_dependency
+        if type(_for_proof_genesis) is not bool or _for_proof_genesis and not _CONVERSION_AUDITS.get():
+            raise StoreIntegrityError('proof-copy staging requires explicit private construction')
+        source, destination = _preflight_conversion_paths(source, destination)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        codec = WorldCodec(identity_links_recorded=True)
+        with tempfile.TemporaryDirectory(prefix='.ate-checked-current-copy-', dir=destination.parent) as directory:
+            private = Path(directory) / 'destination.sqlite'
+            copied = LazyRecordStore.copy_current_head(source, private, codec=codec,
+                expected_simulation_schema=SCHEMA, expected_rules_id=rules_id,
+                _defer_target_audit=_for_proof_genesis)
+            _copy_phase('after_private_copy', private)
+            with LazyRecordStore.open(private, codec=codec, expected_simulation_schema=SCHEMA,
+                                      expected_rules_id=rules_id) as target, ConversionWorkspace(codec, directory=directory) as workspace:
+                pin = target.capture_pin()
+                try:
+                    with catalog_snapshot(target, pin):
+                        if target._namespace_state_at(CATALOG_NAMESPACE, pin.captured_head) is None:
+                            raise StoreFormatError('checked current copy requires an existing checked catalog')
+                        floor = int(target.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+                        from .persistence_complete_format import FORMAT_VERSION as COMPLETE_VERSION, check_open
+                        if floor not in (BOUNDED_AUTHORITY_FORMAT_VERSION, COMPLETE_VERSION):
+                            raise StoreFormatError('checked current copy requires bounded or complete authority')
+                        complete_format = floor == COMPLETE_VERSION
+                        if complete_format:
+                            from .persistence_adapters import _read_cold_manifest
+                            check_open(target, pin, target.checked_head(), _read_cold_manifest(target))
+                        _verify_catalog(target, pin)
+                        rosters = _backing_rosters(target, pin, target.read_identity_state(pin), workspace=workspace)
+                        roster_keys = DiskSet(workspace)
+                        for roster in rosters:
+                            roster_keys.add(codec.encode(roster.key))
+                        if not roster_keys.equals(codec.encode(key) for key in target.iter_keys(pin, DEPENDENCIES)):
+>                           raise StoreIntegrityError('checked copy dependency roster inventory is incomplete or extra')
+E                           ate_sim.incremental_store.StoreIntegrityError: checked copy dependency roster inventory is incomplete or extra
+
+simulation/ate_sim/persistence_catalog_copy.py:607: StoreIntegrityError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[hash]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[size]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[source_hash]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[source_bytes]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[uuid]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[generation]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[year]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[seed]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[rules]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[format]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[acceptance_producer]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[candidate]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[digest]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[digest_proof]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[original]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[symlink]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_imported_control_preserves_actual_post_rebase_check
+17 failed, 1 passed in 19.05s

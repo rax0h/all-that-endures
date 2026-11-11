@@ -1,0 +1,49 @@
+.................F                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_imported_control_preserves_actual_post_rebase_check ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5/test_imported_control_preserve0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bdbc5d810>
+
+    def test_imported_control_preserves_actual_post_rebase_check(tmp_path,monkeypatch):
+        # Receipt authentication above uses a real legacy saved/accepted pair. This
+        # stage-composition case uses the admitted checked-genesis fixture; it makes
+        # no claim that a synthetic local control is a remote acceptance producer.
+        from simulation.tests.test_stage_0_5_final_complete_format import upgraded
+        from simulation.tests.test_stage_0_5_final_catalog_copy import RULES
+        from ate_sim.persistence_lazy import open_lazy_world_session
+        from simulation import stage_0_6_genesis_stages as stages
+        source=upgraded(tmp_path);desc=c.describe(source,rules_id=RULES)
+        with open_lazy_world_session(source,rules_id=RULES) as session:expected=session.world.digest()
+        control=dict(method='historical-control-reused',digest=expected,source=desc,rules_id=RULES)
+        ctx=dict(mode='smoke',runtime_tree='a'*40,critical_blobs={'test.py':'b'*40},source=desc,
+            rules_id=RULES,rank_proofs=True,execution_runtime=dict(python='test',sqlite='test',signature='a'*64),expected_saved_digest='d'*64)
+        producer=lambda stage:dict(run_id=1,head_sha='e'*40,job=c.JOB[stage],attempt=1)
+        row=c.record('source',ctx,desc,producer('source'),data_ref={'kind':'local'})
+        before=c.file_hash(source)
+        original=stages._digest
+        def forbidden(*a,**k):raise AssertionError('source digest repeated despite accepted control')
+        with monkeypatch.context() as change:
+            change.setattr(stages,'_digest',forbidden)
+>           row=stages.run_stage('source_digest',row,source,tmp_path/'source-control',producer=producer('source_digest'),budget=60,source_control=control)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_genesis_stages.py:193: in run_stage
+    c.verify_database(source,input_receipt['database'])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-agent/pytest-5/test_imported_control_preserve0/complete.sqlite')
+descriptor = {'bytes': 417792, 'sha256': '7d225c63569e1b1bb66d762cd2432566319e5d9ad0be3d7339b0b274f9f8140d', 'store_identity': '1c04f41d-4706-4301-8aa7-09723b120619', 'generation': 3, ...}
+
+    def verify_database(path,descriptor):
+        path=Path(path)
+>       if path.is_symlink() or not path.is_file() or path.stat().st_size!=descriptor['bytes'] or file_hash(path)!=descriptor['sha256']:raise ValueError('checkpoint database bytes differ')
+                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: checkpoint database bytes differ
+
+simulation/stage_0_6_genesis_checkpoint.py:146: ValueError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_imported_control_preserves_actual_post_rebase_check
+1 failed, 17 passed in 16.65s

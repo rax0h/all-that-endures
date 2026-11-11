@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.households",
+  "resources": {
+    "block_inputs": 242004800,
+    "block_outputs": 125618880,
+    "cpu_seconds": 2424.853266382,
+    "major_faults": 5,
+    "minor_faults": 118629,
+    "peak_rss_bytes": 427446272,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 162986930988,
+      "read_bytes": 123906469888,
+      "syscr": 8428119,
+      "syscw": 193488,
+      "wchar": 64924794944,
+      "write_bytes": 64317571072
+    },
+    "rss_bytes": 377241600
+  },
+  "time": 1794377200.2203178
+}

@@ -6,6 +6,7 @@ name: Stage 0.6 resumable proof genesis
     paths:
     - simulation/stage_0_6_genesis_*.py
     - simulation/stage_0_6_genesis_resume_request.json
+    - simulation/stage_0_6_genesis_control_compatibility.json
     - .github/tests/test_stage_0_6_genesis_*.py
     - .github/workflows/stage-0-6-resumable-proof-genesis.yml
     - .github/tests/run_genesis_recovery_drill.py
@@ -141,6 +142,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -221,6 +223,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -300,6 +303,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -379,6 +383,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: recovery-drill
       name: Crash a small worker and retain its verified parent
       env:
@@ -449,7 +454,7 @@ jobs:
     if: ${{ always() && needs.gate.result == 'success' && needs.rebase.result != 'failure' && needs.rebase.result != 'cancelled' && (needs.rebase.result
       == 'success' || fromJSON(needs.gate.outputs.resume_index) == 3) && fromJSON(needs.gate.outputs.resume_index) < 4 }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     outputs:
       artifact_id: ${{ steps.metadata.outputs.artifact-id }}
     steps:
@@ -472,6 +477,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -552,6 +558,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -630,6 +637,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -686,7 +694,7 @@ jobs:
     if: ${{ always() && needs.gate.result == 'success' && needs.measure.result != 'failure' && needs.measure.result != 'cancelled' && (needs.measure.result
       == 'success' || fromJSON(needs.gate.outputs.resume_index) == 6) && fromJSON(needs.gate.outputs.resume_index) < 7 }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     outputs:
       artifact_id: ${{ steps.metadata.outputs.artifact-id }}
     steps:
@@ -715,6 +723,7 @@ jobs:
         df -h .
 
         '
+      if: needs.gate.outputs.mode == 'mature'
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:

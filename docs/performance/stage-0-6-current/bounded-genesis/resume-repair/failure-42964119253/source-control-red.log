@@ -1,0 +1,517 @@
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_actual_accepted_source_reuses_its_digest_without_opening_world ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_actual_accepted_source_re0/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f236904d480>
+
+    def test_actual_accepted_source_reuses_its_digest_without_opening_world(accepted_case,monkeypatch):
+>       m=api();member,row,options,_=accepted_case
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+{"complete_format": true, "elapsed_seconds": 0.0001324370000475028, "initialization": "mature", "milestones": [1, 2], "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "independent_control_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"bootstrap_year": 0, "complete_format": true, "elapsed_seconds": 0.05558013499990011, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "bootstrap_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"complete_format": true, "elapsed_seconds": 0.07129978500006473, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "cold_save_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"complete_format": true, "elapsed_seconds": 0.18680103499991674, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "lazy_conversion_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"checkpoint_stage": "lazy", "complete_format": true, "database_sha256": "2b54bbe9533566474234142d0aad4da3fe496c292ee72174a94d6fb678ba04dd", "elapsed_seconds": 0.680044419000069, "initialization": "mature", "product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "checkpoint_ready", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"stage": "storage_verified", "seconds": 0.32487937900009456}
+{"stage": "catalog_verified", "seconds": 2.806354591999934}
+{"checkpoint_product_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "checkpoint_stage": "lazy", "complete_format": true, "elapsed_seconds": 0.0027236050000283285, "initialization": "mature", "origin_workflow_sha": "cccccccccccccccccccccccccccccccccccccccc", "product_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "source_database_sha256": "2b54bbe9533566474234142d0aad4da3fe496c292ee72174a94d6fb678ba04dd", "stage": "checkpoint_verified", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"complete_format": true, "elapsed_seconds": 0.002809822000017448, "initialization": "mature", "product_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "stage": "complete_upgrade_started", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"checkpoint_stage": "complete", "complete_format": true, "database_sha256": "ae3e463769c5e2bff1bcf616c4c656d772b707b9b9d331a41148fd156f56fda1", "elapsed_seconds": 0.048053568999876006, "initialization": "mature", "product_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "stage": "checkpoint_ready", "workflow_sha": "cccccccccccccccccccccccccccccccccccccccc"}
+{"phase": "copy_started"}
+{"cpu_seconds": 0.03319782600000032, "phase": "copy_finished", "wall_seconds": 0.033197189000020444}
+{"phase": "open_started"}
+{"cpu_seconds": 0.04124343099999983, "phase": "open_finished", "wall_seconds": 0.04124164699987887}
+{"phase": "simulation_started"}
+{"cpu_seconds": 2.5421726479999993, "phase": "simulation_finished", "wall_seconds": 2.545701465000093}
+{"phase": "after_simulation", "year": 1}
+{"phase": "save_started"}
+{"cpu_seconds": 1.569400882, "phase": "save_finished", "wall_seconds": 1.5698202339999625}
+{"generation": 4, "phase": "after_save", "year": 1}
+{"phase": "before_close"}
+{"phase": "close_started"}
+{"cpu_seconds": 0.005570300000000472, "phase": "close_finished", "wall_seconds": 0.005570241999976133}
+{"phase": "after_close"}
+{"phase": "before_hash"}
+{"phase": "hash_started"}
+{"cpu_seconds": 0.022244614999999968, "phase": "hash_finished", "wall_seconds": 0.022243052000021635}
+{"phase": "before_publish"}
+{"checkpoint_sha256": "5aab6532aded85a565753415ca9106e4f1e7b70293472d96cdc6e1e7538d1a22", "database": {"bytes": 17842176, "name": "candidate.sqlite", "sha256": "c2e0f7d47c5084c3b0fc3ea0af9a36c08e22e2b76170c4dab7ab12d2c5572a33"}, "generation": 4, "phase": "save_bundle_published", "save_sha256": "a0e436d93c82b66bc0973adb7588e67c4025deddc514190ba5ed2b8f7bb6420f", "year": 1}
+{"phase": "copy_started"}
+{"cpu_seconds": 0.030089131000000435, "phase": "copy_finished", "wall_seconds": 0.03008903500017368}
+{"phase": "open_started"}
+{"cpu_seconds": 0.052155810999998664, "phase": "open_finished", "wall_seconds": 0.0521532819998356}
+{"phase": "audit_started"}
+{"cpu_seconds": 1.1683727830000006, "phase": "audit_finished", "wall_seconds": 1.1712098139998943}
+{"generation": 4, "phase": "after_audit", "year": 1}
+{"phase": "close_started"}
+{"cpu_seconds": 0.00707219999999964, "phase": "close_finished", "wall_seconds": 0.007070214000123087}
+{"phase": "audit_receipt_published", "year": 1}
+{"phase": "copy_started"}
+{"cpu_seconds": 0.0033401589999986214, "phase": "copy_finished", "wall_seconds": 0.00333992700007002}
+{"phase": "open_started"}
+{"cpu_seconds": 0.051076459000000796, "phase": "open_finished", "wall_seconds": 0.05108155299990358}
+{"phase": "digest_started"}
+{"cpu_seconds": 1.1787166929999984, "phase": "digest_finished", "wall_seconds": 1.1791187799999534}
+{"generation": 4, "phase": "after_digest", "year": 1}
+{"phase": "close_started"}
+{"cpu_seconds": 0.006815379000000732, "phase": "close_finished", "wall_seconds": 0.006820403999881819}
+{"phase": "digest_receipt_published", "year": 1}
+______ test_control_rejects_unaccepted_or_differently_bound_values[hash] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte0/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte0')
+damage = 'hash'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+______ test_control_rejects_unaccepted_or_differently_bound_values[size] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte1/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte1')
+damage = 'size'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+___ test_control_rejects_unaccepted_or_differently_bound_values[source_hash] ___
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte2/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte2')
+damage = 'source_hash'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+__ test_control_rejects_unaccepted_or_differently_bound_values[source_bytes] ___
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte3/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte3')
+damage = 'source_bytes'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+______ test_control_rejects_unaccepted_or_differently_bound_values[uuid] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte4/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte4')
+damage = 'uuid'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+___ test_control_rejects_unaccepted_or_differently_bound_values[generation] ____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte5/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte5')
+damage = 'generation'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+______ test_control_rejects_unaccepted_or_differently_bound_values[year] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte6/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte6')
+damage = 'year'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+______ test_control_rejects_unaccepted_or_differently_bound_values[seed] _______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte7/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte7')
+damage = 'seed'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+______ test_control_rejects_unaccepted_or_differently_bound_values[rules] ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte8/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte8')
+damage = 'rules'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+_____ test_control_rejects_unaccepted_or_differently_bound_values[format] ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte9/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte9')
+damage = 'format'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+_ test_control_rejects_unaccepted_or_differently_bound_values[acceptance_producer] _
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte10/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte10')
+damage = 'acceptance_producer'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+____ test_control_rejects_unaccepted_or_differently_bound_values[candidate] ____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte11/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte11')
+damage = 'candidate'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+_____ test_control_rejects_unaccepted_or_differently_bound_values[digest] ______
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte12/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte12')
+damage = 'digest'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+__ test_control_rejects_unaccepted_or_differently_bound_values[digest_proof] ___
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte13/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte13')
+damage = 'digest_proof'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+____ test_control_rejects_unaccepted_or_differently_bound_values[original] _____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte14/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte14')
+damage = 'original'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+_____ test_control_rejects_unaccepted_or_differently_bound_values[symlink] _____
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte15/accepted.json'), {'audit': {'authority': {'...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_control_rejects_unaccepte15')
+damage = 'symlink'
+
+    @pytest.mark.parametrize('damage',['hash','size','source_hash','source_bytes','uuid','generation','year',
+        'seed','rules','format','acceptance_producer','candidate','digest','digest_proof','original','symlink'])
+    def test_control_rejects_unaccepted_or_differently_bound_values(accepted_case,tmp_path,damage):
+>       m=api();member,row,options,_=accepted_case;options=copy.deepcopy(options)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+___________ test_imported_control_preserves_actual_post_rebase_check ___________
+
+accepted_case = (PosixPath('/tmp/pytest-of-agent/pytest-3/test_imported_control_preserve0/accepted.json'), {'audit': {'authority': {'b...ffffffffffffffffffffffffff'), ...}, PosixPath('/tmp/pytest-of-agent/pytest-3/saved-verifiers0/saved/candidate.sqlite'))
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_imported_control_preserve0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f236904cb00>
+
+    def test_imported_control_preserves_actual_post_rebase_check(accepted_case,tmp_path,monkeypatch):
+>       m=api();member,accepted,options,source=accepted_case
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_source_control.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_source_control'
+>       assert importlib.util.find_spec(name) is not None,'authenticated accepted-source control is missing'
+E       AssertionError: authenticated accepted-source control is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f236b6ed6c0>('simulation.stage_0_6_genesis_source_control')
+E        +    where <function find_spec at 0x7f236b6ed6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_source_control.py:17: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_actual_accepted_source_reuses_its_digest_without_opening_world
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[hash]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[size]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[source_hash]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[source_bytes]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[uuid]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[generation]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[year]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[seed]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[rules]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[format]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[acceptance_producer]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[candidate]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[digest]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[digest_proof]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[original]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_control_rejects_unaccepted_or_differently_bound_values[symlink]
+FAILED .github/tests/test_stage_0_6_genesis_source_control.py::test_imported_control_preserves_actual_post_rebase_check
+18 failed in 16.01s

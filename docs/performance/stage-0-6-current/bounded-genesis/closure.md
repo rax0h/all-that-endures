@@ -6,6 +6,12 @@ version rows. Original source bytes were unchanged. This package builds the
 source-preserving format7 preparation route and gates mature execution on both
 hosted validation jobs. No main merge, default reader activation or endurance.
 
+Latest correction: run42964119253 stopped in its first source-digest budget before
+downstream preparation. The November11 V-register below supersedes repeating that
+original World scan: import the actual authenticated accepted source commitment,
+keep the current post-rebase walk and every source/catalog/proof audit. Stage0.6
+performance acceptance remains open; no new mature result follows from this repair.
+
 Physical copy/audit/catalog/sequence/type/retired inventories use row streams and
 checked disk indexes; rebase retains at most64 stable locators plus a current row.
 Disk space grows with rows and copies/journals. Existing canonical native-key
@@ -144,6 +150,31 @@ root final affected run156passed77.87s with1deliberate duplicate-ZIP warning.
 Raw logs/XML and the matching full313fingerprint are retained. No deferred finding.
 U8/U10 remain actual hosted/mature acceptance gates, not local review findings.
 
+## November11 accepted-source control — same closure group
+
+Failure42964119253 is authenticated in resume-repair/failure-42964119253. Restore
+completed500.72s; source_digest expired3600.64s with3257.34CPU seconds at social.
+CodecError wrapped the actual owned BudgetExpired. Preserved raw receipts call it
+an error; this reconciliation identifies it as censored timeout without rewriting
+authenticated historical files. No downstream capture/catalog/rebase/proofs or
+interactive measurement ran. The original hash verification finished in cleanup.
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| V1 | Redundant source canonical scan and independent authority review | Import only the actual retained accepted-year member, exact570001bytes/SHA5e54ce..., full original acceptance/digest/audit chain and original DB/producer/rules binding. Actual current post-rebase digest and all current audits remain. Label historical-control-reused; no current digest/audit claim. | Implemented; final review/hosted smoke pending |
+| V2 | Canonical compatibility and imported-value consumption | Review exact76dee→94267 pair and35canonical/schema/model/codec files. Include compatibility manifest/helper in code fence. Consumers/seal require the exact imported baseline, source and proof/member provenance; arbitrary64hex values cannot replace it. | Local compatibility/consumption rejection controls pass |
+| V3 | Wrapped or swallowed owned alarm | New harness Recorder normalizes only its actual fired alarm before shared immutable receipt publication. Preserve causal chain; consumed expiry cannot report success. Ordinary malformed payload and timeout words remain errors; active caller alarms are not replaced. Shared runtime/old helper unchanged. | Actual decoder RED/GREEN retained; final affected pass pending |
+| V4 | Remaining full deep verification limits | Observed original scan was incomplete after60min. Use120min actual after/fresh compute with180min jobs,30min restore and metadata reserve; prior rebased/saved DB remains durable if this unfinished check fails. No interactive latency guarantee from these offline limits. | Request/YAML reserve controls pass |
+| V5 | Repeated small-worker setup cost | Restrict large capacity cleanup to mature workers; existing per-stage size/disk checks still run in smoke. Prior20min24s smoke evidence explains the change. Mature capacity preparation remains. | Mode guard validated; new hosted smoke pending |
+| V6 | Test input custody and fixture scope | Initial test deep-copy of immutable Authority failed; copy only mutable source options. Initial digest observation opened its input; use a distinct disposable copy. A current legacy saved test source fails the new catalog roster guard and is not claimed as an admitted genesis input. Real accepted-receipt authentication tests and admitted checked-native stage composition are separate; original3actual-audit chain remains covered. Preserve all initial negative logs. | Corrected within group; no runtime bypass or general legacy-genesis support claimed |
+
+The connector cannot download the4.42GB carrier into this local workspace because
+its artifact download limit is512MiB. No summary or partial ZIP is substituted
+for actual authority. Existing prepare_retained already validates that actual
+member on workers; the new mature import must succeed there before capture can
+start. Local tests use a real small accepted receipt and reject promotion into
+the fixed mature context. Successful new hosted smoke remains mandatory first.
+
 
 Hosted smoke42961490569 atb79039d passed all10jobs. U1/U2/U4/U6/U8/U9 now have
 actual hosted evidence: immutable artifact transfer across workers, equal
@@ -157,3 +188,13 @@ evidence and actual availability checks are in resume-repair/hosted-smoke-429614
 No mature metrics follow from this smoke. U10 remains OPEN; mature-launch.md
 records restart units, retained outputs, input expiry and compute/transport/
 publication limits before the protected mature request.
+
+
+V1–V6 local closure: same independent reviewer found no remaining concrete local
+finding. failure-42964119253/independent-closure/closure-addendum.md records
+31focused passes,230stable source/test/spec hashes, all35canonical compatibility
+pairs and44critical dependencies. Root final affected suite187passed94.39s with
+one deliberate duplicate-ZIP warning. Suites overlap and are not summed. Actual
+original-member import and new hosted smoke remain worker gates;120min offline
+limits do not guarantee completion. No original source digest, current audit or
+mature timing is claimed by importing a historical expectation.

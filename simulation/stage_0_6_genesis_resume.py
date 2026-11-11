@@ -19,6 +19,7 @@ import time
 import zipfile
 from simulation import stage_0_6_genesis_checkpoint as c
 from simulation import stage_0_6_genesis_transport as t
+from simulation import stage_0_6_genesis_source_control as controls
 from simulation import checkpoint_artifacts as github
 from simulation import continuation_receipts as r
 from simulation.stage_0_6_retained_transport import _stream_archive,_signed_url
@@ -35,7 +36,7 @@ CRITICAL=('simulation/stage_0_6_genesis_checkpoint.py','simulation/stage_0_6_gen
 GREEN_ARTIFACTS={
     'full-suite':(13778449621,'stage-0-5-proof-map-suite-'+GREEN_SHA,'2c1bd46f45c878bef22131acf4d3b1b70bb9ceef7527bc3f1a1a1652be7cb333'),
     'proof-map':(13774870495,'stage-0-5-proof-map-'+GREEN_SHA,'24fd08053d558e6f9bad1a19b187afef143e7536db5137f3d75c7a6862b8ec87')}
-TIMEOUTS=dict(source_digest=120,capture=240,catalog=240,rebase=240,after_digest=120,proofs=350,measure=150,fresh_restore=120)
+TIMEOUTS=dict(source_digest=120,capture=240,catalog=240,rebase=240,after_digest=180,proofs=350,measure=150,fresh_restore=180)
 
 
 
@@ -206,6 +207,7 @@ def match_receipt_reference(value,ref,*,mode,stage):
 def restore_receipt(root,ref,destination,*,mode,stage):
     t.restore(ref,destination,member='checkpoint.json',compatible=lambda head:compatible(root,head))
     value=c.load(destination,require_remote=True);check_context(root,value['context'],mode)
+    controls.validate_control_chain(root,value,current_runtime_tree=git(root,'rev-parse','HEAD:simulation/ate_sim'))
     match_receipt_reference(value,ref,mode=mode,stage=stage)
     return value
 
@@ -255,7 +257,9 @@ def gate(root,workspace,*,input_mode='',input_resume_run=0,input_smoke_run=0):
     r.publish_receipt(workspace/'green-reuse.json',green)
     r.publish_receipt(workspace/'runtime.json',runtime_description()[1])
     smoke_run=input_smoke_run or cfg['smoke_run_id']
-    if mode=='mature':require_smoke(root,smoke_run,workspace)
+    if mode=='mature':
+        require_smoke(root,smoke_run,workspace)
+        controls.mature_control_contract(root,current_runtime_tree=git(root,'rev-parse','HEAD:simulation/ate_sim'))
     resume_run=input_resume_run or (cfg['resume_run_id'] if mode==cfg['mode'] else 0)
     if not resume_run and int(os.environ['GITHUB_RUN_ATTEMPT'])>1:resume_run=int(os.environ['GITHUB_RUN_ID'])
     if resume_run:
@@ -297,8 +301,8 @@ def original_input(root,workspace,value):
 
 
 def run(root,workspace,*,stage,mode,parent_run,parent_artifact):
-    from simulation.stage_0_6_genesis_stages import run_stage
-    from simulation.stage_0_6_mature_benchmark import Recorder,resources
+    from simulation.stage_0_6_genesis_stages import run_stage,Recorder
+    from simulation.stage_0_6_mature_benchmark import resources
     cfg=config(root);fence(root);workspace.mkdir(parents=True,exist_ok=True)
     previous=c.ORDER[c.ORDER.index(stage)-1]
     ref=find_reference(root,parent_run,parent_artifact,mode=mode,stage=previous)
@@ -321,7 +325,13 @@ def run(root,workspace,*,stage,mode,parent_run,parent_artifact):
         while not stopped.wait(30):print(json.dumps(dict(heartbeat=active,resources=resources(),time=time.time())),flush=True)
     thread=threading.Thread(target=heartbeat,daemon=True);thread.start()
     try:
-        run_stage(stage,value,database,workspace/'out',producer=producer(stage),budget=cfg['budgets'][stage],progress=progress)
+        source_control=None
+        if stage=='source_digest' and mode=='mature':
+            progress('source_control.authenticate_retained_acceptance')
+            source_control=controls.mature_control(root,workspace/'original/accepted/year-verified.json',
+                value['database'],current_runtime_tree=git(root,'rev-parse','HEAD:simulation/ate_sim'))
+            progress('source_control.historical_control_reused')
+        run_stage(stage,value,database,workspace/'out',producer=producer(stage),budget=cfg['budgets'][stage],progress=progress,source_control=source_control)
     except BaseException as exc:
         r.publish_receipt(workspace/'failure.json',dict(stage=stage,status='timeout' if isinstance(exc,TimeoutError) or type(exc).__name__=='BudgetExpired' else 'error',error=type(exc).__name__+': '+str(exc),last_phase=active,notes=getattr(exc,'__notes__',[]),prior_checkpoint=ref))
         raise
@@ -344,6 +354,7 @@ def seal(root,workspace,*,artifact_id=0):
         c.verify_database(db,value['database'])
     elif artifact_id:raise ValueError('read-only checkpoint cannot claim new database')
     c.validate(value,require_remote=True);check_context(root,value['context'],value['context']['mode'])
+    controls.validate_control_chain(root,value,current_runtime_tree=git(root,'rev-parse','HEAD:simulation/ate_sim'))
     temp=directory/'checkpoint.sealed';temp.write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
     with temp.open('rb') as stream:os.fsync(stream.fileno())
     temp.replace(directory/'checkpoint.json')

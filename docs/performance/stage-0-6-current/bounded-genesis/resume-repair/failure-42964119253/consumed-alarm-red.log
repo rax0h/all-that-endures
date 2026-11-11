@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_consumed_alarm_cannot_publish_a_successful_phase _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1/test_consumed_alarm_cannot_pub0')
+
+    def test_consumed_alarm_cannot_publish_a_successful_phase(tmp_path):
+        import time
+        from simulation.profile_stage_0_5_performance import BudgetExpired
+        m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':0.05})
+        def swallowed():
+            try:time.sleep(0.2)
+            except Exception:return 'incorrect completion'
+>       with pytest.raises(BudgetExpired):rec.measure('decode',swallowed)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BudgetExpired
+
+.github/tests/test_stage_0_6_genesis_stages.py:53: Failed
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_consumed_alarm_cannot_publish_a_successful_phase
+1 failed, 11 deselected in 0.24s

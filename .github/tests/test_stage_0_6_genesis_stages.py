@@ -16,6 +16,68 @@ def api():
     return importlib.import_module(name)
 
 
+def test_wrapped_decoder_alarm_remains_a_censored_timeout(tmp_path,monkeypatch):
+    import time
+    from ate_sim import incremental_store
+    from simulation.profile_stage_0_5_performance import BudgetExpired
+    m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':0.05})
+    original=incremental_store.json.loads
+    def slow_decode(*args,**kwargs):
+        time.sleep(0.2)
+        return original(*args,**kwargs)
+    with monkeypatch.context() as change:
+        change.setattr(incremental_store.json,'loads',slow_decode)
+        with pytest.raises(BudgetExpired):
+            rec.measure('decode',lambda:incremental_store.TypedCodec().decode(b'null'))
+    import json
+    row=json.loads((tmp_path/'evidence/phase-progress-decode.json').read_text())['phases']['decode']
+    assert row['status']=='timeout' and row['censored'] is True
+
+
+def test_real_bad_payload_is_still_an_error_without_a_fired_alarm(tmp_path):
+    import json
+    from ate_sim.incremental_store import TypedCodec,CodecError
+    m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':1})
+    with pytest.raises(CodecError):rec.measure('decode',lambda:TypedCodec().decode(b'{broken'))
+    row=json.loads((tmp_path/'evidence/phase-progress-decode.json').read_text())['phases']['decode']
+    assert row['status']=='error' and row.get('censored',False) is False
+
+
+def test_consumed_alarm_cannot_publish_a_successful_phase(tmp_path):
+    import time
+    from simulation.profile_stage_0_5_performance import BudgetExpired
+    m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':0.05})
+    def swallowed():
+        try:time.sleep(0.2)
+        except Exception:return 'incorrect completion'
+    with pytest.raises(BudgetExpired):rec.measure('decode',swallowed)
+
+
+def test_timeout_words_do_not_hide_a_real_error_and_handler_is_restored(tmp_path):
+    import signal
+    from ate_sim.incremental_store import CodecError
+    m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':1,'healthy':1})
+    prior=signal.getsignal(signal.SIGALRM)
+    def bad():raise CodecError('BudgetExpired phase budget exhausted')
+    with pytest.raises(CodecError):rec.measure('decode',bad)
+    assert rec.phases['decode']['status']=='error'
+    assert signal.getsignal(signal.SIGALRM)==prior and signal.getitimer(signal.ITIMER_REAL)[0]==0
+    assert rec.measure('healthy',lambda:42)==42 and rec.phases['healthy']['status']=='complete'
+
+
+def test_harness_does_not_replace_an_active_callers_alarm(tmp_path):
+    import signal
+    m=api();rec=m.Recorder(tmp_path/'evidence',{'decode':1});called=[]
+    prior=signal.getsignal(signal.SIGALRM)
+    signal.setitimer(signal.ITIMER_REAL,2)
+    try:
+        with pytest.raises(ValueError,match='active alarm'):
+            rec.measure('decode',lambda:called.append(True))
+        assert called==[] and signal.getsignal(signal.SIGALRM)==prior
+        assert 0<signal.getitimer(signal.ITIMER_REAL)[0]<=2
+    finally:signal.setitimer(signal.ITIMER_REAL,0)
+
+
 def setup_source(tmp_path):
     m=api();source=upgraded(tmp_path)
     desc=c.describe(source,rules_id=RULES)

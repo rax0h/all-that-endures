@@ -1,0 +1,22 @@
+{
+  "phase": "canonical.field.materials",
+  "resources": {
+    "block_inputs": 244128304,
+    "block_outputs": 125620176,
+    "cpu_seconds": 2741.573743215,
+    "major_faults": 5,
+    "minor_faults": 123259,
+    "peak_rss_bytes": 427446272,
+    "process_io": {
+      "cancelled_write_bytes": 26361856,
+      "rchar": 164197513296,
+      "read_bytes": 124993703936,
+      "syscr": 8724661,
+      "syscw": 194991,
+      "wchar": 64930769031,
+      "write_bytes": 64318234624
+    },
+    "rss_bytes": 388694016
+  },
+  "time": 1794377543.0658486
+}

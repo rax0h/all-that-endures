@@ -1,0 +1,183 @@
+{
+  "current_runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "expected_proofs": {
+    "audit": {
+      "artifact": {
+        "archive_bytes": 35605,
+        "archive_sha256": "c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943",
+        "artifact_id": 12148235361,
+        "harness_sha": "60eaf810fbc156e333722672627a8dc2caf20bc1",
+        "name": "continuation-stage-audit-1001",
+        "producer_job": "mature-stage",
+        "run_id": 39152488567,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317"
+      },
+      "receipt_sha256": "4be22bcfeea6dd71e588d8f65c4e63ab7538c2faca7c4a07640b26b2f1252b97"
+    },
+    "digest": {
+      "artifact": {
+        "archive_bytes": 26329,
+        "archive_sha256": "b34ddc54a8462522715a697f15f0bb61bae1b456e7de1a3fa97606fcdff7dc58",
+        "artifact_id": 12164423938,
+        "harness_sha": "12696c2ec36eba0c0a67d9b8d6351833266a1548",
+        "name": "continuation-stage-digest-1001",
+        "producer_job": "mature-stage",
+        "run_id": 39198567003,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "8ab01eed35176e5f13533bbc011b47fb6bc63335"
+      },
+      "receipt_sha256": "b548f6928ba02491e92a18bfc18eaf0d058898a8aaf6a818489be4ee397620fe"
+    }
+  },
+  "files": {
+    "simulation/ate_sim/advancement.py": {
+      "current_sha256": "5a515f36e79276b9a2ae2717ce0cb45f4c26a514a2415f9d74a1afa115a8c281",
+      "historical_sha256": "5a515f36e79276b9a2ae2717ce0cb45f4c26a514a2415f9d74a1afa115a8c281"
+    },
+    "simulation/ate_sim/agency.py": {
+      "current_sha256": "38d0538421cc714fa51f602995cb7eeaa230b2d192c9a2d7fd68faeb0eacf01d",
+      "historical_sha256": "38d0538421cc714fa51f602995cb7eeaa230b2d192c9a2d7fd68faeb0eacf01d"
+    },
+    "simulation/ate_sim/ambient_magic.py": {
+      "current_sha256": "222fa056814e4fde2f8053a85a89cbf6971b3b6c5e839fe482a29cde0277c3bf",
+      "historical_sha256": "222fa056814e4fde2f8053a85a89cbf6971b3b6c5e839fe482a29cde0277c3bf"
+    },
+    "simulation/ate_sim/canonical_stream.py": {
+      "current_sha256": "9e1d880d139a6dd916645610cbf9840fa0056825c6cb2d7affc606f7576b9fdd",
+      "historical_sha256": "9e1d880d139a6dd916645610cbf9840fa0056825c6cb2d7affc606f7576b9fdd"
+    },
+    "simulation/ate_sim/communities.py": {
+      "current_sha256": "f7730f609951e4ed9665921ae0a743a60d6f533f85cc78af2cc2927f6b17260d",
+      "historical_sha256": "f7730f609951e4ed9665921ae0a743a60d6f533f85cc78af2cc2927f6b17260d"
+    },
+    "simulation/ate_sim/core.py": {
+      "current_sha256": "b344eb1e75f9a2e2d934de2445eeec8dd9a0d746ffe50845822fc95c2b328cdc",
+      "historical_sha256": "b344eb1e75f9a2e2d934de2445eeec8dd9a0d746ffe50845822fc95c2b328cdc"
+    },
+    "simulation/ate_sim/culture.py": {
+      "current_sha256": "9bd8a14708df44d6d7971dac12761fd06f4129c55ada7af4e037021d3d928b27",
+      "historical_sha256": "9bd8a14708df44d6d7971dac12761fd06f4129c55ada7af4e037021d3d928b27"
+    },
+    "simulation/ate_sim/currency.py": {
+      "current_sha256": "3ab604771bbc305943e92e56d5d256ec8b7cea72fb6b1cada8baa681438de21b",
+      "historical_sha256": "3ab604771bbc305943e92e56d5d256ec8b7cea72fb6b1cada8baa681438de21b"
+    },
+    "simulation/ate_sim/divinity.py": {
+      "current_sha256": "b0fe2c96f506b1d10c3ae3319ad45e130e99d062fd2ed0e27fdd35fd2fe3a6dc",
+      "historical_sha256": "b0fe2c96f506b1d10c3ae3319ad45e130e99d062fd2ed0e27fdd35fd2fe3a6dc"
+    },
+    "simulation/ate_sim/economy.py": {
+      "current_sha256": "7f953b791030be6521ae75d220f12d0b7c88d62f343439819ee3bc7e850bc492",
+      "historical_sha256": "7f953b791030be6521ae75d220f12d0b7c88d62f343439819ee3bc7e850bc492"
+    },
+    "simulation/ate_sim/event_log.py": {
+      "current_sha256": "baa09dfaad18846236d9e681623f1f85b483afcceacb8a88ae1720e3fcbcbd0f",
+      "historical_sha256": "baa09dfaad18846236d9e681623f1f85b483afcceacb8a88ae1720e3fcbcbd0f"
+    },
+    "simulation/ate_sim/genealogy.py": {
+      "current_sha256": "c089d815ed43e521f3c949bc1991fdbce7899f2eabf174e7b62255b6125b412c",
+      "historical_sha256": "c089d815ed43e521f3c949bc1991fdbce7899f2eabf174e7b62255b6125b412c"
+    },
+    "simulation/ate_sim/incremental_store.py": {
+      "current_sha256": "3d38fd9ec7df434d1668adabf602c2f2a38266b5f8e08304e8733366514b3019",
+      "historical_sha256": "3d38fd9ec7df434d1668adabf602c2f2a38266b5f8e08304e8733366514b3019"
+    },
+    "simulation/ate_sim/infrastructure.py": {
+      "current_sha256": "539bfd6902c5bde44c7eae23b651cfd832c1ba10c908a73d27de75a59b73ddc1",
+      "historical_sha256": "539bfd6902c5bde44c7eae23b651cfd832c1ba10c908a73d27de75a59b73ddc1"
+    },
+    "simulation/ate_sim/institutions.py": {
+      "current_sha256": "0e1504808d3013d2d8f42eb07d0965a32203bf989afe94c45abcdccbf3c0b9e0",
+      "historical_sha256": "0e1504808d3013d2d8f42eb07d0965a32203bf989afe94c45abcdccbf3c0b9e0"
+    },
+    "simulation/ate_sim/knowledge.py": {
+      "current_sha256": "71d2f5a80380d6e63d0b9e995f3f7ddf26045491bf3ef080d0def7f03a9742d0",
+      "historical_sha256": "71d2f5a80380d6e63d0b9e995f3f7ddf26045491bf3ef080d0def7f03a9742d0"
+    },
+    "simulation/ate_sim/lineage.py": {
+      "current_sha256": "48212f0ef7c8af23162e502d8fbe400d54fafebe4fba7e1b7a621d8e0259992d",
+      "historical_sha256": "48212f0ef7c8af23162e502d8fbe400d54fafebe4fba7e1b7a621d8e0259992d"
+    },
+    "simulation/ate_sim/magic_resources.py": {
+      "current_sha256": "32790d5febcce77258b7ae297704806ed0dee848e7b899c67de0152ce658d1c0",
+      "historical_sha256": "32790d5febcce77258b7ae297704806ed0dee848e7b899c67de0152ce658d1c0"
+    },
+    "simulation/ate_sim/mastery_training.py": {
+      "current_sha256": "a8b73f56b280f5e7c136dcd1453206ee9575d2191ea97c8f39472629f06c5cb3",
+      "historical_sha256": "a8b73f56b280f5e7c136dcd1453206ee9575d2191ea97c8f39472629f06c5cb3"
+    },
+    "simulation/ate_sim/materials.py": {
+      "current_sha256": "531f3e8f5c1cdea32ecb95642c2fecd4295e594bb6d604e05d3b6605d94354da",
+      "historical_sha256": "f94e69db5972b055f8a187349c6b796b9031cebea6c67159b54c51b5e95e2622"
+    },
+    "simulation/ate_sim/metaphysics.py": {
+      "current_sha256": "a31809d4d8d4002b3e1eb02e4e5fbdb64afeae512026b34f9d1718087be0c120",
+      "historical_sha256": "a31809d4d8d4002b3e1eb02e4e5fbdb64afeae512026b34f9d1718087be0c120"
+    },
+    "simulation/ate_sim/persistence_adapters.py": {
+      "current_sha256": "4ef82f75e317f91e480c5a69e672ecba4ededdbeea16408682cd2203ab933dd8",
+      "historical_sha256": "8beb8f308452f5d3ac7982fbbf770a0bc791d690e5eb999880de03cbea6e6846"
+    },
+    "simulation/ate_sim/persistence_event_id_reference.py": {
+      "current_sha256": "baae936ab3c7c2e475de9641eca75762efae3f58c846e6b84371f176e6443d20",
+      "historical_sha256": "baae936ab3c7c2e475de9641eca75762efae3f58c846e6b84371f176e6443d20"
+    },
+    "simulation/ate_sim/persistence_event_ids.py": {
+      "current_sha256": "1e5f2a993aa6d3cec3894356415c74302a1fe8eb5375edcb47f584f37c3b4286",
+      "historical_sha256": "1e5f2a993aa6d3cec3894356415c74302a1fe8eb5375edcb47f584f37c3b4286"
+    },
+    "simulation/ate_sim/persistence_lazy_nested_history.py": {
+      "current_sha256": "c00ac750441be3e526026d126247080e6695e03ca1dd5e981b0f46285bd49c8f",
+      "historical_sha256": "172582194e589a37e47ed65bdcd859865373dd1ab0014efc0d94ad71a71d693b"
+    },
+    "simulation/ate_sim/persistence_nonreflexive_keys.py": {
+      "current_sha256": "1e1dee3749293132dfcbf494979159352e8cea891da9494839cfe52ff490e15d",
+      "historical_sha256": "1e1dee3749293132dfcbf494979159352e8cea891da9494839cfe52ff490e15d"
+    },
+    "simulation/ate_sim/persistence_record_headers.py": {
+      "current_sha256": "3450f8974a9a26035415b8230b7ad6b1706a4c90d55731ff80732275f56a2761",
+      "historical_sha256": "3450f8974a9a26035415b8230b7ad6b1706a4c90d55731ff80732275f56a2761"
+    },
+    "simulation/ate_sim/persistence_schema.py": {
+      "current_sha256": "2a59036c05436fc75ce42ac42d194a49351855345c4f2c7891d0b565bf7beb17",
+      "historical_sha256": "2a59036c05436fc75ce42ac42d194a49351855345c4f2c7891d0b565bf7beb17"
+    },
+    "simulation/ate_sim/record_index.py": {
+      "current_sha256": "31bef73f970414368516daeb9db29b4f134f165d321cc73be8d1c5824a0f9add",
+      "historical_sha256": "002202d5c2f089c67575b389cecce367bbccc3cb6b744f459f2c9f97ce070837"
+    },
+    "simulation/ate_sim/skills.py": {
+      "current_sha256": "fee6d7989a5b30586ea0f953dcefef68995324fd8ab59a766599c0bf266517a7",
+      "historical_sha256": "fee6d7989a5b30586ea0f953dcefef68995324fd8ab59a766599c0bf266517a7"
+    },
+    "simulation/ate_sim/social.py": {
+      "current_sha256": "93ba7265c92ec8765f427d99d901fbe3745e88a709692b5a6699daf68342e08e",
+      "historical_sha256": "93ba7265c92ec8765f427d99d901fbe3745e88a709692b5a6699daf68342e08e"
+    },
+    "simulation/ate_sim/society_accountability.py": {
+      "current_sha256": "1f1c28e76d74604056a30531a20a2a08e49a9ea1f4741169b4cab3821ad33623",
+      "historical_sha256": "1f1c28e76d74604056a30531a20a2a08e49a9ea1f4741169b4cab3821ad33623"
+    },
+    "simulation/ate_sim/threat_ecology.py": {
+      "current_sha256": "c2905b5435243f81b8c200f01298346a79ff602a31507c56c2368e7c6e2a1ff9",
+      "historical_sha256": "c2905b5435243f81b8c200f01298346a79ff602a31507c56c2368e7c6e2a1ff9"
+    },
+    "simulation/ate_sim/transmission.py": {
+      "current_sha256": "8558dba05caed70cb872ce470f51ca9ec92c058fd20c75a49045e7ba82d67619",
+      "historical_sha256": "8558dba05caed70cb872ce470f51ca9ec92c058fd20c75a49045e7ba82d67619"
+    },
+    "simulation/ate_sim/warfare.py": {
+      "current_sha256": "b0fc2c2da2480badee25757780d96d7dde7f6a409b852376eb3fbc94fd79679d",
+      "historical_sha256": "b0fc2c2da2480badee25757780d96d7dde7f6a409b852376eb3fbc94fd79679d"
+    }
+  },
+  "historical_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "historical_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "schema": "ate-accepted-source-canonical-compatibility/1",
+  "source_digest": "57f60fdf49e221af24ffc0a1f2d5a3885dd37c07db00d153171adcb91c579eed"
+}
