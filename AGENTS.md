@@ -6,6 +6,8 @@ Track findings in one consolidated closure register with origin, concrete action
 
 Batch related cleanup and validation. Do not create a separate hosted CI cycle per finding. Use one independent whole-package review and fix actionable findings, including Minors. The user permits brief CI status checks on the hour while long runs are active; do not busy-poll. Benchmark-only harness/workflow changes should use targeted validation without automatically launching the full simulation suite. Stage0.5 original scope is complete; subsequent persistence performance/stabilization is Stage0.6, retaining existing filenames. No main merge, default format activation or endurance run is authorized by cleanup work.
 
+Before expensive runs, record the smallest failure/restart unit, which closed outputs survive failure, compatibility/expiry of reusable inputs and green tests, phase/transport budgets and reserved publication time. Prove restart and actual artifact upload/download on a small case before mature execution. Do not repeat completed compatible stages or unchanged green suites merely because a later stage failed. A new unknown bottleneck must be checked before rebuilding its expensive prerequisite prefix.
+
 For local persistence acceptance and profiling in this Work Mode workspace, use
 an unchanged complete generated-year qualified runtime and verify its full
 fingerprint against docs/performance/stage-0-6-current/fixture-construction/qualified-local-runtime.json.

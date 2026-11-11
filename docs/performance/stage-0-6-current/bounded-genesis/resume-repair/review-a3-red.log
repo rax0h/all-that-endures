@@ -1,0 +1,58 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_requested_measure_budget_is_enforced_and_recorded ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-21/test_requested_measure_budget_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f62927cf490>
+
+    def test_requested_measure_budget_is_enforced_and_recorded(tmp_path,monkeypatch):
+        import json,time
+        from simulation.profile_stage_0_5_performance import BudgetExpired
+        m=api();path,row=setup_source(tmp_path)
+        for stage in ('source_digest','capture','catalog','rebase','after_digest','proofs'):row,path=advance(m,tmp_path,row,path,stage)
+        retained=c.file_hash(path)
+        from ate_sim import persistence_proof_world_session as session_api
+        real=session_api.open_proof_world_session
+        def slow_open(*a,**k):time.sleep(2);return real(*a,**k)
+        monkeypatch.setattr(session_api,'open_proof_world_session',slow_open)
+        with pytest.raises(BudgetExpired):
+>           m.run_stage('measure',row,path,tmp_path/'stage-measure',producer=producer('measure'),budget=1)
+
+.github/tests/test_stage_0_6_genesis_stages.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_genesis_stages.py:189: in run_stage
+    rec.measure(stage,action)
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:182: in action
+    elif stage=='measure':result=_measure(working,input_receipt,rec.output/'operational')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:125: in _measure
+    rec.measure('first_step',lambda:Simulation(session.world).run(1))
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:125: in <lambda>
+    rec.measure('first_step',lambda:Simulation(session.world).run(1))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/engine.py:43: in run
+    collected=False;self.step()
+                    ^^^^^^^^^^^
+simulation/ate_sim/engine.py:61: in step
+    self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
+                    ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.engine.Simulation object at 0x7f6291819010>
+
+    def _weather(self):
+     for sid,s in self.w.settlements.items():
+>     c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+E     KeyError: (0, 0)
+
+simulation/ate_sim/engine.py:67: KeyError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_requested_measure_budget_is_enforced_and_recorded
+1 failed, 8 deselected in 3.16s

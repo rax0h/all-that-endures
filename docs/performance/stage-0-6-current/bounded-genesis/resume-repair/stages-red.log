@@ -1,0 +1,93 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_______ test_small_stage_chain_preserves_source_aliases_and_full_audits ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_small_stage_chain_preserv0')
+
+    def test_small_stage_chain_preserves_source_aliases_and_full_audits(tmp_path):
+>       m=api();source,row=setup_source(tmp_path);original=c.file_hash(source);path=source
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_stages.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_stages'
+>       assert importlib.util.find_spec(name) is not None,'independently recoverable genesis stages are missing'
+E       AssertionError: independently recoverable genesis stages are missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f5543be96c0>('simulation.stage_0_6_genesis_stages')
+E        +    where <function find_spec at 0x7f5543be96c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_stages.py:15: AssertionError
+_________ test_late_failure_resumes_without_capture_or_catalog_replay __________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_late_failure_resumes_with0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5541b383e0>
+
+    def test_late_failure_resumes_without_capture_or_catalog_replay(tmp_path,monkeypatch):
+>       m=api();path,row=setup_source(tmp_path)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_stages.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_stages'
+>       assert importlib.util.find_spec(name) is not None,'independently recoverable genesis stages are missing'
+E       AssertionError: independently recoverable genesis stages are missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f5543be96c0>('simulation.stage_0_6_genesis_stages')
+E        +    where <function find_spec at 0x7f5543be96c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_stages.py:15: AssertionError
+_______________ test_field_progress_keeps_exact_canonical_digest _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_field_progress_keeps_exac0')
+
+    def test_field_progress_keeps_exact_canonical_digest(tmp_path):
+>       m=api();source,row=setup_source(tmp_path)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_stages.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_stages'
+>       assert importlib.util.find_spec(name) is not None,'independently recoverable genesis stages are missing'
+E       AssertionError: independently recoverable genesis stages are missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f5543be96c0>('simulation.stage_0_6_genesis_stages')
+E        +    where <function find_spec at 0x7f5543be96c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_stages.py:15: AssertionError
+______________ test_catalog_adapter_is_one_shot_and_source_bound _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_catalog_adapter_is_one_sh0')
+
+    def test_catalog_adapter_is_one_shot_and_source_bound(tmp_path):
+>       m=api();path,row=setup_source(tmp_path)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_stages.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_stages'
+>       assert importlib.util.find_spec(name) is not None,'independently recoverable genesis stages are missing'
+E       AssertionError: independently recoverable genesis stages are missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f5543be96c0>('simulation.stage_0_6_genesis_stages')
+E        +    where <function find_spec at 0x7f5543be96c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_stages.py:15: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_small_stage_chain_preserves_source_aliases_and_full_audits
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_late_failure_resumes_without_capture_or_catalog_replay
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_field_progress_keeps_exact_canonical_digest
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_catalog_adapter_is_one_shot_and_source_bound
+4 failed in 0.19s

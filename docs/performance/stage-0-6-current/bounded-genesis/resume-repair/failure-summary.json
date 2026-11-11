@@ -1,0 +1,288 @@
+{
+  "run_id": 42823293423,
+  "head": "9e6f022fa556c25394dfd381f4d7d0356e5d8711",
+  "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "artifact_id": 13796420944,
+  "archive_bytes": 78849,
+  "archive_sha256": "19ce09614a26656c2d41603d07e831554282702cba8cff3e41ab32e035bbda5d",
+  "full_suite": {
+    "job_id": 129854000533,
+    "passed": 5023,
+    "subtests": 2,
+    "seconds": 9014.99,
+    "archive_id": 13778449621,
+    "archive_sha256": "2c1bd46f45c878bef22131acf4d3b1b70bb9ceef7527bc3f1a1a1652be7cb333"
+  },
+  "proof_map": {
+    "job_id": 129853999993,
+    "status": "success",
+    "archive_id": 13774870495,
+    "archive_sha256": "24fd08053d558e6f9bad1a19b187afef143e7536db5137f3d75c7a6862b8ec87"
+  },
+  "failure": "construction budget12600s exhausted in canonical_digest.before_rebase",
+  "source_unchanged": true,
+  "operational_phases_reached": false,
+  "phase_intervals": [
+    {
+      "phase": "checked_current_copy",
+      "minutes": 7.348060607910156e-05
+    },
+    {
+      "phase": "source.full_audit",
+      "minutes": 55.41680750449498
+    },
+    {
+      "phase": "after_source_capture",
+      "minutes": 0.0011893788973490397
+    },
+    {
+      "phase": "copy.records",
+      "minutes": 0.00151292085647583
+    },
+    {
+      "phase": "copy.query_membership",
+      "minutes": 3.29891840616862e-05
+    },
+    {
+      "phase": "copy.segments",
+      "minutes": 0.05414537986119588
+    },
+    {
+      "phase": "copy.lazy_record_versions",
+      "minutes": 7.1295396486918134
+    },
+    {
+      "phase": "copy.lazy_order_versions",
+      "minutes": 5.283371969064077
+    },
+    {
+      "phase": "copy.lazy_query_versions",
+      "minutes": 0.9987404505411784
+    },
+    {
+      "phase": "copy.lazy_namespace_state",
+      "minutes": 5.468130111694336e-05
+    },
+    {
+      "phase": "copy.lazy_identity_occurrence_versions",
+      "minutes": 0.5481693108876546
+    },
+    {
+      "phase": "copy.physical_validation",
+      "minutes": 29.826977264881133
+    },
+    {
+      "phase": "before_publish",
+      "minutes": 0.0030585487683614096
+    },
+    {
+      "phase": "after_private_copy",
+      "minutes": 0.0021018346150716146
+    },
+    {
+      "phase": "catalog.groups",
+      "minutes": 2.2940087636311848
+    },
+    {
+      "phase": "catalog.groups.100000",
+      "minutes": 1.6987103501955667
+    },
+    {
+      "phase": "catalog.groups.200000",
+      "minutes": 1.5372052232424418
+    },
+    {
+      "phase": "catalog.groups.300000",
+      "minutes": 1.4644441525141398
+    },
+    {
+      "phase": "catalog.groups.400000",
+      "minutes": 1.4783085266749063
+    },
+    {
+      "phase": "catalog.groups.500000",
+      "minutes": 1.4459847768147787
+    },
+    {
+      "phase": "catalog.groups.600000",
+      "minutes": 1.4270442287127176
+    },
+    {
+      "phase": "catalog.groups.700000",
+      "minutes": 1.4231941858927408
+    },
+    {
+      "phase": "catalog.groups.800000",
+      "minutes": 3.154678153991699
+    },
+    {
+      "phase": "catalog.groups.900000",
+      "minutes": 1.201404869556427
+    },
+    {
+      "phase": "catalog.groups.1000000",
+      "minutes": 1.270625348885854
+    },
+    {
+      "phase": "catalog.groups.1100000",
+      "minutes": 1.318929676214854
+    },
+    {
+      "phase": "catalog.groups.1200000",
+      "minutes": 1.237324098745982
+    },
+    {
+      "phase": "catalog.groups.1300000",
+      "minutes": 1.2657691717147828
+    },
+    {
+      "phase": "catalog.groups.1400000",
+      "minutes": 1.258630911509196
+    },
+    {
+      "phase": "catalog.groups.1500000",
+      "minutes": 1.1817441980044048
+    },
+    {
+      "phase": "catalog.groups.1600000",
+      "minutes": 1.2991019090016682
+    },
+    {
+      "phase": "catalog.groups.1700000",
+      "minutes": 1.313784921169281
+    },
+    {
+      "phase": "catalog.groups.1800000",
+      "minutes": 1.4496296763420105
+    },
+    {
+      "phase": "catalog.groups.1900000",
+      "minutes": 1.4095787445704142
+    },
+    {
+      "phase": "catalog.groups.2000000",
+      "minutes": 1.233540117740631
+    },
+    {
+      "phase": "catalog.groups.2100000",
+      "minutes": 1.1935242056846618
+    },
+    {
+      "phase": "catalog.groups.2200000",
+      "minutes": 0.2614087541898092
+    },
+    {
+      "phase": "catalog.owners",
+      "minutes": 0.47363943258921304
+    },
+    {
+      "phase": "catalog.owners.100000",
+      "minutes": 0.4641598622004191
+    },
+    {
+      "phase": "catalog.owners.200000",
+      "minutes": 0.4356594999631246
+    },
+    {
+      "phase": "catalog.owners.300000",
+      "minutes": 0.43768672943115233
+    },
+    {
+      "phase": "catalog.owners.400000",
+      "minutes": 0.4335671623547872
+    },
+    {
+      "phase": "catalog.owners.500000",
+      "minutes": 0.5409466028213501
+    },
+    {
+      "phase": "catalog.owners.600000",
+      "minutes": 0.4436164736747742
+    },
+    {
+      "phase": "catalog.owners.700000",
+      "minutes": 0.7333109021186829
+    },
+    {
+      "phase": "catalog.owners.800000",
+      "minutes": 0.9964612364768982
+    },
+    {
+      "phase": "catalog.owners.900000",
+      "minutes": 1.2016064882278443
+    },
+    {
+      "phase": "catalog.owners.1000000",
+      "minutes": 1.4117670019467672
+    },
+    {
+      "phase": "catalog.owners.1100000",
+      "minutes": 1.8331788063049317
+    },
+    {
+      "phase": "catalog.owners.1200000",
+      "minutes": 1.4314416170120239
+    },
+    {
+      "phase": "catalog.owners.1300000",
+      "minutes": 1.0432411591211954
+    },
+    {
+      "phase": "catalog.owners.1400000",
+      "minutes": 0.7202827175458272
+    },
+    {
+      "phase": "catalog.owners.1500000",
+      "minutes": 0.863477365175883
+    },
+    {
+      "phase": "catalog.owners.1600000",
+      "minutes": 0.9984631975491841
+    },
+    {
+      "phase": "catalog.owners.1700000",
+      "minutes": 1.0471123854319255
+    },
+    {
+      "phase": "catalog.owners.1800000",
+      "minutes": 1.0971060832341513
+    },
+    {
+      "phase": "catalog.owners.1900000",
+      "minutes": 1.0101492087046304
+    },
+    {
+      "phase": "catalog.owners.2000000",
+      "minutes": 1.1521076162656148
+    },
+    {
+      "phase": "catalog.owners.2100000",
+      "minutes": 1.137389560540517
+    },
+    {
+      "phase": "catalog.owners.2200000",
+      "minutes": 1.2784568985303244
+    },
+    {
+      "phase": "catalog.owners.2300000",
+      "minutes": 0.6408941149711609
+    },
+    {
+      "phase": "catalog.inventories",
+      "minutes": 8.344378968079885
+    },
+    {
+      "phase": "catalog.member_types",
+      "minutes": 9.33992578983307
+    },
+    {
+      "phase": "catalog.sequences",
+      "minutes": 27.104726978143056
+    },
+    {
+      "phase": "before_publish",
+      "minutes": 3.580252329508463e-05
+    }
+  ],
+  "limitation": "No completed private database was uploaded by failed monolith; past preparation cannot be recovered from its logs."
+}

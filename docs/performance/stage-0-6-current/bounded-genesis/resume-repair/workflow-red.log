@@ -1,0 +1,200 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+______ test_green_prerequisites_are_reusable_despite_later_mature_timeout ______
+
+    def test_green_prerequisites_are_reusable_despite_later_mature_timeout():
+>       m=api();r,j,s=green()
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+________ test_green_reuse_rejects_untested_or_different_engine[runtime] ________
+
+damage = 'runtime'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+______ test_green_reuse_rejects_untested_or_different_engine[source_head] ______
+
+damage = 'source_head'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+______ test_green_reuse_rejects_untested_or_different_engine[job_failed] _______
+
+damage = 'job_failed'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+______ test_green_reuse_rejects_untested_or_different_engine[job_skipped] ______
+
+damage = 'job_skipped'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+_______ test_green_reuse_rejects_untested_or_different_engine[duplicate] _______
+
+damage = 'duplicate'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+_______ test_green_reuse_rejects_untested_or_different_engine[run_head] ________
+
+damage = 'run_head'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+_______ test_green_reuse_rejects_untested_or_different_engine[workflow] ________
+
+damage = 'workflow'
+
+    @pytest.mark.parametrize('damage',['runtime','source_head','job_failed','job_skipped','duplicate','run_head','workflow'])
+    def test_green_reuse_rejects_untested_or_different_engine(damage):
+>       m=api();r,j,s=green();runtime=m.RUNTIME
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_resume'
+>       assert importlib.util.find_spec(name) is not None,'safe checkpoint resume/green reuse launcher is missing'
+E       AssertionError: safe checkpoint resume/green reuse launcher is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7fea659fd6c0>('simulation.stage_0_6_genesis_resume')
+E        +    where <function find_spec at 0x7fea659fd6c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_resume.py:9: AssertionError
+_ test_new_workflow_keeps_expensive_stages_protected_and_old_monolith_untouched _
+
+    def test_new_workflow_keeps_expensive_stages_protected_and_old_monolith_untouched():
+        from pathlib import Path
+        import yaml
+        from simulation import stage_0_6_genesis_checkpoint as c
+        path=Path(c.WORKFLOW)
+>       assert path.is_file(),'resumable workflow is missing'
+E       AssertionError: resumable workflow is missing
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('.github/workflows/stage-0-6-resumable-proof-genesis.yml').is_file
+
+.github/tests/test_stage_0_6_genesis_resume.py:46: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_prerequisites_are_reusable_despite_later_mature_timeout
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[runtime]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[source_head]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[job_failed]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[job_skipped]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[duplicate]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[run_head]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_reuse_rejects_untested_or_different_engine[workflow]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_new_workflow_keeps_expensive_stages_protected_and_old_monolith_untouched
+9 failed in 0.07s

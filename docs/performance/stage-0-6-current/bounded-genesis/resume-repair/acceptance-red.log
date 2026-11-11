@@ -1,0 +1,99 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+__________ test_acceptance_checks_actual_measurements_and_fresh_state __________
+
+    def test_acceptance_checks_actual_measurements_and_fresh_state():
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'acceptance must validate full measured/fresh evidence'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: acceptance must validate full measured/fresh evidence
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:99: AssertionError
+___ test_incomplete_or_false_target_claim_cannot_complete_stage06[flag_only] ___
+
+damage = 'flag_only'
+
+    @pytest.mark.parametrize('damage',['flag_only','timeout','digest','audits','year','fake_boolean'])
+    def test_incomplete_or_false_target_claim_cannot_complete_stage06(damage):
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'strict acceptance is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: strict acceptance is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:105: AssertionError
+____ test_incomplete_or_false_target_claim_cannot_complete_stage06[timeout] ____
+
+damage = 'timeout'
+
+    @pytest.mark.parametrize('damage',['flag_only','timeout','digest','audits','year','fake_boolean'])
+    def test_incomplete_or_false_target_claim_cannot_complete_stage06(damage):
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'strict acceptance is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: strict acceptance is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:105: AssertionError
+____ test_incomplete_or_false_target_claim_cannot_complete_stage06[digest] _____
+
+damage = 'digest'
+
+    @pytest.mark.parametrize('damage',['flag_only','timeout','digest','audits','year','fake_boolean'])
+    def test_incomplete_or_false_target_claim_cannot_complete_stage06(damage):
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'strict acceptance is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: strict acceptance is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:105: AssertionError
+____ test_incomplete_or_false_target_claim_cannot_complete_stage06[audits] _____
+
+damage = 'audits'
+
+    @pytest.mark.parametrize('damage',['flag_only','timeout','digest','audits','year','fake_boolean'])
+    def test_incomplete_or_false_target_claim_cannot_complete_stage06(damage):
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'strict acceptance is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: strict acceptance is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:105: AssertionError
+_____ test_incomplete_or_false_target_claim_cannot_complete_stage06[year] ______
+
+damage = 'year'
+
+    @pytest.mark.parametrize('damage',['flag_only','timeout','digest','audits','year','fake_boolean'])
+    def test_incomplete_or_false_target_claim_cannot_complete_stage06(damage):
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'strict acceptance is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: strict acceptance is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:105: AssertionError
+_ test_incomplete_or_false_target_claim_cannot_complete_stage06[fake_boolean] __
+
+damage = 'fake_boolean'
+
+    @pytest.mark.parametrize('damage',['flag_only','timeout','digest','audits','year','fake_boolean'])
+    def test_incomplete_or_false_target_claim_cannot_complete_stage06(damage):
+>       m=api();assert hasattr(m,'evaluate_acceptance'),'strict acceptance is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: strict acceptance is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'evaluate_acceptance')
+
+.github/tests/test_stage_0_6_genesis_resume.py:105: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_acceptance_checks_actual_measurements_and_fresh_state
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_incomplete_or_false_target_claim_cannot_complete_stage06[flag_only]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_incomplete_or_false_target_claim_cannot_complete_stage06[timeout]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_incomplete_or_false_target_claim_cannot_complete_stage06[digest]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_incomplete_or_false_target_claim_cannot_complete_stage06[audits]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_incomplete_or_false_target_claim_cannot_complete_stage06[year]
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_incomplete_or_false_target_claim_cannot_complete_stage06[fake_boolean]
+7 failed, 11 deselected in 0.08s

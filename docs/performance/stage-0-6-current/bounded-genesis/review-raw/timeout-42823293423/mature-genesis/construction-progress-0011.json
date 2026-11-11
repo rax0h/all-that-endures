@@ -1,0 +1,23 @@
+{
+  "phase": "copy.physical_validation",
+  "resources": {
+    "block_inputs": 298454392,
+    "block_outputs": 132712776,
+    "cpu_seconds": 1809.425538055,
+    "major_faults": 0,
+    "minor_faults": 387001,
+    "peak_rss_bytes": 407289856,
+    "process_io": {
+      "cancelled_write_bytes": 2009501696,
+      "rchar": 232926246759,
+      "read_bytes": 152808660992,
+      "syscr": 47186410,
+      "syscw": 12932595,
+      "wchar": 87170362013,
+      "write_bytes": 67949608960
+    },
+    "rss_bytes": 216322048
+  },
+  "sequence": 11,
+  "unix_time": 1794330390.4782345
+}

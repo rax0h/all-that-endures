@@ -1,0 +1,430 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+________ test_successful_checkpoint_job_survives_later_workflow_failure ________
+
+    def test_successful_checkpoint_job_survives_later_workflow_failure():
+>       a,r,j=metadata();ref=auth(a,r,j)
+                             ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+__________ test_untrusted_checkpoint_producer_is_rejected[job_failed] __________
+
+damage = 'job_failed'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+___________ test_untrusted_checkpoint_producer_is_rejected[job_head] ___________
+
+damage = 'job_head'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+________ test_untrusted_checkpoint_producer_is_rejected[duplicate_job] _________
+
+damage = 'duplicate_job'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+____________ test_untrusted_checkpoint_producer_is_rejected[expiry] ____________
+
+damage = 'expiry'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+________ test_untrusted_checkpoint_producer_is_rejected[artifact_head] _________
+
+damage = 'artifact_head'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+___________ test_untrusted_checkpoint_producer_is_rejected[workflow] ___________
+
+damage = 'workflow'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+____________ test_untrusted_checkpoint_producer_is_rejected[branch] ____________
+
+damage = 'branch'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+___________ test_untrusted_checkpoint_producer_is_rejected[created] ____________
+
+damage = 'created'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+____________ test_untrusted_checkpoint_producer_is_rejected[digest] ____________
+
+damage = 'digest'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+_____________ test_untrusted_checkpoint_producer_is_rejected[size] _____________
+
+damage = 'size'
+
+    @pytest.mark.parametrize('damage',['job_failed','job_head','duplicate_job','expiry','artifact_head','workflow','branch','created','digest','size'])
+    def test_untrusted_checkpoint_producer_is_rejected(damage):
+        a,r,j=metadata()
+        if damage=='job_failed':j[0]['conclusion']='failure'
+        elif damage=='job_head':j[0]['head_sha']='c'*40
+        elif damage=='duplicate_job':j*=2
+        elif damage=='expiry':a['expires_at']='2026-11-10T03:00:00Z'
+        elif damage=='artifact_head':a['workflow_run']['head_sha']='c'*40
+        elif damage=='workflow':r['path']='other.yml'
+        elif damage=='branch':r['head_branch']='main'
+        elif damage=='created':a['created_at']='2026-11-10T01:04:00Z'
+        elif damage=='digest':a['digest']='bad'
+        else:a['size_in_bytes']=True
+>       with pytest.raises(ValueError):auth(a,r,j)
+                                       ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:28: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+           ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+________ test_exact_bounded_archive_rejects_extra_or_duplicate_members _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_exact_bounded_archive_rej0')
+
+    def test_exact_bounded_archive_rejects_extra_or_duplicate_members(tmp_path):
+>       m=api();archive=tmp_path/'data.zip'
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_transport'
+>       assert importlib.util.find_spec(name) is not None,'checkpoint transport is missing'
+E       AssertionError: checkpoint transport is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f7c427096c0>('simulation.stage_0_6_genesis_transport')
+E        +    where <function find_spec at 0x7f7c427096c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_transport.py:12: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_successful_checkpoint_job_survives_later_workflow_failure
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[job_failed]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[job_head]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[duplicate_job]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[expiry]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[artifact_head]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[workflow]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[branch]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[created]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[digest]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_untrusted_checkpoint_producer_is_rejected[size]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_exact_bounded_archive_rejects_extra_or_duplicate_members
+12 failed in 0.07s

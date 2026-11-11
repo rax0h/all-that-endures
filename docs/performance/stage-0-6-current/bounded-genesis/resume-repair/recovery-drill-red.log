@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_hosted_smoke_kills_a_worker_before_resuming_verified_catalog _______
+
+    def test_hosted_smoke_kills_a_worker_before_resuming_verified_catalog():
+        from pathlib import Path
+        import yaml
+        m=api();path=Path('.github/tests/run_genesis_recovery_drill.py')
+>       assert path.is_file(),'real hosted crash/recovery drill is missing'
+E       AssertionError: real hosted crash/recovery drill is missing
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('.github/tests/run_genesis_recovery_drill.py').is_file
+
+.github/tests/test_stage_0_6_genesis_resume.py:74: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_hosted_smoke_kills_a_worker_before_resuming_verified_catalog
+1 failed, 10 deselected in 0.07s

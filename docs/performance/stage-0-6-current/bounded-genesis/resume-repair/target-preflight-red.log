@@ -1,0 +1,26 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_missed_mature_targets_stop_before_expensive_fresh_verification ______
+
+    def test_missed_mature_targets_stop_before_expensive_fresh_verification():
+>       m=api();assert hasattr(m,'check_measured_targets'),'known target failure must stop before the deep final digest'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: known target failure must stop before the deep final digest
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'check_measured_targets')
+
+.github/tests/test_stage_0_6_genesis_resume.py:142: AssertionError
+_____ test_smoke_checks_functional_recovery_without_claiming_mature_speed ______
+
+    def test_smoke_checks_functional_recovery_without_claiming_mature_speed():
+>       m=api();assert hasattr(m,'check_measured_targets'),'measurement preflight is missing'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: measurement preflight is missing
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'check_measured_targets')
+
+.github/tests/test_stage_0_6_genesis_resume.py:150: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_missed_mature_targets_stop_before_expensive_fresh_verification
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_smoke_checks_functional_recovery_without_claiming_mature_speed
+2 failed, 21 deselected in 0.07s

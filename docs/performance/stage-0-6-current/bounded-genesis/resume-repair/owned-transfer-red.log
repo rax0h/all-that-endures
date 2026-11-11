@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_owned_closed_database_publishes_without_a_second_full_copy ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-12/test_owned_closed_database_pub0')
+
+    def test_owned_closed_database_publishes_without_a_second_full_copy(tmp_path):
+>       m=api();assert 'move_owned' in __import__('inspect').signature(m.publish).parameters,'large closed outputs need an owned transfer, not another full copy'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: large closed outputs need an owned transfer, not another full copy
+E       assert 'move_owned' in mappingproxy(OrderedDict({'destination': <Parameter "destination">, 'value': <Parameter "value">, 'database': <Parameter "database=None">}))
+E        +  where mappingproxy(OrderedDict({'destination': <Parameter "destination">, 'value': <Parameter "value">, 'database': <Parameter "database=None">})) = <Signature (destination, value, *, database=None)>.parameters
+E        +    where <Signature (destination, value, *, database=None)> = <function signature at 0x7f31ba611760>(<function publish at 0x7f31b92e0f40>)
+E        +      where <function signature at 0x7f31ba611760> = <module 'inspect' from '/usr/lib/python3.13/inspect.py'>.signature
+E        +        where <module 'inspect' from '/usr/lib/python3.13/inspect.py'> = __import__('inspect')
+E        +      and   <function publish at 0x7f31b92e0f40> = <module 'simulation.stage_0_6_genesis_checkpoint' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_checkpoint.py'>.publish
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_owned_closed_database_publishes_without_a_second_full_copy
+1 failed, 10 deselected in 0.04s

@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_hosted_software_change_fails_before_reusing_engine_validation ______
+
+    def test_hosted_software_change_fails_before_reusing_engine_validation():
+        m=api()
+>       assert hasattr(m,'check_software'),'hosted interpreter/SQLite tuple must be checked before engine work'
+E       AssertionError: hosted interpreter/SQLite tuple must be checked before engine work
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'check_software')
+
+.github/tests/test_stage_0_6_genesis_resume.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_hosted_software_change_fails_before_reusing_engine_validation
+1 failed, 9 deselected in 0.06s

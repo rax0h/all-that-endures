@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_code_fence_includes_imported_helpers_and_authority_data_only _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-14/test_code_fence_includes_impor0')
+
+    def test_code_fence_includes_imported_helpers_and_authority_data_only(tmp_path):
+>       m=api();assert hasattr(m,'dependency_paths'),'resume code fence must cover imported helper semantics'
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: resume code fence must cover imported helper semantics
+E       assert False
+E        +  where False = hasattr(<module 'simulation.stage_0_6_genesis_resume' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_resume.py'>, 'dependency_paths')
+
+.github/tests/test_stage_0_6_genesis_resume.py:130: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_code_fence_includes_imported_helpers_and_authority_data_only
+1 failed, 20 deselected in 0.06s

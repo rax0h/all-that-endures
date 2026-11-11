@@ -1,0 +1,49 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_saved_world_is_durable_before_fresh_process_validation __________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9/test_saved_world_is_durable_be0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa62d623490>
+
+    def test_saved_world_is_durable_before_fresh_process_validation(tmp_path,monkeypatch):
+        m=api();path,row=measured_source(tmp_path)
+>       for stage in c.STAGES[:-1]:row,path=advance(m,tmp_path,row,path,stage)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_stages.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_stages.py:33: in advance
+    result=m.run_stage(stage,row,path,out,producer=producer(stage),budget=120)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:133: in run_stage
+    rec.measure(stage,action)
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def action():
+        nonlocal result
+        if stage=='capture':
+            lazy.LazyRecordStore.copy_current_head(source,working,codec=WorldCodec(identity_links_recorded=True),
+                expected_simulation_schema=SCHEMA,expected_rules_id=rules,_defer_target_audit=True)
+        elif stage=='catalog':
+            with captured_transfer(source,input_receipt,private):
+                catalog._copy_current_checked_catalog(source,working,rules_id=rules,_for_proof_genesis=True)
+        else:
+            shutil.copyfile(source,working)
+            if stage in ('source_digest','after_digest'):
+                result=_digest(working,rules,progress)
+                if stage=='after_digest' and result!=input_receipt['baseline_digest']:raise ValueError('native transfer/rebase changed canonical World')
+            elif stage=='rebase':
+                with lazy.LazyRecordStore.open(working,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules) as store:
+                    genesis._rebase_private_snapshot(store,_defer_final_audit=True)
+            elif stage=='proofs':result=_build_proofs(working,rules,progress)
+>           else:raise NotImplementedError('measurement stage not yet implemented')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           NotImplementedError: measurement stage not yet implemented
+
+simulation/stage_0_6_genesis_stages.py:129: NotImplementedError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_saved_world_is_durable_before_fresh_process_validation
+1 failed, 4 deselected in 34.47s

@@ -1,0 +1,204 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+__________ test_checkpoint_parent_hash_and_read_only_database_binding __________
+
+    def test_checkpoint_parent_hash_and_read_only_database_binding():
+>       m=api();a=source()
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+___________ test_mixed_or_incomplete_checkpoint_cannot_advance[hash] ___________
+
+damage = 'hash'
+
+    @pytest.mark.parametrize('damage',['hash','context','stage','database','baseline','extra'])
+    def test_mixed_or_incomplete_checkpoint_cannot_advance(damage):
+>       m=api();a=source();b=m.record('source_digest',context(),descriptor(),producer('source_digest'),parent=a,baseline_digest='f'*64)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+_________ test_mixed_or_incomplete_checkpoint_cannot_advance[context] __________
+
+damage = 'context'
+
+    @pytest.mark.parametrize('damage',['hash','context','stage','database','baseline','extra'])
+    def test_mixed_or_incomplete_checkpoint_cannot_advance(damage):
+>       m=api();a=source();b=m.record('source_digest',context(),descriptor(),producer('source_digest'),parent=a,baseline_digest='f'*64)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+__________ test_mixed_or_incomplete_checkpoint_cannot_advance[stage] ___________
+
+damage = 'stage'
+
+    @pytest.mark.parametrize('damage',['hash','context','stage','database','baseline','extra'])
+    def test_mixed_or_incomplete_checkpoint_cannot_advance(damage):
+>       m=api();a=source();b=m.record('source_digest',context(),descriptor(),producer('source_digest'),parent=a,baseline_digest='f'*64)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+_________ test_mixed_or_incomplete_checkpoint_cannot_advance[database] _________
+
+damage = 'database'
+
+    @pytest.mark.parametrize('damage',['hash','context','stage','database','baseline','extra'])
+    def test_mixed_or_incomplete_checkpoint_cannot_advance(damage):
+>       m=api();a=source();b=m.record('source_digest',context(),descriptor(),producer('source_digest'),parent=a,baseline_digest='f'*64)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+_________ test_mixed_or_incomplete_checkpoint_cannot_advance[baseline] _________
+
+damage = 'baseline'
+
+    @pytest.mark.parametrize('damage',['hash','context','stage','database','baseline','extra'])
+    def test_mixed_or_incomplete_checkpoint_cannot_advance(damage):
+>       m=api();a=source();b=m.record('source_digest',context(),descriptor(),producer('source_digest'),parent=a,baseline_digest='f'*64)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+__________ test_mixed_or_incomplete_checkpoint_cannot_advance[extra] ___________
+
+damage = 'extra'
+
+    @pytest.mark.parametrize('damage',['hash','context','stage','database','baseline','extra'])
+    def test_mixed_or_incomplete_checkpoint_cannot_advance(damage):
+>       m=api();a=source();b=m.record('source_digest',context(),descriptor(),producer('source_digest'),parent=a,baseline_digest='f'*64)
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+______________ test_failed_publication_keeps_existing_checkpoint _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_failed_publication_keeps_0')
+
+    def test_failed_publication_keeps_existing_checkpoint(tmp_path):
+>       m=api();out=tmp_path/'checkpoint';a=source()
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+_____ test_local_receipt_requires_explicit_remote_transport_before_resume ______
+
+    def test_local_receipt_requires_explicit_remote_transport_before_resume():
+>       m=api()
+          ^^^^^
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def api():
+        name='simulation.stage_0_6_genesis_checkpoint'
+>       assert importlib.util.find_spec(name) is not None, 'durable genesis checkpoint contract is missing'
+E       AssertionError: durable genesis checkpoint contract is missing
+E       assert None is not None
+E        +  where None = <function find_spec at 0x7f6d6e0716c0>('simulation.stage_0_6_genesis_checkpoint')
+E        +    where <function find_spec at 0x7f6d6e0716c0> = <module 'importlib.util' (frozen)>.find_spec
+E        +      where <module 'importlib.util' (frozen)> = importlib.util
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:12: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_checkpoint_parent_hash_and_read_only_database_binding
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_mixed_or_incomplete_checkpoint_cannot_advance[hash]
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_mixed_or_incomplete_checkpoint_cannot_advance[context]
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_mixed_or_incomplete_checkpoint_cannot_advance[stage]
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_mixed_or_incomplete_checkpoint_cannot_advance[database]
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_mixed_or_incomplete_checkpoint_cannot_advance[baseline]
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_mixed_or_incomplete_checkpoint_cannot_advance[extra]
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_failed_publication_keeps_existing_checkpoint
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_local_receipt_requires_explicit_remote_transport_before_resume
+9 failed in 0.05s

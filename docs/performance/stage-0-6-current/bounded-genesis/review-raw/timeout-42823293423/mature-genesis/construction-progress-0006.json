@@ -1,0 +1,23 @@
+{
+  "phase": "copy.lazy_record_versions",
+  "resources": {
+    "block_inputs": 271831568,
+    "block_outputs": 76364368,
+    "cpu_seconds": 1434.810229694,
+    "major_faults": 0,
+    "minor_faults": 309105,
+    "peak_rss_bytes": 199589888,
+    "process_io": {
+      "cancelled_write_bytes": 2009501696,
+      "rchar": 207268224305,
+      "read_bytes": 139177775104,
+      "syscr": 40922099,
+      "syscw": 3860741,
+      "wchar": 50012652074,
+      "write_bytes": 39099224064
+    },
+    "rss_bytes": 88514560
+  },
+  "sequence": 6,
+  "unix_time": 1794329552.885671
+}

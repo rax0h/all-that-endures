@@ -1,0 +1,21 @@
+{
+  "head": "9e6f022fa556c25394dfd381f4d7d0356e5d8711",
+  "runtime_tree": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "runtime_working_changes": [],
+  "method": "source/architecture and saved-evidence review only; no production edits, runtime changes, tests, expensive runs or hosted actions",
+  "files": {
+    "simulation/stage_0_6_proof_mature_genesis.py": "ef4603377db44172d43f0daac756d5a2eeba8f4b8553d7f1c54896391542639e",
+    "simulation/ate_sim/persistence_proof_world_copy.py": "14fedaccd5eefeb70de5692607a8514e695d2bdaff498957df7f10d9cd609e4e",
+    "simulation/ate_sim/persistence_catalog_copy.py": "fa05ecb724cc35be6059cef8c09d414ec1de2be272a41ec7dcf756d0d224d799",
+    "simulation/ate_sim/persistence_lazy_store.py": "b980a2e341bb1bae635a6889a9d5f754862a914717527539c624a589bfbcd405",
+    "simulation/ate_sim/persistence_genesis_transaction.py": "79f5c3b316fd9ad3f19cb83e13560cccd13090642f04deaa110b79a532650357",
+    "simulation/ate_sim/canonical_stream.py": "9e1d880d139a6dd916645610cbf9840fa0056825c6cb2d7affc606f7576b9fdd",
+    "simulation/ate_sim/core.py": "b344eb1e75f9a2e2d934de2445eeec8dd9a0d746ffe50845822fc95c2b328cdc",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/stage_0_6_retained_producer.py": "f6ce0cf2327f39559b868a662f7c385ccd4156df950e01ef9277ad9eff70de9e",
+    "simulation/construction_mature_prepare.py": "12108ba18d1d1ef842445003437b124e8d82de56eae7c8409fdc5a3518ce5924",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "480e528775b6c9295c84051fab0ccfaf9da8e977d3812ca9db53c587464cdfbc"
+  }
+}

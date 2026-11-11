@@ -1,0 +1,23 @@
+{
+  "phase": "catalog.sequences",
+  "resources": {
+    "block_inputs": 479264512,
+    "block_outputs": 141452920,
+    "cpu_seconds": 6073.839010246,
+    "major_faults": 9707,
+    "minor_faults": 426810,
+    "peak_rss_bytes": 407289856,
+    "process_io": {
+      "cancelled_write_bytes": 3429724160,
+      "rchar": 378016070800,
+      "read_bytes": 245383442432,
+      "syscr": 82675628,
+      "syscw": 16020596,
+      "wchar": 99816269414,
+      "write_bytes": 72424562688
+    },
+    "rss_bytes": 99749888
+  },
+  "sequence": 63,
+  "unix_time": 1794336520.1226041
+}

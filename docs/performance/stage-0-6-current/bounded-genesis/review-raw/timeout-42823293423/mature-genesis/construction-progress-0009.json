@@ -1,0 +1,23 @@
+{
+  "phase": "copy.lazy_namespace_state",
+  "resources": {
+    "block_inputs": 298452304,
+    "block_outputs": 127292160,
+    "cpu_seconds": 1781.060874446,
+    "major_faults": 0,
+    "minor_faults": 387001,
+    "peak_rss_bytes": 407289856,
+    "process_io": {
+      "cancelled_write_bytes": 2009501696,
+      "rchar": 231756621119,
+      "read_bytes": 152807591936,
+      "syscr": 46900844,
+      "syscw": 12183065,
+      "wchar": 84100476885,
+      "write_bytes": 65174253568
+    },
+    "rss_bytes": 216322048
+  },
+  "sequence": 9,
+  "unix_time": 1794330357.584795
+}

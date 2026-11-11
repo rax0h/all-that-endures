@@ -1,0 +1,50 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_capture_replay_rejects_symlink_boundaries[source] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-16/test_capture_replay_rejects_sy0')
+alias = 'source'
+
+    @pytest.mark.parametrize('alias',['source','destination_parent'])
+    def test_capture_replay_rejects_symlink_boundaries(tmp_path,alias):
+        m=api();path,row=setup_source(tmp_path)
+        for stage in ('source_digest','capture'):row,path=advance(m,tmp_path,row,path,stage)
+        from ate_sim import persistence_lazy_store as lazy
+        from ate_sim.persistence_adapters import WorldCodec,SCHEMA
+        root=tmp_path/'owned';root.mkdir()
+        if alias=='source':
+            link=tmp_path/'source-link.sqlite';link.symlink_to(path)
+>           with pytest.raises(ValueError,match='regular'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'regular'
+E             Actual message: 'catalog did not consume exactly one captured transfer'
+
+.github/tests/test_stage_0_6_genesis_stages.py:138: AssertionError
+______ test_capture_replay_rejects_symlink_boundaries[destination_parent] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-16/test_capture_replay_rejects_sy1')
+alias = 'destination_parent'
+
+    @pytest.mark.parametrize('alias',['source','destination_parent'])
+    def test_capture_replay_rejects_symlink_boundaries(tmp_path,alias):
+        m=api();path,row=setup_source(tmp_path)
+        for stage in ('source_digest','capture'):row,path=advance(m,tmp_path,row,path,stage)
+        from ate_sim import persistence_lazy_store as lazy
+        from ate_sim.persistence_adapters import WorldCodec,SCHEMA
+        root=tmp_path/'owned';root.mkdir()
+        if alias=='source':
+            link=tmp_path/'source-link.sqlite';link.symlink_to(path)
+            with pytest.raises(ValueError,match='regular'):
+                with lazy._bounded_conversion_audits(),m.captured_transfer(link,row,root):pass
+        else:
+            outside=tmp_path/'outside';outside.mkdir();parent=root/'.ate-checked-current-copy-link';parent.symlink_to(outside,target_is_directory=True)
+>           with pytest.raises(ValueError,match='transfer'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_stages.py:142: Failed
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_capture_replay_rejects_symlink_boundaries[source]
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_capture_replay_rejects_symlink_boundaries[destination_parent]
+2 failed, 5 deselected in 0.88s

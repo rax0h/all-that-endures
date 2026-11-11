@@ -1,0 +1,23 @@
+{
+  "phase": "copy.lazy_identity_occurrence_versions",
+  "resources": {
+    "block_inputs": 298452408,
+    "block_outputs": 127292216,
+    "cpu_seconds": 1781.062468188,
+    "major_faults": 0,
+    "minor_faults": 387001,
+    "peak_rss_bytes": 407289856,
+    "process_io": {
+      "cancelled_write_bytes": 2009501696,
+      "rchar": 231756674551,
+      "read_bytes": 152807645184,
+      "syscr": 46900861,
+      "syscw": 12183090,
+      "wchar": 84100527121,
+      "write_bytes": 65174282240
+    },
+    "rss_bytes": 216322048
+  },
+  "sequence": 10,
+  "unix_time": 1794330357.5880759
+}

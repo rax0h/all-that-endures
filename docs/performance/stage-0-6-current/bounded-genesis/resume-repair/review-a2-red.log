@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_diagnostic_upload_failure_cannot_invalidate_committed_checkpoints ____
+
+    def test_diagnostic_upload_failure_cannot_invalidate_committed_checkpoints():
+        from pathlib import Path
+        import yaml
+        w=yaml.safe_load(Path('.github/workflows/stage-0-6-resumable-proof-genesis.yml').read_text())
+        for job in w['jobs'].values():
+            for step in job['steps']:
+>               if step.get('id')=='evidence':assert step.get('continue-on-error') is True,'diagnostics must not turn a published checkpoint producer red'
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: diagnostics must not turn a published checkpoint producer red
+E               assert None is True
+E                +  where None = <built-in method get of dict object at 0x7feddf2cbdc0>('continue-on-error')
+E                +    where <built-in method get of dict object at 0x7feddf2cbdc0> = {'id': 'evidence', 'uses': 'actions/upload-artifact@v4', 'timeout-minutes': 5, 'with': {'name': 'resume-evidence-gate-...empt }}', 'path': 'resume-tests/**\nresume-work/*.json', 'retention-days': 30, 'if-no-files-found': 'error', ...}, ...}.get
+
+.github/tests/test_stage_0_6_genesis_resume.py:171: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_diagnostic_upload_failure_cannot_invalidate_committed_checkpoints
+1 failed, 24 deselected in 0.10s

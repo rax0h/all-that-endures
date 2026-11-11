@@ -1,0 +1,7 @@
+{
+  "acceptance": "not-accepted",
+  "censored": true,
+  "exit_status": 1,
+  "schema": "ate-stage06-mature-genesis-exit/1",
+  "status": "timeout"
+}

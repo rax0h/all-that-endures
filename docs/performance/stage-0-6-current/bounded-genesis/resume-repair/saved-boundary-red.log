@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_saved_checkpoint_survives_separate_fresh_restore_validation _______
+
+    def test_saved_checkpoint_survives_separate_fresh_restore_validation():
+        m=api()
+>       assert 'fresh_restore' in m.STAGES,'fresh verification must not discard the completed saved checkpoint'
+E       AssertionError: fresh verification must not discard the completed saved checkpoint
+E       assert 'fresh_restore' in ('source_digest', 'capture', 'catalog', 'rebase', 'after_digest', 'proofs', ...)
+E        +  where ('source_digest', 'capture', 'catalog', 'rebase', 'after_digest', 'proofs', ...) = <module 'simulation.stage_0_6_genesis_checkpoint' from '/workspace/scratch/d88f8db353e8/ate/simulation/stage_0_6_genesis_checkpoint.py'>.STAGES
+
+.github/tests/test_stage_0_6_genesis_checkpoint.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_checkpoint.py::test_saved_checkpoint_survives_separate_fresh_restore_validation
+1 failed, 9 deselected in 0.02s

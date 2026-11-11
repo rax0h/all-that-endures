@@ -1,0 +1,277 @@
+............FFFFFFFFFF.                                                  [100%]
+=================================== FAILURES ===================================
+_ test_committed_checkpoint_survives_post_publication_cleanup_failure[failure] _
+
+conclusion = 'failure'
+
+    @pytest.mark.parametrize('conclusion',['failure','cancelled','timed_out'])
+    def test_committed_checkpoint_survives_post_publication_cleanup_failure(conclusion):
+        a,r,j=metadata();j[0]['conclusion']=conclusion
+>       assert auth(a,r,j)['artifact_id']==10
+               ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:29: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+artifact = {'id': 10, 'name': 'checkpoint-smoke-capture-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1', 'expired': False, 'size_in_bytes': 100, ...}
+run = {'id': 20, 'head_sha': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'head_branch': 'sol/durable-proof-map', 'event': 'workflow_dispatch', ...}
+jobs = [{'name': 'capture', 'head_sha': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'completed', 'conclusion': 'failure', ...}]
+name = 'checkpoint-smoke-capture-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1'
+job = 'capture', head = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', run_id = 20
+now = datetime.datetime(2026, 11, 11, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def authenticate(artifact,run,jobs,*,name,job,head,run_id,now=None):
+        c.integer(run_id,'run id',1);c.hexadecimal(head,40,'producer head')
+        if (type(run) is not dict or run.get('id')!=run_id or run.get('head_sha')!=head
+            or run.get('head_branch')!=BRANCH or run.get('path')!=c.WORKFLOW
+            or run.get('event') not in ('push','workflow_dispatch')
+            or run.get('status') not in ('in_progress','completed')):raise ValueError('checkpoint run differs')
+        result=reference(artifact,name=name,job=job,head=head,run_id=run_id)
+        created=_timestamp(artifact.get('created_at'));expires=_timestamp(artifact.get('expires_at'))
+        now=datetime.now(timezone.utc) if now is None else now
+        if now.tzinfo is None or not created<expires or now.astimezone(timezone.utc)>=expires:raise ValueError('checkpoint expired')
+        matches=[x for x in jobs if type(x) is dict and x.get('name')==job and x.get('head_sha')==head
+            and x.get('status')=='completed' and x.get('conclusion')=='success'
+            and _timestamp(x.get('started_at'))<=created<=_timestamp(x.get('completed_at'))]
+>       if len(matches)!=1:raise ValueError('checkpoint requires one completed successful producer')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: checkpoint requires one completed successful producer
+
+simulation/stage_0_6_genesis_transport.py:50: ValueError
+_ test_committed_checkpoint_survives_post_publication_cleanup_failure[cancelled] _
+
+conclusion = 'cancelled'
+
+    @pytest.mark.parametrize('conclusion',['failure','cancelled','timed_out'])
+    def test_committed_checkpoint_survives_post_publication_cleanup_failure(conclusion):
+        a,r,j=metadata();j[0]['conclusion']=conclusion
+>       assert auth(a,r,j)['artifact_id']==10
+               ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:29: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+artifact = {'id': 10, 'name': 'checkpoint-smoke-capture-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1', 'expired': False, 'size_in_bytes': 100, ...}
+run = {'id': 20, 'head_sha': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'head_branch': 'sol/durable-proof-map', 'event': 'workflow_dispatch', ...}
+jobs = [{'name': 'capture', 'head_sha': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'completed', 'conclusion': 'cancelled', ...}]
+name = 'checkpoint-smoke-capture-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1'
+job = 'capture', head = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', run_id = 20
+now = datetime.datetime(2026, 11, 11, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def authenticate(artifact,run,jobs,*,name,job,head,run_id,now=None):
+        c.integer(run_id,'run id',1);c.hexadecimal(head,40,'producer head')
+        if (type(run) is not dict or run.get('id')!=run_id or run.get('head_sha')!=head
+            or run.get('head_branch')!=BRANCH or run.get('path')!=c.WORKFLOW
+            or run.get('event') not in ('push','workflow_dispatch')
+            or run.get('status') not in ('in_progress','completed')):raise ValueError('checkpoint run differs')
+        result=reference(artifact,name=name,job=job,head=head,run_id=run_id)
+        created=_timestamp(artifact.get('created_at'));expires=_timestamp(artifact.get('expires_at'))
+        now=datetime.now(timezone.utc) if now is None else now
+        if now.tzinfo is None or not created<expires or now.astimezone(timezone.utc)>=expires:raise ValueError('checkpoint expired')
+        matches=[x for x in jobs if type(x) is dict and x.get('name')==job and x.get('head_sha')==head
+            and x.get('status')=='completed' and x.get('conclusion')=='success'
+            and _timestamp(x.get('started_at'))<=created<=_timestamp(x.get('completed_at'))]
+>       if len(matches)!=1:raise ValueError('checkpoint requires one completed successful producer')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: checkpoint requires one completed successful producer
+
+simulation/stage_0_6_genesis_transport.py:50: ValueError
+_ test_committed_checkpoint_survives_post_publication_cleanup_failure[timed_out] _
+
+conclusion = 'timed_out'
+
+    @pytest.mark.parametrize('conclusion',['failure','cancelled','timed_out'])
+    def test_committed_checkpoint_survives_post_publication_cleanup_failure(conclusion):
+        a,r,j=metadata();j[0]['conclusion']=conclusion
+>       assert auth(a,r,j)['artifact_id']==10
+               ^^^^^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_transport.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.github/tests/test_stage_0_6_genesis_transport.py:29: in auth
+    return api().authenticate(a,r,j,name=a['name'],job='capture',head='a'*40,run_id=20,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+artifact = {'id': 10, 'name': 'checkpoint-smoke-capture-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1', 'expired': False, 'size_in_bytes': 100, ...}
+run = {'id': 20, 'head_sha': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'head_branch': 'sol/durable-proof-map', 'event': 'workflow_dispatch', ...}
+jobs = [{'name': 'capture', 'head_sha': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'completed', 'conclusion': 'timed_out', ...}]
+name = 'checkpoint-smoke-capture-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1'
+job = 'capture', head = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', run_id = 20
+now = datetime.datetime(2026, 11, 11, 0, 0, tzinfo=datetime.timezone.utc)
+
+    def authenticate(artifact,run,jobs,*,name,job,head,run_id,now=None):
+        c.integer(run_id,'run id',1);c.hexadecimal(head,40,'producer head')
+        if (type(run) is not dict or run.get('id')!=run_id or run.get('head_sha')!=head
+            or run.get('head_branch')!=BRANCH or run.get('path')!=c.WORKFLOW
+            or run.get('event') not in ('push','workflow_dispatch')
+            or run.get('status') not in ('in_progress','completed')):raise ValueError('checkpoint run differs')
+        result=reference(artifact,name=name,job=job,head=head,run_id=run_id)
+        created=_timestamp(artifact.get('created_at'));expires=_timestamp(artifact.get('expires_at'))
+        now=datetime.now(timezone.utc) if now is None else now
+        if now.tzinfo is None or not created<expires or now.astimezone(timezone.utc)>=expires:raise ValueError('checkpoint expired')
+        matches=[x for x in jobs if type(x) is dict and x.get('name')==job and x.get('head_sha')==head
+            and x.get('status')=='completed' and x.get('conclusion')=='success'
+            and _timestamp(x.get('started_at'))<=created<=_timestamp(x.get('completed_at'))]
+>       if len(matches)!=1:raise ValueError('checkpoint requires one completed successful producer')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: checkpoint requires one completed successful producer
+
+simulation/stage_0_6_genesis_transport.py:50: ValueError
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[seal_failed] _
+
+damage = 'seal_failed'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[metadata_cancelled] _
+
+damage = 'metadata_cancelled'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[data_failed] _
+
+damage = 'data_failed'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[step_order] _
+
+damage = 'step_order'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[duplicate_step] _
+
+damage = 'duplicate_step'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[created_outside_step] _
+
+damage = 'created_outside_step'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+_ test_checkpoint_commit_requires_exact_successful_publication_steps[wrong_attempt] _
+
+damage = 'wrong_attempt'
+
+    @pytest.mark.parametrize('damage',['seal_failed','metadata_cancelled','data_failed','step_order','duplicate_step','created_outside_step','wrong_attempt','in_progress'])
+    def test_checkpoint_commit_requires_exact_successful_publication_steps(damage):
+        a,r,j=metadata();steps=j[0]['steps']
+        if damage=='seal_failed':steps[1]['conclusion']='failure'
+        elif damage=='metadata_cancelled':steps[2]['conclusion']='cancelled'
+        elif damage=='data_failed':steps[0]['conclusion']='failure'
+        elif damage=='step_order':steps[0]['number']=8
+        elif damage=='duplicate_step':steps.append(copy.deepcopy(steps[2]))
+        elif damage=='created_outside_step':a['created_at']='2026-11-10T01:00:00Z'
+        elif damage=='wrong_attempt':j[0]['run_attempt']=2
+        else:j[0]['status']='in_progress'
+>       with pytest.raises(ValueError):auth(a,r,j)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+.github/tests/test_stage_0_6_genesis_transport.py:84: Failed
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_committed_checkpoint_survives_post_publication_cleanup_failure[failure]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_committed_checkpoint_survives_post_publication_cleanup_failure[cancelled]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_committed_checkpoint_survives_post_publication_cleanup_failure[timed_out]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[seal_failed]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[metadata_cancelled]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[data_failed]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[step_order]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[duplicate_step]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[created_outside_step]
+FAILED .github/tests/test_stage_0_6_genesis_transport.py::test_checkpoint_commit_requires_exact_successful_publication_steps[wrong_attempt]
+10 failed, 13 passed in 0.10s

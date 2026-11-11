@@ -1,0 +1,44 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_original_green_jobs_survive_a_later_failed_rerun_attempt _________
+
+    def test_original_green_jobs_survive_a_later_failed_rerun_attempt():
+>       m=api();r,j,s=green();r['run_attempt']=2
+                      ^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def green():
+        m=api()
+        run=dict(id=m.GREEN_RUN,head_sha=m.GREEN_SHA,head_branch='sol/durable-proof-map',
+            path='.github/workflows/stage-0-5-proof-map-validation.yml',event='push',run_attempt=1,
+            status='completed',conclusion='failure')
+>       jobs=[dict(id=m.GREEN_JOBS[name],name=name,head_sha=m.GREEN_SHA,status='completed',conclusion='success') for name in ('proof-map','full-suite')]
+                      ^^^^^^^^^^^^
+E       AttributeError: module 'simulation.stage_0_6_genesis_resume' has no attribute 'GREEN_JOBS'
+
+.github/tests/test_stage_0_6_genesis_resume.py:18: AttributeError
+__________ test_green_source_receipt_software_must_match_hosted_tuple __________
+
+    def test_green_source_receipt_software_must_match_hosted_tuple():
+>       m=api();r,j,s=green();s['proof-map']['sqlite']='3.53.1'
+                      ^^^^^^^
+
+.github/tests/test_stage_0_6_genesis_resume.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def green():
+        m=api()
+        run=dict(id=m.GREEN_RUN,head_sha=m.GREEN_SHA,head_branch='sol/durable-proof-map',
+            path='.github/workflows/stage-0-5-proof-map-validation.yml',event='push',run_attempt=1,
+            status='completed',conclusion='failure')
+>       jobs=[dict(id=m.GREEN_JOBS[name],name=name,head_sha=m.GREEN_SHA,status='completed',conclusion='success') for name in ('proof-map','full-suite')]
+                      ^^^^^^^^^^^^
+E       AttributeError: module 'simulation.stage_0_6_genesis_resume' has no attribute 'GREEN_JOBS'
+
+.github/tests/test_stage_0_6_genesis_resume.py:18: AttributeError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_original_green_jobs_survive_a_later_failed_rerun_attempt
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_green_source_receipt_software_must_match_hosted_tuple
+2 failed, 18 deselected in 0.07s

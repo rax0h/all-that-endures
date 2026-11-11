@@ -1,0 +1,5 @@
+{
+  "acceptance": "not-accepted",
+  "error": "BudgetExpired: construction phase budget exhausted",
+  "status": "error"
+}

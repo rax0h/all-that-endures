@@ -1,0 +1,55 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_requested_measure_budget_is_enforced_and_recorded ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-22/test_requested_measure_budget_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efcd3f9f490>
+
+    def test_requested_measure_budget_is_enforced_and_recorded(tmp_path,monkeypatch):
+        import json,time
+        from simulation.profile_stage_0_5_performance import BudgetExpired
+        m=api();path,row=setup_source(tmp_path)
+        for stage in ('source_digest','capture','catalog','rebase','after_digest','proofs'):row,path=advance(m,tmp_path,row,path,stage)
+        retained=c.file_hash(path)
+        from ate_sim import persistence_proof_world_session as session_api
+        real=session_api.open_proof_world_session
+        def slow_open(*a,**k):
+            time.sleep(2)
+            raise AssertionError('requested aggregate deadline did not interrupt open')
+        monkeypatch.setattr(session_api,'open_proof_world_session',slow_open)
+        with pytest.raises(BudgetExpired):
+>           m.run_stage('measure',row,path,tmp_path/'stage-measure',producer=producer('measure'),budget=1)
+
+.github/tests/test_stage_0_6_genesis_stages.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/stage_0_6_genesis_stages.py:189: in run_stage
+    rec.measure(stage,action)
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:182: in action
+    elif stage=='measure':result=_measure(working,input_receipt,rec.output/'operational')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:122: in _measure
+    session=rec.measure('open',lambda:open_proof_world_session(path,rules_id=ctx['rules_id'],expected_commitment=bytes.fromhex(receipt['proof_commitment'])))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/stage_0_6_mature_benchmark.py:64: in measure
+    value=operation();row['status']='complete';return value
+          ^^^^^^^^^^^
+simulation/stage_0_6_genesis_stages.py:122: in <lambda>
+    session=rec.measure('open',lambda:open_proof_world_session(path,rules_id=ctx['rules_id'],expected_commitment=bytes.fromhex(receipt['proof_commitment'])))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (PosixPath('/tmp/pytest-of-agent/pytest-22/test_requested_measure_budget_0/.proof-stage-wi1upue8/working.sqlite'),)
+k = {'rules_id': 'private-catalog-copy', 'expected_commitment': b"IgC\xd2\x93\x06\xe4\xe0\x1a\xb6\x03:\xf1\xfa\xc5B\x99\xba\xd4\x97\xdc\x82\xbf'\x8b`\x1fV\xbe\x07\xf3\xbd"}
+
+    def slow_open(*a,**k):
+        time.sleep(2)
+>       raise AssertionError('requested aggregate deadline did not interrupt open')
+E       AssertionError: requested aggregate deadline did not interrupt open
+
+.github/tests/test_stage_0_6_genesis_stages.py:178: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_stages.py::test_requested_measure_budget_is_enforced_and_recorded
+1 failed, 8 deselected in 2.98s

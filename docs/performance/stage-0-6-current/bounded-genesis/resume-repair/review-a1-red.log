@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_source_digest_restart_keeps_the_selected_sources_original_run ______
+
+    def test_source_digest_restart_keeps_the_selected_sources_original_run():
+        from pathlib import Path
+        import yaml
+        w=yaml.safe_load(Path('.github/workflows/stage-0-6-resumable-proof-genesis.yml').read_text())
+        worker=next(s for s in w['jobs']['source-digest']['steps'] if s.get('id')=='run')
+>       assert worker['env']['PARENT_RUN']=='${{ needs.gate.outputs.run_id }}', 'an earlier-run source artifact must not be relabeled with the new run id'
+E       AssertionError: an earlier-run source artifact must not be relabeled with the new run id
+E       assert '${{ needs.ga...uts.run_id }}' == '${{ needs.ga...uts.run_id }}'
+E         
+E         - ${{ needs.gate.outputs.run_id }}
+E         + ${{ needs.gate.outputs.artifact_id && github.run_id || needs.gate.outputs.run_id }}
+
+.github/tests/test_stage_0_6_genesis_resume.py:162: AssertionError
+=========================== short test summary info ============================
+FAILED .github/tests/test_stage_0_6_genesis_resume.py::test_source_digest_restart_keeps_the_selected_sources_original_run
+1 failed, 23 deselected in 0.09s

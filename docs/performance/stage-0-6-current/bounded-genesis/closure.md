@@ -93,3 +93,53 @@ failure; they are observations with their original source/runtime fences.
 Final independent whole-package closure: review-raw/timeout-repair-review/final-ordinary-review.md,62existing regressions18.50s and188stable source/test/spec hashes. Runtime94267bb00a219702a4bd1700a2fc0600a5c5aa56 and all17request fingerprints verified. Final unchanged13phase driver passed at clean localbec836a with the same runtime; receipt is timeout-repair/final-real-year-receipt.json. Earlier source/runtime observations are retained. Hosted validation and mature-performance acceptance remain T10, not implied by these local gates.
 
 Final mature job harness:84passed/1deliberate duplicate-ZIP warning in19.86s. Raw sequential small constructor pair:28.279sbaseline→15.045srepair, source SHA/canonical digest identical; single uncontrolled-cache observation only. Final code fences and request hashes still match94267bb0.
+
+
+## November10 second timeout — resumable execution group
+
+42823293423 at9e6/runtime94267 completed5023tests/2subtests in9014.99s and
+proof-map successfully. These exact prerequisite jobs remain usable; their
+parent run's mature failure does not invalidate them. Authenticated source/log
+receipts and artifact hashes are in resume-repair/green-42823293423 and
+failure-summary.json. The mature constructor exhausted12600s in its first
+canonical digest. Capture/physical checking plus catalog/reference work had
+already consumed approximately198min. No rebase/proofs/operational timings ran.
+The original source bytes remained intact. The old workflow retained logs only,
+so its private preparation DB is gone; the new protocol cannot recover it retroactively.
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| U1 | Second timeout and user direction | Replace aggregate monolith with independently bounded source_digest/capture/catalog/rebase/after_digest/proofs/measure/fresh_restore jobs. Source digest control runs first, before costly preparation. | Implemented locally; hosted smoke pending |
+| U2 | Lost completed preparation | Closed database data artifacts plus sealed metadata receipts bind source/code/software/options/parents and exact hashes. Read-only phases reuse large data; consumers authenticate completed authoritative publication steps even if later cleanup/job/run failed; see A2/A4. | Local corruption/provenance/recovery controls pass; cloud transport pending |
+| U3 | Unnecessary suite reruns | Exact immutable9e6green jobIDs/source archives, unchanged94267engine, basic hosted software and full portable runtime fingerprint. New workflow/request/tests avoid all old monolith trigger paths. | Implemented; old engine/trigger blobs unchanged |
+| U4 | Original-source vs copied baseline | Independent architect approved format6-only stronger original-source control. Native copy/catalog source data stay exact; rebase/after-digest must match before proofs. No source/catalog authority comes from a digest receipt. | Code/alias/equality/3actual-audit tests pass |
+| U5 | SQL certificate lifetime | Keep six builders in one real owned transaction, with fresh actual audit on each retry and mandatory final World/physical checks. SourceAuditMemo never persists. Earlier completed checkpoints survive; unfinished proof transaction must restart. | Deliberate bounded failure unit; retry tests cover it |
+| U6 | Last deep check discarding saves | Measure publishes a closed saved generation1 checkpoint before separate fresh-process validation. Forced late failure recovers directly from saved checkpoint. Known missed mature speed targets stop before deep restore/digest. | Local complete generated World/recovery/target controls pass |
+| U7 | Input/working-file boundaries | One-shot authenticated capture adapter checks exact paths/options; source and private-parent symlinks rejected. Owned closed output transfer avoids another full database copy. Prior inputs are never writable hardlinks. | RED/GREEN retained |
+| U8 | Actual hosted recovery proof | Smoke-only child process exits77 during real rebase transaction on an actual downloaded catalog checkpoint; parent remains exact, no partial checkpoint exists; next ordinary process restores/resumes. Helper code is fenced and cannot run in mature mode. | Ready for independent review and actual hosted smoke |
+| U9 | Honest completion gate | Actual completed phase times, exact saved commitment, seed/year/generation/digest and zero full-World fallback are required. False flags/censored phases/mixed contexts/expired artifacts fail before acceptance. | Local targeted tests pass |
+| U10 | Remaining mature acceptance | Protected workflow must pass real hosted smoke before mature request. Checkpoints have30day GitHub retention, not indefinite storage. Unknown unfinished phase/network/machine failures remain possible; no automatic full restart/retry. Mature10sopen/2ssave/1swarm and exact1002digest remain unmeasured. | OPEN |
+
+Independent whole-package findings are appended to this same register and resolved
+here, including Minor items. No new mature run has been authorized by a green
+small fixture alone; require successful hosted transport/recovery proof and reuse
+the already-green engine tests. No main merge/default activation/endurance.
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| A1 | Independent whole-package review, earlier-run source restart | First source-digest worker uses the gate's selected producer run ID directly, including when the source metadata artifact comes from a previous run. review-a1-red/green.log observes the wrong-origin case and corrected mapping. | Fixed; final independent source closure below |
+| A2 | Independent review, committed checkpoint lost to diagnostics/cleanup | All diagnostic evidence uploads are nonfatal. Data/seal/metadata remain fatal. Authenticate unique completed producer custody through ordered successful publication steps and artifact upload timestamps, so later cleanup failure does not discard committed work. Failed current DAG stops; explicit resume may reuse its committed predecessor. Original green jobs still require success. review-a2-red/green.log and publication-commit-red/publication-attempt-green.log preserve coverage. | Fixed; final independent source closure below |
+| A3 | Independent review, unused aggregate measure budget | One aggregate monotonic deadline covers working copy and every measured operation; each phase is capped by its own limit and remaining aggregate time. No conflicting nested alarm, no null aggregate budget in receipt. review-a3-red-control/red/green.log demonstrates budget expiry in a deliberately slow open. | Fixed; final independent source closure below |
+| A4 | Independent review follow-through, checkpoint attempt binding | Receipt producer attempt binds the exact immutable metadata artifact name; jobs API attempt must match when supplied. Wrong attempt, missing/duplicate/incomplete/reordered publication steps and out-of-upload artifact times reject. Transport/resume tests pass52/52 in0.31s; final new-module tests pass72/72 in98.76s. | Fixed; final independent source closure below |
+
+Suites overlap; counts are not additive. Independent review evidence is retained
+in resume-repair/independent-review. Final hosted transport/recovery and mature
+performance gates remain open regardless of local review/test success.
+
+
+A1–A4 independently CLOSED: resume-repair/independent-review/closure-addendum.md
+and234-file closure-fence.json verify the final fixes, stable42critical dependencies
+and unchanged runtime/monolith paths. Independent new-module run72passed98.76s;
+root final affected run156passed77.87s with1deliberate duplicate-ZIP warning.
+Raw logs/XML and the matching full313fingerprint are retained. No deferred finding.
+U8/U10 remain actual hosted/mature acceptance gates, not local review findings.
