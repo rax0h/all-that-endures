@@ -1,0 +1,22 @@
+{
+  "phase": "rebase.audit_pending_owned_bootstrap",
+  "resources": {
+    "block_inputs": 0,
+    "block_outputs": 109456,
+    "cpu_seconds": 4.277942316,
+    "major_faults": 0,
+    "minor_faults": 11603,
+    "peak_rss_bytes": 49750016,
+    "process_io": {
+      "cancelled_write_bytes": 2830336,
+      "rchar": 313325033,
+      "read_bytes": 0,
+      "syscr": 75806,
+      "syscw": 144817,
+      "wchar": 332484180,
+      "write_bytes": 56041472
+    },
+    "rss_bytes": 46391296
+  },
+  "time": 1794373109.6461823
+}

@@ -1,0 +1,22 @@
+{
+  "phase": "rebase.full_audit",
+  "resources": {
+    "block_inputs": 0,
+    "block_outputs": 71704,
+    "cpu_seconds": 1.597883847,
+    "major_faults": 0,
+    "minor_faults": 11186,
+    "peak_rss_bytes": 49750016,
+    "process_io": {
+      "cancelled_write_bytes": 2723840,
+      "rchar": 83686898,
+      "read_bytes": 0,
+      "syscr": 19182,
+      "syscw": 631,
+      "wchar": 36728569,
+      "write_bytes": 36712448
+    },
+    "rss_bytes": 44683264
+  },
+  "time": 1794373106.756923
+}

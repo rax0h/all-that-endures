@@ -1,0 +1,22 @@
+{
+  "phase": "rebase.ordinary_complete",
+  "resources": {
+    "block_inputs": 0,
+    "block_outputs": 76248,
+    "cpu_seconds": 2.340434609,
+    "major_faults": 0,
+    "minor_faults": 11603,
+    "peak_rss_bytes": 49750016,
+    "process_io": {
+      "cancelled_write_bytes": 2727936,
+      "rchar": 146911502,
+      "read_bytes": 0,
+      "syscr": 35136,
+      "syscw": 1625,
+      "wchar": 38837201,
+      "write_bytes": 39038976
+    },
+    "rss_bytes": 46391296
+  },
+  "time": 1794373107.5367856
+}

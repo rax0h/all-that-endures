@@ -1,0 +1,26 @@
+[
+  {
+    "id": 12849181590,
+    "name": "stage-0-6-authenticated-input-b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+    "expired": false,
+    "expires_at": "2026-11-27T20:23:25Z",
+    "digest": "sha256:4f040569fb91cef482bd5706230bcada058788a747278b99df7cca2c137d373f",
+    "bytes": 4419106896
+  },
+  {
+    "id": 13778449621,
+    "name": "stage-0-5-proof-map-suite-9e6f022fa556c25394dfd381f4d7d0356e5d8711",
+    "expired": false,
+    "expires_at": "2026-11-24T15:48:44Z",
+    "digest": "sha256:2c1bd46f45c878bef22131acf4d3b1b70bb9ceef7527bc3f1a1a1652be7cb333",
+    "bytes": 193149
+  },
+  {
+    "id": 13774870495,
+    "name": "stage-0-5-proof-map-9e6f022fa556c25394dfd381f4d7d0356e5d8711",
+    "expired": false,
+    "expires_at": "2026-11-24T14:39:46Z",
+    "digest": "sha256:24fd08053d558e6f9bad1a19b187afef143e7536db5137f3d75c7a6862b8ec87",
+    "bytes": 210984
+  }
+]

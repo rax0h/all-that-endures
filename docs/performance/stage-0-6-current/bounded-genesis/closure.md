@@ -78,11 +78,11 @@ as a save failure, a memory failure, or an integrity assertion failure.
 | T5 | Private transfer/digest optimization boundary | Default native transfer retains full source+target audits. Proof-only native transfer retains source+target physical checks and mandatory pre-rebase semantic audit. Staged checksum damage still fails before rewrite/publication. Canonical digest equality unchanged; both bodies use owned read-only contexts with lifecycle outside. |Closed independently;77affected tests29.97s and62independent tests18.50s |
 | T6 | Timeout receipt inconsistency | Preserve internal timeout as censored even when Python exits1; original RED and repair/harness passes retained in timeout-repair. | Closed locally |
 | T7 | Measurement input custody | First shared-input probes failed byte hash and are invalid; raw failures retained. Repeat probes use independent byte-identical inputs and explicit canonical expectation. Record operation counts separately from raw timings. | Corrected; no speed claim from invalid samples |
-| T8 | Changed local OS tuple and earlier R6 | Unchanged13phase baseline passed on313.5/GCC14.2.0/SQLite3.46.1; full new fingerprint recorded. Historical312 positives/negatives retained without attributing cause. Hosted85f full/proof/13phase green closes that candidate's hosted prerequisite; final repair still needs unchanged13phase and hosted suite. | Final repair13phase passed locally; hosted/mature gates pending |
+| T8 | Changed local OS tuple and earlier R6 | Unchanged13phase baseline passed on313.5/GCC14.2.0/SQLite3.46.1; full new fingerprint recorded. Historical312 positives/negatives retained without attributing cause. Hosted85f full/proof/13phase green closes that candidate's hosted prerequisite; final repair still needs unchanged13phase and hosted suite. | Final repair13phase passed locally and hosted9e6full/proof jobs passed; mature gate remains U10 |
 | T9 | Cleanup and progress detail | Removed unused schema imports; emit source audit, copied table, catalog stage, rebase and final physical audit phases. No construction budget increase. | Closed independently; source/spec fence verified |
 | T11 | Final independent Minor documentation finding | Mark earlier312 negative qualification paragraphs historical and link R6 to the current T8 gate, retaining all raw observations. | Closed independently; final-ordinary-review verifies reconciliation |
 | T12 | Overbroad local test selection | Compatibility command reached320completed cases, then was intentionally interrupted in unchanged cold archive400segment tracemalloc benchmark (hosted baseline1027s). That backend does not import changed GuardedConnection. Remaining27targeted cases pass0.61s; full hosted suite retains the benchmark. Raw interrupted log is preserved and not represented as a complete348test pass. | Closed by scoped local contract; full hosted suite remains gating |
-| T10 | Stage0.6 mature acceptance | Repeat one bundled hosted candidate with exact runtime/request fingerprints, full/proof prerequisites and gated original mature fixture. Reach proof open, first year, save, warm year and fresh-process digest. Targets10s/2s/1s remain unmeasured. | OPEN |
+| T10 | Stage0.6 mature acceptance | Historical bundled execution is superseded by U1–U10 after the second constructor timeout. Exact9e6full/proof prerequisites passed and are reused. Reach actual mature open/save/warm/fresh digest through the protected staged workflow. | OPEN as U10 |
 
 The final repair evidence lives in timeout-repair. Earlier test sets overlap and
 must not be summed. Local bounded component probes do not establish total mature
@@ -109,15 +109,15 @@ so its private preparation DB is gone; the new protocol cannot recover it retroa
 
 | ID | Origin | Concrete action/evidence | Status |
 |---|---|---|---|
-| U1 | Second timeout and user direction | Replace aggregate monolith with independently bounded source_digest/capture/catalog/rebase/after_digest/proofs/measure/fresh_restore jobs. Source digest control runs first, before costly preparation. | Implemented locally; hosted smoke pending |
-| U2 | Lost completed preparation | Closed database data artifacts plus sealed metadata receipts bind source/code/software/options/parents and exact hashes. Read-only phases reuse large data; consumers authenticate completed authoritative publication steps even if later cleanup/job/run failed; see A2/A4. | Local corruption/provenance/recovery controls pass; cloud transport pending |
-| U3 | Unnecessary suite reruns | Exact immutable9e6green jobIDs/source archives, unchanged94267engine, basic hosted software and full portable runtime fingerprint. New workflow/request/tests avoid all old monolith trigger paths. | Implemented; old engine/trigger blobs unchanged |
-| U4 | Original-source vs copied baseline | Independent architect approved format6-only stronger original-source control. Native copy/catalog source data stay exact; rebase/after-digest must match before proofs. No source/catalog authority comes from a digest receipt. | Code/alias/equality/3actual-audit tests pass |
+| U1 | Second timeout and user direction | Replace aggregate monolith with independently bounded source_digest/capture/catalog/rebase/after_digest/proofs/measure/fresh_restore jobs. Source digest control runs first, before costly preparation. | Hosted smoke42961490569 passed; mature performance remains U10 |
+| U2 | Lost completed preparation | Closed database data artifacts plus sealed metadata receipts bind source/code/software/options/parents and exact hashes. Read-only phases reuse large data; consumers authenticate completed authoritative publication steps even if later cleanup/job/run failed; see A2/A4. | Closed independently and actual hosted transport/recovery passed42961490569 |
+| U3 | Unnecessary suite reruns | Exact immutable9e6green jobIDs/source archives, unchanged94267engine, basic hosted software and full portable runtime fingerprint. New workflow/request/tests avoid all old monolith trigger paths. | Hosted gate reused both exact green jobs; old engine/trigger blobs unchanged |
+| U4 | Original-source vs copied baseline | Independent architect approved format6-only stronger original-source control. Native copy/catalog source data stay exact; rebase/after-digest must match before proofs. No source/catalog authority comes from a digest receipt. | Independent controls pass; hosted original/post-rebase digests match |
 | U5 | SQL certificate lifetime | Keep six builders in one real owned transaction, with fresh actual audit on each retry and mandatory final World/physical checks. SourceAuditMemo never persists. Earlier completed checkpoints survive; unfinished proof transaction must restart. | Deliberate bounded failure unit; retry tests cover it |
-| U6 | Last deep check discarding saves | Measure publishes a closed saved generation1 checkpoint before separate fresh-process validation. Forced late failure recovers directly from saved checkpoint. Known missed mature speed targets stop before deep restore/digest. | Local complete generated World/recovery/target controls pass |
+| U6 | Last deep check discarding saves | Measure publishes a closed saved generation1 checkpoint before separate fresh-process validation. Forced late failure recovers directly from saved checkpoint. Known missed mature speed targets stop before deep restore/digest. | Local late-failure controls and hosted saved/fresh separation pass |
 | U7 | Input/working-file boundaries | One-shot authenticated capture adapter checks exact paths/options; source and private-parent symlinks rejected. Owned closed output transfer avoids another full database copy. Prior inputs are never writable hardlinks. | RED/GREEN retained |
-| U8 | Actual hosted recovery proof | Smoke-only child process exits77 during real rebase transaction on an actual downloaded catalog checkpoint; parent remains exact, no partial checkpoint exists; next ordinary process restores/resumes. Helper code is fenced and cannot run in mature mode. | Ready for independent review and actual hosted smoke |
-| U9 | Honest completion gate | Actual completed phase times, exact saved commitment, seed/year/generation/digest and zero full-World fallback are required. False flags/censored phases/mixed contexts/expired artifacts fail before acceptance. | Local targeted tests pass |
+| U8 | Actual hosted recovery proof | Smoke-only child process exits77 during real rebase transaction on an actual downloaded catalog checkpoint; parent remains exact, no partial checkpoint exists; next ordinary process restores/resumes. Helper code is fenced and cannot run in mature mode. | CLOSED independently and hosted42961490569 actual crash/retry passed |
+| U9 | Honest completion gate | Actual completed phase times, exact saved commitment, seed/year/generation/digest and zero full-World fallback are required. False flags/censored phases/mixed contexts/expired artifacts fail before acceptance. | Local target controls and hosted smoke-functional-only acceptance pass |
 | U10 | Remaining mature acceptance | Protected workflow must pass real hosted smoke before mature request. Checkpoints have30day GitHub retention, not indefinite storage. Unknown unfinished phase/network/machine failures remain possible; no automatic full restart/retry. Mature10sopen/2ssave/1swarm and exact1002digest remain unmeasured. | OPEN |
 
 Independent whole-package findings are appended to this same register and resolved
@@ -143,3 +143,17 @@ and unchanged runtime/monolith paths. Independent new-module run72passed98.76s;
 root final affected run156passed77.87s with1deliberate duplicate-ZIP warning.
 Raw logs/XML and the matching full313fingerprint are retained. No deferred finding.
 U8/U10 remain actual hosted/mature acceptance gates, not local review findings.
+
+
+Hosted smoke42961490569 atb79039d passed all10jobs. U1/U2/U4/U6/U8/U9 now have
+actual hosted evidence: immutable artifact transfer across workers, equal
+source/post-rebase canonical digests, forced mid-transaction crash, exact retained
+catalog, ordinary-process retry, all six proof builders, saved generation1,
+separate fresh-process exact continuation and smoke-functional-only acceptance.
+U8 is CLOSED. The final checkpoint metadata artifact13830202476 has archive
+SHA2562f28f6eb9f8c51fb09d203f174fecf889d6cb06e17d74d7fede608b9206a942f;
+its parent is the separately published saved database13830281649. Raw authenticated
+evidence and actual availability checks are in resume-repair/hosted-smoke-42961490569.
+No mature metrics follow from this smoke. U10 remains OPEN; mature-launch.md
+records restart units, retained outputs, input expiry and compute/transport/
+publication limits before the protected mature request.

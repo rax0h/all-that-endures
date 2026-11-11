@@ -1,0 +1,22 @@
+{
+  "phase": "rebase.lazy_identity_occurrence_versions",
+  "resources": {
+    "block_inputs": 0,
+    "block_outputs": 106056,
+    "cpu_seconds": 4.160821009,
+    "major_faults": 0,
+    "minor_faults": 11603,
+    "peak_rss_bytes": 49750016,
+    "process_io": {
+      "cancelled_write_bytes": 2727936,
+      "rchar": 311608495,
+      "read_bytes": 0,
+      "syscr": 75377,
+      "syscw": 117499,
+      "wchar": 275523079,
+      "write_bytes": 54300672
+    },
+    "rss_bytes": 46391296
+  },
+  "time": 1794373109.521104
+}

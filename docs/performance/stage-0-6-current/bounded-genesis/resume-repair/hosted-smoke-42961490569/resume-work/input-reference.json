@@ -1,0 +1,25 @@
+{
+  "budget_seconds": 9000,
+  "context_sha256": "d09b0540dce8a5e659830f8158ef42488a00ded9d425bc89a9769e734d2432ce",
+  "database": {
+    "bytes": 16961536,
+    "format": 6,
+    "generation": 3,
+    "seed": 843000,
+    "sha256": "1d2cc62cae085f644042ec017ac4481c476cbdf65c5577218dbf91cc3c08ec2c",
+    "store_identity": "c8c84501-6f16-4b67-aacb-8213e8f52c7e",
+    "year": 1
+  },
+  "metadata_artifact": {
+    "archive_bytes": 6095,
+    "archive_sha256": "c1c88950de92cd0acd9a6244e19a82cdc6892ff255c5d293e39ec756b1ac1a6b",
+    "artifact_id": 13829422589,
+    "expires_at": "2026-12-11T04:56:48Z",
+    "head_sha": "b79039dbd026d20105702ade32533283b1efca0c",
+    "job": "catalog",
+    "kind": "github",
+    "name": "checkpoint-smoke-catalog-b79039dbd026d20105702ade32533283b1efca0c-1",
+    "run_id": 42961490569
+  },
+  "stage": "rebase"
+}

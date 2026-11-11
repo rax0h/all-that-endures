@@ -1,0 +1,22 @@
+{
+  "phase": "rebase.lazy_records_complete",
+  "resources": {
+    "block_inputs": 0,
+    "block_outputs": 92672,
+    "cpu_seconds": 2.811149889,
+    "major_faults": 0,
+    "minor_faults": 11603,
+    "peak_rss_bytes": 49750016,
+    "process_io": {
+      "cancelled_write_bytes": 2727936,
+      "rchar": 155386434,
+      "read_bytes": 0,
+      "syscr": 37217,
+      "syscw": 9382,
+      "wchar": 53884944,
+      "write_bytes": 47448064
+    },
+    "rss_bytes": 46391296
+  },
+  "time": 1794373108.1621568
+}

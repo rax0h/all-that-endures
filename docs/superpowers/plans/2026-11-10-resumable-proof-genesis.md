@@ -67,7 +67,7 @@ AGENTS.md future expensive-run rule.
 - [x] Preserve authenticated42823293423 green/failure evidence and phase timing analysis.
 - [x] Same independent reviewer checks whole package and recovery/provenance invariants.
 - [x] Close every actionable finding, verify final source fences and no engine change.
-- [ ] Publish one candidate to existing branch; small hosted smoke only first.
+- [x] Publish one candidate to existing branch; small hosted smoke only first.
 - [ ] Verify real checkpoint upload/download/restart success, then mature dispatch with
       explicit stage boundaries and green reuse; no monolithic rerun.
 - [ ] Report actual live run, remaining unmeasured gates and bounded remaining risks.

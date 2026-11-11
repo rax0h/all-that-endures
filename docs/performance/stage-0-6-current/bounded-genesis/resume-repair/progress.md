@@ -76,3 +76,31 @@ Task4: independent local closure complete; protected publication/small hosted
 transport and crash/recovery proof next. Request is mode=smoke with both external
 run IDs0. No mature launch before hosted smoke success. Stage0.6 acceptance remains
 OPEN until actual mature targets and exact saved1002digest pass.
+
+
+Protected hosted smoke launched atb79039dbd026d20105702ade32533283b1efca0c,
+run42961490569. Published tree014cfc1a64b3526af6955c421a96f0759e8918f0 exactly
+matches the tested local tree. Only the new resumable workflow started; the old
+monolith/full engine suite did not. Hosted156tests passed139.74s. Gate authenticated
+and reused both exact9e6prerequisites. Its first closed source DB and sealed
+metadata artifacts were published and consumed by the next independent worker.
+
+Observed hosted recovery: source_digest/capture/catalog/rebase/after_digest passed.
+Smoke-only worker exited77 mid-rebase; retained catalog hash stayed exact and no
+completed output was published. The following ordinary process restored the same
+parent and completed rebase. Rebase evidence artifact13830100976 is authenticated
+by SHA256b3fb9bd091c834e1317a8f463ee7c0b1f1ae50ac66088681bd6b8a9d5fbfe88a.
+The original-source and post-rebase digests matched. Raw gate/rebase artifacts and
+job logs are under hosted-smoke-42961490569. Proofs, measure/save, fresh restore and
+final smoke acceptance are still pending at this checkpoint; no mature launch yet.
+
+
+Task4 hosted smoke: complete. Run42961490569 concluded success at05:07:42UTC,
+all10jobs green. Final metadata13830202476 authenticated/extracted and validated
+locally without opening a database; acceptance matches its hosted acceptance log.
+Saved year2/gen1/seed843000 digestcebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451,
+world_audits0, saved DBartifact13830281649. This is smoke-functional-only.
+Protected mature request now selects the successful smoke and same budgets/code,
+resume_run_id0 (old failed monolith retained no reusable DB). Original/green
+artifacts are available with exact expiry recorded in mature-launch.md. No new
+implementation edits or unchanged full-suite rerun. Mature metrics/Stage0.6 remain OPEN.
