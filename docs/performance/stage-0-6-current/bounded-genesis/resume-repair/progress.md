@@ -104,3 +104,12 @@ Protected mature request now selects the successful smoke and same budgets/code,
 resume_run_id0 (old failed monolith retained no reusable DB). Original/green
 artifacts are available with exact expiry recorded in mature-launch.md. No new
 implementation edits or unchanged full-suite rerun. Mature metrics/Stage0.6 remain OPEN.
+
+
+Task4 protected dispatch: complete. Mature request78bf9b1 launched42964119253;
+gate130337246961 passed and selected mode=mature, fresh original reference with
+no database re-upload. Source-digest130337978833 is the first worker. Successful
+smoke42961490569, all42critical code fingerprints and exact green engine jobs
+are preserved. Local implementation/review/recovery work is complete; current
+external blocker is actual mature execution/targets (U10), not more unimplemented
+recovery work. Do not claim .6complete or launch another old monolithic run.

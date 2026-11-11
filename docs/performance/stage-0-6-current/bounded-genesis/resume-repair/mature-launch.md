@@ -64,3 +64,19 @@ fresh-process validation remain unmeasured. A known failed speed target stops
 before a further deep restore/digest while preserving the saved checkpoint.
 Stage0.6 is open until these real mature gates pass. No main merge, default
 activation or endurance execution is included.
+
+
+## Live execution checkpoint
+
+Published mature request78bf9b1b6033c789078446c08f5d371e6120b805 launched
+[run42964119253](https://github.com/rax0h/all-that-endures/actions/runs/42964119253).
+Its gate passed: targeted156tests, actual compatible smoke authentication,
+exact green prerequisite reuse and retained-original producer availability.
+Gate selected mode=mature, resume_index=-1, has_database=false, fresh=true.
+The first mature worker is source-digest (job130337978833). It starts with the
+original-source digest and cannot start capture/catalog until that control passes.
+No mature phase duration, speed target or Stage0.6 completion is claimed yet.
+Use this run's compatible committed checkpoints for any explicit resume; do not
+restart the old monolithic workflow. The complete gate log is
+mature-gate-42964119253.log. A later documentation-only commit does not change the
+worker's pinned78bf9b1producer source or its42critical dependencies.
