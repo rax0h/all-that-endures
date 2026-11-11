@@ -48,7 +48,7 @@ def event_domain(store_identity,codec_version):return _digest(b'ate-event-conten
 
 def _map(store,event=False):
     domain=(event_domain if event else version_domain)(store.store_identity,store.codec.version);nodes=ProofNodeStore(store.db)
-    return ProofMap(domain,lambda d:nodes.read(domain,d),lambda d,raw:nodes.write(domain,d,raw))
+    return ProofMap(domain,lambda d:nodes._read_bound_bytes(domain,d),lambda d,raw:nodes.write(domain,d,raw))
 
 
 def _root_bytes(cert):return b''.join(r.digest+r.count.to_bytes(8,'big') for r in (cert.versions,cert.events))

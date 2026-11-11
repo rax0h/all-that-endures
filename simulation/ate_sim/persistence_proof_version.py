@@ -123,7 +123,7 @@ def read_version_bytes(store, pin, certificate, expected_commitment, namespace, 
             raise StoreConflictError('version pin exceeds two-snapshot visibility')
         domain = version_domain(certificate.store_identity, certificate.codec_version)
         nodes = ProofNodeStore(store.db)
-        proof_map = ProofMap(domain, lambda d: nodes.read(domain, d), None)
+        proof_map = ProofMap(domain, lambda d: nodes._read_bound_bytes(domain, d), None)
         wanted = proof_map.get(certificate.content, encoded)
         # SQL guards run BEFORE transfer, including for malformed TEXT with NUL.
         body_ok = ("typeof(payload)='blob' AND typeof(memberships)='blob' "

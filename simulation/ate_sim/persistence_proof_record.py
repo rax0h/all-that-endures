@@ -76,7 +76,7 @@ def _schemas(db):
 
 def _map(store):
     domain=record_domain(store.store_identity,store.codec.version);nodes=ProofNodeStore(store.db)
-    return ProofMap(domain,lambda d:nodes.read(domain,d),lambda d,raw:nodes.write(domain,d,raw))
+    return ProofMap(domain,lambda d:nodes._read_bound_bytes(domain,d),lambda d,raw:nodes.write(domain,d,raw))
 
 
 def _root_checksum(cert,parent,pin_token,commit_token):

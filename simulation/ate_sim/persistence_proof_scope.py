@@ -101,7 +101,7 @@ def directory_domain(store_identity,codec_version,kind):
 
 def _map(store,kind):
     domain=directory_domain(store.store_identity,store.codec.version,kind);nodes=ProofNodeStore(store.db)
-    return ProofMap(domain,lambda d:nodes.read(domain,d),lambda d,raw:nodes.write(domain,d,raw))
+    return ProofMap(domain,lambda d:nodes._read_bound_bytes(domain,d),lambda d,raw:nodes.write(domain,d,raw))
 
 
 def _seek_domain(store,scope):

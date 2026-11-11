@@ -107,10 +107,19 @@ def decode_node(raw: bytes) -> Leaf | Branch:
     if not 2 <= count <= 16 or len(raw) != count_offset+1+count*41:
         raise StoreIntegrityError('invalid proof child inventory length')
     prefix = tuple((raw[7+i//2] >> (4 if i % 2 == 0 else 0)) & 15 for i in range(length))
-    children = tuple((raw[i], Root(raw[i+9:i+41], int.from_bytes(raw[i+1:i+9], 'big')))
-                     for i in range(count_offset+1, len(raw), 41))
-    result = Branch(prefix, children)
-    # The encoder checks order, counts, exact types and canonical shape too.
-    if encode_node(result) != raw:
-        raise StoreIntegrityError('noncanonical proof branch bytes')
-    return result
+    children = []
+    previous, total = -1, 0
+    for i in range(count_offset+1, len(raw), 41):
+        slot = raw[i]
+        child_count = int.from_bytes(raw[i+1:i+9], 'big')
+        if not previous < slot <= 15 or child_count == 0:
+            raise StoreIntegrityError('invalid proof child slot/count')
+        total += child_count
+        if total > MAX_COUNT:
+            raise StoreIntegrityError('proof count overflow')
+        # Exact inventory length guarantees each digest slice has 32 bytes.
+        # Parsed nibbles, slots and counts are exact ints; all containers and
+        # Root objects below are constructed here, not supplied by a caller.
+        children.append((slot, Root(raw[i+9:i+41], child_count)))
+        previous = slot
+    return Branch(prefix, tuple(children))

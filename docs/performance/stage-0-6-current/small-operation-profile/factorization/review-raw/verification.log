@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "differential_cases": 16086,
+  "accepted_cases": 8617,
+  "rejected_cases": 7469,
+  "sql_checks": [
+    "TEXT",
+    "INTEGER",
+    "REAL",
+    "OVERSIZED",
+    "MISSING",
+    "ADDRESS",
+    "ROOT_COUNT",
+    "REQUIRED_PREFIX",
+    "COLLISION_READBACK"
+  ],
+  "head": "aa35dfe2b47bbbb4b53c78fd9644bf96f0cd60a9",
+  "test_sha256": "46ffc7d74b31c97f176c6c4b31e4e799668def0d81475e7f7bed7af3cf7b4c42",
+  "compare_sha256": "9cc7308ba4f3ea9314dc2e15f1dcf602b0d0f12df902b2c86b95745939f15203",
+  "verification_script_sha256": "566f0563ad7e6221d8a8a970719fee71b8dde6cd220c9e0f4f4d0b03088e4914"
+}

@@ -47,7 +47,7 @@ class ReferenceFact:
 def domain(identity,codec):return _digest(b'ate-reference-facts-domain/1',_namespace(identity),_integer(codec,1))
 def _map(store):
     d=domain(store.store_identity,store.codec.version);nodes=ProofNodeStore(store.db)
-    return ProofMap(d,lambda h:nodes.read(d,h),lambda h,b:nodes.write(d,h,b))
+    return ProofMap(d,lambda h:nodes._read_bound_bytes(d,h),lambda h,b:nodes.write(d,h,b))
 
 def _reference(pair):
     from .persistence_lazy_nested_history import HistoryReference

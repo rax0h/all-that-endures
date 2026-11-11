@@ -24,6 +24,16 @@ class ProofNodeStore:
             raise StoreIntegrityError('invalid proof node address')
 
     def read(self, map_domain, digest):
+        raw = self._read_bound_bytes(map_domain, digest)
+        decode_node(raw)
+        return raw
+
+    def _read_bound_bytes(self, map_domain, digest):
+        """Fetch bounded, address-bound bytes; the caller must decode the node.
+
+        Only the fully checking ProofMap reader may consume this boundary in
+        place of public read. This is no canonical-node validation certificate.
+        """
         self._address(map_domain, digest)
         self._read_requests += 1
         # TEXT length stops at NUL. Check storage class before evaluating its
@@ -41,7 +51,6 @@ class ProofNodeStore:
         self._read_bytes += len(raw)
         if len(raw) != size or node_digest(map_domain, raw) != digest:
             raise StoreIntegrityError('stored proof node digest disagreement')
-        decode_node(raw)
         return raw
 
     def write(self, map_domain, digest, raw):

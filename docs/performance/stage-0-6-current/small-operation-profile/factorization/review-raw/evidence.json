@@ -1,0 +1,160 @@
+{
+  "status": "bounded-review-pass",
+  "findings": [],
+  "source_sha256": {
+    "simulation/ate_sim/persistence_proof_nodes.py": "202d30291fdefba820b40494f93ff8212d7f0305d7e9213a3f1a0bd8079843c5",
+    "simulation/ate_sim/persistence_proof_occurrence.py": "6383bbc5bef2e8b4a04d1c68810fb3c8137a302ac3c893b2a0e20ec03d591486",
+    "simulation/ate_sim/persistence_proof_publication.py": "362390dfb56a8ae394d7a96d5a2af9853127f89b6c9b7964cf6b461ced0bde47",
+    "simulation/ate_sim/persistence_proof_query.py": "1c4479205e5a85a7dd058e7ff3693a362e0d490c3d8aded0d653c799f6f31fbc",
+    "simulation/ate_sim/persistence_proof_record.py": "948f88c179f05c115e93e3d24ddedc5a04af3f0d05899d516b0f273d59e59341",
+    "simulation/ate_sim/persistence_proof_reference.py": "5d6fb54b15c38c57ed89e8829fdd49bd1fb7df7b4bd79de4b3f6a601b13a327e",
+    "simulation/ate_sim/persistence_proof_scope.py": "88cb1151686a90952fcea4223abffa0a3be1f0ef44a4a7d6222cda5d8b332b5c",
+    "simulation/ate_sim/persistence_proof_store.py": "106b7005898ef0263823315c21f4b85125cc735275c504136a8e94ef692e054c",
+    "simulation/ate_sim/persistence_proof_version.py": "cbb2030b03b5988256c357e863833353be7f410d5d29f1a06a86fcb9c4e76fd7",
+    "simulation/ate_sim/persistence_proof_world.py": "e816c7111847d7a818fb9443ecbd6f5cab230f2654ade82ad501b9679a1769b2"
+  },
+  "baseline_sha256": {
+    "simulation/ate_sim/persistence_proof_nodes.py": "0f5ee3f9fdbed0433ceb9cd420ef154e35de039206b5cb27cdfefef9b3955fa3",
+    "simulation/ate_sim/persistence_proof_occurrence.py": "6d7ebf0fcf2f0c2b3363ef689997f2b0306c538f928e9f48456aff6653639892",
+    "simulation/ate_sim/persistence_proof_publication.py": "e6f7979ee8340aa9f9b150d3f1bbd71124b50e18c582002a32ee7a46ec5c4040",
+    "simulation/ate_sim/persistence_proof_query.py": "2c6cd8a4bc850db7dd9368964003903ce68b52ed6f2abc0e1392118bd584ed19",
+    "simulation/ate_sim/persistence_proof_record.py": "fef338fba48e4b46a4b728bab243c1173be010b0289e5d69b02fec3342023dfb",
+    "simulation/ate_sim/persistence_proof_reference.py": "cf39087d8dabd4a78391614f32ab8318404dfb706bf13b17761f084892cf1880",
+    "simulation/ate_sim/persistence_proof_scope.py": "108a9c7f9774496450596a296d89a6c8d58cd7140957594e493ab5bb0427f02a",
+    "simulation/ate_sim/persistence_proof_store.py": "ba7270864a24b339b6b068031e66dbd15cad979138feba31977c477a37ab042e",
+    "simulation/ate_sim/persistence_proof_version.py": "dbc2ca449444fca67828ba11947cc92f6a0a75c700b71a307ed983ea13586225",
+    "simulation/ate_sim/persistence_proof_world.py": "86744344b2f5363dd8afadc380eade25d37ee578417c167f96f896928d09d1f3"
+  },
+  "artifact_sha256": {
+    "AGENTS.md": "76da33f0914d46cb1f41bcad767cc2d6f15b4fb06934160f8290320b04cbaaa1",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "d263ae888629f625c77435a289401fb4819f7c11629254b4131c96619f78c13c",
+    "simulation/tests/test_stage_0_6_proof_node_factorization.py": "46ffc7d74b31c97f176c6c4b31e4e799668def0d81475e7f7bed7af3cf7b4c42",
+    "docs/performance/stage-0-6-current/small-operation-profile/first-phase-review-plan.md": "15724d675fe3c90189e63b55ef0970b4b1ef09ec38e9189beade67e1bfb2c147",
+    "docs/performance/stage-0-6-current/small-operation-profile/independent-review.md": "f49e5d24c3e3ab44c3012d538b93b3116639fbb7c22322fe46e487e76cd56ff3",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/progress.md": "73ff80926b1b5d889e70927a123a9af22e8cd75da42a8900e6c9176c44040855",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/report.md": "1455725eccc2bf83e24f517e2e0d82ad0b2a48470c5e598639f0e7402023ae92",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/compare.py": "9cc7308ba4f3ea9314dc2e15f1dcf602b0d0f12df902b2c86b95745939f15203",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/runtime-fingerprint.json": "5c6c46c8f6f0bd82bc6174b1a7919e250fa3933942a491892d0035000d96d181",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/focused.log": "c408adb40d34e88377b68f0badc7421a526ea693388add912c88dd892a3dfaa8",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/focused.xml": "73ac9fde4000f0fa29d93967ce3745d30ada89e1abdbbb74377e4d2fa18dc4a8",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/red.log": "59e03913cc48c3dba8948ad1e07c0388840cd9209885d9cf771c498a86bc52e6",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/red.xml": "100782d0cc834feddf02d03b149d457c129c34243bc6d1a88c131b4f4de75fd9",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/checked-readers-red.log": "608a5a109442a9aef36dafec22c23979eb2c619cceddb65523c62cdc00af68a5",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/checked-readers-red.xml": "0f580056183541e9b5174e432c8bf79dc3038dabcb1e6dd68b61b1e15c254004",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/candidate-profile/first_step-calls.json": "e3884bdf208664fce5657e0a010f8ccf2dfa2efe8bdbfc2207a57df9e132ffcb",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/candidate-profile/save-calls.json": "dd00012d09a141c721ab1e79058036500f22ce4991a6b9a9b273f95d53b09374",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/candidate-profile/warm_step-calls.json": "8393322df146b04516abb9cbc2b0380ca252dcdc4d4e9f063d5b7bae5a77ac86",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/candidate-profile/open-calls.json": "9bc5ee07b7e80e226736e5432dca8cc242b72affb20c0c870652bbf7de75e590",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/candidate-profile/report.json": "bab9913744c33bd20bfa2a133db0ee4a89306d725803a6bd8b9d3a8db5757cfc",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/baseline-raw-1/report.json": "a09a9686faa9163aa4444163c9bc6cbdd09ea38c7db7cedb12ac69907807a608",
+    "docs/performance/stage-0-6-current/small-operation-profile/factorization/candidate-raw-1/report.json": "bc2f0c42d57b5f587e4ffc26ed52141919ffc85960a8bab70a7ca07af38a39d3",
+    "docs/performance/stage-0-6-current/small-operation-profile/save-calls.json": "055ef1e1445770d7ea01874f606b0d46c222e97d89ef1f869edebc9ac9c797bf",
+    "docs/performance/stage-0-6-current/small-operation-profile/warm_step-calls.json": "2858be9dd0c3d1745edb13eefe7779d1ecf47934d83e64d728b4d1f95ced09fe"
+  },
+  "raw_summary": {
+    "baseline-raw-1": {
+      "status": "complete",
+      "phases": {
+        "open": 1.3932310389999998,
+        "first_step": 8.391385275000005,
+        "save": 6.245413154000005,
+        "warm_step": 7.805107457999981,
+        "fresh_verify": 18.600651949999985
+      },
+      "saved_commitment": "b74c01432d38d7e66b91cac399199b12003fdd5aa3dc37120ae987b1c5ed22c5",
+      "restored": {
+        "saved": {
+          "year": 2,
+          "seed": 843000,
+          "generation": 1,
+          "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+        },
+        "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3",
+        "warm_year": 3
+      },
+      "source_preserved": true,
+      "runtime_preserved": true
+    },
+    "candidate-raw-1": {
+      "status": "complete",
+      "phases": {
+        "open": 1.1648986839999793,
+        "first_step": 7.807791220999945,
+        "save": 4.964471726999989,
+        "warm_step": 6.0872284470000295,
+        "fresh_verify": 14.257474124999987
+      },
+      "saved_commitment": "aa06c53421203efe94997c92809cf8a59de6b202a69d3ecedb1b250869f3a4d9",
+      "restored": {
+        "saved": {
+          "year": 2,
+          "seed": 843000,
+          "generation": 1,
+          "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+        },
+        "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3",
+        "warm_year": 3
+      },
+      "source_preserved": true,
+      "runtime_preserved": true
+    },
+    "candidate-profile": {
+      "status": "complete",
+      "phases": {
+        "open": 2.919799459999979,
+        "first_step": 18.707570842999985,
+        "save": 12.886352267999996,
+        "warm_step": 15.548628534000045,
+        "fresh_verify": 14.521205230000021
+      },
+      "saved_commitment": "8af4d6bba15c18112bc52c937bf993b91e119ee1aa84e07233e164350c810f0d",
+      "restored": {
+        "saved": {
+          "year": 2,
+          "seed": 843000,
+          "generation": 1,
+          "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+        },
+        "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3",
+        "warm_year": 3
+      },
+      "source_preserved": true,
+      "runtime_preserved": true
+    }
+  },
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "75",
+    "time": "1.712",
+    "timestamp": "2026-11-11T14:53:17.548099-06:00",
+    "hostname": "429cb4f9677a"
+  },
+  "affected": "in progress; not claimed complete by this review",
+  "old_profile_runtime": "94267bb00a219702a4bd1700a2fc0600a5c5aa56",
+  "old_profile_python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+  "git_diff_check": "exit 0",
+  "independent_verification": {
+    "status": "passed",
+    "differential_cases": 16086,
+    "accepted_cases": 8617,
+    "rejected_cases": 7469,
+    "sql_checks": [
+      "TEXT",
+      "INTEGER",
+      "REAL",
+      "OVERSIZED",
+      "MISSING",
+      "ADDRESS",
+      "ROOT_COUNT",
+      "REQUIRED_PREFIX",
+      "COLLISION_READBACK"
+    ],
+    "head": "aa35dfe2b47bbbb4b53c78fd9644bf96f0cd60a9",
+    "test_sha256": "46ffc7d74b31c97f176c6c4b31e4e799668def0d81475e7f7bed7af3cf7b4c42",
+    "compare_sha256": "9cc7308ba4f3ea9314dc2e15f1dcf602b0d0f12df902b2c86b95745939f15203",
+    "verification_script_sha256": "566f0563ad7e6221d8a8a970719fee71b8dde6cd220c9e0f4f4d0b03088e4914"
+  }
+}

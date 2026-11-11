@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="14" time="0.358" timestamp="2026-11-11T14:50:16.851614-06:00" hostname="429cb4f9677a"><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[record]" time="0.031"><failure message="AssertionError: assert 10 == 5&#10; +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d639580&gt;('decode_node')">family = 'record'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 10 == 5
+E            +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d639580&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[reference]" time="0.047"><failure message="AssertionError: assert 10 == 5&#10; +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d5bf2e0&gt;('decode_node')">family = 'reference'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 10 == 5
+E            +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d5bf2e0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[scope:0]" time="0.014"><failure message="AssertionError: assert 12 == 6&#10; +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d3fc4a0&gt;('decode_node')">family = 'scope:0'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 12 == 6
+E            +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d3fc4a0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[scope:3]" time="0.013"><failure message="AssertionError: assert 12 == 6&#10; +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d3d8ea0&gt;('decode_node')">family = 'scope:3'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 12 == 6
+E            +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d3d8ea0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[scope:6]" time="0.013"><failure message="AssertionError: assert 10 == 5&#10; +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d454e00&gt;('decode_node')">family = 'scope:6'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 10 == 5
+E            +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d454e00&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[publication:version]" time="0.013"><failure message="AssertionError: assert 12 == 6&#10; +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d457ec0&gt;('decode_node')">family = 'publication:version'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 12 == 6
+E            +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d457ec0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[publication:event]" time="0.012"><failure message="AssertionError: assert 10 == 5&#10; +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d4a4f40&gt;('decode_node')">family = 'publication:event'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 10 == 5
+E            +  where 10 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d4a4f40&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_point_lookups_parse_each_fetched_node_once[world]" time="0.019"><failure message="AssertionError: assert 12 == 6&#10; +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d2f13a0&gt;('decode_node')">family = 'world'
+
+    @pytest.mark.parametrize('family', [
+        'record', 'reference', 'scope:0', 'scope:3', 'scope:6',
+        'publication:version', 'publication:event', 'world',
+    ])
+    def test_sql_map_point_lookups_parse_each_fetched_node_once(family):
+        # Reintroducing store+map parsing or decoder re-encoding repeats real work.
+        with sqlite3.connect(':memory:') as db:
+            ProofNodeStore(db).create_schema()
+            mapping = _factory(db, family)
+            root = mapping.empty
+            db.execute('BEGIN')
+            for i in range(96):
+                root = mapping.set(root, str(i).encode(), hashlib.sha256(str(i).encode()).digest())
+            db.commit()
+            reads = []
+            db.set_trace_callback(reads.append)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                assert mapping.get(root, b'7') == hashlib.sha256(b'7').digest()
+                assert mapping.get(root, b'absent') is None
+            finally:
+                profile.disable()
+                db.set_trace_callback(None)
+            fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+            stats = pstats.Stats(profile).stats
+            calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                     if file.endswith('/persistence_proof_nodes.py') and func == name)
+            assert fetched &gt;= 3  # Real multi-level positive and negative paths.
+&gt;           assert calls('decode_node') == fetched
+E           AssertionError: assert 12 == 6
+E            +  where 12 = &lt;function test_sql_map_point_lookups_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fca6d2f13a0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:57: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_branch_parser_checks_canonical_bytes_without_encoder_roundtrip" time="0.000"><failure message="assert 1 == 0">def test_branch_parser_checks_canonical_bytes_without_encoder_roundtrip():
+        # Encoder calls on a valid branch are avoidable work, independent of timing.
+        raw = (b'ATEP\x01B\x03\xab\xc0\x02'
+               + b'\x02' + (1).to_bytes(8, 'big') + b'x' * 32
+               + b'\x0f' + (4).to_bytes(8, 'big') + b'y' * 32)
+        expected = Branch((10, 11, 12), ((2, Root(b'x' * 32, 1)), (15, Root(b'y' * 32, 4))))
+        profile = cProfile.Profile()
+        profile.enable()
+        try:
+            assert decode_node(raw) == expected
+        finally:
+            profile.disable()
+        calls = sum(v[1] for (file, _, name), v in pstats.Stats(profile).stats.items()
+                    if file.endswith('/persistence_proof_nodes.py') and name == 'encode_node')
+&gt;       assert calls == 0
+E       assert 1 == 0
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:75: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_retains_physical_and_outer_domain_hashes[False]" time="0.001"><failure message="AttributeError: 'ProofNodeStore' object has no attribute '_read_bound_bytes'">outer_wrong = False
+
+    @pytest.mark.parametrize('outer_wrong', [False, True])
+    def test_sql_map_retains_physical_and_outer_domain_hashes(outer_wrong):
+        # Dropping either hash permits a wrong-domain callback to authenticate a row.
+        raw = b'ATEP\x01L' + b'k' * 32 + b'v' * 32
+        correct, wrong = b'correct-domain', b'wrong-domain'
+        digest = node_digest(correct, raw)
+        physical, outer = (correct, wrong) if outer_wrong else (wrong, correct)
+        with sqlite3.connect(':memory:') as db:
+            nodes = ProofNodeStore(db)
+            nodes.create_schema()
+            db.execute('INSERT INTO ate_proof_nodes VALUES(?,?,?)', (physical, digest, raw))
+            mapping = ProofMap(outer, lambda d: nodes._read_bound_bytes(physical, d), None)
+            message = '^proof node digest' if outer_wrong else '^stored proof node digest'
+            with pytest.raises(StoreIntegrityError, match=message):
+&gt;               mapping._read(Root(digest, 1))
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_map.py:38: in _read
+    raw = self.read_node(root.digest)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = b'\xbc\x00s\xd5\x89\x0e\x1f\xe7\xca\x13\xf7.{\x89\xb6q\x12_\x80\xe3\xd0N\x89fZni\x9d7*\xd2\xb2'
+
+&gt;   mapping = ProofMap(outer, lambda d: nodes._read_bound_bytes(physical, d), None)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ProofNodeStore' object has no attribute '_read_bound_bytes'
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:90: AttributeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_sql_map_retains_physical_and_outer_domain_hashes[True]" time="0.001"><failure message="AttributeError: 'ProofNodeStore' object has no attribute '_read_bound_bytes'">outer_wrong = True
+
+    @pytest.mark.parametrize('outer_wrong', [False, True])
+    def test_sql_map_retains_physical_and_outer_domain_hashes(outer_wrong):
+        # Dropping either hash permits a wrong-domain callback to authenticate a row.
+        raw = b'ATEP\x01L' + b'k' * 32 + b'v' * 32
+        correct, wrong = b'correct-domain', b'wrong-domain'
+        digest = node_digest(correct, raw)
+        physical, outer = (correct, wrong) if outer_wrong else (wrong, correct)
+        with sqlite3.connect(':memory:') as db:
+            nodes = ProofNodeStore(db)
+            nodes.create_schema()
+            db.execute('INSERT INTO ate_proof_nodes VALUES(?,?,?)', (physical, digest, raw))
+            mapping = ProofMap(outer, lambda d: nodes._read_bound_bytes(physical, d), None)
+            message = '^proof node digest' if outer_wrong else '^stored proof node digest'
+            with pytest.raises(StoreIntegrityError, match=message):
+&gt;               mapping._read(Root(digest, 1))
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_map.py:38: in _read
+    raw = self.read_node(root.digest)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = b'\xbc\x00s\xd5\x89\x0e\x1f\xe7\xca\x13\xf7.{\x89\xb6q\x12_\x80\xe3\xd0N\x89fZni\x9d7*\xd2\xb2'
+
+&gt;   mapping = ProofMap(outer, lambda d: nodes._read_bound_bytes(physical, d), None)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ProofNodeStore' object has no attribute '_read_bound_bytes'
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:90: AttributeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_hash_consistent_noncanonical_sql_node_still_rejects[public]" time="0.001" /><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_hash_consistent_noncanonical_sql_node_still_rejects[map]" time="0.000"><failure message="AttributeError: 'ProofNodeStore' object has no attribute '_read_bound_bytes'">reader = 'map'
+
+    @pytest.mark.parametrize('reader', ['public', 'map'])
+    def test_hash_consistent_noncanonical_sql_node_still_rejects(reader):
+        # Factoring the fetch must leave canonical validation at each public boundary.
+        raw = (b'ATEP\x01B\x00\x02'
+               + b'\x01' + (1).to_bytes(8, 'big') + b'x' * 32
+               + b'\x00' + (1).to_bytes(8, 'big') + b'y' * 32)
+        domain = b'noncanonical-domain'
+        digest = node_digest(domain, raw)
+        with sqlite3.connect(':memory:') as db:
+            nodes = ProofNodeStore(db)
+            nodes.create_schema()
+            db.execute('INSERT INTO ate_proof_nodes VALUES(?,?,?)', (domain, digest, raw))
+            with pytest.raises(StoreIntegrityError):
+                if reader == 'public':
+                    nodes.read(domain, digest)
+                else:
+&gt;                   ProofMap(domain, lambda d: nodes._read_bound_bytes(domain, d), None)._read(Root(digest, 2))
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_map.py:38: in _read
+    raw = self.read_node(root.digest)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = b'\r\xa0&amp;\xa3\xdb(\xdd\x8a\x8f\x10\xac\xf3&lt;\xe6Cr\x8a\x06e\xe6\x986:\x92Uo\xf3\xfd\xe7\x1a\xaa\x17'
+
+&gt;   ProofMap(domain, lambda d: nodes._read_bound_bytes(domain, d), None)._read(Root(digest, 2))
+                               ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ProofNodeStore' object has no attribute '_read_bound_bytes'
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:112: AttributeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_public_sql_store_read_still_parses_once" time="0.000" /></testsuite></testsuites>

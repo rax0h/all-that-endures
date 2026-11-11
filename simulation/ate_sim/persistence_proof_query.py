@@ -162,7 +162,7 @@ def read_query_page(store, pin, certificate, expected_commitment, *, after=None,
         scope = certificate.scope
         domain = query_domain(certificate.store_identity, certificate.codec_version, scope)
         nodes = ProofNodeStore(store.db)
-        m = ProofMap(domain, lambda d:nodes.read(domain,d), None)
+        m = ProofMap(domain, lambda d:nodes._read_bound_bytes(domain,d), None)
         fetched = _rows(store,generation,head,scope,boundary=after,limit=limit+1)
         page = fetched[:limit]
         boundary_entry = None

@@ -40,7 +40,7 @@ class WorldRoots:
 
 def _map(store,label):
     d=_digest(b'ate-audited-world-domain/1',_namespace(store.store_identity),_integer(store.codec.version,1),label);nodes=ProofNodeStore(store.db)
-    return ProofMap(d,lambda h:nodes.read(d,h),lambda h,b:nodes.write(d,h,b))
+    return ProofMap(d,lambda h:nodes._read_bound_bytes(d,h),lambda h,b:nodes.write(d,h,b))
 
 def _composite(store,label,roots,*,persist=True):
     m=_map(store,label)

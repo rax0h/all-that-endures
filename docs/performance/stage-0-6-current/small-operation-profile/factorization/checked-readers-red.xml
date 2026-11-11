@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.364" timestamp="2026-11-11T14:52:35.474324-06:00" hostname="429cb4f9677a"><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_checked_sql_readers_parse_each_fetched_node_once[query]" time="0.049"><failure message="AssertionError: assert 28 == 14&#10; +  where 28 = &lt;function test_checked_sql_readers_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fdb35d46b60&gt;('decode_node')">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_checked_sql_readers_parse0')
+family = 'query'
+
+    @pytest.mark.parametrize('family', ['query', 'version', 'occurrence'])
+    def test_checked_sql_readers_parse_each_fetched_node_once(tmp_path, family):
+        # These three production readers construct SQL callbacks without _map.
+        if family == 'query':
+            from simulation.tests.proof_query_fixtures import make_store, construct_certificate
+            from ate_sim.persistence_proof_query import read_query_page
+            store, pin = make_store(tmp_path / 'source.sqlite', 8)
+            cert, expected = construct_certificate(store, pin)
+            def read():
+                assert len(read_query_page(store, pin, cert, expected, limit=3).positions) == 3
+                assert read_query_page(store, pin, cert, expected,
+                                       after=(999, b'end')).positions == ()
+        elif family == 'version':
+            from simulation.tests.test_stage_0_5_proof_version import setup_source, read as version_read
+            module, store, pin, cert, expected = setup_source(tmp_path)
+            def read():
+                assert version_read(module, store, pin, cert, expected).payload == store.codec.encode({'wealth': 2})
+                assert version_read(module, store, pin, cert, expected, key=999) is None
+        else:
+            from simulation.tests.test_stage_0_5_proof_occurrence import setup_source
+            module, store, pin, certs = setup_source(tmp_path)
+            def read():
+                assert len(module.read_occurrence_page(store, pin, *certs[0], limit=3).rows) == 3
+                assert module.read_occurrence_page(store, pin, *certs[0], after=('zz', b'', b'')).rows == ()
+        reads = []
+        profile = cProfile.Profile()
+        store.db.set_trace_callback(reads.append)
+        profile.enable()
+        try:
+            read()
+        finally:
+            profile.disable()
+            store.db.set_trace_callback(None)
+            store.close()
+        fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+        stats = pstats.Stats(profile).stats
+        calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                 if file.endswith('/persistence_proof_nodes.py') and func == name)
+        assert fetched &gt; 0
+&gt;       assert calls('decode_node') == fetched
+E       AssertionError: assert 28 == 14
+E        +  where 28 = &lt;function test_checked_sql_readers_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fdb35d46b60&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:118: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_checked_sql_readers_parse_each_fetched_node_once[version]" time="0.071"><failure message="AssertionError: assert 8 == 4&#10; +  where 8 = &lt;function test_checked_sql_readers_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fdb35b8aac0&gt;('decode_node')">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_checked_sql_readers_parse1')
+family = 'version'
+
+    @pytest.mark.parametrize('family', ['query', 'version', 'occurrence'])
+    def test_checked_sql_readers_parse_each_fetched_node_once(tmp_path, family):
+        # These three production readers construct SQL callbacks without _map.
+        if family == 'query':
+            from simulation.tests.proof_query_fixtures import make_store, construct_certificate
+            from ate_sim.persistence_proof_query import read_query_page
+            store, pin = make_store(tmp_path / 'source.sqlite', 8)
+            cert, expected = construct_certificate(store, pin)
+            def read():
+                assert len(read_query_page(store, pin, cert, expected, limit=3).positions) == 3
+                assert read_query_page(store, pin, cert, expected,
+                                       after=(999, b'end')).positions == ()
+        elif family == 'version':
+            from simulation.tests.test_stage_0_5_proof_version import setup_source, read as version_read
+            module, store, pin, cert, expected = setup_source(tmp_path)
+            def read():
+                assert version_read(module, store, pin, cert, expected).payload == store.codec.encode({'wealth': 2})
+                assert version_read(module, store, pin, cert, expected, key=999) is None
+        else:
+            from simulation.tests.test_stage_0_5_proof_occurrence import setup_source
+            module, store, pin, certs = setup_source(tmp_path)
+            def read():
+                assert len(module.read_occurrence_page(store, pin, *certs[0], limit=3).rows) == 3
+                assert module.read_occurrence_page(store, pin, *certs[0], after=('zz', b'', b'')).rows == ()
+        reads = []
+        profile = cProfile.Profile()
+        store.db.set_trace_callback(reads.append)
+        profile.enable()
+        try:
+            read()
+        finally:
+            profile.disable()
+            store.db.set_trace_callback(None)
+            store.close()
+        fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+        stats = pstats.Stats(profile).stats
+        calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                 if file.endswith('/persistence_proof_nodes.py') and func == name)
+        assert fetched &gt; 0
+&gt;       assert calls('decode_node') == fetched
+E       AssertionError: assert 8 == 4
+E        +  where 8 = &lt;function test_checked_sql_readers_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fdb35b8aac0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:118: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_proof_node_factorization" name="test_checked_sql_readers_parse_each_fetched_node_once[occurrence]" time="0.055"><failure message="AssertionError: assert 18 == 9&#10; +  where 18 = &lt;function test_checked_sql_readers_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fdb35b094e0&gt;('decode_node')">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_checked_sql_readers_parse2')
+family = 'occurrence'
+
+    @pytest.mark.parametrize('family', ['query', 'version', 'occurrence'])
+    def test_checked_sql_readers_parse_each_fetched_node_once(tmp_path, family):
+        # These three production readers construct SQL callbacks without _map.
+        if family == 'query':
+            from simulation.tests.proof_query_fixtures import make_store, construct_certificate
+            from ate_sim.persistence_proof_query import read_query_page
+            store, pin = make_store(tmp_path / 'source.sqlite', 8)
+            cert, expected = construct_certificate(store, pin)
+            def read():
+                assert len(read_query_page(store, pin, cert, expected, limit=3).positions) == 3
+                assert read_query_page(store, pin, cert, expected,
+                                       after=(999, b'end')).positions == ()
+        elif family == 'version':
+            from simulation.tests.test_stage_0_5_proof_version import setup_source, read as version_read
+            module, store, pin, cert, expected = setup_source(tmp_path)
+            def read():
+                assert version_read(module, store, pin, cert, expected).payload == store.codec.encode({'wealth': 2})
+                assert version_read(module, store, pin, cert, expected, key=999) is None
+        else:
+            from simulation.tests.test_stage_0_5_proof_occurrence import setup_source
+            module, store, pin, certs = setup_source(tmp_path)
+            def read():
+                assert len(module.read_occurrence_page(store, pin, *certs[0], limit=3).rows) == 3
+                assert module.read_occurrence_page(store, pin, *certs[0], after=('zz', b'', b'')).rows == ()
+        reads = []
+        profile = cProfile.Profile()
+        store.db.set_trace_callback(reads.append)
+        profile.enable()
+        try:
+            read()
+        finally:
+            profile.disable()
+            store.db.set_trace_callback(None)
+            store.close()
+        fetched = sum(sql.startswith('SELECT CASE WHEN typeof(node_bytes)') for sql in reads)
+        stats = pstats.Stats(profile).stats
+        calls = lambda name: sum(v[1] for (file, _, func), v in stats.items()
+                                 if file.endswith('/persistence_proof_nodes.py') and func == name)
+        assert fetched &gt; 0
+&gt;       assert calls('decode_node') == fetched
+E       AssertionError: assert 18 == 9
+E        +  where 18 = &lt;function test_checked_sql_readers_parse_each_fetched_node_once.&lt;locals&gt;.&lt;lambda&gt; at 0x7fdb35b094e0&gt;('decode_node')
+
+simulation/tests/test_stage_0_6_proof_node_factorization.py:118: AssertionError</failure></testcase></testsuite></testsuites>

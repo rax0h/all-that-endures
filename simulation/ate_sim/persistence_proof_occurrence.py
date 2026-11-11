@@ -246,7 +246,7 @@ def read_occurrence_page(store,pin,certificate,expected_commitment,*,after=None,
             raise StoreError('occurrence proof reader cannot use legacy interval selection')
         _require_indexes(store.db);_check_allocator(store,generation,certificate.next_incarnation_id)
         domain=occurrence_domain(certificate.store_identity,certificate.codec_version,scope)
-        nodes=ProofNodeStore(store.db);m=ProofMap(domain,lambda d:nodes.read(domain,d),None)
+        nodes=ProofNodeStore(store.db);m=ProofMap(domain,lambda d:nodes._read_bound_bytes(domain,d),None)
         def source(**kwargs):return _rows(store,generation,head,scope,certificate.next_incarnation_id,**kwargs)
         fetched=source(boundary=after,limit=limit+1);page=fetched[:limit];entries=[];boundary_entry=None
         def cursor(row):return row.namespace,row.typed_key,row.path
