@@ -1,0 +1,86 @@
+...F...F....                                                             [100%]
+=================================== FAILURES ===================================
+__________ test_public_controls_permanently_invalidate[cursor-script] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_public_controls_permanent3')
+control = 'cursor-script'
+
+    @pytest.mark.parametrize('control', ['isolation-level', 'context-commit', 'context-rollback', 'cursor-script'])
+    def test_public_controls_permanently_invalidate(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as s:
+            st = s.store
+            with checked_read_operation(st, s.pin) as scope:
+                scope.remember('probe', (), ('accepted',))
+                assert scope.lookup('probe', ()) == ('accepted',)
+                before = st._world_proof_authority._epoch()
+                if control == 'isolation-level':
+                    original = st.db.isolation_level
+                    st.db.isolation_level = None
+                    st.db.isolation_level = original
+                elif control == 'context-commit':
+                    with st.db: pass
+                elif control == 'context-rollback':
+                    try:
+                        with st.db: raise RuntimeError('rollback')
+                    except RuntimeError: pass
+                else:
+>                   st.db.cursor().executescript('COMMIT; BEGIN;')
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/review-raw/test_independent_read_view.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7f9a36735910>
+args = ('COMMIT; BEGIN;',), kwargs = {}
+
+    def executescript(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+        self.connection._schema_statement_generation += 1
+>       return super().executescript(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: cannot commit - no transaction is active
+
+simulation/ate_sim/persistence_sqlite_guard.py:62: OperationalError
+________ test_zero_transient_budget_and_spilled_owner_ownership[False] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_zero_transient_budget_and0')
+fail = False
+
+    @pytest.mark.parametrize('fail', [False, True])
+    def test_zero_transient_budget_and_spilled_owner_ownership(tmp_path, fail):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as s:
+            st = s.store
+            # 1 byte forces even the single placement of this owner to spill.
+            cat = IdentityCatalog(st, occurrence_limit=1, byte_limit=1)
+            observed_scopes, spools = [], []
+            original_node, original_init, original_freeze = cat._node, CheckedSpool.__init__, CheckedSpool.freeze
+            def node(*args, **kwargs):
+                scope = st._validation_scope
+                assert scope is not None and scope.byte_limit == 0
+                assert scope.entries == scope.bytes == 0
+                observed_scopes.append(scope)
+                return original_node(*args, **kwargs)
+            def init(spool, *args, **kwargs):
+                original_init(spool, *args, **kwargs)
+                spools.append(spool)
+            def freeze(spool):
+                if fail: raise RuntimeError('freeze failure after spill')
+                return original_freeze(spool)
+            with patch.object(cat, '_node', node), patch.object(CheckedSpool, '__init__', init), patch.object(CheckedSpool, 'freeze', freeze):
+                if fail:
+                    with pytest.raises(RuntimeError, match='freeze failure'): cat.read_owner_identity(s.pin, OWNER)
+                else:
+                    result = cat.read_owner_identity(s.pin, OWNER)
+                    assert result.occurrences.spilled
+>                   assert len(list(result.occurrences)) == 1
+E                   AssertionError: assert 3 == 1
+E                    +  where 3 = len([((('field', 'provenance'),), 5), ((('field', 'teachers'),), 6), ((), 7)])
+E                    +    where [((('field', 'provenance'),), 5), ((('field', 'teachers'),), 6), ((), 7)] = list(<ate_sim.persistence_lazy_spill.CheckedSpool object at 0x7f9a3678e390>)
+E                    +      where <ate_sim.persistence_lazy_spill.CheckedSpool object at 0x7f9a3678e390> = CheckedOwnerIdentity(owner=('world.skills.skills', (1, 'craft')), occurrences=<ate_sim.persistence_lazy_spill.CheckedS...ayload_commitment='97e68d4eb9aebc86731b52dfe86a738e4621f8f843d6c55902d2a30c714f9d7a', exists=True, storage_kind='lazy').occurrences
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/review-raw/test_independent_read_view.py:128: AssertionError
+=========================== short test summary info ============================
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/review-raw/test_independent_read_view.py::test_public_controls_permanently_invalidate[cursor-script]
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/review-raw/test_independent_read_view.py::test_zero_transient_budget_and_spilled_owner_ownership[False]
+2 failed, 10 passed in 13.47s

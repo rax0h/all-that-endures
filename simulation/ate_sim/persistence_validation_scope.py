@@ -36,6 +36,54 @@ class ValidationScope:
         self.bytes = 0
         self._valid = eligible
         self._epoch = self._current_epoch() if eligible else None
+        self._native_custody = self._capture_native_custody() if eligible else None
+
+    def _capture_native_custody(self):
+        from .persistence_proof_world_session import _WorldProofAuthority
+        from .persistence_sqlite_guard import GuardedConnection
+        st, db = self.store, self.db
+        authority = getattr(st, '_world_proof_authority', None)
+        if (type(authority) is not _WorldProofAuthority or type(db) is not GuardedConnection
+                or not authority.proof_only or not authority._opening_admitted
+                or authority.busy or authority.uncertain or authority.epoch is None
+                or authority.read_pin != self.pin or st._active_read_transaction
+                or not getattr(st, '_checked_snapshot_owns_transaction', False)
+                or db._sql_callback_generation != 0 or db.row_factory is not None
+                or db.text_factory is not str or db._known_authorizer is not None
+                or getattr(db, '_native_write_guard', None) is not None):
+            return None
+        return (authority, authority.pair, authority.epoch, authority.read_components,
+                db._schema_statement_generation, db._transaction_generation)
+
+    def native_epoch(self, store, authority):
+        """Reuse entry checks only while the exact owned read view survives."""
+        custody = self._native_custody
+        if custody is None:return None
+        db = self.db
+        if (not self._valid or store is not self.store or store._closed
+                or getattr(store, '_validation_scope', None) is not self
+                or store.db is not db or store.codec is not self.codec
+                or not db.in_transaction or store._active_read_transaction
+                or not getattr(store, '_checked_snapshot_owns_transaction', False)
+                or not getattr(store, '_checked_snapshot_depth', 0)
+                or store._checked_snapshot_generation != self.pin.captured_head
+                or db.total_changes != self._epoch[0]
+                or store._phase_hook is not self._epoch[-1]
+                or db._schema_statement_generation != custody[4]
+                or db._transaction_generation != custody[5]
+                or db._sql_callback_generation != 0 or db.row_factory is not None
+                or db.text_factory is not str or db._known_authorizer is not None
+                or db._callback_guard or getattr(db, '_native_sql_callback_depth', 0)
+                or getattr(db, '_native_write_guard', None) is not None
+                or authority is not custody[0]
+                or getattr(store, '_world_proof_authority', None) is not authority
+                or authority.store is not store or not authority.proof_only
+                or not authority._opening_admitted or authority.busy or authority.uncertain
+                or authority.read_pin != self.pin or authority.pair is not custody[1]
+                or authority.epoch is not custody[2] or authority.read_components is not custody[3]):
+            self.invalidate()
+            return None
+        return custody[2]
 
     @property
     def entries(self):
@@ -55,6 +103,11 @@ class ValidationScope:
     def can_reuse(self, store, pin):
         if not self._valid:
             return False
+        if self._native_custody is not None:
+            if pin != self.pin:
+                self.invalidate()
+                return False
+            return self.native_epoch(store, self._native_custody[0]) is not None
         if (store is not self.store or pin != self.pin or store._closed
                 or store.db is not self.db or store.codec is not self.codec
                 or not self.db.in_transaction or not getattr(store, '_checked_snapshot_depth', 0)
@@ -74,6 +127,7 @@ class ValidationScope:
         return cached[0]
 
     def remember(self, kind, key, proof):
+        if self.byte_limit <= 0:return
         if not self.can_reuse(self.store, self.pin) or not _immutable((key, proof)):
             return
         marker = kind, key

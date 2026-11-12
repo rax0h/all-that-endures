@@ -793,7 +793,20 @@ class IdentityCatalog:
             # a certificate in a borrowed transaction/savepoint, where a later
             # rollback could restore different bytes under that same counter.
             self._clear_owner_cache()
-        with self.store.read_snapshot(pin):
+        from .persistence_proof_native_sources import active
+        from .persistence_validation_scope import checked_read_operation
+        authority = active(self.store)
+        admitted = (authority is not None and authority.proof_only and authority._opening_admitted
+                    and not authority.busy and not authority.uncertain
+                    and not self.store._active_read_transaction
+                    and getattr(self.store.db, '_sql_callback_generation', None) == 0
+                    and self.store.db.row_factory is None and self.store.db.text_factory is str
+                    and self.store.db._known_authorizer is None
+                    and getattr(self.store.db, '_native_write_guard', None) is None)
+        operation = (checked_read_operation(self.store, pin, byte_limit=0)
+                     if standalone and admitted
+                     else self.store.read_snapshot(pin))
+        with operation:
             epoch = self._owner_epoch(pin) if standalone else None
             key = self.codec.encode(owner) if standalone else None
             if standalone:

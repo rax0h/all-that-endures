@@ -1,0 +1,186 @@
+{
+  "full": {
+    "archive_sha256": "8f5995ea0378e1d583427471af105fdee200a04687b4be90074e05079117130c",
+    "bytes": 195113,
+    "source": {
+      "head": "f6d5d2badbe240f84433f191c12a88f408a3e8a8",
+      "python": "3.12.16",
+      "runtime_tree": "41d21d8dfd2eedd44b35c12c894cbb4a59ba6058",
+      "sqlite": "3.45.1"
+    },
+    "test_suites": [
+      {
+        "path": "full-suite.xml",
+        "tests": 5071,
+        "seconds": 6060.896
+      }
+    ]
+  },
+  "proof": {
+    "archive_sha256": "be66a583eb50923e1b8677225e1170742c792effe1a162350641eddc57be970e",
+    "bytes": 213100,
+    "source": {
+      "head": "f6d5d2badbe240f84433f191c12a88f408a3e8a8",
+      "python": "3.12.16",
+      "runtime_tree": "41d21d8dfd2eedd44b35c12c894cbb4a59ba6058",
+      "sqlite": "3.45.1"
+    },
+    "test_suites": [
+      {
+        "path": "child-extents-tests.xml",
+        "tests": 34,
+        "seconds": 5.679
+      },
+      {
+        "path": "collection-directory-tests.xml",
+        "tests": 31,
+        "seconds": 2.432
+      },
+      {
+        "path": "collection-publication-tests.xml",
+        "tests": 12,
+        "seconds": 1.295
+      },
+      {
+        "path": "collection-tests.xml",
+        "tests": 20,
+        "seconds": 1.523
+      },
+      {
+        "path": "descriptor-fact-tests.xml",
+        "tests": 29,
+        "seconds": 24.636
+      },
+      {
+        "path": "directory-publication-tests.xml",
+        "tests": 22,
+        "seconds": 2.245
+      },
+      {
+        "path": "frozen-extents-tests.xml",
+        "tests": 46,
+        "seconds": 8.967
+      },
+      {
+        "path": "generation-tests.xml",
+        "tests": 60,
+        "seconds": 2.448
+      },
+      {
+        "path": "group-tests.xml",
+        "tests": 72,
+        "seconds": 18.979
+      },
+      {
+        "path": "inventory-tests.xml",
+        "tests": 34,
+        "seconds": 3.856
+      },
+      {
+        "path": "native-insert-tests.xml",
+        "tests": 403,
+        "seconds": 1199.7
+      },
+      {
+        "path": "native-metadata-tests.xml",
+        "tests": 39,
+        "seconds": 49.449
+      },
+      {
+        "path": "native-rank-tests.xml",
+        "tests": 47,
+        "seconds": 65.891
+      },
+      {
+        "path": "native-value-tests.xml",
+        "tests": 102,
+        "seconds": 259.758
+      },
+      {
+        "path": "native-world-session-tests.xml",
+        "tests": 45,
+        "seconds": 224.643
+      },
+      {
+        "path": "node-factorization-tests.xml",
+        "tests": 17,
+        "seconds": 1.278
+      },
+      {
+        "path": "owner-target-tests.xml",
+        "tests": 20,
+        "seconds": 3.723
+      },
+      {
+        "path": "projection-tests.xml",
+        "tests": 43,
+        "seconds": 3.119
+      },
+      {
+        "path": "proof-open-tests.xml",
+        "tests": 62,
+        "seconds": 80.272
+      },
+      {
+        "path": "proof-tests.xml",
+        "tests": 262,
+        "seconds": 15.525
+      },
+      {
+        "path": "publication-tests.xml",
+        "tests": 67,
+        "seconds": 5.785
+      },
+      {
+        "path": "record-tests.xml",
+        "tests": 60,
+        "seconds": 4.217
+      },
+      {
+        "path": "reference-closure-tests.xml",
+        "tests": 38,
+        "seconds": 14.147
+      },
+      {
+        "path": "reference-tests.xml",
+        "tests": 40,
+        "seconds": 10.394
+      },
+      {
+        "path": "scope-tests.xml",
+        "tests": 55,
+        "seconds": 4.592
+      },
+      {
+        "path": "seek-tests.xml",
+        "tests": 54,
+        "seconds": 11.897
+      },
+      {
+        "path": "sequence-event-extents-tests.xml",
+        "tests": 47,
+        "seconds": 10.671
+      },
+      {
+        "path": "target-group-tests.xml",
+        "tests": 38,
+        "seconds": 6.172
+      },
+      {
+        "path": "target-incoming-tests.xml",
+        "tests": 44,
+        "seconds": 6.537
+      },
+      {
+        "path": "target-tests.xml",
+        "tests": 36,
+        "seconds": 4.008
+      },
+      {
+        "path": "world-manifest-tests.xml",
+        "tests": 35,
+        "seconds": 39.946
+      }
+    ]
+  }
+}

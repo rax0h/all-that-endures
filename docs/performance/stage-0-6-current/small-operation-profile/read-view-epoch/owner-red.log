@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_distinct_standalone_owner_reads_reuse_checked_descriptor _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1/test_distinct_standalone_owner0')
+
+    def test_distinct_standalone_owner_reads_reuse_checked_descriptor(tmp_path):
+        from ate_sim.persistence_lazy_identity_catalog import CATALOG_NAMESPACE
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            cat = session._identity_coordinator.catalog
+            first = cat.read_owner_identity(session.pin, OWNER)
+            assert first.exists
+            with patch.object(cat, '_read', wraps=cat._read) as reads:
+                second = cat.read_owner_identity(session.pin, (OWNER[0], (2, 'craft')))
+            assert second.exists and second.owner != first.owner
+>           assert not [call for call in reads.call_args_list if call.args[1] == CATALOG_NAMESPACE]
+E           AssertionError: assert not [call(GenerationPin(token='f5469c7a-e5d9-4092-9764-23f8070ae424', store_identity='152333d9-ff56-4a1e-a5b3-fbdf86218767', captured_head=0), 'aux.lazy.identity.catalog', 0)]
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:111: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_read_view_epoch.py::test_distinct_standalone_owner_reads_reuse_checked_descriptor
+1 failed, 11 deselected in 1.00s

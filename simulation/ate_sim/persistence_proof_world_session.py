@@ -25,6 +25,11 @@ class _WorldProofAuthority:
         self._admission_temp_schema=store.db.execute('PRAGMA temp.schema_version').fetchone()[0]
 
     def _epoch(self):
+        from .persistence_validation_scope import ValidationScope
+        scope=getattr(self.store,'_validation_scope',None)
+        if type(scope) is ValidationScope:
+            captured=scope.native_epoch(self.store,self)
+            if captured is not None:return captured
         db=self.store.db
         return (db,self.store.codec,db.execute('PRAGMA data_version').fetchone()[0],db.total_changes,
             db.execute('PRAGMA main.schema_version').fetchone()[0],db.execute('PRAGMA temp.schema_version').fetchone()[0])

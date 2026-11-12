@@ -1,0 +1,18 @@
+{
+  "parent_pid": 5,
+  "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "cpu_max": ""
+}

@@ -298,3 +298,43 @@ remain compatible evidence only. Raw/open tradeoff is explicit: opening slower
 inboth final pairs (+62.0%/+42.8%), warmmixed. See independent final signoff in
 ../small-operation-profile/closed-read/review-raw/report.md. Hosted proof/full
 validation is the next completion gate; no mature request activation.
+
+## Verified descriptor engine green — November12
+
+Hosted43227352719 atf6d5d2badbe240f84433f191c12a88f408a3e8a8 matches local
+1b6e770 exact tree2a00c0e4/runtime41d21d8. Full suite5071passed6060.896s;
+proof31XMLs1914tests plus scaling pass. Counts overlap and are not summed.
+Actual authenticated archive hashes: full13956228024
+8f5995ea0378e1d583427471af105fdee200a04687b4be90074e05079117130c;
+proof13954104103
+be66a583eb50923e1b8677225e1170742c792effe1a162350641eddc57be970e.
+Downloaded bytes, test XML and source/runtime records were verified; summary is
+../small-operation-profile/closed-read/hosted-43227352719. This closes W6 hosted
+engine validation. It does not close W3/U10 performance; mature job was skipped.
+
+## Owned read-view group
+
+| ID | Origin | Concrete action and evidence | Status |
+|---|---|---|---|
+| W7a | Nested epoch SQL and repeated standalone owner descriptor proofs | Reuse actual admitted epoch only in one owned internal native read view; standalone proof-only owner uses existing checked_read_operation with zero transient fact-cache budget. Physical source/proof checks and spool cleanup remain; readonly descriptor fact still shares existing owner budget. Initial12controls passed;42including existingdescriptor cases pass20.38s. | CLOSED locally; full final hosted gate pending |
+| W7b | Root and initial independent static inspection: autocommit setter bypasses commit/execute overrides | Track monotonic transaction revision for public commit/rollback, exact transaction SQL and autocommit/isolation_level setters; unknown SQL/scripts already advance separate revision. Equal-coarse-epoch mode-toggle test RED→GREEN preserved. Scope/facts permanently invalidate on revision/callback/codec identity/custody changes. | CLOSED locally through RED/GREEN and independent probes |
+| W7c | Initial owner selector proof-only check also selected publisher/opening generic scopes | Tighten actual admission/callback/writeguard/busy eligibility before owner scope creation. Four explicit borrowed/callback/busy/audited fallback cases pass4.60s; original paths retained. | CLOSED locally |
+| W7d | Timing comparison crossed user interruption and separate command context | Retain original and reverse raw outputs with precise ordering; final paired.py runs baseline→candidate as sequential children of one command, recording parent CPU/affinity/cgroup context and exact child source/import/input/state fences. First12.055→8.381s; warm9.224→7.271s; save7.722→8.152s. Do not claim save or mature target improvement. | CLOSED measurement clarification |
+| W7e | Independent diagnostic assumptions: executescript implicit commit and fixture placement count | Preserve initial-probes.py and original10pass/2fail log/XML. Correct script to BEGIN;SELECT1 and expected fixture3placements; rerun only corrected2cases, both pass2.37s. | CLOSED diagnostic repair |
+| W7f | Whole-package review boundary and arbitrary API claims | Thirteen independent distinct probes pass (10initial +2corrected +1physical omission); final source/test fences and report in read-view-epoch/review-raw. Guarded public SQL API contract excludes arbitrary private/base-class Python bypasses. No main/default/endurance authorization; no mature target claim. Hosted full proof/simulation remains gate. Static reviewer reads occurred during timing; no tests or reviewer CPU probes ran during raw timing. | CLOSED locally; hosted gate pending |
+
+W7 diagnostic work uses qualified313 full fingerprint including binary/extension/
+library/SQLite options. Exact fresh saved year2/generation1 and continued year3
+state remain unchanged. The new source reduces first-step SQL528188→327965 and
+warm386922→245391; save257723unchanged. Instrumented elapsed times are not raw
+latency evidence and ran concurrently with affected tests. Raw pair is one
+controlled observation, not a latency distribution. W3/U10 targets remain OPEN.
+
+W7 final affected evidence:328passed327.84s,1deselected unchanged audited
+generated2save constructor reserved for hosted full validation. Four owner
+fallback cases appended after collection pass separately. New focused workflow
+command includes them; no per-finding CI is launched. Independent whole-package
+review reports no remaining actionable code finding; final wording precision
+records static reviewer reads during raw timing and codec identity explicitly.
+No unresolved finding is carried into a later work group. Hosted proof/full
+remains the engine acceptance gate.

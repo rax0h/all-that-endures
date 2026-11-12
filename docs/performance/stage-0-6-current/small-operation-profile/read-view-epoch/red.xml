@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="11" time="7.474" timestamp="2026-11-12T10:19:00.416230-06:00" hostname="725e82a23885"><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_nested_physical_group_checks_do_not_repeat_epoch_sql" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="19" time="0.819"><failure message="AssertionError: assert 1163 &lt;= 12&#10; +  where 1163 = len(['PRAGMA data_version', 'PRAGMA schema_version', 'PRAGMA data_version', 'PRAGMA schema_version', 'PRAGMA data_version', 'PRAGMA main.schema_version', ...])">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_nested_physical_group_che0')
+
+    def test_nested_physical_group_checks_do_not_repeat_epoch_sql(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            cat, inc = group(session)
+            sql = []
+            execute = type(st.db).execute
+            def observed(db, statement, *args, **kwargs):
+                sql.append(statement)
+                return execute(db, statement, *args, **kwargs)
+            with patch.object(type(st.db), 'execute', observed):
+                with checked_read_operation(st, session.pin) as scope:
+                    before = len(sql)
+                    for _ in range(8):
+                        assert len(cat.read_identity_group(session.pin, inc).occurrences) == 2
+                    pragmas = [s for s in sql[before:] if s.upper().startswith('PRAGMA ')]
+&gt;                   assert len(pragmas) &lt;= 12
+E                   AssertionError: assert 1163 &lt;= 12
+E                    +  where 1163 = len(['PRAGMA data_version', 'PRAGMA schema_version', 'PRAGMA data_version', 'PRAGMA schema_version', 'PRAGMA data_version', 'PRAGMA main.schema_version', ...])
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:36: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[commit]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.806"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b7100&gt;, GenerationPin(token='f8e61053-d279-45d6-af8f-eba8761fe975', store_identity='b25a456b-5d6f-43f5-820c-0d90779d5c43', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca32d450&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot0')
+control = 'commit'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b7100&gt;, GenerationPin(token='f8e61053-d279-45d6-af8f-eba8761fe975', store_identity='b25a456b-5d6f-43f5-820c-0d90779d5c43', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca32d450&gt;.can_reuse
+E                +    and   GenerationPin(token='f8e61053-d279-45d6-af8f-eba8761fe975', store_identity='b25a456b-5d6f-43f5-820c-0d90779d5c43', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca5da850&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[rollback]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.611"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b4180&gt;, GenerationPin(token='2b0c11b6-684b-430e-b54a-b6ed2cb1360c', store_identity='806ba142-e994-4196-82c1-42a1ed506fbe', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca12d630&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot1')
+control = 'rollback'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b4180&gt;, GenerationPin(token='2b0c11b6-684b-430e-b54a-b6ed2cb1360c', store_identity='806ba142-e994-4196-82c1-42a1ed506fbe', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca12d630&gt;.can_reuse
+E                +    and   GenerationPin(token='2b0c11b6-684b-430e-b54a-b6ed2cb1360c', store_identity='806ba142-e994-4196-82c1-42a1ed506fbe', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca3c0050&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[sql-commit]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.591"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b43e0&gt;, GenerationPin(token='a308f939-01aa-4426-9eed-da2e1a6e8679', store_identity='d0bd44cb-0c73-44f1-b0c1-592482a54f3f', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca22e990&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot2')
+control = 'sql-commit'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b43e0&gt;, GenerationPin(token='a308f939-01aa-4426-9eed-da2e1a6e8679', store_identity='d0bd44cb-0c73-44f1-b0c1-592482a54f3f', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca22e990&gt;.can_reuse
+E                +    and   GenerationPin(token='a308f939-01aa-4426-9eed-da2e1a6e8679', store_identity='d0bd44cb-0c73-44f1-b0c1-592482a54f3f', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca5db750&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[sql-rollback]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.604"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b6d70&gt;, GenerationPin(token='fd9970f6-eee4-44f9-a577-da824d9a4041', store_identity='146c3bc0-1f51-4e3c-945c-89b22d89a2a5', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca223390&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot3')
+control = 'sql-rollback'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b6d70&gt;, GenerationPin(token='fd9970f6-eee4-44f9-a577-da824d9a4041', store_identity='146c3bc0-1f51-4e3c-945c-89b22d89a2a5', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca223390&gt;.can_reuse
+E                +    and   GenerationPin(token='fd9970f6-eee4-44f9-a577-da824d9a4041', store_identity='146c3bc0-1f51-4e3c-945c-89b22d89a2a5', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca3c20d0&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[callback]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.639"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b7e10&gt;, GenerationPin(token='0fc6996c-aadb-4756-ae0a-63cb1c9577b7', store_identity='7b4b0e6f-5da9-4320-9ef9-4347b2bedc15', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca04b9d0&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot4')
+control = 'callback'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b7e10&gt;, GenerationPin(token='0fc6996c-aadb-4756-ae0a-63cb1c9577b7', store_identity='7b4b0e6f-5da9-4320-9ef9-4347b2bedc15', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca04b9d0&gt;.can_reuse
+E                +    and   GenerationPin(token='0fc6996c-aadb-4756-ae0a-63cb1c9577b7', store_identity='7b4b0e6f-5da9-4320-9ef9-4347b2bedc15', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca5dae90&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[custom-cursor]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.605"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b7bb0&gt;, GenerationPin(token='16d9417a-acd9-423c-b8c6-68a7563b1d08', store_identity='f8cbbf5f-3ee9-4266-92a4-736968f19572', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca20d630&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot5')
+control = 'custom-cursor'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b7bb0&gt;, GenerationPin(token='16d9417a-acd9-423c-b8c6-68a7563b1d08', store_identity='f8cbbf5f-3ee9-4266-92a4-736968f19572', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca20d630&gt;.can_reuse
+E                +    and   GenerationPin(token='16d9417a-acd9-423c-b8c6-68a7563b1d08', store_identity='f8cbbf5f-3ee9-4266-92a4-736968f19572', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca3c2990&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[blob]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.613"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b49d0&gt;, GenerationPin(token='255e8080-93b3-48ac-b8b4-f2c92148638f', store_identity='1ea1dd55-c3ea-4986-8b29-9ed0b954df4c', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca1a6710&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot6')
+control = 'blob'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b49d0&gt;, GenerationPin(token='255e8080-93b3-48ac-b8b4-f2c92148638f', store_identity='1ea1dd55-c3ea-4986-8b29-9ed0b954df4c', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca1a6710&gt;.can_reuse
+E                +    and   GenerationPin(token='255e8080-93b3-48ac-b8b4-f2c92148638f', store_identity='1ea1dd55-c3ea-4986-8b29-9ed0b954df4c', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca5dac10&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_equal_coarse_epoch_cannot_restore_closed_scope_custody[schema-reset]" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="41" time="0.596"><failure message="AssertionError: assert not True&#10; +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b6c40&gt;, GenerationPin(token='3d1c5eec-0d6a-49f6-a43d-681bf267f29c', store_identity='e3ccdb88-750b-44f2-81de-964c63ae68e7', captured_head=0))&#10; +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca367bb0&gt;.can_reuse&#10;[+1 more line; full report in element text]">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_equal_coarse_epoch_cannot7')
+control = 'schema-reset'
+
+    @pytest.mark.parametrize('control', ['commit', 'rollback', 'sql-commit', 'sql-rollback',
+                                        'callback', 'custom-cursor', 'blob', 'schema-reset'])
+    def test_equal_coarse_epoch_cannot_restore_closed_scope_custody(tmp_path, control):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            with checked_read_operation(st, session.pin) as scope:
+                assert scope.can_reuse(st, session.pin)
+                before = st._world_proof_authority._epoch()
+                if control in ('commit', 'rollback'):
+                    getattr(st.db, control)()
+                    st.db.execute('BEGIN')
+                elif control.startswith('sql-'):
+                    st.db.execute(control[4:].upper())
+                    st.db.execute('BEGIN')
+                elif control == 'callback':
+                    st.db.set_trace_callback(lambda _: None)
+                    st.db.set_trace_callback(None)
+                elif control == 'custom-cursor':
+                    class CallerCursor(sqlite3.Cursor):pass
+                    st.db.cursor(factory=CallerCursor).close()
+                elif control == 'blob':
+                    row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                    st.db.blobopen('store_metadata', 'value', row).close()
+                else:
+                    st.db.execute('CREATE TABLE custody_probe(x)')
+                    st.db.execute('DROP TABLE custody_probe')
+                    st.db.execute('PRAGMA schema_version=' + str(before[4]))
+                assert st._world_proof_authority._epoch() == before
+&gt;               assert not scope.can_reuse(st, session.pin)
+E               AssertionError: assert not True
+E                +  where True = can_reuse(&lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc3ca4b6c40&gt;, GenerationPin(token='3d1c5eec-0d6a-49f6-a43d-681bf267f29c', store_identity='e3ccdb88-750b-44f2-81de-964c63ae68e7', captured_head=0))
+E                +    where can_reuse = &lt;ate_sim.persistence_validation_scope.ValidationScope object at 0x7fc3ca367bb0&gt;.can_reuse
+E                +    and   GenerationPin(token='3d1c5eec-0d6a-49f6-a43d-681bf267f29c', store_identity='e3ccdb88-750b-44f2-81de-964c63ae68e7', captured_head=0) = &lt;ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc3ca3c1e50&gt;.pin
+
+simulation/tests/test_stage_0_6_read_view_epoch.py:71: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_released_view_cannot_hide_external_change_before_reopen" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="75" time="0.632" /><testcase classname="simulation.tests.test_stage_0_6_read_view_epoch" name="test_borrowed_view_keeps_full_epoch_checks" file="simulation/tests/test_stage_0_6_read_view_epoch.py" line="91" time="0.653" /></testsuite></testsuites>

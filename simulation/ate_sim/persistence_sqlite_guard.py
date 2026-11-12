@@ -95,8 +95,11 @@ class GuardedConnection(sqlite3.Connection):
         # even if later unregistered. These need not change total_changes.
         self._sql_callback_generation=0
         self._schema_statement_generation=0
+        self._transaction_generation=0
 
     def _note_fact_sql(self,sql):
+        if type(sql) is str and sql in ('BEGIN','COMMIT','ROLLBACK'):
+            self._transaction_generation += 1
         if type(sql) is str and (sql.startswith('SELECT ') or sql in _FACT_READ_SQL):return
         # SQLite WITH prefixes SELECT or one of these DML verbs, never DDL or
         # PRAGMA. Scan the entire text, including quoted/comment text: harmless
@@ -131,6 +134,8 @@ class GuardedConnection(sqlite3.Connection):
         return super().load_extension(path,entrypoint=entrypoint)
 
     def __setattr__(self,name,value):
+        if name in ('autocommit','isolation_level'):
+            self._transaction_generation = getattr(self, '_transaction_generation', 0) + 1
         if name in ('row_factory','text_factory'):
             self._reject_callback_factory_change()
             if (name=='row_factory' and value is not None
@@ -229,10 +234,12 @@ class GuardedConnection(sqlite3.Connection):
 
     def commit(self):
         self._reject_callback_sql()
+        self._transaction_generation += 1
         return super().commit()
 
     def rollback(self):
         self._reject_callback_sql()
+        self._transaction_generation += 1
         return super().rollback()
 
     def set_authorizer(self,callback):

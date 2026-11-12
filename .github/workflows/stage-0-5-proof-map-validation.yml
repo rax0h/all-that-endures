@@ -98,6 +98,7 @@ jobs:
           mkdir -p evidence
           python -m pytest -q simulation/tests/test_stage_0_6_proof_node_factorization.py --junitxml=evidence/node-factorization-tests.xml 2>&1 | tee evidence/node-factorization-tests.log
           python -m pytest -q simulation/tests/test_stage_0_6_descriptor_facts.py --junitxml=evidence/descriptor-fact-tests.xml 2>&1 | tee evidence/descriptor-fact-tests.log
+          python -m pytest -q simulation/tests/test_stage_0_6_read_view_epoch.py --junitxml=evidence/read-view-epoch-tests.xml 2>&1 | tee evidence/read-view-epoch-tests.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_nodes.py simulation/tests/test_stage_0_5_proof_map.py simulation/tests/test_stage_0_5_proof_store.py simulation/tests/test_stage_0_5_proof_batch.py simulation/tests/test_stage_0_5_proof_content.py simulation/tests/test_stage_0_5_proof_order.py simulation/tests/test_stage_0_5_proof_order_edit.py simulation/tests/test_stage_0_5_proof_query.py simulation/tests/test_stage_0_5_proof_version.py simulation/tests/test_stage_0_5_proof_occurrence.py --junitxml=evidence/proof-tests.xml 2>&1 | tee evidence/proof-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_map_scaling.py --output evidence/scaling 2>&1 | tee evidence/scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_batch_scaling.py --output evidence/batch-scaling 2>&1 | tee evidence/batch-scaling.log

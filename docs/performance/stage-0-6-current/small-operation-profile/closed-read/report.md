@@ -139,3 +139,9 @@ final-focused and13additional revision cases in revision-controls. These are
 The301intermediate affected result remains explicitly separate. Independent
 whole-package final signoff is review-raw/report.md. Hosted validation remains
 pending; this document does not claim final hosted green.
+
+Hosted43227352719 at exact published f6d5d2ba/runtime41d21d8 is now verified
+green:5071full tests6060.896s; proof31XMLs1914tests plus scaling. Counts overlap.
+Actual archive hashes/source records are in hosted-43227352719/summary.json.
+This closes the hosted engine gate only; mature and interactive targets remain
+open, and the mature job was skipped.
