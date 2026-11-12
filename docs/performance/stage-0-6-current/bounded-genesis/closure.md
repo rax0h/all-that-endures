@@ -241,3 +241,60 @@ patch/tests/source fences/profiles and all fixture negatives are preserved under
 to green0785bf9. No new engine authority, test selection, cache or mature trigger
 was landed and no additional expensive CI is warranted by this evidence-only
 closure. Repeated closed-read validation/proof batching is the next investigation.
+
+## November12 descriptor fact group
+
+One whole-package independent review covers both withdrawn guard and retained
+replacement. All raw negatives remain evidence; none is a published engine
+failure. Detailed design, bounds and raw measurements are in
+../small-operation-profile/closed-read/report.md.
+
+| ID | Origin | Concrete disposition and evidence | Status |
+|---|---|---|---|
+| W6a | Broad guard slower despite fewer SQL calls | Remove entire new scope/guard/world-session integration; preserve candidate patch/module/tests and raw/profile evidence under closed-read/rejected-guard. Replacement adds no guard/exit boundary. | CLOSED by withdrawal |
+| W6b | Independent interrupted activation left guard installed | Remove offending activation path and module; original guard lifecycle restored exactly. Original fault injection retained in review-raw/independent.log/xml. | CLOSED by withdrawal |
+| W6c | Independent final rejection retained unreturned spilled buffers | Remove new final-rejection scope; original group cleanup restored. No replacement exit validator exists. Original negative preserved. | CLOSED by withdrawal |
+| W6d | Original budget probe missed specialized branch; callback contract imprecise | Withdraw specialized branch. Replacement one-entry/64KiB independent forced-spill probe passes; revised plan/report explain retained immutable fact vs active read scope and callback fallback. | CLOSED locally |
+| W6e | Reviewer assumed unsupported WAL journal | Preserve initial failed fixture and follow-up negative; corrected DELETE-mode reader/writer probe passes. No journal support change claimed. | CLOSED test repair |
+| W6f | Replacement raw-id registry stamp could permit address reuse; retained fence accounting incomplete | Keep bounded actual registry entry references and charge retained tuple/string/fence weight against combined owner-cache limits; independent one-entry probe passes. | CLOSED locally |
+| W6g | SQL callback could change codec after early stamp; hook equality could be permissive | Do all callback-capable SQL before final pure fence; callback history always falls back. Bind hook id+weakref. Independent trace mutation/unregister probe passes without cached hit. | CLOSED locally |
+| W6h | Writable blob/deserialize bypass ordinary change counters; extensions can register native callbacks | Monotonic disqualification on writable blobopen/deserialize/extension enable/load, including failed attempts. Two regression RED cases preserved; expanded four opaque API controls pass. Normal guarded API contract stated, not arbitrary Python sandbox. | CLOSED locally |
+| W6i | New test insertion misplaced save-follow tail | Restore tail to its intended shared-limit/save test before final focused suite;12tests pass10.45s. Expanded opaque4pass2.91s includes two additional cases; counts overlap and are not summed. | CLOSED test repair |
+| W6k | Historical fingerprint helper compared new receipt bookkeeping as runtime field | Preserve original helper; exclude runtime_tree and qualification_receipt metadata from runtime comparison. Every actual fingerprint field matches in final-runtime-fingerprint.json. No interpreter/library change. | CLOSED diagnostic repair |
+| W6j | Broader completion/performance claim risk | Keep targets and mature preparation OPEN. Adjacent reverse-order raw pair first12.377→9.526s/warm8.698→7.889s with exact fresh state, explicit earlier host drift and no meaningful save gain claim. | CLOSED scope clarification |
+
+Runtime fingerprint matches full qualified313 record. Independent replacement
+boundary cases pass4in2.53s plus physical descriptor corruption1in1.11s on
+compatible source changes, with exact source fences. Original native admission,
+epoch checks and physical proofs still reject corruption even after a warmed
+fact and manual accepted-epoch update. Local affected suite and final independent
+signoff are recorded with the final package below; hosted validation is still a
+separate completion gate.
+
+
+| ID | Origin | Concrete disposition and evidence | Status |
+|---|---|---|---|
+| W6l | Late independent DDL replacement with manually restored schema_version hid changed catalog bytes | Bind monotonic guarded-SQL revision in descriptor fence and existing owner-cache epoch. Unknown SQL/scripts advance; narrow read allowlist and bounded WITH DML-token exclusion retain reads. Custom cursor factory history disables facts. Live DDL inspection occurs before warmup, avoiding incidental test invalidation. Original RED preserved;16focused and13extra CTE/comment/script controls pass. First strict-allowlist setup negative also preserved. | CLOSED locally through independent DDL-reset probe1.26s; final signoff below |
+
+Intermediate candidate affected suite:301passed431.51s,7JUnit record_property
+format warnings. Do not count this as final-source full validation after W6l.
+Compatible outputs are retained rather than rerunning the same expensive
+constructor locally; final guarded connection/scope controls and one hosted
+proof/full package provide the remaining changed-source coverage. The earlier
+raw speed pair is intermediate-source evidence and must not be attributed to
+final revised source until remeasured. No mature request changed.
+
+
+Final-source two direction-balanced raw pairs retain all results: first-step
+baseline9.854/10.635s→candidate8.185/7.481s. Warm8.051/10.547→8.558/7.535s is mixed;
+open1.171/1.310→1.896/1.871s is slower. No consistent warm/save/open improvement
+claim. Exact state and metadata-work reduction persist. Keeping bounded repeated
+proof-work reduction/first-step observation for bundled CI does not close W3/U10
+or mature targets. Full final table and raw source fences are in closed-read/report.
+
+Final-source54guard/scope cases passed20.81s; new29distinct regression controls
+passed as16focused+13revision cases. Existing301intermediate affected cases
+remain compatible evidence only. Raw/open tradeoff is explicit: opening slower
+inboth final pairs (+62.0%/+42.8%), warmmixed. See independent final signoff in
+../small-operation-profile/closed-read/review-raw/report.md. Hosted proof/full
+validation is the next completion gate; no mature request activation.

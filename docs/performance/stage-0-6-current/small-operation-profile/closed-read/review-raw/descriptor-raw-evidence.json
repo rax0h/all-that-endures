@@ -1,0 +1,54 @@
+{
+  "changed_files": [
+    "simulation/ate_sim/persistence_sqlite_guard.py",
+    "simulation/ate_sim/persistence_lazy_identity_catalog.py"
+  ],
+  "reverse_baseline_runtime_matches_initial_baseline": true,
+  "input_matches": true,
+  "phases": {
+    "open": {
+      "baseline_seconds": 1.5543701180000085,
+      "candidate_seconds": 1.6423025640000048,
+      "candidate_change_percent": 5.657111197758891
+    },
+    "first_step": {
+      "baseline_seconds": 12.376655341000003,
+      "candidate_seconds": 9.526160170999987,
+      "candidate_change_percent": -23.031223634039588
+    },
+    "save": {
+      "baseline_seconds": 6.617256685000029,
+      "candidate_seconds": 6.344771788999992,
+      "candidate_change_percent": -4.1177924474005145
+    },
+    "warm_step": {
+      "baseline_seconds": 8.698165716000005,
+      "candidate_seconds": 7.889040790999985,
+      "candidate_change_percent": -9.302247754508286
+    },
+    "fresh_verify": {
+      "baseline_seconds": 20.983236337999983,
+      "candidate_seconds": 18.554248234,
+      "candidate_change_percent": -11.575850668951205
+    }
+  },
+  "metadata_rows": {
+    "first_step": {
+      "baseline": 61171,
+      "candidate": 57461
+    },
+    "save": {
+      "baseline": 24929,
+      "candidate": 24929
+    },
+    "warm_step": {
+      "baseline": 51359,
+      "candidate": 47507
+    }
+  },
+  "semantic_state_matches": {
+    "saved": true,
+    "warm_digest": true,
+    "warm_year": true
+  }
+}

@@ -1,0 +1,41 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_external_commit_cannot_change_current_view_or_next_admission _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_external_commit_cannot_ch0')
+
+    def test_external_commit_cannot_change_current_view_or_next_admission(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with sqlite3.connect(path) as setup:
+            assert setup.execute('PRAGMA journal_mode=WAL').fetchone()[0] == 'wal'
+>       with fast_open(path, pair) as session:
+             ^^^^^^^^^^^^^^^^^^^^^
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/test_independent_boundaries.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:26: in fast_open
+    return api.open_proof_world_session(path,rules_id=kwargs.pop('rules_id',RULES),
+simulation/ate_sim/persistence_proof_world_session.py:252: in open_proof_world_session
+    return open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18086: in open_lazy_world_session
+    store = open_store(path,_proof_admission,rules_id=rules_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_open.py:90: in open_store
+    LazyRecordStore._configure_open(db)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f07736cae50>
+
+    @staticmethod
+    def _configure_open(db: sqlite3.Connection) -> None:
+        db.execute("PRAGMA foreign_keys=ON")
+        mode = db.execute("PRAGMA journal_mode").fetchone()[0]
+        if str(mode).lower() != "delete":
+>           raise StoreFormatError("save store requires rollback journal mode DELETE")
+E           ate_sim.incremental_store.StoreFormatError: save store requires rollback journal mode DELETE
+
+simulation/ate_sim/persistence_lazy_store.py:667: StoreFormatError
+=========================== short test summary info ============================
+FAILED docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/test_independent_boundaries.py::test_external_commit_cannot_change_current_view_or_next_admission
+1 failed, 8 deselected in 1.24s

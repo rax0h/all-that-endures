@@ -1,0 +1,68 @@
+{
+  "changed_sources": {
+    "simulation/ate_sim/persistence_lazy_identity_catalog.py": {
+      "baseline": "648ebc0d6d6ac082edf16f9abe1fcd81ba4eb92add0fe6325cf89185f9b0a9b5",
+      "candidate": "592eeeee1abdbf3cdfc5173566aa6983591e5f178bb48778f32876c929431f92",
+      "current": "592eeeee1abdbf3cdfc5173566aa6983591e5f178bb48778f32876c929431f92"
+    },
+    "simulation/ate_sim/persistence_proof_read_scope.py": {
+      "baseline": null,
+      "candidate": "b6aa472f9255bf477d690a92dcd8ee13645c2469228e95212315472766da282a",
+      "current": "b6aa472f9255bf477d690a92dcd8ee13645c2469228e95212315472766da282a"
+    },
+    "simulation/ate_sim/persistence_proof_world_session.py": {
+      "baseline": "5811b96a9e157b873ca7414a5b2a65db19ed2bf44945b025b40dd871bdc6942c",
+      "candidate": "12a801a43995da9b5313246d258211d87f6a240300c7f9178d8187441bc67953",
+      "current": "12a801a43995da9b5313246d258211d87f6a240300c7f9178d8187441bc67953"
+    },
+    "simulation/ate_sim/persistence_sqlite_guard.py": {
+      "baseline": "e389928d7a517f916c8f06c67e2efa302afb6da92d828d22c54a353bfced9417",
+      "candidate": "247929367eb5b5847dc334a4b89ea57c713294da4c3acba82b5df54752d14c61",
+      "current": "247929367eb5b5847dc334a4b89ea57c713294da4c3acba82b5df54752d14c61"
+    },
+    "simulation/ate_sim/persistence_validation_scope.py": {
+      "baseline": "fd16b2481575600ab76314a2b862664756251e3a23f256cd4b3a6ed30636a2f7",
+      "candidate": "5359c49dd2922fd992c7f576bb4b0cb221b85c7a12382e414d86c02ab021c17a",
+      "current": "5359c49dd2922fd992c7f576bb4b0cb221b85c7a12382e414d86c02ab021c17a"
+    }
+  },
+  "input_equal": true,
+  "source_preserved": [
+    true,
+    true
+  ],
+  "runtime_preserved": [
+    true,
+    true
+  ],
+  "phase_seconds": {
+    "open": {
+      "baseline": 1.0866683909999892,
+      "candidate": 1.104533994999997
+    },
+    "first_step": {
+      "baseline": 6.919340689000023,
+      "candidate": 8.157624313000042
+    },
+    "save": {
+      "baseline": 4.506949400999986,
+      "candidate": 4.586282717000017
+    },
+    "warm_step": {
+      "baseline": 5.751314657000023,
+      "candidate": 6.544987208000066
+    },
+    "fresh_verify": {
+      "baseline": 13.696725808999986,
+      "candidate": 14.555747902000007
+    }
+  },
+  "restored_top_level_keys": [
+    "saved",
+    "warm_digest",
+    "warm_year",
+    "imports"
+  ],
+  "probe_source_fence_preserved": true,
+  "probe_sha256": "1c2aba27569e8f8f43adc1be1d5461440637e6384b3388448f04afcef5c7d72d"
+}

@@ -1,0 +1,109 @@
+diff --git a/simulation/ate_sim/persistence_lazy_identity_catalog.py b/simulation/ate_sim/persistence_lazy_identity_catalog.py
+index 077c8f3..b587752 100644
+--- a/simulation/ate_sim/persistence_lazy_identity_catalog.py
++++ b/simulation/ate_sim/persistence_lazy_identity_catalog.py
+@@ -518,8 +518,9 @@ class IdentityCatalog:
+ 
+     def _descriptor(self, pin):
+         from .persistence_genesis_transaction import _FrozenScope
++        from .persistence_proof_read_scope import ClosedProofReadScope
+         scope = getattr(self.store, '_validation_scope', None)
+-        reusable = type(scope) is _FrozenScope and scope.can_reuse(self.store, pin)
++        reusable = type(scope) in (_FrozenScope, ClosedProofReadScope) and scope.can_reuse(self.store, pin)
+         cached = scope.lookup('descriptor', ()) if reusable else None
+         if cached is not None:
+             return cached
+@@ -754,7 +755,7 @@ class IdentityCatalog:
+         if type(incarnation_id) is not int or incarnation_id < 1:
+             raise ValueError('incarnation_id must be a positive int')
+         from .persistence_validation_scope import checked_read_operation
+-        with checked_read_operation(self.store, pin, byte_limit=min(256*1024, self.byte_limit//6)) as scope:
++        with checked_read_operation(self.store, pin, byte_limit=min(256*1024, self.byte_limit//6), _proof_group=True) as scope:
+             descriptor = self._descriptor(pin)
+             if incarnation_id >= descriptor[2]:
+                 raise StoreIntegrityError('identity incarnation exceeds catalog allocator')
+diff --git a/simulation/ate_sim/persistence_proof_world_session.py b/simulation/ate_sim/persistence_proof_world_session.py
+index 29db6de..513befa 100644
+--- a/simulation/ate_sim/persistence_proof_world_session.py
++++ b/simulation/ate_sim/persistence_proof_world_session.py
+@@ -25,6 +25,11 @@ class _WorldProofAuthority:
+         self._admission_temp_schema=store.db.execute('PRAGMA temp.schema_version').fetchone()[0]
+ 
+     def _epoch(self):
++        from .persistence_proof_read_scope import ClosedProofReadScope
++        scope = getattr(self.store, '_validation_scope', None)
++        if type(scope) is ClosedProofReadScope:
++            cached = scope.epoch_for(self)
++            if cached is not None:return cached
+         db=self.store.db
+         return (db,self.store.codec,db.execute('PRAGMA data_version').fetchone()[0],db.total_changes,
+             db.execute('PRAGMA main.schema_version').fetchone()[0],db.execute('PRAGMA temp.schema_version').fetchone()[0])
+diff --git a/simulation/ate_sim/persistence_sqlite_guard.py b/simulation/ate_sim/persistence_sqlite_guard.py
+index 531ec55..2e6f639 100644
+--- a/simulation/ate_sim/persistence_sqlite_guard.py
++++ b/simulation/ate_sim/persistence_sqlite_guard.py
+@@ -150,15 +150,23 @@ class GuardedConnection(sqlite3.Connection):
+ 
+     def _invoke_sql_callback(self,callback,*args):
+         if getattr(self,'_native_write_guard',None) is None:return callback(*args)
++        guard = self._native_write_guard
+         self._native_sql_callback_depth=getattr(self,'_native_sql_callback_depth',0)+1
+         try:return callback(*args)
+-        finally:self._native_sql_callback_depth-=1
++        finally:
++            self._native_sql_callback_depth-=1
++            checked = getattr(guard, 'after_callback', None)
++            if checked is not None:checked()
+ 
+     def set_trace_callback(self,callback):
++        guard=getattr(self,'_native_write_guard',None)
++        if guard is not None and getattr(guard,'freeze_callbacks',False):guard.reject('closed proof read cannot replace callbacks')
+         if callback is not None and not callable(callback):raise TypeError('trace callback must be callable')
+         return super().set_trace_callback(None if callback is None else lambda sql:self._invoke_sql_callback(callback,sql))
+ 
+     def set_progress_handler(self,callback,n):
++        guard=getattr(self,'_native_write_guard',None)
++        if guard is not None and getattr(guard,'freeze_callbacks',False):guard.reject('closed proof read cannot replace callbacks')
+         if callback is not None and not callable(callback):raise TypeError('progress callback must be callable')
+         return super().set_progress_handler(None if callback is None else lambda:self._invoke_sql_callback(callback),n)
+ 
+diff --git a/simulation/ate_sim/persistence_validation_scope.py b/simulation/ate_sim/persistence_validation_scope.py
+index f7e85ef..8c9d6fc 100644
+--- a/simulation/ate_sim/persistence_validation_scope.py
++++ b/simulation/ate_sim/persistence_validation_scope.py
+@@ -90,7 +90,7 @@ class ValidationScope:
+ 
+ 
+ @contextmanager
+-def checked_read_operation(store, pin, *, byte_limit=256*1024):
++def checked_read_operation(store, pin, *, byte_limit=256*1024, _proof_group=False):
+     """Internal operations only; ordinary read_snapshot retains its contract."""
+     store._ensure_open()
+     previous = getattr(store, '_validation_scope', None)
+@@ -101,11 +101,24 @@ def checked_read_operation(store, pin, *, byte_limit=256*1024):
+     owned_open = opener is not None and opener.matches(store, pin)
+     eligible = (not getattr(store, '_checked_snapshot_depth', 0)
+                 and (owned_open or not store.db.in_transaction and not store._active_read_transaction))
++    native = None
++    if _proof_group and eligible and not owned_open:
++        from . import persistence_proof_read_scope as closed
++        from .persistence_proof_native_sources import active
++        authority = active(store)
++        if closed.eligible(store, authority, byte_limit):
++            native = authority
+     with store.read_snapshot(pin):
+-        scope = ValidationScope(store, pin, eligible=eligible, byte_limit=byte_limit)
++        if native is not None:
++            scope = closed.ClosedProofReadScope(store, pin, native, byte_limit)
++            scope.activate()
++        else:
++            scope = ValidationScope(store, pin, eligible=eligible, byte_limit=byte_limit)
+         store._validation_scope = scope
+         try:
+             yield scope
++            if native is not None:scope.check()
+         finally:
+-            scope.invalidate()
+             store._validation_scope = previous
++            if native is not None:scope.release()
++            else:scope.invalidate()

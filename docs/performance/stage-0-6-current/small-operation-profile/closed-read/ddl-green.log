@@ -1,0 +1,29 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_ddl_replacement_with_restored_schema_epoch_cannot_hit_warmed_fact ____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5/test_ddl_replacement_with_rest0')
+
+    def test_ddl_replacement_with_restored_schema_epoch_cannot_hit_warmed_fact(tmp_path):
+        from ate_sim.persistence_lazy_identity_catalog import CATALOG_NAMESPACE
+>       session, cat, inc = warmed(tmp_path)
+                            ^^^^^^^^^^^^^^^^
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/descriptor_boundaries.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5/test_ddl_replacement_with_rest0')
+
+    def warmed(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        session = fast_open(path, pair)
+        st, cat = session.store, session._identity_coordinator.catalog
+        inc = st.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+        cat.read_identity_group(session.pin, inc)
+>       assert cat.owner_cache_diagnostics()['descriptor_entries'] == 1
+E       assert 0 == 1
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/descriptor_boundaries.py:18: AssertionError
+=========================== short test summary info ============================
+FAILED docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/descriptor_boundaries.py::test_ddl_replacement_with_restored_schema_epoch_cannot_hit_warmed_fact
+1 failed, 5 deselected in 1.56s

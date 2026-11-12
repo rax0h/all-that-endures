@@ -1,0 +1,6 @@
+{
+  "simulation/ate_sim/persistence_lazy_identity_catalog.py": "462f51fe021f13534b9710568c2b63a2dc406404bf3e4d9f2e060adfe11efd96",
+  "simulation/ate_sim/persistence_sqlite_guard.py": "f4fda2905572b67f12a40890453e10af40b39010d8dffadb848d7966ea946506",
+  "simulation/tests/test_stage_0_6_descriptor_facts.py": "bed3073fe3a6d0dd19bdb80b1a49a8325941008e1b639480de13cdbcffce3f6e",
+  "docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/descriptor_boundaries.py": "1b5a75fafd96f77a96d89ab0731c94606061434579fae3dd5f09d80aed4820b9"
+}

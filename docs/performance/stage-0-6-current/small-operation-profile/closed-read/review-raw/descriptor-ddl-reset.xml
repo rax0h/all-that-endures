@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.086" timestamp="2026-11-12T07:12:28.977417-06:00" hostname="7809e6b3dd47"><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.descriptor_boundaries" name="test_ddl_replacement_with_restored_schema_epoch_cannot_hit_warmed_fact" time="0.794"><failure message="AssertionError: warmed descriptor skipped corruption despite equal coarse epoch&#10;assert not True">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_ddl_replacement_with_rest0')
+
+    def test_ddl_replacement_with_restored_schema_epoch_cannot_hit_warmed_fact(tmp_path):
+        from ate_sim.persistence_lazy_identity_catalog import CATALOG_NAMESPACE
+        session, cat, inc = warmed(tmp_path)
+        with session:
+            st = session.store
+            before = st._world_proof_authority._epoch()
+            indexes = [row[0] for row in st.db.execute(
+                "SELECT sql FROM sqlite_schema WHERE tbl_name='lazy_record_versions' AND type='index' AND sql IS NOT NULL")]
+            columns = [row[1] for row in st.db.execute('PRAGMA table_info(lazy_record_versions)')]
+            projection = ','.join(
+                "CASE WHEN namespace='" + CATALOG_NAMESPACE + "' THEN X'00' ELSE payload END AS payload"
+                if column == 'payload' else column for column in columns)
+            st.db.execute('CREATE TABLE review_replacement AS SELECT ' + projection + ' FROM lazy_record_versions')
+            st.db.execute('DROP TABLE lazy_record_versions')
+            st.db.execute('ALTER TABLE review_replacement RENAME TO lazy_record_versions')
+            for statement in indexes:
+                st.db.execute(statement)
+            st.db.execute('PRAGMA schema_version=' + str(before[4]))
+            assert st._world_proof_authority._epoch() == before
+            cached_accepted = False
+            try:
+                cat.read_identity_group(session.pin, inc)
+                cached_accepted = True
+            except StoreError:
+                pass
+            cat._descriptor_fact = None
+            cat._descriptor_fact_bytes = 0
+            with pytest.raises(StoreError):
+                cat.read_identity_group(session.pin, inc)
+&gt;           assert not cached_accepted, 'warmed descriptor skipped corruption despite equal coarse epoch'
+E           AssertionError: warmed descriptor skipped corruption despite equal coarse epoch
+E           assert not True
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/descriptor_boundaries.py:106: AssertionError</failure></testcase></testsuite></testsuites>

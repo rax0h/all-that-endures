@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="10" time="7.144" timestamp="2026-11-12T00:01:02.753388-06:00" hostname="a58c7467fd5e"><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_repeated_group_reads_reuse_descriptor_but_check_actual_group" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="15" time="0.667" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[local]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.630" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[external]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.610" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[rollback]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.614" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[temp-shadow]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.601"><failure message="sqlite3.OperationalError: no such index: lazy_record_expiry">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6/test_warmed_fact_does_not_bypa3')
+fault = 'temp-shadow'
+
+    @pytest.mark.parametrize('fault', ['local', 'external', 'rollback', 'temp-shadow', 'codec', 'registry', 'hook'])
+    def test_warmed_fact_does_not_bypass_context_drift(tmp_path, fault):
+        path, pair = ranked_fixture(tmp_path, size=4)
+&gt;       with fast_open(path, pair) as session:
+             ^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_descriptor_facts.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18062: in __exit__
+    self.close()
+simulation/ate_sim/persistence_lazy.py:18028: in close
+    self._release_publisher_pin()
+simulation/ate_sim/persistence_lazy.py:18001: in _release_publisher_pin
+    self._backing_dependencies.close(abandon_stale=self._state == 'stale')
+simulation/ate_sim/persistence_history_dependencies.py:233: in close
+    self.store.release_pin(self.pin)
+simulation/ate_sim/persistence_lazy_store.py:1256: in release_pin
+    self.release_pins((pin,), cleanup_budget=cleanup_budget)
+simulation/ate_sim/persistence_lazy_store.py:1300: in release_pins
+    self._cleanup_expired(floor, row_budget=cleanup_budget)
+simulation/ate_sim/persistence_lazy_store.py:2711: in _cleanup_expired
+    rowids = [row[0] for row in self.db.execute(
+simulation/ate_sim/persistence_sqlite_guard.py:173: in execute
+    return self.cursor().execute(*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;ate_sim.persistence_sqlite_guard._NativeGuardCursor object at 0x7f025f25df40&gt;
+args = ('SELECT rowid FROM lazy_record_versions INDEXED BY lazy_record_expiry WHERE valid_to IS NOT NULL AND valid_to&lt;=? ORDER BY valid_to LIMIT ?', (0, 256))
+kwargs = {}
+
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+&gt;       return super().execute(*args,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: no such index: lazy_record_expiry
+
+simulation/ate_sim/persistence_sqlite_guard.py:44: OperationalError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[codec]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.576" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[registry]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.560"><failure message="Failed: DID NOT RAISE StoreError">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-6/test_warmed_fact_does_not_bypa5')
+fault = 'registry'
+
+    @pytest.mark.parametrize('fault', ['local', 'external', 'rollback', 'temp-shadow', 'codec', 'registry', 'hook'])
+    def test_warmed_fact_does_not_bypass_context_drift(tmp_path, fault):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st, cat = session.store, session._identity_coordinator.catalog
+            inc = st.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+            cat.read_identity_group(session.pin, inc)
+            if fault in ('local', 'external', 'rollback'):
+                db = sqlite3.connect(path) if fault == 'external' else st.db
+                if fault == 'rollback':db.execute('SAVEPOINT trial')
+                db.execute("UPDATE records SET payload_checksum='descriptor-drift' WHERE namespace='world.seed'")
+                if fault == 'rollback':db.execute('ROLLBACK TO trial');db.execute('RELEASE trial')
+                else:db.commit()
+                if db is not st.db:db.close()
+            elif fault == 'temp-shadow':
+                st.db.execute('CREATE TEMP TABLE lazy_record_versions(payload)')
+            elif fault == 'codec':
+                st.codec.decode = lambda _: None
+            elif fault == 'registry':
+                st.codec._record_by_name['core.Ref/v1'] = object
+            else:
+                original = st._phase_hook
+                st._phase_hook = lambda _: None
+                before = cat.owner_cache_diagnostics()['descriptor_hits']
+                cat.read_identity_group(session.pin, inc)
+                assert cat.owner_cache_diagnostics()['descriptor_hits'] == before
+                st._phase_hook = original
+                return
+            try:
+&gt;               with pytest.raises(StoreError):cat.read_identity_group(session.pin, inc)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_6_descriptor_facts.py:67: Failed</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_warmed_fact_does_not_bypass_context_drift[hook]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="37" time="0.578" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_borrowed_and_audited_reads_do_not_use_descriptor_fact" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="75" time="0.775" /><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_descriptor_and_owner_facts_share_existing_limits_and_follow_save" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="92" time="0.803" /></testsuite></testsuites>

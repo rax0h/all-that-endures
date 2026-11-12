@@ -11,6 +11,7 @@ from collections import OrderedDict
 from contextlib import closing
 import hashlib
 import sys
+import weakref
 from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, StoreConflictError, _framed_sha, _record_checksum
 from .persistence_lazy_store import VersionChange
 from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES, ParticipantDelta
@@ -30,6 +31,47 @@ CATALOG_NAMESPACES = (CATALOG_NAMESPACE, GROUP_NAMESPACE, OWNER_NAMESPACE,
                       OWNER_TREE_NAMESPACE, RETIRED_NAMESPACE, LINK_NAMESPACE, RETIRED_NODE_NAMESPACE)
 LEGACY_FEATURES = ('complete-groups/v1', 'owner-radix/v1', 'versioned-p2c/v1')
 FEATURES = LEGACY_FEATURES + ('retired-intervals/v1',)
+
+
+class _DescriptorRegistries:
+    """Bounded entry-identity snapshot, holding refs so addresses cannot recycle."""
+    __slots__ = ('items', 'weight')
+
+    def __init__(self, items, weight):
+        self.items, self.weight = items, weight
+
+    def __eq__(self, other):
+        return (type(other) is _DescriptorRegistries and len(self.items) == len(other.items)
+                and all(len(a) == len(b) and all(ka is kb and va is vb for (ka, va), (kb, vb) in zip(a, b))
+                        for a, b in zip(self.items, other.items)))
+
+
+def _descriptor_registries(codec):
+    from .persistence_adapters import RECORD_FIELDS
+    from .core import Ref, Layer
+    known = {id(cls) for cls in RECORD_FIELDS} | {id(Ref), id(Layer)}
+    maps = []
+    strings = set()
+    weight = sys.getsizeof(()) + 4*8 + 128
+    for name in ('_record_by_name', '_record_by_type', '_enum_by_name', '_enum_by_type'):
+        mapping = getattr(codec, name, None)
+        if type(mapping) is not dict or len(mapping) > 128:
+            return None
+        weight += sys.getsizeof(()) + len(mapping)*8
+        for key, value in mapping.items():
+            tag, cls = (key, value) if name.endswith('_by_name') else (value, key)
+            if type(tag) is not str or len(tag) > 256 or id(cls) not in known:
+                return None
+            weight += sys.getsizeof((None, None))
+            if id(tag) not in strings:
+                weight += sys.getsizeof(tag)
+                strings.add(id(tag))
+        if weight > 32768:
+            return None
+        maps.append(tuple(mapping.items()))
+    # Repository schema classes are already held globally. Charge all newly
+    # retained tuple metadata and bounded strings, not duplicate code objects.
+    return _DescriptorRegistries(tuple(maps), weight)
 
 
 def digest(codec, domain, values):
@@ -461,17 +503,32 @@ class IdentityCatalog:
         self._owner_cache_epoch = None
         self._owner_cache_bytes = self._owner_cache_occurrences = 0
         self._owner_cache_hits = self._owner_cache_misses = 0
+        self._descriptor_fact = None
+        self._descriptor_fact_bytes = 0
+        self._descriptor_hits = 0
 
     def _clear_owner_cache(self):
         self._owner_cache.clear()
         self._owner_cache_epoch = None
         self._owner_cache_bytes = self._owner_cache_occurrences = 0
+        self._descriptor_fact = None
+        self._descriptor_fact_bytes = 0
+
+    def _trim_owner_cache(self):
+        while self._owner_cache and (
+                len(self._owner_cache) + (self._descriptor_fact is not None) > min(256, self.occurrence_limit)
+                or self._owner_cache_bytes + self._descriptor_fact_bytes > min(self.byte_limit, 256*1024)
+                or self._owner_cache_occurrences > self.occurrence_limit):
+            _, (old, weight) = self._owner_cache.popitem(last=False)
+            self._owner_cache_bytes -= weight
+            self._owner_cache_occurrences -= len(old.occurrences)
 
     def _owner_epoch(self, pin):
         db = self.store.db
         return (db, self.codec, self.store.codec, pin.captured_head, db.total_changes,
                 db.execute('PRAGMA data_version').fetchone()[0],
-                db.execute('PRAGMA schema_version').fetchone()[0])
+                db.execute('PRAGMA schema_version').fetchone()[0],
+                getattr(db, '_schema_statement_generation', None))
 
     @staticmethod
     def _immutable_owner_value(value):
@@ -494,21 +551,77 @@ class IdentityCatalog:
         self._owner_cache[key] = checked, size
         self._owner_cache_bytes += size
         self._owner_cache_occurrences += count
-        while (len(self._owner_cache) > min(256, self.occurrence_limit)
-               or self._owner_cache_bytes > byte_limit
-               or self._owner_cache_occurrences > self.occurrence_limit):
-            _, (old, weight) = self._owner_cache.popitem(last=False)
-            self._owner_cache_bytes -= weight
-            self._owner_cache_occurrences -= len(old.occurrences)
+        self._trim_owner_cache()
 
     def owner_cache_diagnostics(self):
-        return dict(entries=len(self._owner_cache), bytes=self._owner_cache_bytes,
+        return dict(entries=len(self._owner_cache) + (self._descriptor_fact is not None),
+                    bytes=self._owner_cache_bytes + self._descriptor_fact_bytes,
                     occurrences=self._owner_cache_occurrences,
                     entry_limit=min(256, self.occurrence_limit),
                     byte_limit=min(self.byte_limit, 256 * 1024),
                     occurrence_limit=self.occurrence_limit,
                     metadata_python_bytes=sys.getsizeof(self._owner_cache),
-                    hits=self._owner_cache_hits, misses=self._owner_cache_misses)
+                    hits=self._owner_cache_hits, misses=self._owner_cache_misses,
+                    descriptor_entries=int(self._descriptor_fact is not None),
+                    descriptor_bytes=self._descriptor_fact_bytes, descriptor_hits=self._descriptor_hits)
+
+    def _descriptor_fact_fence(self, pin):
+        """A fresh owned native snapshot authorizes immutable facts, not reads."""
+        from .persistence_validation_scope import ValidationScope
+        from .persistence_proof_native_sources import active
+        from .persistence_proof_projection import _require_closed_codec
+        from .persistence_sqlite_guard import require_persistent_sources
+        from .incremental_store import StoreError
+        st = self.store
+        authority = active(st)
+        if (authority is None or not authority.proof_only or authority.busy or authority.uncertain
+                or not authority._opening_admitted):
+            self._descriptor_fact = None
+            self._descriptor_fact_bytes = 0
+            return None
+        scope = getattr(st, '_validation_scope', None)
+        if (type(scope) is not ValidationScope
+                or getattr(st.db, '_sql_callback_generation', None) != 0
+                or st.db.row_factory is not None or st.db.text_factory is not str
+                or st.db._known_authorizer is not None):
+            if getattr(st.db, '_sql_callback_generation', None) != 0:
+                self._descriptor_fact = None
+                self._descriptor_fact_bytes = 0
+            return None
+        if (not scope.can_reuse(st, pin) or authority.read_pin != pin
+                or not getattr(st, '_checked_snapshot_owns_transaction', False)
+                or st._active_read_transaction or self.codec is not st.codec):
+            return None
+        require_persistent_sources(st.db)
+        authority.guard()
+        if not scope.can_reuse(st, pin):
+            return None
+        # All callback-capable SQL precedes the final pure-Python fence. Recheck
+        # context after it; callbacks always select the original checking path.
+        if (getattr(st.db, '_sql_callback_generation', None) != 0
+                or active(st) is not authority or st._validation_scope is not scope
+                or st.db is not scope.db or st.codec is not scope.codec
+                or st.db.total_changes != scope._epoch[0]
+                or st._phase_hook is not scope._epoch[-1]):
+            return None
+        try:
+            _require_closed_codec(st)
+        except StoreError:
+            self._descriptor_fact = None
+            self._descriptor_fact_bytes = 0
+            return None
+        registries = _descriptor_registries(self.codec)
+        if registries is None:
+            return None
+        methods = tuple(getattr(getattr(self.codec, name), '__func__', getattr(self.codec, name))
+                        for name in ('encode', 'decode', '_encode_value', '_decode_value', '_enter', '_node_sort_key'))
+        try:
+            hook = (id(st._phase_hook), weakref.ref(st._phase_hook))
+        except TypeError:
+            return None
+        return (authority, st.db, self.codec, pin, authority.pair[1], authority.epoch,
+                hook, self.codec.version, self.codec.identity_links_recorded,
+                registries, methods, st.db._schema_statement_generation)
 
     def _read(self, pin, namespace, key):
         try:
@@ -523,6 +636,13 @@ class IdentityCatalog:
         cached = scope.lookup('descriptor', ()) if reusable else None
         if cached is not None:
             return cached
+        fence = self._descriptor_fact_fence(pin)
+        if fence is not None and self._descriptor_fact is not None and self._descriptor_fact[0] == fence:
+            self._descriptor_hits += 1
+            return self._descriptor_fact[1]
+        if fence is not None:
+            self._descriptor_fact = None
+            self._descriptor_fact_bytes = 0
         value = self._read(pin, CATALOG_NAMESPACE, 0)
         legacy = type(value) is tuple and len(value) == 5 and value[0] == 'identity-catalog/v1'
         for ns in CATALOG_NAMESPACES[:-1] if legacy else CATALOG_NAMESPACES:
@@ -549,6 +669,12 @@ class IdentityCatalog:
         if value[3] + retired_count != value[2] - 1 or self.store.namespace_size(pin, GROUP_NAMESPACE) != value[3]:
             raise StoreIntegrityError('identity group/retirement inventory count disagreement')
         if reusable:scope.remember('descriptor', (), value)
+        if fence is not None and self._immutable_owner_value(value) and self._descriptor_fact_fence(pin) == fence:
+            size = resident_bytes((fence, value)) + fence[9].weight + 256
+            if size <= min(32768, min(self.byte_limit, 256*1024)//4):
+                self._descriptor_fact = fence, value
+                self._descriptor_fact_bytes = size
+                self._trim_owner_cache()
         return value
 
     def _owner(self, pin, owner):

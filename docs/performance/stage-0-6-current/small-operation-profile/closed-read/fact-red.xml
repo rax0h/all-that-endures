@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.916" timestamp="2026-11-11T23:59:49.927335-06:00" hostname="a58c7467fd5e"><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_repeated_group_reads_reuse_descriptor_but_check_actual_group" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="15" time="0.651"><failure message="assert 2 == 0">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-5/test_repeated_group_reads_reus0')
+
+    def test_repeated_group_reads_reuse_descriptor_but_check_actual_group(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            cat = session._identity_coordinator.catalog
+            inc = session.store.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+            first = cat.read_identity_group(session.pin, inc)
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                second = cat.read_identity_group(session.pin, inc)
+            finally:
+                profile.disable()
+            assert second == first
+            assert len(second.occurrences) == 2
+            reads = 0
+            for (file, _, name), value in pstats.Stats(profile).stats.items():
+                if file.endswith('/persistence_lazy_identity_catalog.py') and name == '_read':
+                    reads += sum(v[1] for (_, _, caller), v in value[4].items() if caller == '_descriptor')
+&gt;           assert reads == 0
+E           assert 2 == 0
+
+simulation/tests/test_stage_0_6_descriptor_facts.py:34: AssertionError</failure></testcase></testsuite></testsuites>

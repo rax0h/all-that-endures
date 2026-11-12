@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.663" timestamp="2026-11-12T00:28:39.995182-06:00" hostname="a58c7467fd5e"><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_opaque_connection_mutation_apis_disable_fact_reuse[blob]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="111" time="0.721"><failure message="assert 1 == 0">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10/test_opaque_connection_mutatio0')
+method = 'blob'
+
+    @pytest.mark.parametrize('method', ['blob', 'deserialize'])
+    def test_opaque_connection_mutation_apis_disable_fact_reuse(tmp_path, method):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st, cat = session.store, session._identity_coordinator.catalog
+            inc = st.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+            cat.read_identity_group(session.pin, inc)
+            before = cat.owner_cache_diagnostics()['descriptor_hits']
+            if method == 'blob':
+                row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                with st.db.blobopen('store_metadata', 'value', row) as blob:
+                    assert blob.read() == b'7'
+            else:
+                st.db.deserialize(st.db.serialize())
+            cat.read_identity_group(session.pin, inc)
+&gt;           assert cat.owner_cache_diagnostics()['descriptor_hits'] == before
+E           assert 1 == 0
+
+simulation/tests/test_stage_0_6_descriptor_facts.py:127: AssertionError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_descriptor_facts" name="test_opaque_connection_mutation_apis_disable_fact_reuse[deserialize]" file="simulation/tests/test_stage_0_6_descriptor_facts.py" line="111" time="0.658"><failure message="assert 1 == 0">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-10/test_opaque_connection_mutatio1')
+method = 'deserialize'
+
+    @pytest.mark.parametrize('method', ['blob', 'deserialize'])
+    def test_opaque_connection_mutation_apis_disable_fact_reuse(tmp_path, method):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st, cat = session.store, session._identity_coordinator.catalog
+            inc = st.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+            cat.read_identity_group(session.pin, inc)
+            before = cat.owner_cache_diagnostics()['descriptor_hits']
+            if method == 'blob':
+                row = st.db.execute("SELECT rowid FROM store_metadata WHERE key='format_version'").fetchone()[0]
+                with st.db.blobopen('store_metadata', 'value', row) as blob:
+                    assert blob.read() == b'7'
+            else:
+                st.db.deserialize(st.db.serialize())
+            cat.read_identity_group(session.pin, inc)
+&gt;           assert cat.owner_cache_diagnostics()['descriptor_hits'] == before
+E           assert 1 == 0
+
+simulation/tests/test_stage_0_6_descriptor_facts.py:127: AssertionError</failure></testcase></testsuite></testsuites>

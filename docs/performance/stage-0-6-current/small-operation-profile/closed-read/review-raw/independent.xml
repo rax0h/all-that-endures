@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="9" time="10.937" timestamp="2026-11-11T23:52:53.186438-06:00" hostname="a58c7467fd5e"><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_prepared_transaction_statements_are_reauthorized[COMMIT]" time="0.666" /><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_prepared_transaction_statements_are_reauthorized[ROLLBACK]" time="0.577" /><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_prepared_transaction_statements_are_reauthorized[SAVEPOINT prior]" time="0.573" /><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_previous_authorizer_restored_on_success_and_exception" time="0.575" /><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_swallowed_trace_registry_mutation_poisons_scope" time="0.567" /><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_external_commit_cannot_change_current_view_or_next_admission" time="5.599"><failure message="sqlite3.OperationalError: database is locked">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_external_commit_cannot_ch0')
+
+    def test_external_commit_cannot_change_current_view_or_next_admission(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            external = sqlite3.connect(path)
+            try:
+                with checked_read_operation(st, session.pin, _proof_group=True) as scope:
+                    assert type(scope) is ClosedProofReadScope
+                    before = st.db.execute('SELECT count(*) FROM records').fetchone()[0]
+                    external.execute('DELETE FROM records')
+&gt;                   external.commit()
+E                   sqlite3.OperationalError: database is locked
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/test_independent_boundaries.py:89: OperationalError</failure></testcase><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_specialized_metadata_and_facts_share_the_declared_limit" time="0.704" /><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_interrupted_guard_activation_restores_connection" time="0.655"><failure message="assert &lt;ate_sim.persistence_proof_read_scope.ClosedProofReadScope object at 0x7f24dbbb9810&gt; is None&#10; +  where &lt;ate_sim.persistence_proof_read_scope.ClosedProofReadScope object at 0x7f24dbbb9810&gt; = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f24dbd76050&gt;._native_write_guard&#10; +    where &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f24dbd76050&gt; = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f24dbbbb230&gt;.db">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_interrupted_guard_activat0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f24dbbb9350&gt;
+
+    def test_interrupted_guard_activation_restores_connection(tmp_path, monkeypatch):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            original_activate = ClosedProofReadScope.activate
+            def interrupted(self):
+                original_activate(self)
+                raise RuntimeError('controlled activation interruption')
+            monkeypatch.setattr(ClosedProofReadScope, 'activate', interrupted)
+            try:
+                with pytest.raises((RuntimeError, sqlite3.Error)):
+                    with checked_read_operation(st, session.pin, _proof_group=True):
+                        pytest.fail('interrupted setup yielded')
+&gt;               assert st.db._native_write_guard is None
+E               assert &lt;ate_sim.persistence_proof_read_scope.ClosedProofReadScope object at 0x7f24dbbb9810&gt; is None
+E                +  where &lt;ate_sim.persistence_proof_read_scope.ClosedProofReadScope object at 0x7f24dbbb9810&gt; = &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f24dbd76050&gt;._native_write_guard
+E                +    where &lt;ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f24dbd76050&gt; = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f24dbbbb230&gt;.db
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/test_independent_boundaries.py:127: AssertionError</failure></testcase><testcase classname="docs.performance.stage-0-6-current.small-operation-profile.closed-read.review-raw.test_independent_boundaries" name="test_final_custody_rejection_closes_unreturned_spills" time="0.723"><failure message="assert False&#10; +  where False = all(&lt;generator object test_final_custody_rejection_closes_unreturned_spills.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f24dbbe2bc0&gt;)">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_final_custody_rejection_c0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f24dbbbbe10&gt;
+
+    def test_final_custody_rejection_closes_unreturned_spills(tmp_path, monkeypatch):
+        from ate_sim.persistence_lazy_identity_catalog import IdentityCatalog
+        from ate_sim.persistence_lazy_spill import CheckedSpool
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            inc = st.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+            spools = []
+            original_init = CheckedSpool.__init__
+            original_check = ClosedProofReadScope.check
+            def capture(self, *args, **kwargs):
+                original_init(self, *args, **kwargs)
+                spools.append(self)
+            def fail_at_exit(self):
+                frame = inspect.currentframe().f_back
+                if frame.f_code.co_name == 'checked_read_operation':
+                    self.reject('controlled final custody rejection')
+                return original_check(self)
+            monkeypatch.setattr(CheckedSpool, '__init__', capture)
+            monkeypatch.setattr(ClosedProofReadScope, 'check', fail_at_exit)
+            try:
+                with pytest.raises(StoreError):
+                    IdentityCatalog(st, occurrence_limit=1).read_identity_group(session.pin, inc)
+                assert any(spool.spilled for spool in spools)
+&gt;               assert all(spool._closed for spool in spools)
+E               assert False
+E                +  where False = all(&lt;generator object test_final_custody_rejection_closes_unreturned_spills.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f24dbbe2bc0&gt;)
+
+docs/performance/stage-0-6-current/small-operation-profile/closed-read/review-raw/test_independent_boundaries.py:161: AssertionError</failure></testcase></testsuite></testsuites>

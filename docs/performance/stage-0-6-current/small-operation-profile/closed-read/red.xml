@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.933" timestamp="2026-11-11T23:34:04.981825-06:00" hostname="a58c7467fd5e"><testcase classname="simulation.tests.test_stage_0_6_closed_proof_read" name="test_group_read_uses_bounded_epoch_sql_without_skipping_membership" file="simulation/tests/test_stage_0_6_closed_proof_read.py" line="13" time="0.646"><failure message="assert 129 &lt;= 8&#10; +  where 129 = sum(&lt;generator object test_group_read_uses_bounded_epoch_sql_without_skipping_membership.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fa22724d150&gt;)">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_group_read_uses_bounded_e0')
+
+    def test_group_read_uses_bounded_epoch_sql_without_skipping_membership(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            st = session.store
+            inc = st.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+            sql = []
+            st.db.set_trace_callback(sql.append)
+            try:
+                group = session._identity_coordinator.catalog.read_identity_group(session.pin, inc)
+            finally:
+                st.db.set_trace_callback(None)
+            assert (OWNER[0], OWNER[1], PATH) in group.occurrences
+            assert len(group.occurrences) == 2
+&gt;           assert sum(x.lower().startswith('pragma data_version') for x in sql) &lt;= 8
+E           assert 129 &lt;= 8
+E            +  where 129 = sum(&lt;generator object test_group_read_uses_bounded_epoch_sql_without_skipping_membership.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fa22724d150&gt;)
+
+simulation/tests/test_stage_0_6_closed_proof_read.py:27: AssertionError</failure></testcase></testsuite></testsuites>
