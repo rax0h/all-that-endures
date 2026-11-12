@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "runtime_restored_to_baseline": true,
+  "production_diff_empty": true,
+  "live_tests_removed": true,
+  "evidence_sha256": {
+    "docs/performance/stage-0-6-current/small-operation-profile/identity-point/candidate.patch": "0ca90dbac3239effd792906ba0534bbb4eec0af7e9c635257a62638094d4ab44",
+    "docs/performance/stage-0-6-current/small-operation-profile/identity-point/candidate-tests.py": "3053302edb4a4d72763dd924499b07baff309e662cee645b17ab86440a3cf269",
+    "docs/performance/stage-0-6-current/small-operation-profile/identity-point/report.md": "f17c129cdf2952ccf4846cf256a28e8b885495d7f7b676e47b0b2885a8c6a90d",
+    "docs/performance/stage-0-6-current/bounded-genesis/closure.md": "cf2c5890d52e306df783ce5bf85d5617689764c8eb27af889e730a6cd7d83155"
+  }
+}

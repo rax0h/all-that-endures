@@ -1,0 +1,76 @@
+{
+  "kind": "instrumented-entry-custody-only",
+  "counts": {
+    "open": {
+      "read_owner_identity": {
+        "calls": 129,
+        "borrowed": 129,
+        "owner_cache_hits": 0
+      },
+      "read_identity_group": {
+        "calls": 11,
+        "borrowed": 11
+      }
+    },
+    "first_step": {
+      "read_owner_identity": {
+        "calls": 1450,
+        "owned_entry_candidate": 1450,
+        "owner_cache_hits": 899
+      },
+      "read_identity_group": {
+        "calls": 377,
+        "owned_entry_candidate": 377
+      },
+      "read_identity_membership": {
+        "calls": 203,
+        "borrowed": 129,
+        "owned_entry_candidate": 74
+      }
+    },
+    "save": {
+      "read_owner_identity": {
+        "calls": 66,
+        "owned_entry_candidate": 66,
+        "owner_cache_hits": 37
+      },
+      "read_identity_membership": {
+        "calls": 16,
+        "borrowed": 16
+      },
+      "read_identity_group": {
+        "calls": 106,
+        "borrowed": 106
+      }
+    },
+    "warm_step": {
+      "read_owner_identity": {
+        "calls": 1296,
+        "owned_entry_candidate": 1296,
+        "owner_cache_hits": 940
+      },
+      "read_identity_membership": {
+        "calls": 180,
+        "borrowed": 111,
+        "owned_entry_candidate": 69
+      },
+      "read_identity_group": {
+        "calls": 377,
+        "owned_entry_candidate": 377
+      }
+    },
+    "setup": {
+      "read_owner_identity": {
+        "calls": 380,
+        "owned_entry_candidate": 380,
+        "owner_cache_hits": 247
+      },
+      "read_identity_group": {
+        "calls": 33,
+        "owned_entry_candidate": 33
+      }
+    }
+  },
+  "script_sha256": "33e05da72608bd66053421dc76823d48e37874d08faf45bb8424c70a0a199a95",
+  "limitation": "Diagnostic wrappers only; borrowed entries are not eligible for minting certificates. Owned entry is a necessary condition, not proof of safe scope. No latency acceptance claim."
+}

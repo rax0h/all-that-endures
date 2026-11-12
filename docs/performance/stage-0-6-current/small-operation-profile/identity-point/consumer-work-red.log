@@ -1,0 +1,28 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_recursive_proof_reads_do_0')
+
+    def test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference(tmp_path):
+        # Reintroducing the owner scan for a single reference repeats complete work.
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            value = session.store.read_version(session.pin, *OWNER, expected_record_schema=1).value.provenance
+            profile = cProfile.Profile()
+            profile.enable()
+            try:
+                child = session._recursive_histories.decode(value, OWNER, PATH)
+                assert session._recursive_histories.decode(value, OWNER, PATH) is child
+                assert session.skills[1, 'craft'].provenance is session.skills[2, 'craft'].provenance is child
+                assert list(child) == [0, 1, 2, 3]
+            finally:
+                profile.disable()
+>           assert owner_calls(profile, from_decode=True) == 0
+E           assert 2 == 0
+E            +  where 2 = owner_calls(<cProfile.Profile object at 0x7fe11e76a510>, from_decode=True)
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference
+1 failed, 18 deselected in 1.68s

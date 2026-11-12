@@ -1,0 +1,181 @@
+{
+  "full": {
+    "archive_sha256": "9d34f9938ef2723f42dd54dbde6efb3c3df73722ab8567af5311d6baff4e786e",
+    "bytes": 192879,
+    "source": {
+      "head": "7261d61577f7c2bb09282b226c2f67508e9f4576",
+      "python": "3.12.16",
+      "runtime_tree": "0785bf972756879b10d7452f36f742a257a14e00",
+      "sqlite": "3.45.1"
+    },
+    "test_suites": [
+      {
+        "path": "full-suite.xml",
+        "tests": 5042,
+        "seconds": 8214.788
+      }
+    ]
+  },
+  "proof": {
+    "archive_sha256": "2265bea202d392bfc294a17a67247f1b1191d23451b54b938309e1fbab7baa96",
+    "bytes": 212143,
+    "source": {
+      "head": "7261d61577f7c2bb09282b226c2f67508e9f4576",
+      "python": "3.12.16",
+      "runtime_tree": "0785bf972756879b10d7452f36f742a257a14e00",
+      "sqlite": "3.45.1"
+    },
+    "test_suites": [
+      {
+        "path": "child-extents-tests.xml",
+        "tests": 34,
+        "seconds": 5.78
+      },
+      {
+        "path": "collection-directory-tests.xml",
+        "tests": 31,
+        "seconds": 2.91
+      },
+      {
+        "path": "collection-publication-tests.xml",
+        "tests": 12,
+        "seconds": 1.457
+      },
+      {
+        "path": "collection-tests.xml",
+        "tests": 20,
+        "seconds": 2.142
+      },
+      {
+        "path": "directory-publication-tests.xml",
+        "tests": 22,
+        "seconds": 2.465
+      },
+      {
+        "path": "frozen-extents-tests.xml",
+        "tests": 46,
+        "seconds": 9.092
+      },
+      {
+        "path": "generation-tests.xml",
+        "tests": 60,
+        "seconds": 2.596
+      },
+      {
+        "path": "group-tests.xml",
+        "tests": 72,
+        "seconds": 17.807
+      },
+      {
+        "path": "inventory-tests.xml",
+        "tests": 34,
+        "seconds": 4.613
+      },
+      {
+        "path": "native-insert-tests.xml",
+        "tests": 403,
+        "seconds": 1043.443
+      },
+      {
+        "path": "native-metadata-tests.xml",
+        "tests": 39,
+        "seconds": 47.327
+      },
+      {
+        "path": "native-rank-tests.xml",
+        "tests": 47,
+        "seconds": 61.954
+      },
+      {
+        "path": "native-value-tests.xml",
+        "tests": 102,
+        "seconds": 234.413
+      },
+      {
+        "path": "native-world-session-tests.xml",
+        "tests": 45,
+        "seconds": 175.9
+      },
+      {
+        "path": "node-factorization-tests.xml",
+        "tests": 17,
+        "seconds": 1.207
+      },
+      {
+        "path": "owner-target-tests.xml",
+        "tests": 20,
+        "seconds": 3.705
+      },
+      {
+        "path": "projection-tests.xml",
+        "tests": 43,
+        "seconds": 3.994
+      },
+      {
+        "path": "proof-open-tests.xml",
+        "tests": 62,
+        "seconds": 78.878
+      },
+      {
+        "path": "proof-tests.xml",
+        "tests": 262,
+        "seconds": 17.312
+      },
+      {
+        "path": "publication-tests.xml",
+        "tests": 67,
+        "seconds": 7.604
+      },
+      {
+        "path": "record-tests.xml",
+        "tests": 60,
+        "seconds": 5.441
+      },
+      {
+        "path": "reference-closure-tests.xml",
+        "tests": 38,
+        "seconds": 13.116
+      },
+      {
+        "path": "reference-tests.xml",
+        "tests": 40,
+        "seconds": 9.741
+      },
+      {
+        "path": "scope-tests.xml",
+        "tests": 55,
+        "seconds": 6.348
+      },
+      {
+        "path": "seek-tests.xml",
+        "tests": 54,
+        "seconds": 10.111
+      },
+      {
+        "path": "sequence-event-extents-tests.xml",
+        "tests": 47,
+        "seconds": 10.441
+      },
+      {
+        "path": "target-group-tests.xml",
+        "tests": 38,
+        "seconds": 6.412
+      },
+      {
+        "path": "target-incoming-tests.xml",
+        "tests": 44,
+        "seconds": 6.703
+      },
+      {
+        "path": "target-tests.xml",
+        "tests": 36,
+        "seconds": 4.345
+      },
+      {
+        "path": "world-manifest-tests.xml",
+        "tests": 35,
+        "seconds": 38.42
+      }
+    ]
+  }
+}

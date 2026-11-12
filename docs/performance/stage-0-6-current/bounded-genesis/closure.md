@@ -207,7 +207,7 @@ mature timing is claimed by importing a historical expectation.
 | W1 | New-upload metadata404 after successful proof build | New harness sealer retries only exact-ID metadataGET404, at most4attempts with1/2/4s waits. No stage recomputation during retries; all ordinary reference/hash/context checks remain. Actual seal regression caught wrong initial callsite and passes after correction. | Closed locally; future bundled hosted candidate still required |
 | W2 | Independent Minor exact-ID readback finding | Require response.id to be an integer exactly equal to upload output ID; a matching name/run/head cannot substitute a different artifact. No retry of a successful but invalid response. RED/GREEN retained; focused8controls independently pass. | Closed locally |
 | W3 | Successful smoke mistaken for performance readiness | Raw smallsave/warm targets miss on sameengine941; newMature request is paused. Authenticated small input profile plus exactfreshdigest preserves semantics and identifies duplicate node verification and identity-placement costs. No mature failure or target speedup inferred from instrumentation. | Bounded runtime performance investigation active; Stage0.6 OPEN |
-| W4 | Duplicate SQL proof-node canonical parsing and branch re-encoding | Factor only the eight SQL callbacks through bounded domain-bound bytes; unchanged ProofMap performs its own hash, canonical parse and path/count checks. Public store read/collision readback remain fully validating. Raw qualified small-input pair saves6.245→4.964s/warm7.805→6.087s; exact fresh saved and continued state match. Seventeen new controls;75focused and405affected passes; independent16086decoder comparisons and9SQL probes, no actionable findings. Details in ../small-operation-profile/factorization/report.md. | Local implementation/review CLOSED; new engine greens pending; mature targets remain OPEN |
+| W4 | Duplicate SQL proof-node canonical parsing and branch re-encoding | Factor only the eight SQL callbacks through bounded domain-bound bytes; unchanged ProofMap performs its own hash, canonical parse and path/count checks. Public store read/collision readback remain fully validating. Raw qualified small-input pair saves6.245→4.964s/warm7.805→6.087s; exact fresh saved and continued state match. Seventeen new controls;75focused and405affected passes; independent16086decoder comparisons and9SQL probes, no actionable findings. Details in ../small-operation-profile/factorization/report.md. | CLOSED through hosted43099834661 exact-engine proof/full greens; mature targets remain OPEN |
 
 43035885119attempt2isgreenafterrerunningonlyfailedproof/downstreamjobs; earlier
 completedstagesretainedtheoriginaltimestamps. Newsmalloperationaltimes10.448ssave/
@@ -215,3 +215,29 @@ completedstagesretainedtheoriginaltimestamps. Newsmalloperationaltimes10.448ssav
 1deliberate duplicateZIPwarning; engineandoldtriggerpaths remainunchanged. The next
 runtimephasefactorsduplicatecanonicalnodeparsingwhilekeepingbothdomainhashes,
 thenmeasuresbeforebroadercachesoranynewexpensivematurepreparation.
+
+
+## Verified node parsing engine greens — November11
+
+43099834661 at published7261d615/local46494a0, identical tree df15b9b1 and
+runtime0785bf9, passed5042full simulation tests (8214.788s) and the full proof
+job (30test XML suites plus bounded scaling commands). These suite counts overlap
+and are not summed. Both artifact archive hashes and actual source.json runtime/
+head/software records were verified after download; evidence is
+../small-operation-profile/factorization/hosted-43099834661. The old monolithic
+mature request remained unchanged; its dependent mature job was skipped.
+This closes W4 engine validation only. W3/U10 performance acceptance remains open.
+
+| ID | Origin | Action/evidence | Status |
+|---|---|---|---|
+| W5 | Repeated whole-owner inventories during one recursive reference read | Proof-only exact native owner/group occurrence proof plus current coordinator overlay; full ordinary/audited and mutation/save checks retained. Plan and fixture negatives recorded in ../small-operation-profile/identity-point. | CLOSED as measured rejected standalone candidate; green0785bf9source restored; mature work paused |
+
+W5 disposition:19focused controls and6independent adversarial cases passed,
+no actionable safety finding. Raw single pair warm9.544→9.150s/save7.852→8.176s
+does not justify a standalone latency repair. The1002removed owner-read calls
+eliminate only165actual cache misses; point calls increase400→1402. Candidate
+patch/tests/source fences/profiles and all fixture negatives are preserved under
+../small-operation-profile/identity-point; both production files restored exactly
+to green0785bf9. No new engine authority, test selection, cache or mature trigger
+was landed and no additional expensive CI is warranted by this evidence-only
+closure. Repeated closed-read validation/proof batching is the next investigation.

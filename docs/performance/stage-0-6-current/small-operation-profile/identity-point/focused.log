@@ -1,0 +1,792 @@
+FFF..............FF                                                      [100%]
+=================================== FAILURES ===================================
+__ test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_proof_reads_do_0')
+
+    def test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference(tmp_path):
+        # Reintroducing the owner scan for a single reference repeats complete work.
+>       path, pair = ranked_fixture(tmp_path, size=4, configure=nested_world)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:17: in ranked_fixture
+    store,pin,*_rest=make_world(tmp_path/'source',**kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:17: in make_world
+    source=legacy_lazy(path,size=size,configure=config);file=path/'complete.sqlite';upgrade_lazy_snapshot(source,file,rules_id=RULES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_final_catalog_copy.py:42: in legacy_lazy
+    convert_cold_to_lazy(cold, source, rules_id=RULES, native_graph_buckets=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_proof_reads_do_0/source/cold.sqlite')
+destination = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_proof_reads_do_0/source/legacy-lazy.sqlite')
+rules_id = 'private-catalog-copy', paged_household_members = False
+counted_households = True, native_graph_buckets = True
+
+    def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False, native_graph_buckets=False):
+        """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
+        source, destination = _preflight_conversion_paths(source, destination)
+        if type(counted_households) is not bool:
+            raise TypeError('counted_households must be bool')
+        if type(native_graph_buckets) is not bool:
+            raise TypeError('native_graph_buckets must be bool')
+        counted_households = counted_households or native_graph_buckets
+        if counted_households:
+            paged_household_members = False
+        scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
+        codec = WorldCodec(identity_links_recorded=True)
+        source_store = TransactionalStore.open(
+            source,
+            codec=codec,
+            expected_simulation_schema=SCHEMA,
+            expected_rules_id=rules_id,
+        )
+        capture = None
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with source_store.read_transaction():
+                source_store.verify_all()
+                raw_manifest = source_store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+                if (
+                    type(raw_manifest) is not dict
+                    or raw_manifest.get("event_storage") != COLD_EVENT_STORAGE
+                ):
+                    raise StoreFormatError(
+                        "convert_cold_to_lazy requires P3B cold event storage"
+                    )
+                capture = _capture_cold_world(source_store)
+                from .persistence_event_ids import EventIdSet
+                event_id_authority = EventIdSet.from_checked_values(capture.world.event_ids)
+                from .persistence_event_ids import AUTHORITY_REFERENCE
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        a = _household_member_path(target_path)
+                        b = _household_member_path(owner_path)
+                        if a == b:
+                            continue
+                        paged_path = target_path if a else owner_path
+                        other_path = owner_path if a else target_path
+                        other = _lazy_occurrence_from_path(other_path)
+                        if (
+                            len(paged_path) != 3
+                            or other is None
+                            or not ((other[0] in (WALLET_NAMESPACE, TREASURY_NAMESPACE) and other[2])
+                                    or (other[0] == GENEALOGY_CHILD_NAMESPACE and not other[2]))
+                        ):
+                            raise StoreError(
+                                "paged household cross-family identity requires a supported list occurrence"
+                            )
+                cross_family_member_paths = {}
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        if _household_member_path(target_path) == _household_member_path(owner_path):
+                            continue
+                        foreign = owner_path if _household_member_path(target_path) else target_path
+                        lazy_owner = _lazy_occurrence_from_path(foreign)
+                        if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE, GENEALOGY_CHILD_NAMESPACE):
+                            raise StoreError("unsupported foreign household members identity")
+                        namespace, owner_key, relative, _ = lazy_owner
+                        cross_family_member_paths.setdefault(
+                            (namespace, codec.encode(owner_key)), set()
+                        ).add(relative)
+                source_head = source_store.db.execute(
+                    "SELECT generation,parent_generation,simulation_position,seed,"
+                    "next_ids,namespace_inventory,namespace_counts,head_checksum "
+                    "FROM save_head WHERE singleton=1"
+                ).fetchone()
+                if source_head is None:
+                    raise StoreIntegrityError("missing source save head")
+                generation = int(source_head[0])
+                identity_rows, next_incarnation = _identity_labels(
+                    capture.world,
+                    capture.manifest,
+                    capture.identity_links,
+                    codec,
+                )
+                nested_children = {}
+                from .persistence_event_ids import paged_key_supported
+                if (native_graph_buckets and event_id_authority.range_end is None
+                        and all(paged_key_supported(value) for value in capture.world.event_ids)):
+                    from .persistence_event_ids import EXCEPTION_TAG
+                    nested_children[next_incarnation] = ('sequence', ())
+                    nested_children[next_incarnation + 1] = ('set', capture.world.event_ids)
+                    event_id_authority = EventIdSet.from_exception_descriptor((EXCEPTION_TAG, 0,
+                        HistoryReference('sequence', next_incarnation), HistoryReference('set', next_incarnation + 1),
+                        len(capture.world.event_ids)))
+                    next_incarnation += 2
+                if native_graph_buckets:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if namespace in BUCKET_SPECS and not relative:
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)))
+                            kind = BUCKET_SPECS[namespace][0]
+                            if (not valid_bucket_key(namespace, owner_key)
+                                    or type(values) is not {'list': list, 'set': set}[kind]
+                                    or any(not valid_bucket_member(namespace, value) for value in values)):
+                                raise StoreFormatError('invalid native graph bucket source')
+                            nested_children.setdefault(incarnation, (kind, values))
+                if counted_households:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if ((namespace == 'world.households' and relative == (("field", "members"),))
+                                or (namespace == 'world.settlements' and relative == (("field", "households"),))):
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                            if type(values) is not list or any(not nested_immutable_value(value) for value in values):
+                                raise StoreFormatError('counted household source requires immutable list values')
+                            nested_children[incarnation] = ('sequence', values)
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if (namespace != 'world.households' and namespace in NESTED_RECORD_FIELDS
+                            and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace])):
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                        kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                        if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                            raise StoreFormatError('typed history source has wrong type')
+                        if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
+                            not nested_immutable_value(value) for value in
+                            (tuple(values) + tuple(values.values()) if kind == 'map' else values)
+                        ):
+                            # Recursive mutable history is not yet a complete
+                            # authority. Reject before staging instead of publishing
+                            # a legacy header with unbindable descendant labels.
+>                           raise StoreFormatError('skill/soul history contains unsupported mutable descendants')
+E                           ate_sim.incremental_store.StoreFormatError: skill/soul history contains unsupported mutable descendants
+
+simulation/ate_sim/persistence_lazy.py:1386: StoreFormatError
+_______ test_default_and_audited_reads_keep_owner_completeness[ordinary] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_default_and_audited_reads0')
+mode = 'ordinary'
+
+    @pytest.mark.parametrize('mode', ['ordinary', 'audited'])
+    def test_default_and_audited_reads_keep_owner_completeness(tmp_path, mode):
+        from ate_sim.persistence_lazy import open_lazy_world_session
+        from ate_sim.persistence_proof_world_session import open_audited_proof_world_session
+>       path, pair = ranked_fixture(tmp_path, size=4, configure=nested_world)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:17: in ranked_fixture
+    store,pin,*_rest=make_world(tmp_path/'source',**kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:17: in make_world
+    source=legacy_lazy(path,size=size,configure=config);file=path/'complete.sqlite';upgrade_lazy_snapshot(source,file,rules_id=RULES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_final_catalog_copy.py:42: in legacy_lazy
+    convert_cold_to_lazy(cold, source, rules_id=RULES, native_graph_buckets=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = PosixPath('/tmp/pytest-of-agent/pytest-2/test_default_and_audited_reads0/source/cold.sqlite')
+destination = PosixPath('/tmp/pytest-of-agent/pytest-2/test_default_and_audited_reads0/source/legacy-lazy.sqlite')
+rules_id = 'private-catalog-copy', paged_household_members = False
+counted_households = True, native_graph_buckets = True
+
+    def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False, native_graph_buckets=False):
+        """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
+        source, destination = _preflight_conversion_paths(source, destination)
+        if type(counted_households) is not bool:
+            raise TypeError('counted_households must be bool')
+        if type(native_graph_buckets) is not bool:
+            raise TypeError('native_graph_buckets must be bool')
+        counted_households = counted_households or native_graph_buckets
+        if counted_households:
+            paged_household_members = False
+        scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
+        codec = WorldCodec(identity_links_recorded=True)
+        source_store = TransactionalStore.open(
+            source,
+            codec=codec,
+            expected_simulation_schema=SCHEMA,
+            expected_rules_id=rules_id,
+        )
+        capture = None
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with source_store.read_transaction():
+                source_store.verify_all()
+                raw_manifest = source_store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+                if (
+                    type(raw_manifest) is not dict
+                    or raw_manifest.get("event_storage") != COLD_EVENT_STORAGE
+                ):
+                    raise StoreFormatError(
+                        "convert_cold_to_lazy requires P3B cold event storage"
+                    )
+                capture = _capture_cold_world(source_store)
+                from .persistence_event_ids import EventIdSet
+                event_id_authority = EventIdSet.from_checked_values(capture.world.event_ids)
+                from .persistence_event_ids import AUTHORITY_REFERENCE
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        a = _household_member_path(target_path)
+                        b = _household_member_path(owner_path)
+                        if a == b:
+                            continue
+                        paged_path = target_path if a else owner_path
+                        other_path = owner_path if a else target_path
+                        other = _lazy_occurrence_from_path(other_path)
+                        if (
+                            len(paged_path) != 3
+                            or other is None
+                            or not ((other[0] in (WALLET_NAMESPACE, TREASURY_NAMESPACE) and other[2])
+                                    or (other[0] == GENEALOGY_CHILD_NAMESPACE and not other[2]))
+                        ):
+                            raise StoreError(
+                                "paged household cross-family identity requires a supported list occurrence"
+                            )
+                cross_family_member_paths = {}
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        if _household_member_path(target_path) == _household_member_path(owner_path):
+                            continue
+                        foreign = owner_path if _household_member_path(target_path) else target_path
+                        lazy_owner = _lazy_occurrence_from_path(foreign)
+                        if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE, GENEALOGY_CHILD_NAMESPACE):
+                            raise StoreError("unsupported foreign household members identity")
+                        namespace, owner_key, relative, _ = lazy_owner
+                        cross_family_member_paths.setdefault(
+                            (namespace, codec.encode(owner_key)), set()
+                        ).add(relative)
+                source_head = source_store.db.execute(
+                    "SELECT generation,parent_generation,simulation_position,seed,"
+                    "next_ids,namespace_inventory,namespace_counts,head_checksum "
+                    "FROM save_head WHERE singleton=1"
+                ).fetchone()
+                if source_head is None:
+                    raise StoreIntegrityError("missing source save head")
+                generation = int(source_head[0])
+                identity_rows, next_incarnation = _identity_labels(
+                    capture.world,
+                    capture.manifest,
+                    capture.identity_links,
+                    codec,
+                )
+                nested_children = {}
+                from .persistence_event_ids import paged_key_supported
+                if (native_graph_buckets and event_id_authority.range_end is None
+                        and all(paged_key_supported(value) for value in capture.world.event_ids)):
+                    from .persistence_event_ids import EXCEPTION_TAG
+                    nested_children[next_incarnation] = ('sequence', ())
+                    nested_children[next_incarnation + 1] = ('set', capture.world.event_ids)
+                    event_id_authority = EventIdSet.from_exception_descriptor((EXCEPTION_TAG, 0,
+                        HistoryReference('sequence', next_incarnation), HistoryReference('set', next_incarnation + 1),
+                        len(capture.world.event_ids)))
+                    next_incarnation += 2
+                if native_graph_buckets:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if namespace in BUCKET_SPECS and not relative:
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)))
+                            kind = BUCKET_SPECS[namespace][0]
+                            if (not valid_bucket_key(namespace, owner_key)
+                                    or type(values) is not {'list': list, 'set': set}[kind]
+                                    or any(not valid_bucket_member(namespace, value) for value in values)):
+                                raise StoreFormatError('invalid native graph bucket source')
+                            nested_children.setdefault(incarnation, (kind, values))
+                if counted_households:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if ((namespace == 'world.households' and relative == (("field", "members"),))
+                                or (namespace == 'world.settlements' and relative == (("field", "households"),))):
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                            if type(values) is not list or any(not nested_immutable_value(value) for value in values):
+                                raise StoreFormatError('counted household source requires immutable list values')
+                            nested_children[incarnation] = ('sequence', values)
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if (namespace != 'world.households' and namespace in NESTED_RECORD_FIELDS
+                            and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace])):
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                        kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                        if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                            raise StoreFormatError('typed history source has wrong type')
+                        if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
+                            not nested_immutable_value(value) for value in
+                            (tuple(values) + tuple(values.values()) if kind == 'map' else values)
+                        ):
+                            # Recursive mutable history is not yet a complete
+                            # authority. Reject before staging instead of publishing
+                            # a legacy header with unbindable descendant labels.
+>                           raise StoreFormatError('skill/soul history contains unsupported mutable descendants')
+E                           ate_sim.incremental_store.StoreFormatError: skill/soul history contains unsupported mutable descendants
+
+simulation/ate_sim/persistence_lazy.py:1386: StoreFormatError
+_______ test_default_and_audited_reads_keep_owner_completeness[audited] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_default_and_audited_reads1')
+mode = 'audited'
+
+    @pytest.mark.parametrize('mode', ['ordinary', 'audited'])
+    def test_default_and_audited_reads_keep_owner_completeness(tmp_path, mode):
+        from ate_sim.persistence_lazy import open_lazy_world_session
+        from ate_sim.persistence_proof_world_session import open_audited_proof_world_session
+>       path, pair = ranked_fixture(tmp_path, size=4, configure=nested_world)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:17: in ranked_fixture
+    store,pin,*_rest=make_world(tmp_path/'source',**kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:17: in make_world
+    source=legacy_lazy(path,size=size,configure=config);file=path/'complete.sqlite';upgrade_lazy_snapshot(source,file,rules_id=RULES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_final_catalog_copy.py:42: in legacy_lazy
+    convert_cold_to_lazy(cold, source, rules_id=RULES, native_graph_buckets=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = PosixPath('/tmp/pytest-of-agent/pytest-2/test_default_and_audited_reads1/source/cold.sqlite')
+destination = PosixPath('/tmp/pytest-of-agent/pytest-2/test_default_and_audited_reads1/source/legacy-lazy.sqlite')
+rules_id = 'private-catalog-copy', paged_household_members = False
+counted_households = True, native_graph_buckets = True
+
+    def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False, native_graph_buckets=False):
+        """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
+        source, destination = _preflight_conversion_paths(source, destination)
+        if type(counted_households) is not bool:
+            raise TypeError('counted_households must be bool')
+        if type(native_graph_buckets) is not bool:
+            raise TypeError('native_graph_buckets must be bool')
+        counted_households = counted_households or native_graph_buckets
+        if counted_households:
+            paged_household_members = False
+        scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
+        codec = WorldCodec(identity_links_recorded=True)
+        source_store = TransactionalStore.open(
+            source,
+            codec=codec,
+            expected_simulation_schema=SCHEMA,
+            expected_rules_id=rules_id,
+        )
+        capture = None
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with source_store.read_transaction():
+                source_store.verify_all()
+                raw_manifest = source_store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+                if (
+                    type(raw_manifest) is not dict
+                    or raw_manifest.get("event_storage") != COLD_EVENT_STORAGE
+                ):
+                    raise StoreFormatError(
+                        "convert_cold_to_lazy requires P3B cold event storage"
+                    )
+                capture = _capture_cold_world(source_store)
+                from .persistence_event_ids import EventIdSet
+                event_id_authority = EventIdSet.from_checked_values(capture.world.event_ids)
+                from .persistence_event_ids import AUTHORITY_REFERENCE
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        a = _household_member_path(target_path)
+                        b = _household_member_path(owner_path)
+                        if a == b:
+                            continue
+                        paged_path = target_path if a else owner_path
+                        other_path = owner_path if a else target_path
+                        other = _lazy_occurrence_from_path(other_path)
+                        if (
+                            len(paged_path) != 3
+                            or other is None
+                            or not ((other[0] in (WALLET_NAMESPACE, TREASURY_NAMESPACE) and other[2])
+                                    or (other[0] == GENEALOGY_CHILD_NAMESPACE and not other[2]))
+                        ):
+                            raise StoreError(
+                                "paged household cross-family identity requires a supported list occurrence"
+                            )
+                cross_family_member_paths = {}
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        if _household_member_path(target_path) == _household_member_path(owner_path):
+                            continue
+                        foreign = owner_path if _household_member_path(target_path) else target_path
+                        lazy_owner = _lazy_occurrence_from_path(foreign)
+                        if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE, GENEALOGY_CHILD_NAMESPACE):
+                            raise StoreError("unsupported foreign household members identity")
+                        namespace, owner_key, relative, _ = lazy_owner
+                        cross_family_member_paths.setdefault(
+                            (namespace, codec.encode(owner_key)), set()
+                        ).add(relative)
+                source_head = source_store.db.execute(
+                    "SELECT generation,parent_generation,simulation_position,seed,"
+                    "next_ids,namespace_inventory,namespace_counts,head_checksum "
+                    "FROM save_head WHERE singleton=1"
+                ).fetchone()
+                if source_head is None:
+                    raise StoreIntegrityError("missing source save head")
+                generation = int(source_head[0])
+                identity_rows, next_incarnation = _identity_labels(
+                    capture.world,
+                    capture.manifest,
+                    capture.identity_links,
+                    codec,
+                )
+                nested_children = {}
+                from .persistence_event_ids import paged_key_supported
+                if (native_graph_buckets and event_id_authority.range_end is None
+                        and all(paged_key_supported(value) for value in capture.world.event_ids)):
+                    from .persistence_event_ids import EXCEPTION_TAG
+                    nested_children[next_incarnation] = ('sequence', ())
+                    nested_children[next_incarnation + 1] = ('set', capture.world.event_ids)
+                    event_id_authority = EventIdSet.from_exception_descriptor((EXCEPTION_TAG, 0,
+                        HistoryReference('sequence', next_incarnation), HistoryReference('set', next_incarnation + 1),
+                        len(capture.world.event_ids)))
+                    next_incarnation += 2
+                if native_graph_buckets:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if namespace in BUCKET_SPECS and not relative:
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)))
+                            kind = BUCKET_SPECS[namespace][0]
+                            if (not valid_bucket_key(namespace, owner_key)
+                                    or type(values) is not {'list': list, 'set': set}[kind]
+                                    or any(not valid_bucket_member(namespace, value) for value in values)):
+                                raise StoreFormatError('invalid native graph bucket source')
+                            nested_children.setdefault(incarnation, (kind, values))
+                if counted_households:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if ((namespace == 'world.households' and relative == (("field", "members"),))
+                                or (namespace == 'world.settlements' and relative == (("field", "households"),))):
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                            if type(values) is not list or any(not nested_immutable_value(value) for value in values):
+                                raise StoreFormatError('counted household source requires immutable list values')
+                            nested_children[incarnation] = ('sequence', values)
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if (namespace != 'world.households' and namespace in NESTED_RECORD_FIELDS
+                            and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace])):
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                        kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                        if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                            raise StoreFormatError('typed history source has wrong type')
+                        if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
+                            not nested_immutable_value(value) for value in
+                            (tuple(values) + tuple(values.values()) if kind == 'map' else values)
+                        ):
+                            # Recursive mutable history is not yet a complete
+                            # authority. Reject before staging instead of publishing
+                            # a legacy header with unbindable descendant labels.
+>                           raise StoreFormatError('skill/soul history contains unsupported mutable descendants')
+E                           ate_sim.incremental_store.StoreFormatError: skill/soul history contains unsupported mutable descendants
+
+simulation/ate_sim/persistence_lazy.py:1386: StoreFormatError
+_ test_recursive_point_reads_keep_private_alias_replacement_and_recovery[before_commit] _
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_point_reads_kee0')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase', ['before_commit', 'after_commit'])
+    def test_recursive_point_reads_keep_private_alias_replacement_and_recovery(tmp_path, phase):
+>       path, pair = ranked_fixture(tmp_path, size=4, configure=nested_world)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:17: in ranked_fixture
+    store,pin,*_rest=make_world(tmp_path/'source',**kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:17: in make_world
+    source=legacy_lazy(path,size=size,configure=config);file=path/'complete.sqlite';upgrade_lazy_snapshot(source,file,rules_id=RULES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_final_catalog_copy.py:42: in legacy_lazy
+    convert_cold_to_lazy(cold, source, rules_id=RULES, native_graph_buckets=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_point_reads_kee0/source/cold.sqlite')
+destination = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_point_reads_kee0/source/legacy-lazy.sqlite')
+rules_id = 'private-catalog-copy', paged_household_members = False
+counted_households = True, native_graph_buckets = True
+
+    def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False, native_graph_buckets=False):
+        """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
+        source, destination = _preflight_conversion_paths(source, destination)
+        if type(counted_households) is not bool:
+            raise TypeError('counted_households must be bool')
+        if type(native_graph_buckets) is not bool:
+            raise TypeError('native_graph_buckets must be bool')
+        counted_households = counted_households or native_graph_buckets
+        if counted_households:
+            paged_household_members = False
+        scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
+        codec = WorldCodec(identity_links_recorded=True)
+        source_store = TransactionalStore.open(
+            source,
+            codec=codec,
+            expected_simulation_schema=SCHEMA,
+            expected_rules_id=rules_id,
+        )
+        capture = None
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with source_store.read_transaction():
+                source_store.verify_all()
+                raw_manifest = source_store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+                if (
+                    type(raw_manifest) is not dict
+                    or raw_manifest.get("event_storage") != COLD_EVENT_STORAGE
+                ):
+                    raise StoreFormatError(
+                        "convert_cold_to_lazy requires P3B cold event storage"
+                    )
+                capture = _capture_cold_world(source_store)
+                from .persistence_event_ids import EventIdSet
+                event_id_authority = EventIdSet.from_checked_values(capture.world.event_ids)
+                from .persistence_event_ids import AUTHORITY_REFERENCE
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        a = _household_member_path(target_path)
+                        b = _household_member_path(owner_path)
+                        if a == b:
+                            continue
+                        paged_path = target_path if a else owner_path
+                        other_path = owner_path if a else target_path
+                        other = _lazy_occurrence_from_path(other_path)
+                        if (
+                            len(paged_path) != 3
+                            or other is None
+                            or not ((other[0] in (WALLET_NAMESPACE, TREASURY_NAMESPACE) and other[2])
+                                    or (other[0] == GENEALOGY_CHILD_NAMESPACE and not other[2]))
+                        ):
+                            raise StoreError(
+                                "paged household cross-family identity requires a supported list occurrence"
+                            )
+                cross_family_member_paths = {}
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        if _household_member_path(target_path) == _household_member_path(owner_path):
+                            continue
+                        foreign = owner_path if _household_member_path(target_path) else target_path
+                        lazy_owner = _lazy_occurrence_from_path(foreign)
+                        if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE, GENEALOGY_CHILD_NAMESPACE):
+                            raise StoreError("unsupported foreign household members identity")
+                        namespace, owner_key, relative, _ = lazy_owner
+                        cross_family_member_paths.setdefault(
+                            (namespace, codec.encode(owner_key)), set()
+                        ).add(relative)
+                source_head = source_store.db.execute(
+                    "SELECT generation,parent_generation,simulation_position,seed,"
+                    "next_ids,namespace_inventory,namespace_counts,head_checksum "
+                    "FROM save_head WHERE singleton=1"
+                ).fetchone()
+                if source_head is None:
+                    raise StoreIntegrityError("missing source save head")
+                generation = int(source_head[0])
+                identity_rows, next_incarnation = _identity_labels(
+                    capture.world,
+                    capture.manifest,
+                    capture.identity_links,
+                    codec,
+                )
+                nested_children = {}
+                from .persistence_event_ids import paged_key_supported
+                if (native_graph_buckets and event_id_authority.range_end is None
+                        and all(paged_key_supported(value) for value in capture.world.event_ids)):
+                    from .persistence_event_ids import EXCEPTION_TAG
+                    nested_children[next_incarnation] = ('sequence', ())
+                    nested_children[next_incarnation + 1] = ('set', capture.world.event_ids)
+                    event_id_authority = EventIdSet.from_exception_descriptor((EXCEPTION_TAG, 0,
+                        HistoryReference('sequence', next_incarnation), HistoryReference('set', next_incarnation + 1),
+                        len(capture.world.event_ids)))
+                    next_incarnation += 2
+                if native_graph_buckets:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if namespace in BUCKET_SPECS and not relative:
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)))
+                            kind = BUCKET_SPECS[namespace][0]
+                            if (not valid_bucket_key(namespace, owner_key)
+                                    or type(values) is not {'list': list, 'set': set}[kind]
+                                    or any(not valid_bucket_member(namespace, value) for value in values)):
+                                raise StoreFormatError('invalid native graph bucket source')
+                            nested_children.setdefault(incarnation, (kind, values))
+                if counted_households:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if ((namespace == 'world.households' and relative == (("field", "members"),))
+                                or (namespace == 'world.settlements' and relative == (("field", "households"),))):
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                            if type(values) is not list or any(not nested_immutable_value(value) for value in values):
+                                raise StoreFormatError('counted household source requires immutable list values')
+                            nested_children[incarnation] = ('sequence', values)
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if (namespace != 'world.households' and namespace in NESTED_RECORD_FIELDS
+                            and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace])):
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                        kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                        if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                            raise StoreFormatError('typed history source has wrong type')
+                        if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
+                            not nested_immutable_value(value) for value in
+                            (tuple(values) + tuple(values.values()) if kind == 'map' else values)
+                        ):
+                            # Recursive mutable history is not yet a complete
+                            # authority. Reject before staging instead of publishing
+                            # a legacy header with unbindable descendant labels.
+>                           raise StoreFormatError('skill/soul history contains unsupported mutable descendants')
+E                           ate_sim.incremental_store.StoreFormatError: skill/soul history contains unsupported mutable descendants
+
+simulation/ate_sim/persistence_lazy.py:1386: StoreFormatError
+_ test_recursive_point_reads_keep_private_alias_replacement_and_recovery[after_commit] _
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_point_reads_kee1')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase', ['before_commit', 'after_commit'])
+    def test_recursive_point_reads_keep_private_alias_replacement_and_recovery(tmp_path, phase):
+>       path, pair = ranked_fixture(tmp_path, size=4, configure=nested_world)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:17: in ranked_fixture
+    store,pin,*_rest=make_world(tmp_path/'source',**kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:17: in make_world
+    source=legacy_lazy(path,size=size,configure=config);file=path/'complete.sqlite';upgrade_lazy_snapshot(source,file,rules_id=RULES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_final_catalog_copy.py:42: in legacy_lazy
+    convert_cold_to_lazy(cold, source, rules_id=RULES, native_graph_buckets=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_point_reads_kee1/source/cold.sqlite')
+destination = PosixPath('/tmp/pytest-of-agent/pytest-2/test_recursive_point_reads_kee1/source/legacy-lazy.sqlite')
+rules_id = 'private-catalog-copy', paged_household_members = False
+counted_households = True, native_graph_buckets = True
+
+    def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False, native_graph_buckets=False):
+        """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
+        source, destination = _preflight_conversion_paths(source, destination)
+        if type(counted_households) is not bool:
+            raise TypeError('counted_households must be bool')
+        if type(native_graph_buckets) is not bool:
+            raise TypeError('native_graph_buckets must be bool')
+        counted_households = counted_households or native_graph_buckets
+        if counted_households:
+            paged_household_members = False
+        scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
+        codec = WorldCodec(identity_links_recorded=True)
+        source_store = TransactionalStore.open(
+            source,
+            codec=codec,
+            expected_simulation_schema=SCHEMA,
+            expected_rules_id=rules_id,
+        )
+        capture = None
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with source_store.read_transaction():
+                source_store.verify_all()
+                raw_manifest = source_store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+                if (
+                    type(raw_manifest) is not dict
+                    or raw_manifest.get("event_storage") != COLD_EVENT_STORAGE
+                ):
+                    raise StoreFormatError(
+                        "convert_cold_to_lazy requires P3B cold event storage"
+                    )
+                capture = _capture_cold_world(source_store)
+                from .persistence_event_ids import EventIdSet
+                event_id_authority = EventIdSet.from_checked_values(capture.world.event_ids)
+                from .persistence_event_ids import AUTHORITY_REFERENCE
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        a = _household_member_path(target_path)
+                        b = _household_member_path(owner_path)
+                        if a == b:
+                            continue
+                        paged_path = target_path if a else owner_path
+                        other_path = owner_path if a else target_path
+                        other = _lazy_occurrence_from_path(other_path)
+                        if (
+                            len(paged_path) != 3
+                            or other is None
+                            or not ((other[0] in (WALLET_NAMESPACE, TREASURY_NAMESPACE) and other[2])
+                                    or (other[0] == GENEALOGY_CHILD_NAMESPACE and not other[2]))
+                        ):
+                            raise StoreError(
+                                "paged household cross-family identity requires a supported list occurrence"
+                            )
+                cross_family_member_paths = {}
+                if paged_household_members:
+                    for target_path, owner_path in capture.identity_links:
+                        if _household_member_path(target_path) == _household_member_path(owner_path):
+                            continue
+                        foreign = owner_path if _household_member_path(target_path) else target_path
+                        lazy_owner = _lazy_occurrence_from_path(foreign)
+                        if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE, GENEALOGY_CHILD_NAMESPACE):
+                            raise StoreError("unsupported foreign household members identity")
+                        namespace, owner_key, relative, _ = lazy_owner
+                        cross_family_member_paths.setdefault(
+                            (namespace, codec.encode(owner_key)), set()
+                        ).add(relative)
+                source_head = source_store.db.execute(
+                    "SELECT generation,parent_generation,simulation_position,seed,"
+                    "next_ids,namespace_inventory,namespace_counts,head_checksum "
+                    "FROM save_head WHERE singleton=1"
+                ).fetchone()
+                if source_head is None:
+                    raise StoreIntegrityError("missing source save head")
+                generation = int(source_head[0])
+                identity_rows, next_incarnation = _identity_labels(
+                    capture.world,
+                    capture.manifest,
+                    capture.identity_links,
+                    codec,
+                )
+                nested_children = {}
+                from .persistence_event_ids import paged_key_supported
+                if (native_graph_buckets and event_id_authority.range_end is None
+                        and all(paged_key_supported(value) for value in capture.world.event_ids)):
+                    from .persistence_event_ids import EXCEPTION_TAG
+                    nested_children[next_incarnation] = ('sequence', ())
+                    nested_children[next_incarnation + 1] = ('set', capture.world.event_ids)
+                    event_id_authority = EventIdSet.from_exception_descriptor((EXCEPTION_TAG, 0,
+                        HistoryReference('sequence', next_incarnation), HistoryReference('set', next_incarnation + 1),
+                        len(capture.world.event_ids)))
+                    next_incarnation += 2
+                if native_graph_buckets:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if namespace in BUCKET_SPECS and not relative:
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)))
+                            kind = BUCKET_SPECS[namespace][0]
+                            if (not valid_bucket_key(namespace, owner_key)
+                                    or type(values) is not {'list': list, 'set': set}[kind]
+                                    or any(not valid_bucket_member(namespace, value) for value in values)):
+                                raise StoreFormatError('invalid native graph bucket source')
+                            nested_children.setdefault(incarnation, (kind, values))
+                if counted_households:
+                    for namespace, owner_key, relative, incarnation in identity_rows:
+                        if ((namespace == 'world.households' and relative == (("field", "members"),))
+                                or (namespace == 'world.settlements' and relative == (("field", "households"),))):
+                            values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                            if type(values) is not list or any(not nested_immutable_value(value) for value in values):
+                                raise StoreFormatError('counted household source requires immutable list values')
+                            nested_children[incarnation] = ('sequence', values)
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if (namespace != 'world.households' and namespace in NESTED_RECORD_FIELDS
+                            and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace])):
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                        kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                        if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                            raise StoreFormatError('typed history source has wrong type')
+                        if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
+                            not nested_immutable_value(value) for value in
+                            (tuple(values) + tuple(values.values()) if kind == 'map' else values)
+                        ):
+                            # Recursive mutable history is not yet a complete
+                            # authority. Reject before staging instead of publishing
+                            # a legacy header with unbindable descendant labels.
+>                           raise StoreFormatError('skill/soul history contains unsupported mutable descendants')
+E                           ate_sim.incremental_store.StoreFormatError: skill/soul history contains unsupported mutable descendants
+
+simulation/ate_sim/persistence_lazy.py:1386: StoreFormatError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_default_and_audited_reads_keep_owner_completeness[ordinary]
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_default_and_audited_reads_keep_owner_completeness[audited]
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_recursive_point_reads_keep_private_alias_replacement_and_recovery[before_commit]
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_recursive_point_reads_keep_private_alias_replacement_and_recovery[after_commit]
+5 failed, 14 passed in 19.35s

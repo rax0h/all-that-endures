@@ -1,0 +1,47 @@
+diff --git a/simulation/ate_sim/persistence_history_runtime.py b/simulation/ate_sim/persistence_history_runtime.py
+index 136d2fe..25df18f 100644
+--- a/simulation/ate_sim/persistence_history_runtime.py
++++ b/simulation/ate_sim/persistence_history_runtime.py
+@@ -770,9 +770,7 @@ class RecursiveHistoryRuntime:
+             if session._lifecycle_operation is None:
+                 self.synchronize()
+             coord = session._identity_coordinator
+-            rows = coord._owner_changes(owner, ())
+-            marker = coord._marker(owner, path)
+-            if marker not in rows or rows[marker][2] != value.incarnation:
++            if coord._placement_for_read(owner, path) != value.incarnation:
+                 raise StoreIntegrityError('recursive reference lacks its checked physical placement')
+             if nonreflexive_key_reference(value):
+                 coord.discover_group(value.incarnation, read_only=True)
+diff --git a/simulation/ate_sim/persistence_lazy_identity_coordinator.py b/simulation/ate_sim/persistence_lazy_identity_coordinator.py
+index 74886dd..426342a 100644
+--- a/simulation/ate_sim/persistence_lazy_identity_coordinator.py
++++ b/simulation/ate_sim/persistence_lazy_identity_coordinator.py
+@@ -291,6 +291,27 @@ class IdentityCoordinator:
+             if inc not in self._by_incarnation and inc not in self._value_dirty_groups:
+                 self.dirty_incarnations.discard(inc)
+ 
++    def _placement_for_read(self, owner, path):
++        """Read one placement under native proof authority, otherwise its owner.
++
++        The exact occurrence reader checks both accepted owner/group roots and
++        physical metadata before a pending replacement or deletion can win.
++        Audited/default readers retain their complete owner inventory contract.
++        """
++        from .persistence_proof_native_sources import active
++        authority = active(self.store)
++        marker = self._marker(owner, path)
++        if authority is not None and authority.proof_only:
++            placement_path(*owner, path)
++            try:
++                original = self.store.read_identity_occurrence(self.pin, *owner, path).incarnation_id
++            except KeyError:
++                original = None
++            change = self.placement_overlay.get(marker)
++            return original if change is None else None if change.delete else change.incarnation_id
++        rows = self._owner_changes(owner, ())
++        return None if marker not in rows else rows[marker][2]
++
+     def _owner_changes(self, owner, prefix):
+         """Capture only metadata; no owner or child payload loading."""
+         try:

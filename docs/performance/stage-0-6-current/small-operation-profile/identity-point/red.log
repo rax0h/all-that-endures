@@ -1,0 +1,221 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_recursive_proof_reads_do_0')
+
+    def test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference(tmp_path):
+        # Reintroducing the owner scan for a single reference repeats complete work.
+>       path, pair = ranked_fixture(tmp_path, size=4, configure=nested_world)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_open.py:17: in ranked_fixture
+    store,pin,*_rest=make_world(tmp_path/'source',**kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_world_fixtures.py:17: in make_world
+    source=legacy_lazy(path,size=size,configure=config);file=path/'complete.sqlite';upgrade_lazy_snapshot(source,file,rules_id=RULES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_final_catalog_copy.py:41: in legacy_lazy
+    write_cold_snapshot(world, cold, rules_id=RULES)
+simulation/ate_sim/persistence_session.py:971: in write_cold_snapshot
+    _validate_private_cold_store(
+simulation/ate_sim/persistence_session.py:877: in _validate_private_cold_store
+    capture = _capture_cold_world(store)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_session.py:450: in _capture_cold_world
+    _restore_identity(
+simulation/ate_sim/persistence_adapters.py:1119: in _restore_identity
+    boundary = _identity_assignment_boundary(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = World(seed=843000, year=0, cells={}, people={}, households={}, settlements={1: Settlement(id=1, x=0, y=0, households=[...tEcologyState(threats={}, next_id=1, resolutions={}), next_person=1, next_household=1, next_settlement=1, next_event=1)
+target = (('field', 'skills'), ('field', 'skills'), ('key', (1, 'craft')), ('field', 'provenance'), ('index', 2), ('index', 0))
+mutable_event_tail_only = True
+
+    def _identity_assignment_boundary(
+        world, target, *, mutable_event_tail_only=False
+    ):
+        if not target:
+            raise StoreIntegrityError('duplicate/invalid identity target')
+        parent = _at_path(
+            world, target[:-1],
+            mutable_event_tail_only=mutable_event_tail_only,
+        )
+        component = target[-1]
+        if type(component) is not tuple or len(component) != 2:
+            raise StoreFormatError('invalid identity path component')
+        kind, key = component
+        if (
+            kind == 'field'
+            and type(parent) in RECORD_FIELDS
+            and key in RECORD_FIELDS[type(parent)]
+            and not type(parent).__dataclass_params__.frozen
+        ):
+            return 'field'
+        if (
+            kind == 'key'
+            and type(parent) in (dict, RecordTable)
+            and key in parent
+        ):
+            return 'key'
+        if (
+            kind == 'index'
+            and type(parent) is list
+            and type(key) is int
+            and key >= 0
+            and key < len(parent)
+        ):
+            return 'list'
+        if (
+            kind == 'index'
+            and isinstance(parent, EventLog)
+            and mutable_event_tail_only
+        ):
+            # _at_path validates absolute range, sealedness and lifetime.
+            _at_path(
+                world, target,
+                mutable_event_tail_only=True,
+            )
+            return 'eventlog'
+>       raise StoreFormatError('unsupported mutable identity boundary')
+E       ate_sim.incremental_store.StoreFormatError: unsupported mutable identity boundary
+
+simulation/ate_sim/persistence_adapters.py:1082: StoreFormatError
+_________ test_point_read_applies_replacement_tombstone_and_reversion __________
+
+self = <ate_sim.persistence_lazy_identity.LazyIdentityRegistry object at 0x7f0eee727610>
+obj = [99]
+incarnation = IncarnationId(store_identity='b1a15bad-de89-4d42-ace6-9d889063a14e', value=10)
+nonreflexive_key = False
+
+    def _install(
+        self, obj: Any, incarnation: IncarnationId, *, nonreflexive_key=False
+    ) -> IncarnationId:
+        self._check_incarnation(incarnation)
+        object_id = id(obj)
+        current = self._by_object_id.get(object_id)
+        if current is not None:
+            current_obj = current[0]()
+            if current_obj is obj:
+                if current[1] != incarnation:
+                    raise IdentityRegistryError(
+                        "one live object cannot have two incarnations"
+                    )
+                return incarnation
+            if current_obj is not None:
+                raise IdentityRegistryError(
+                    "live object-id collision in identity registry"
+                )
+            self._by_object_id.pop(object_id, None)
+    
+        forward = self._by_incarnation.get(incarnation)
+        if forward is not None:
+            live = forward()
+            if live is obj:
+                return incarnation
+            if live is not None:
+                raise IdentityRegistryError(
+                    "incarnation already has a different live mutable object"
+                )
+            self._by_incarnation.pop(incarnation, None)
+    
+        token = self._next_runtime_token
+        self._next_runtime_token += 1
+        registry_ref = weakref.ref(self)
+    
+        def cleanup(reference, *, _id=object_id, _inc=incarnation, _token=token):
+            registry = registry_ref()
+            if registry is not None:
+                registry._cleanup(_id, _inc, _token, reference)
+    
+        if nonreflexive_key:
+            reference = _NonreflexiveKeyRoot(obj)
+        else:
+            try:
+>               reference = weakref.ref(obj, cleanup)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               TypeError: cannot create weak reference to 'list' object
+
+simulation/ate_sim/persistence_lazy_identity.py:234: TypeError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_point_read_applies_replac0')
+
+    def test_point_read_applies_replacement_tombstone_and_reversion(tmp_path):
+        path, pair = ranked_fixture(tmp_path, size=4)
+        with fast_open(path, pair) as session:
+            coord = session._identity_coordinator
+            original = session.store.read_identity_occurrence(session.pin, *OWNER, PATH).incarnation_id
+>           replacement = session._registry.bind([99]).value
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy_identity.py:336: in bind
+    self._install(obj, chosen)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_identity.LazyIdentityRegistry object at 0x7f0eee727610>
+obj = [99]
+incarnation = IncarnationId(store_identity='b1a15bad-de89-4d42-ace6-9d889063a14e', value=10)
+nonreflexive_key = False
+
+    def _install(
+        self, obj: Any, incarnation: IncarnationId, *, nonreflexive_key=False
+    ) -> IncarnationId:
+        self._check_incarnation(incarnation)
+        object_id = id(obj)
+        current = self._by_object_id.get(object_id)
+        if current is not None:
+            current_obj = current[0]()
+            if current_obj is obj:
+                if current[1] != incarnation:
+                    raise IdentityRegistryError(
+                        "one live object cannot have two incarnations"
+                    )
+                return incarnation
+            if current_obj is not None:
+                raise IdentityRegistryError(
+                    "live object-id collision in identity registry"
+                )
+            self._by_object_id.pop(object_id, None)
+    
+        forward = self._by_incarnation.get(incarnation)
+        if forward is not None:
+            live = forward()
+            if live is obj:
+                return incarnation
+            if live is not None:
+                raise IdentityRegistryError(
+                    "incarnation already has a different live mutable object"
+                )
+            self._by_incarnation.pop(incarnation, None)
+    
+        token = self._next_runtime_token
+        self._next_runtime_token += 1
+        registry_ref = weakref.ref(self)
+    
+        def cleanup(reference, *, _id=object_id, _inc=incarnation, _token=token):
+            registry = registry_ref()
+            if registry is not None:
+                registry._cleanup(_id, _inc, _token, reference)
+    
+        if nonreflexive_key:
+            reference = _NonreflexiveKeyRoot(obj)
+        else:
+            try:
+                reference = weakref.ref(obj, cleanup)
+            except TypeError as exc:
+>               raise TypeError(
+                    "persistable mutable objects must support weak references"
+                ) from exc
+E               TypeError: persistable mutable objects must support weak references
+
+simulation/ate_sim/persistence_lazy_identity.py:236: TypeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_point_read_applies_replacement_tombstone_and_reversion
+2 failed, 17 deselected in 1.56s

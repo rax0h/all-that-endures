@@ -1,0 +1,136 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_recursive_proof_reads_do_0')
+
+    def nested_fixture(tmp_path):
+        from ate_sim.persistence_proof_world_session import open_audited_proof_world_session
+        path, pair = ranked_fixture(tmp_path, size=4)
+        # Recursive descendants are admitted through the established native writer,
+        # after legacy conversion; that converter deliberately rejects this graph.
+        with open_audited_proof_world_session(path, rules_id=RULES, expected_commitment=pair[1]) as session:
+>           populate(session)
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_placement_reads.py:24: in populate
+    session.save()
+simulation/ate_sim/persistence_lazy.py:16733: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:119: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16764: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:156: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:245: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:216: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:340: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:522: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:312: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:3067: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:206: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:218: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f135f81fbb0>
+pin = GenerationPin(token='67c7a2d9-fc15-4b72-9858-89e09bc3f4ea', store_identity='67e20e6f-2b07-4776-b629-76d7a6b87ba8', captured_head=1)
+ca = (ContentCertificate(store_identity='67e20e6f-2b07-4776-b629-76d7a6b87ba8', generation=1, codec_version=1, versions=Roo...count=0)), b'#\xc5H`\xa7\xa1\xba+\x8eC\xc9\x1d\xd1\xb3\x05\x9a\xba\x89\xceA\xc7\xcf\xbc\x85\x1a\xbc\x03+4\x10\xcd\xff')
+sa = (ScopeDirectoryCertificate(store_identity='67e20e6f-2b07-4776-b629-76d7a6b87ba8', generation=1, codec_version=1, next_...xcb^5", count=0))), b'h\xf9\xcc1\x11\xba\xd7\xb2!\xc5\xadW\x82w\x9b\xad\x81.\x16\x85k\x93\xc6\xc1<\xd1\xe2\xc0m-2\xd6')
+ia = (InventoryCertificate(store_identity='67e20e6f-2b07-4776-b629-76d7a6b87ba8', generation=1, codec_version=1, head=Manif...f\xb5;", count=89)), b"\x92\xf0\xe5\x87@#\x10*\t\x02\x9b'f\xcb+\r\x94\xac\xaaxiz\xca\xe8\xd5\x8c\x97\xe43\xd3\xd0\x1b")
+ra = (RecordCertificate(store_identity='67e20e6f-2b07-4776-b629-76d7a6b87ba8', generation=1, codec_version=1, root=Root(dig...8z_\xaa\x8a\x7fA\x87%Y6', count=34)), b'm\xb1j\x02\xbc\xe5\x1e#+\x13\xc9\x08\xc4Z*\'&\x85\x0e]\xfe\n"]{\xc8\\"+\xd6?O')
+da = (CollectionDirectoryCertificate(store_identity='67e20e6f-2b07-4776-b629-76d7a6b87ba8', generation=1, codec_version=1, ...,9\xa8N6', count=70)), b'MW\xdf[\xb3MPI\xea|\x85\xf7\x06\xa7\xcd\xcc\x18\xcc\xbe\x9e\xc8\x8d\x19$\xbdjIK\x8e\x00h\xf7')
+
+    def _audit_world(store,pin,ca,sa,ia,ra,da):
+        from .persistence_adapters import META,_read_cold_manifest
+        from .persistence_complete_format import selected as complete_selected
+        from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES,_checked_value
+        from .persistence_history_types import NAMESPACE as TYPES
+        from .persistence_event_ids import EXCEPTION_TAG
+        if not getattr(store,'_checked_snapshot_depth',0):raise StoreError('World audit requires checked owned snapshot')
+        if pin.captured_head!=store.generation:raise StoreConflictError('World full audit requires current pinned head')
+        _check_sources(store,pin.captured_head,ca,sa,ia,ra,da)
+        manifest=_read_cold_manifest(store)
+        floor=int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+        if not complete_selected(manifest,floor):raise StoreError('World proof construction requires explicit complete source format')
+        from .persistence_proof_manifest_publish import _check_head
+        from .persistence_history_retirement import NAMESPACE as RETIREMENT
+>       if next(iter(store.iter_keys(pin,RETIREMENT)),None) is not None:raise StoreError('partial retirement requires a separately checked World proof path')
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreError: partial retirement requires a separately checked World proof path
+
+simulation/ate_sim/persistence_proof_world.py:358: StoreError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_recursive_proof_reads_do_0')
+
+    def test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference(tmp_path):
+        # Reintroducing the owner scan for a single reference repeats complete work.
+>       path, pair = nested_fixture(tmp_path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_proof_placement_reads.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_proof_placement_reads.py:32: in nested_fixture
+    with open_audited_proof_world_session(path, rules_id=RULES, expected_commitment=pair[1]) as session:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18062: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f135f5b8190>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18020: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_proof_placement_reads.py::test_recursive_proof_reads_do_not_enumerate_owner_to_decode_one_reference
+1 failed, 18 deselected in 3.72s
