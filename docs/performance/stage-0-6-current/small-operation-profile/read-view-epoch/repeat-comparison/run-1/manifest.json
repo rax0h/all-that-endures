@@ -1,0 +1,314 @@
+{
+  "status": "complete",
+  "source": {
+    "bytes": 26206208,
+    "format": 7,
+    "generation": 0,
+    "seed": 843000,
+    "sha256": "2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554",
+    "store_identity": "c8c84501-6f16-4b67-aacb-8213e8f52c7e",
+    "year": 1
+  },
+  "trees": {
+    "baseline": "41d21d8dfd2eedd44b35c12c894cbb4a59ba6058",
+    "candidate": "4654b0194149f735a15c79507a6e57c88a7acbb2"
+  },
+  "order": [
+    [
+      "pair1",
+      "baseline"
+    ],
+    [
+      "pair1",
+      "candidate"
+    ],
+    [
+      "pair2",
+      "candidate"
+    ],
+    [
+      "pair2",
+      "baseline"
+    ]
+  ],
+  "wall_limit_seconds": 120,
+  "context": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu_max": null,
+    "cpu_stat": null
+  },
+  "trials": [
+    {
+      "name": "pair1-baseline",
+      "status": "complete",
+      "started": "2026-11-12T19:22:18.158165+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.476944,
+          "cpu": 1.461504
+        },
+        "first_step": {
+          "wall": 7.658783,
+          "cpu": 7.642113
+        },
+        "save": {
+          "wall": 5.624427,
+          "cpu": 5.58863
+        },
+        "warm_step": {
+          "wall": 6.45714,
+          "cpu": 6.447392
+        },
+        "fresh_verify": {
+          "wall": 15.546957,
+          "cpu": 0.001179
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    },
+    {
+      "name": "pair1-candidate",
+      "status": "complete",
+      "started": "2026-11-12T19:22:58.774852+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.238073,
+          "cpu": 1.224895
+        },
+        "first_step": {
+          "wall": 6.018721,
+          "cpu": 6.005266
+        },
+        "save": {
+          "wall": 5.594529,
+          "cpu": 5.562471
+        },
+        "warm_step": {
+          "wall": 4.867917,
+          "cpu": 4.851231
+        },
+        "fresh_verify": {
+          "wall": 12.965805,
+          "cpu": 0.001072
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    },
+    {
+      "name": "pair2-candidate",
+      "status": "complete",
+      "started": "2026-11-12T19:23:32.691620+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.248493,
+          "cpu": 1.223578
+        },
+        "first_step": {
+          "wall": 5.677765,
+          "cpu": 5.65692
+        },
+        "save": {
+          "wall": 5.288921,
+          "cpu": 5.265035
+        },
+        "warm_step": {
+          "wall": 4.916531,
+          "cpu": 4.91348
+        },
+        "fresh_verify": {
+          "wall": 12.265108,
+          "cpu": 0.001094
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    },
+    {
+      "name": "pair2-baseline",
+      "status": "complete",
+      "started": "2026-11-12T19:24:05.561360+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.452612,
+          "cpu": 1.440338
+        },
+        "first_step": {
+          "wall": 7.483413,
+          "cpu": 7.47003
+        },
+        "save": {
+          "wall": 4.944695,
+          "cpu": 4.910559
+        },
+        "warm_step": {
+          "wall": 5.682416,
+          "cpu": 5.676327
+        },
+        "fresh_verify": {
+          "wall": 14.354372,
+          "cpu": 0.000987
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    }
+  ],
+  "saved": {
+    "year": 2,
+    "seed": 843000,
+    "generation": 1,
+    "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+  },
+  "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+}

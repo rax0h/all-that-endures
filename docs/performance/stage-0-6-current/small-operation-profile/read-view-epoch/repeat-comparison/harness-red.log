@@ -1,0 +1,224 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+________ test_stopping_group_kills_child_even_after_leader_exits[False] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_stopping_group_kills_chil0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f770ab5f5c0>
+parent_exits = False
+
+    @pytest.mark.parametrize('parent_exits', [False, True])
+    def test_stopping_group_kills_child_even_after_leader_exits(tmp_path, monkeypatch, parent_exits):
+        child = ("import os,signal,sys,time; from pathlib import Path; "
+                 "signal.signal(signal.SIGTERM,signal.SIG_IGN); "
+                 "p=Path(sys.argv[1]); q=p.with_suffix('.tmp'); "
+                 "q.write_text(str(os.getpid())); q.replace(p); time.sleep(60)")
+        parent = ("import subprocess,sys,time; from pathlib import Path; "
+                  "subprocess.Popen([sys.executable,'-c',sys.argv[2],sys.argv[1]], "
+                  "stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); "
+                  "p=Path(sys.argv[1]); "
+                  "exec('while not p.exists():\\n time.sleep(0.01)'); "
+                  "time.sleep(0 if sys.argv[3]=='exit' else 60)")
+        pidfile = tmp_path / 'child.pid'
+        proc = subprocess.Popen([sys.executable, '-c', parent, str(pidfile), child,
+                                 'exit' if parent_exits else 'wait'],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                start_new_session=True)
+        child_pid = None
+        try:
+            deadline = time.monotonic() + 5
+            while not pidfile.exists() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            assert pidfile.exists()
+            child_pid = int(pidfile.read_text())
+            if parent_exits:
+                assert proc.wait(timeout=5) == 0
+            assert running(child_pid)
+            monkeypatch.setattr(repeat, '_STOP_GRACE_SECONDS', 0.15, raising=False)
+            repeat.stop_group(proc)
+            deadline = time.monotonic() + 2
+            while running(child_pid) and time.monotonic() < deadline:
+                time.sleep(0.01)
+>           assert not running(child_pid)
+E           assert not True
+E            +  where True = running(8)
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py:61: AssertionError
+________ test_stopping_group_kills_child_even_after_leader_exits[True] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_stopping_group_kills_chil1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f770ab5f230>
+parent_exits = True
+
+    @pytest.mark.parametrize('parent_exits', [False, True])
+    def test_stopping_group_kills_child_even_after_leader_exits(tmp_path, monkeypatch, parent_exits):
+        child = ("import os,signal,sys,time; from pathlib import Path; "
+                 "signal.signal(signal.SIGTERM,signal.SIG_IGN); "
+                 "p=Path(sys.argv[1]); q=p.with_suffix('.tmp'); "
+                 "q.write_text(str(os.getpid())); q.replace(p); time.sleep(60)")
+        parent = ("import subprocess,sys,time; from pathlib import Path; "
+                  "subprocess.Popen([sys.executable,'-c',sys.argv[2],sys.argv[1]], "
+                  "stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); "
+                  "p=Path(sys.argv[1]); "
+                  "exec('while not p.exists():\\n time.sleep(0.01)'); "
+                  "time.sleep(0 if sys.argv[3]=='exit' else 60)")
+        pidfile = tmp_path / 'child.pid'
+        proc = subprocess.Popen([sys.executable, '-c', parent, str(pidfile), child,
+                                 'exit' if parent_exits else 'wait'],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                start_new_session=True)
+        child_pid = None
+        try:
+            deadline = time.monotonic() + 5
+            while not pidfile.exists() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            assert pidfile.exists()
+            child_pid = int(pidfile.read_text())
+            if parent_exits:
+                assert proc.wait(timeout=5) == 0
+            assert running(child_pid)
+            monkeypatch.setattr(repeat, '_STOP_GRACE_SECONDS', 0.15, raising=False)
+            repeat.stop_group(proc)
+            deadline = time.monotonic() + 2
+            while running(child_pid) and time.monotonic() < deadline:
+                time.sleep(0.01)
+>           assert not running(child_pid)
+E           assert not True
+E            +  where True = running(10)
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py:61: AssertionError
+_______ test_preflight_rejects_runtime_bytes_outside_pinned_tree[staged] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_preflight_rejects_runtime0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f770a833d10>
+change = 'staged'
+
+    @pytest.mark.parametrize('change', ['staged', 'untracked', 'ignored'])
+    def test_preflight_rejects_runtime_bytes_outside_pinned_tree(tmp_path, monkeypatch, change):
+        repo = tmp_path / 'repo'
+        repo.mkdir()
+        subprocess.run(['git', 'init', '-q'], cwd=repo, check=True)
+        subprocess.run(['git', 'config', 'user.name', 'Test'], cwd=repo, check=True)
+        subprocess.run(['git', 'config', 'user.email', 'test@example.invalid'], cwd=repo, check=True)
+        runtime = repo / 'simulation/ate_sim'
+        runtime.mkdir(parents=True)
+        (runtime / 'tracked.py').write_text('value = 1\n')
+        (repo / '.gitignore').write_text('simulation/ate_sim/ignored.py\n')
+        (repo / 'driver.py').write_text('# test driver\n')
+        subprocess.run(['git', 'add', '.'], cwd=repo, check=True)
+        subprocess.run(['git', 'commit', '-q', '-m', 'baseline'], cwd=repo, check=True)
+        tree = subprocess.check_output(['git', 'rev-parse', 'HEAD:simulation/ate_sim'], cwd=repo, text=True).strip()
+        if change == 'staged':
+            (runtime / 'tracked.py').write_text('value = 2\n')
+            subprocess.run(['git', 'add', 'simulation/ate_sim/tracked.py'], cwd=repo, check=True)
+        else:
+            (runtime / ('ignored.py' if change == 'ignored' else 'new.py')).write_text('value = 2\n')
+        source = tmp_path / 'source.bin'
+        source.write_bytes(b'deterministic fixture')
+        info = tmp_path / 'input.json'
+        info.write_text(json.dumps({'database': {'sha256': hashlib.sha256(source.read_bytes()).hexdigest()}}))
+        monkeypatch.setattr(repeat, 'SOURCES', {'baseline': repo, 'candidate': repo})
+        monkeypatch.setattr(repeat, 'EXPECTED_TREES', {'baseline': tree, 'candidate': tree})
+        monkeypatch.setattr(repeat, 'SOURCE', source)
+        monkeypatch.setattr(repeat, 'INPUT', info)
+        monkeypatch.setattr(repeat, 'DRIVER', Path('driver.py'))
+        monkeypatch.setattr(sys, 'argv', ['repeat.py', '--dry-run'])
+>       with pytest.raises((ValueError, subprocess.CalledProcessError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, CalledProcessError)
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py:98: Failed
+----------------------------- Captured stdout call -----------------------------
+{"source": "abef54e4ce3ae7de1d944ee5c3a040f4fa0542cbc2458b9ca1dc20b52421b6b9", "trees": {"baseline": "1a249ecdc7e0391562813efb1c7e6f3f1e407bf1", "candidate": "1a249ecdc7e0391562813efb1c7e6f3f1e407bf1"}, "order": [["pair1", "baseline"], ["pair1", "candidate"], ["pair2", "candidate"], ["pair2", "baseline"]], "context": {"platform": "Linux-6.18.57-x86_64-with-glibc2.41", "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]", "cpu": "AMD EPYC 9V74 80-Core Processor", "affinity": [0, 1, 2, 3, 4, 5, 6, 7, 8], "cpu_max": null, "cpu_stat": null}}
+_____ test_preflight_rejects_runtime_bytes_outside_pinned_tree[untracked] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_preflight_rejects_runtime1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f770abb56a0>
+change = 'untracked'
+
+    @pytest.mark.parametrize('change', ['staged', 'untracked', 'ignored'])
+    def test_preflight_rejects_runtime_bytes_outside_pinned_tree(tmp_path, monkeypatch, change):
+        repo = tmp_path / 'repo'
+        repo.mkdir()
+        subprocess.run(['git', 'init', '-q'], cwd=repo, check=True)
+        subprocess.run(['git', 'config', 'user.name', 'Test'], cwd=repo, check=True)
+        subprocess.run(['git', 'config', 'user.email', 'test@example.invalid'], cwd=repo, check=True)
+        runtime = repo / 'simulation/ate_sim'
+        runtime.mkdir(parents=True)
+        (runtime / 'tracked.py').write_text('value = 1\n')
+        (repo / '.gitignore').write_text('simulation/ate_sim/ignored.py\n')
+        (repo / 'driver.py').write_text('# test driver\n')
+        subprocess.run(['git', 'add', '.'], cwd=repo, check=True)
+        subprocess.run(['git', 'commit', '-q', '-m', 'baseline'], cwd=repo, check=True)
+        tree = subprocess.check_output(['git', 'rev-parse', 'HEAD:simulation/ate_sim'], cwd=repo, text=True).strip()
+        if change == 'staged':
+            (runtime / 'tracked.py').write_text('value = 2\n')
+            subprocess.run(['git', 'add', 'simulation/ate_sim/tracked.py'], cwd=repo, check=True)
+        else:
+            (runtime / ('ignored.py' if change == 'ignored' else 'new.py')).write_text('value = 2\n')
+        source = tmp_path / 'source.bin'
+        source.write_bytes(b'deterministic fixture')
+        info = tmp_path / 'input.json'
+        info.write_text(json.dumps({'database': {'sha256': hashlib.sha256(source.read_bytes()).hexdigest()}}))
+        monkeypatch.setattr(repeat, 'SOURCES', {'baseline': repo, 'candidate': repo})
+        monkeypatch.setattr(repeat, 'EXPECTED_TREES', {'baseline': tree, 'candidate': tree})
+        monkeypatch.setattr(repeat, 'SOURCE', source)
+        monkeypatch.setattr(repeat, 'INPUT', info)
+        monkeypatch.setattr(repeat, 'DRIVER', Path('driver.py'))
+        monkeypatch.setattr(sys, 'argv', ['repeat.py', '--dry-run'])
+>       with pytest.raises((ValueError, subprocess.CalledProcessError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, CalledProcessError)
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py:98: Failed
+----------------------------- Captured stdout call -----------------------------
+{"source": "abef54e4ce3ae7de1d944ee5c3a040f4fa0542cbc2458b9ca1dc20b52421b6b9", "trees": {"baseline": "1a249ecdc7e0391562813efb1c7e6f3f1e407bf1", "candidate": "1a249ecdc7e0391562813efb1c7e6f3f1e407bf1"}, "order": [["pair1", "baseline"], ["pair1", "candidate"], ["pair2", "candidate"], ["pair2", "baseline"]], "context": {"platform": "Linux-6.18.57-x86_64-with-glibc2.41", "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]", "cpu": "AMD EPYC 9V74 80-Core Processor", "affinity": [0, 1, 2, 3, 4, 5, 6, 7, 8], "cpu_max": null, "cpu_stat": null}}
+______ test_preflight_rejects_runtime_bytes_outside_pinned_tree[ignored] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_preflight_rejects_runtime2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f770abb6470>
+change = 'ignored'
+
+    @pytest.mark.parametrize('change', ['staged', 'untracked', 'ignored'])
+    def test_preflight_rejects_runtime_bytes_outside_pinned_tree(tmp_path, monkeypatch, change):
+        repo = tmp_path / 'repo'
+        repo.mkdir()
+        subprocess.run(['git', 'init', '-q'], cwd=repo, check=True)
+        subprocess.run(['git', 'config', 'user.name', 'Test'], cwd=repo, check=True)
+        subprocess.run(['git', 'config', 'user.email', 'test@example.invalid'], cwd=repo, check=True)
+        runtime = repo / 'simulation/ate_sim'
+        runtime.mkdir(parents=True)
+        (runtime / 'tracked.py').write_text('value = 1\n')
+        (repo / '.gitignore').write_text('simulation/ate_sim/ignored.py\n')
+        (repo / 'driver.py').write_text('# test driver\n')
+        subprocess.run(['git', 'add', '.'], cwd=repo, check=True)
+        subprocess.run(['git', 'commit', '-q', '-m', 'baseline'], cwd=repo, check=True)
+        tree = subprocess.check_output(['git', 'rev-parse', 'HEAD:simulation/ate_sim'], cwd=repo, text=True).strip()
+        if change == 'staged':
+            (runtime / 'tracked.py').write_text('value = 2\n')
+            subprocess.run(['git', 'add', 'simulation/ate_sim/tracked.py'], cwd=repo, check=True)
+        else:
+            (runtime / ('ignored.py' if change == 'ignored' else 'new.py')).write_text('value = 2\n')
+        source = tmp_path / 'source.bin'
+        source.write_bytes(b'deterministic fixture')
+        info = tmp_path / 'input.json'
+        info.write_text(json.dumps({'database': {'sha256': hashlib.sha256(source.read_bytes()).hexdigest()}}))
+        monkeypatch.setattr(repeat, 'SOURCES', {'baseline': repo, 'candidate': repo})
+        monkeypatch.setattr(repeat, 'EXPECTED_TREES', {'baseline': tree, 'candidate': tree})
+        monkeypatch.setattr(repeat, 'SOURCE', source)
+        monkeypatch.setattr(repeat, 'INPUT', info)
+        monkeypatch.setattr(repeat, 'DRIVER', Path('driver.py'))
+        monkeypatch.setattr(sys, 'argv', ['repeat.py', '--dry-run'])
+>       with pytest.raises((ValueError, subprocess.CalledProcessError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, CalledProcessError)
+
+docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py:98: Failed
+----------------------------- Captured stdout call -----------------------------
+{"source": "abef54e4ce3ae7de1d944ee5c3a040f4fa0542cbc2458b9ca1dc20b52421b6b9", "trees": {"baseline": "1a249ecdc7e0391562813efb1c7e6f3f1e407bf1", "candidate": "1a249ecdc7e0391562813efb1c7e6f3f1e407bf1"}, "order": [["pair1", "baseline"], ["pair1", "candidate"], ["pair2", "candidate"], ["pair2", "baseline"]], "context": {"platform": "Linux-6.18.57-x86_64-with-glibc2.41", "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]", "cpu": "AMD EPYC 9V74 80-Core Processor", "affinity": [0, 1, 2, 3, 4, 5, 6, 7, 8], "cpu_max": null, "cpu_stat": null}}
+=========================== short test summary info ============================
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py::test_stopping_group_kills_child_even_after_leader_exits[False]
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py::test_stopping_group_kills_child_even_after_leader_exits[True]
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py::test_preflight_rejects_runtime_bytes_outside_pinned_tree[staged]
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py::test_preflight_rejects_runtime_bytes_outside_pinned_tree[untracked]
+FAILED docs/performance/stage-0-6-current/small-operation-profile/read-view-epoch/repeat-comparison/test_repeat_checks.py::test_preflight_rejects_runtime_bytes_outside_pinned_tree[ignored]
+5 failed in 4.28s

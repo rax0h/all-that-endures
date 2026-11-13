@@ -338,3 +338,23 @@ review reports no remaining actionable code finding; final wording precision
 records static reviewer reads during raw timing and codec identity explicitly.
 No unresolved finding is carried into a later work group. Hosted proof/full
 remains the engine acceptance gate.
+
+## November12 timing comparison clarification
+
+| ID | Origin | Action and evidence | Status |
+|---|---|---|---|
+| W8a | Daniel noticed later reported absolute times exceeded earlier ones | Acknowledge earlier same-source/fixture baseline5.312ssave/5.990swarm and prior paired baseline7.722/9.224 with candidate8.152/7.271. Same input/Python/runtime-file fingerprints; earlier baseline CPU not recorded. Prior pair Intel Xeon8573C, new session AMD EPYC9V74. Cause of the older gap is not established. Two same-session A-B/B-A pairs show candidate warm4.868/4.917s vs baseline6.457/5.682s, with save5.595/5.289s vs5.624/4.945s. Full raw source/input/state fences and restart-unit/120s caps retained in ../small-operation-profile/read-view-epoch/repeat-comparison/. | CLOSED reporting correction; mature targets remain OPEN |
+| W8b | Earlier1.870s simulated-year result could be mistaken for the exact latest fixture | Retain and identify the actual annual-ordinary/real-year-final.json result: year2 source SHA bd8b3e…, older3.12.3 engine and audited open9.252s; current input SHA255567… and proof-only path differ. Search found no exact old SHA among local25–35MB SQLite files. Do not claim either that current source meets1.870s on old workload or that the change is a proven regression on that workload. | CLOSED scope clarification; exact historical workload comparison unverified |
+
+The two new A-B/B-A pairs are bounded observations, not a latency distribution;
+save performance shows no proven improvement. Independent benchmark review is
+recorded beside the comparison before publication. No product engine bytes,
+existing workflow, mature request, default format, main branch or endurance run
+is changed by this documentation/measurement group.
+
+| W8c | Independent review: a timed-out trial leader could exit while a descendant ignored TERM | Preserve actual measured runner and its SHA. Future runner TERM-signals the group regardless of leader state, waits bounded grace then KILLs remaining group; two RED→GREEN process-group controls cover live/exited leader. Partial output and cleanup errors are recorded. | CLOSED locally |
+| W8d | Independent review: staged, untracked or ignored Python files could evade tree preflight; qualification cadence overstated | Future preflight compares engine Python inventory and raw Git-blob bytes to pinned HEAD and checks tracked runtime diff against HEAD; staged/untracked/ignored controls RED→GREEN. Existing four trials independently verified against actual pinned blobs. Plan/report state full runtime qualification once per session, Python/source/input checks per trial. | CLOSED locally |
+
+Final benchmark-only harness validation:5controls pass0.57s; measured source
+copy and original failing output are preserved. No product engine/workflow or
+CI trigger changed, and the four successful timing trials were not repeated.
