@@ -83,3 +83,8 @@ time totals884.14s (not one raw benchmark). Resume authenticated and reused
 second invocation. Rank-up module9passed94.45s. All engine bytes and every XML/log
 hash were rechecked before commit. Workflow YAML parses; focused command has10m
 reserve within the existing90m proof job. Hosted acceptance remains pending.
+
+Hosted bundled validation is IN PROGRESS:
+https://github.com/rax0h/all-that-endures/actions/runs/43482217438
+at exact engine source d2b0a38fac5e76f5938878bc0d66adcd77619f15.
+This later pointer update is documentation only and does not start another run.

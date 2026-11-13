@@ -44,3 +44,14 @@ must only be used through disposable copies; its archive expires December11.
 Rank-up tests build disposable small fixtures and include a10000-entry unrelated
 history read refusal, not a mature-world latency measurement. Mature
 open10s/save2s/warm1s targets remain OPEN. Do not infer Stage0.6 completion.
+
+Published rank-up engine: `d2b0a38fac5e76f5938878bc0d66adcd77619f15`,
+tree `78976cd1b1c9a8573141edc878eb2337d75b0d2f`, runtime
+`6b4e02da84294f98dd2a14595112109f36cacb5a`. Exact local9c685ca tree.
+Publication receipt is in rank-up-publication/publication.json. Hosted result
+for this exact source must be checked before claiming engine acceptance.
+
+Hosted bundled validation is IN PROGRESS:
+https://github.com/rax0h/all-that-endures/actions/runs/43482217438
+at exact engine source d2b0a38fac5e76f5938878bc0d66adcd77619f15.
+This later pointer update is documentation only and does not start another run.
