@@ -84,3 +84,12 @@ mature improvement claim. Final hosted proof/full candidate gate still required.
 The unrelated10000-entry imported-history local timeout is preserved; its14tests
 were green on the unchanged persistence engine and remain in hosted full suite.
 No mature/main/default/endurance request.
+
+Published annual lifetime source457a619f84f6610f9b965829b2be8cb8389c5f9b,
+exact tree0d414678e3d18bc7b9225c78052bb796e6822f78 matching local28cefdc;
+runtime95c61911. Read rank-ecology-lifetime/publication.json for hosted status.
+No extra mature request was changed.
+
+Hosted gate IN PROGRESS: https://github.com/rax0h/all-that-endures/actions/runs/43501337447
+at exact source457a619f84f6610f9b965829b2be8cb8389c5f9b/runtime95c61911.
+Later continuation pointers are documentation only [skip ci].

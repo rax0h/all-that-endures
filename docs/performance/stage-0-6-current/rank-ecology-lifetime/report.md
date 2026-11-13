@@ -108,3 +108,7 @@ Retain the independently verified80→20header work reduction; mature targets re
 open. All four saved/continued states match exactly, including fresh processes.
 Original input bytes remain exact. Raw source/runtime/file/module-path fences and
 per-trial CPU context are preserved in raw-pairs/. No raw trials were repeated.
+
+Hosted gate IN PROGRESS: https://github.com/rax0h/all-that-endures/actions/runs/43501337447
+at exact source457a619f84f6610f9b965829b2be8cb8389c5f9b/runtime95c61911.
+Later continuation pointers are documentation only [skip ci].
