@@ -1,0 +1,179 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_action_matches_eager_state_rng_events_and_saved_identity[milestone] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_action_matches_eager_stat0')
+mode = 'milestone'
+
+    @pytest.mark.parametrize('mode', ['empty', 'partial', 'full', 'ceiling', 'milestone'])
+    def test_action_matches_eager_state_rng_events_and_saved_identity(tmp_path, mode):
+        expected = []
+        def setup(world):
+            configure(world)
+            path = world.advancement.path(1)
+            if mode == 'empty':
+                path.abilities.clear()
+            elif mode == 'partial':
+                del path.abilities[4:]
+            elif mode == 'ceiling':
+                for ability in path.abilities:
+                    ability.rank = 5
+            elif mode == 'milestone':
+                for ability in path.abilities:
+                    ability.level = 9
+                    ability.progress = .99
+            world.people[1].rank = world.advancement.rank(1)
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        reference_rng = random.Random(32)
+        _practice_path(eager, eager.people[1], reference_rng, 'work', .5)
+        expected_digest = eager.digest()
+        with fast_open(path, pair) as session:
+            rng = random.Random(32)
+            _practice_path(session.world, session.world.people[1], rng, 'work', .5)
+            assert rng.getstate() == reference_rng.getstate()
+            assert session.world.digest() == expected_digest
+            assert session.skills[1, 'craft'].provenance is session.skills[2, 'craft'].provenance
+>           session.save()
+
+simulation/tests/test_stage_0_6_action_ability_lifetime.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16733: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:124: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16764: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:161: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:245: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:216: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:340: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:522: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:312: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:3067: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:206: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:218: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f15f8ed7950>
+pin = GenerationPin(token='ac47d955-3a4c-4b66-9d81-8da265740908', store_identity='c0f0b93f-3682-40a5-98fd-9b74424b7aab', captured_head=1)
+ca = (ContentCertificate(store_identity='c0f0b93f-3682-40a5-98fd-9b74424b7aab', generation=1, codec_version=1, versions=Roo...bf', count=0)), b'\x1c\x7f7M\x96\x1f\x111G\xd4d\x99\n\x16\xb7\xe9\x84\x03\x9f\xaf\xa2\xba\x06\xdf1\xe3\xa2^&k\x81\x0b')
+sa = (ScopeDirectoryCertificate(store_identity='c0f0b93f-3682-40a5-98fd-9b74424b7aab', generation=1, codec_version=1, next_...4t"c', count=0))), b'\xcf\'.\xe2\x17\x0bV\x8b\xac\xbd";\xe3\x10\x9b\xad\x17\xb8\xf54D\x84,\x08\x91t\xebl\xd8G\x9c\x86')
+ia = (InventoryCertificate(store_identity='c0f0b93f-3682-40a5-98fd-9b74424b7aab', generation=1, codec_version=1, head=Manif...'\xce", count=89)), b'\xe2\xb92F\xb2p\xe0\xc1\xd7\xfd]T\xb5tX\x8fV\x0e\x10z\x9b\xaf7\x00\xe3\xb6\xd0\xee\xda\x0b&\xec')
+ra = (RecordCertificate(store_identity='c0f0b93f-3682-40a5-98fd-9b74424b7aab', generation=1, codec_version=1, root=Root(dig...ee-[7', count=38)), b'\xf2\xea\x8d\xa4\xb6\xf0\xc3\xcd\xbf\xb5Y}.1\xf8\x9d_D8T\x96\x03\xaf\xb4\x95\xad\xa2\x8d`\xe8HR')
+da = (CollectionDirectoryCertificate(store_identity='c0f0b93f-3682-40a5-98fd-9b74424b7aab', generation=1, codec_version=1, ...ed', count=70)), b'\x1d\xd7!\xe8\x93\x90;\xe9?\xbb_\xff\x13\xe5(\xb3\xf0\x90\xb1\xf71eM\xc7\xf9,\xc6\x14#\xaf\x80\xe6')
+
+    def _audit_world(store,pin,ca,sa,ia,ra,da):
+        from .persistence_adapters import META,_read_cold_manifest
+        from .persistence_complete_format import selected as complete_selected
+        from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES,_checked_value
+        from .persistence_history_types import NAMESPACE as TYPES
+        from .persistence_event_ids import EXCEPTION_TAG
+        if not getattr(store,'_checked_snapshot_depth',0):raise StoreError('World audit requires checked owned snapshot')
+        if pin.captured_head!=store.generation:raise StoreConflictError('World full audit requires current pinned head')
+        _check_sources(store,pin.captured_head,ca,sa,ia,ra,da)
+        manifest=_read_cold_manifest(store)
+        floor=int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+        if not complete_selected(manifest,floor):raise StoreError('World proof construction requires explicit complete source format')
+        from .persistence_proof_manifest_publish import _check_head
+        from .persistence_history_retirement import NAMESPACE as RETIREMENT
+>       if next(iter(store.iter_keys(pin,RETIREMENT)),None) is not None:raise StoreError('partial retirement requires a separately checked World proof path')
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreError: partial retirement requires a separately checked World proof path
+
+simulation/ate_sim/persistence_proof_world.py:358: StoreError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_action_matches_eager_stat0')
+mode = 'milestone'
+
+    @pytest.mark.parametrize('mode', ['empty', 'partial', 'full', 'ceiling', 'milestone'])
+    def test_action_matches_eager_state_rng_events_and_saved_identity(tmp_path, mode):
+        expected = []
+        def setup(world):
+            configure(world)
+            path = world.advancement.path(1)
+            if mode == 'empty':
+                path.abilities.clear()
+            elif mode == 'partial':
+                del path.abilities[4:]
+            elif mode == 'ceiling':
+                for ability in path.abilities:
+                    ability.rank = 5
+            elif mode == 'milestone':
+                for ability in path.abilities:
+                    ability.level = 9
+                    ability.progress = .99
+            world.people[1].rank = world.advancement.rank(1)
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        reference_rng = random.Random(32)
+        _practice_path(eager, eager.people[1], reference_rng, 'work', .5)
+        expected_digest = eager.digest()
+>       with fast_open(path, pair) as session:
+             ^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_action_ability_lifetime.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18062: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f15f8d74190>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18020: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_action_ability_lifetime.py::test_action_matches_eager_state_rng_events_and_saved_identity[milestone]
+1 failed in 8.74s

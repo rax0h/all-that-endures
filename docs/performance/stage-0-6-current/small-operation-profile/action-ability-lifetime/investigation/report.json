@@ -1,0 +1,1073 @@
+{
+  "first_step": {
+    "reads": 50113,
+    "unique_nodes": 7334,
+    "scoped_reads": 30495,
+    "unique_scope_nodes": 22866,
+    "outside_scope_reads": 19618,
+    "top_domains": [
+      {
+        "domain": "841d9fcd42e73fd5e3bb236b483ed1b5df79df372a8efe7a587aa1ea01aeb842",
+        "reads": 35973
+      },
+      {
+        "domain": "054670f4294d951b16be7592e9ff94f8aaf4dcaf2a8ce5866c6b84ee73dbbef5",
+        "reads": 7250
+      },
+      {
+        "domain": "409bcd972eb0fe5be70e5ae8d52e2c2e7cdd45529b5913c18907eef49338f997",
+        "reads": 5694
+      },
+      {
+        "domain": "e466cc8d62fe72deaaec506403936ccb8cfb53f2fe2e7c0579ab47248853fe07",
+        "reads": 1196
+      }
+    ],
+    "owner_calls": [
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.people"
+        ],
+        "count": 20
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.skills.skills"
+        ],
+        "count": 36
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.local"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.settlements"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.households"
+        ],
+        "count": 7
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.households"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.sequence.nodes"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.genealogy.children"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.nested.list_pages"
+        ],
+        "count": 15
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.genealogy.children"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.event_ids"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.event_ids"
+        ],
+        "count": 10
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.lineage.children"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.lineage.children"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.social.adjacency"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.social.adjacency"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.divinity.gods"
+        ],
+        "count": 17
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.magic_resources.aspirations"
+        ],
+        "count": 11
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.ambient_magic.fields"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.advancement.paths"
+        ],
+        "count": 8
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.records.headers"
+        ],
+        "count": 228
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "aux.lazy.records.headers"
+        ],
+        "count": 561
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.social.edges"
+        ],
+        "count": 41
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.agency.motives"
+        ],
+        "count": 11
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.agency.motives"
+        ],
+        "count": 22
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "aux.lazy.nested.list_pages"
+        ],
+        "count": 267
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.institutions.institutions"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.materials.lot_index"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.materials.lot_index"
+        ],
+        "count": 3
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.materials.active_lot_index"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.materials.active_lot_index"
+        ],
+        "count": 3
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.culture.practices"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.culture.adoption"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.culture.practices"
+        ],
+        "count": 10
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.nested.entries"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.infrastructure.assets"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.infrastructure.assets"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.institutions.branches"
+        ],
+        "count": 2
+      }
+    ]
+  },
+  "save": {
+    "reads": 54366,
+    "unique_nodes": 7228,
+    "scoped_reads": 4565,
+    "unique_scope_nodes": 2996,
+    "outside_scope_reads": 49801,
+    "top_domains": [
+      {
+        "domain": "841d9fcd42e73fd5e3bb236b483ed1b5df79df372a8efe7a587aa1ea01aeb842",
+        "reads": 41125
+      },
+      {
+        "domain": "f03d49bf563c147fab8dac56e44678facd433362309b41d3ac3167072104432f",
+        "reads": 3966
+      },
+      {
+        "domain": "409bcd972eb0fe5be70e5ae8d52e2c2e7cdd45529b5913c18907eef49338f997",
+        "reads": 3031
+      },
+      {
+        "domain": "054670f4294d951b16be7592e9ff94f8aaf4dcaf2a8ce5866c6b84ee73dbbef5",
+        "reads": 3009
+      },
+      {
+        "domain": "6f07dac92420b2d16462b431ca2e76e22b8573afcb6acdae6f01e043a8e1d28e",
+        "reads": 1094
+      },
+      {
+        "domain": "3a41ff31a56189c184cfd119aa9596cbb5ca00a5a11f3a96e7180dc9a3532c53",
+        "reads": 739
+      },
+      {
+        "domain": "e466cc8d62fe72deaaec506403936ccb8cfb53f2fe2e7c0579ab47248853fe07",
+        "reads": 469
+      },
+      {
+        "domain": "b413fe533dc579f34bdcef3c686ca4d92827d26dda87a34e13d48f3559b18ad8",
+        "reads": 418
+      }
+    ],
+    "owner_calls": [
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.settlements"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "aux.lazy.nested.list_pages"
+        ],
+        "count": 24
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.sequence.nodes"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "aux.lazy.nested.entries"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.social.adjacency"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.lineage.children"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.culture.practices"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.materials.lot_index"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.genealogy.children"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.households"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.materials.active_lot_index"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.event_ids"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  "warm_step": {
+    "reads": 36543,
+    "unique_nodes": 5341,
+    "scoped_reads": 22826,
+    "unique_scope_nodes": 17687,
+    "outside_scope_reads": 13717,
+    "top_domains": [
+      {
+        "domain": "841d9fcd42e73fd5e3bb236b483ed1b5df79df372a8efe7a587aa1ea01aeb842",
+        "reads": 26448
+      },
+      {
+        "domain": "054670f4294d951b16be7592e9ff94f8aaf4dcaf2a8ce5866c6b84ee73dbbef5",
+        "reads": 4864
+      },
+      {
+        "domain": "409bcd972eb0fe5be70e5ae8d52e2c2e7cdd45529b5913c18907eef49338f997",
+        "reads": 4025
+      },
+      {
+        "domain": "e466cc8d62fe72deaaec506403936ccb8cfb53f2fe2e7c0579ab47248853fe07",
+        "reads": 1206
+      }
+    ],
+    "owner_calls": [
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.local"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.event_ids"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.event_ids"
+        ],
+        "count": 16
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.settlements"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.local"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.households"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.sequence.nodes"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.households"
+        ],
+        "count": 2
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.genealogy.children"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.nested.list_pages"
+        ],
+        "count": 14
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.genealogy.children"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.lineage.children"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.lineage.children"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.social.adjacency"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.social.adjacency"
+        ],
+        "count": 4
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.ambient_magic.fields"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.skills.skills"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.agency.motives"
+        ],
+        "count": 12
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.agency.motives"
+        ],
+        "count": 24
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.agency.actions"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.agency.actions"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.records.headers"
+        ],
+        "count": 183
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "aux.lazy.records.headers"
+        ],
+        "count": 579
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "aux.lazy.nested.list_pages"
+        ],
+        "count": 287
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.materials.lot_index"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.materials.lot_index"
+        ],
+        "count": 3
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.materials.active_lot_index"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.materials.active_lot_index"
+        ],
+        "count": 3
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.culture.adoption"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.culture.practices"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "aux.lazy.nested.entries"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.culture.practices"
+        ],
+        "count": 5
+      },
+      {
+        "kind": [
+          "standalone",
+          "miss",
+          "world.infrastructure.assets"
+        ],
+        "count": 1
+      },
+      {
+        "kind": [
+          "standalone",
+          "hit",
+          "world.infrastructure.assets"
+        ],
+        "count": 1
+      }
+    ]
+  },
+  "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3",
+  "phases": {
+    "open": {
+      "status": "complete",
+      "budget_seconds": 60,
+      "resources_start": {
+        "cpu_seconds": 0.553759357,
+        "rss_bytes": 34697216,
+        "peak_rss_bytes": 34562048,
+        "minor_faults": 10436,
+        "major_faults": 0,
+        "block_inputs": 224,
+        "block_outputs": 51424,
+        "process_io": {
+          "rchar": 74897016,
+          "wchar": 26208705,
+          "syscr": 663,
+          "syscw": 4,
+          "read_bytes": 114688,
+          "write_bytes": 26329088,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "wall_seconds": 1.6813011950000032,
+      "cpu_seconds": 1.677463469,
+      "resources_end": {
+        "cpu_seconds": 2.231222826,
+        "rss_bytes": 39776256,
+        "peak_rss_bytes": 39673856,
+        "minor_faults": 11676,
+        "major_faults": 0,
+        "block_inputs": 224,
+        "block_outputs": 51480,
+        "process_io": {
+          "rchar": 107452975,
+          "wchar": 26242029,
+          "syscr": 8645,
+          "syscw": 22,
+          "read_bytes": 114688,
+          "write_bytes": 26357760,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "resource_delta": {
+        "cpu_seconds": 1.677463469,
+        "rss_bytes": 5079040,
+        "peak_rss_bytes": 5111808,
+        "minor_faults": 1240,
+        "major_faults": 0,
+        "block_inputs": 0,
+        "block_outputs": 56
+      },
+      "process_io_delta": {
+        "rchar": 32555959,
+        "wchar": 33324,
+        "syscr": 7982,
+        "syscw": 18,
+        "read_bytes": 0,
+        "write_bytes": 28672,
+        "cancelled_write_bytes": 0
+      }
+    },
+    "first_step": {
+      "status": "complete",
+      "budget_seconds": 120,
+      "resources_start": {
+        "cpu_seconds": 2.233090451,
+        "rss_bytes": 39780352,
+        "peak_rss_bytes": 39673856,
+        "minor_faults": 11677,
+        "major_faults": 0,
+        "block_inputs": 224,
+        "block_outputs": 51496,
+        "process_io": {
+          "rchar": 107453125,
+          "wchar": 26243825,
+          "syscr": 8649,
+          "syscw": 24,
+          "read_bytes": 114688,
+          "write_bytes": 26365952,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "wall_seconds": 8.26126698600001,
+      "cpu_seconds": 8.256419528999999,
+      "resources_end": {
+        "cpu_seconds": 10.48950998,
+        "rss_bytes": 54591488,
+        "peak_rss_bytes": 54353920,
+        "minor_faults": 15294,
+        "major_faults": 0,
+        "block_inputs": 224,
+        "block_outputs": 51496,
+        "process_io": {
+          "rchar": 236006226,
+          "wchar": 26243825,
+          "syscr": 67074,
+          "syscw": 24,
+          "read_bytes": 114688,
+          "write_bytes": 26365952,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "resource_delta": {
+        "cpu_seconds": 8.256419528999999,
+        "rss_bytes": 14811136,
+        "peak_rss_bytes": 14680064,
+        "minor_faults": 3617,
+        "major_faults": 0,
+        "block_inputs": 0,
+        "block_outputs": 0
+      },
+      "process_io_delta": {
+        "rchar": 128553101,
+        "wchar": 0,
+        "syscr": 58425,
+        "syscw": 0,
+        "read_bytes": 0,
+        "write_bytes": 0,
+        "cancelled_write_bytes": 0
+      },
+      "io": {
+        "payload_reads": 5130,
+        "payload_read_bytes": 1235467,
+        "payload_check_reads": 11130,
+        "payload_check_bytes": 2752244,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 39173,
+        "query_rows": 210,
+        "pin_rows": 28068,
+        "maintenance_rows": 0,
+        "maintenance_removed_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "before": 0,
+          "after": 17
+        }
+      }
+    },
+    "save": {
+      "status": "complete",
+      "budget_seconds": 120,
+      "resources_start": {
+        "cpu_seconds": 15.143214186,
+        "rss_bytes": 56786944,
+        "peak_rss_bytes": 56582144,
+        "minor_faults": 15830,
+        "major_faults": 0,
+        "block_inputs": 224,
+        "block_outputs": 51544,
+        "process_io": {
+          "rchar": 236006379,
+          "wchar": 26251069,
+          "syscr": 67078,
+          "syscw": 27,
+          "read_bytes": 114688,
+          "write_bytes": 26390528,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "wall_seconds": 7.616747180999994,
+      "cpu_seconds": 7.4834496989999995,
+      "resources_end": {
+        "cpu_seconds": 22.626663885,
+        "rss_bytes": 62287872,
+        "peak_rss_bytes": 61956096,
+        "minor_faults": 17173,
+        "major_faults": 0,
+        "block_inputs": 824,
+        "block_outputs": 126000,
+        "process_io": {
+          "rchar": 392241780,
+          "wchar": 64011429,
+          "syscr": 107469,
+          "syscw": 15944,
+          "read_bytes": 421888,
+          "write_bytes": 64512000,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "resource_delta": {
+        "cpu_seconds": 7.4834496989999995,
+        "rss_bytes": 5500928,
+        "peak_rss_bytes": 5373952,
+        "minor_faults": 1343,
+        "major_faults": 0,
+        "block_inputs": 600,
+        "block_outputs": 74456
+      },
+      "process_io_delta": {
+        "rchar": 156235401,
+        "wchar": 37760360,
+        "syscr": 40391,
+        "syscw": 15917,
+        "read_bytes": 307200,
+        "write_bytes": 38121472,
+        "cancelled_write_bytes": 0
+      },
+      "io": {
+        "payload_reads": 3062,
+        "payload_read_bytes": 597087,
+        "payload_check_reads": 11805,
+        "payload_check_bytes": 2185178,
+        "payload_writes": 1146,
+        "payload_write_bytes": 239010,
+        "metadata_rows": 24929,
+        "query_rows": 319,
+        "pin_rows": 36449,
+        "maintenance_rows": 256,
+        "maintenance_removed_rows": 128
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "before": 17,
+          "after": 17
+        }
+      }
+    },
+    "warm_step": {
+      "status": "complete",
+      "budget_seconds": 120,
+      "resources_start": {
+        "cpu_seconds": 26.420287369,
+        "rss_bytes": 62390272,
+        "peak_rss_bytes": 62087168,
+        "minor_faults": 17198,
+        "major_faults": 0,
+        "block_inputs": 824,
+        "block_outputs": 126032,
+        "process_io": {
+          "rchar": 392241937,
+          "wchar": 64019345,
+          "syscr": 107473,
+          "syscw": 15947,
+          "read_bytes": 421888,
+          "write_bytes": 64528384,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "wall_seconds": 7.739025341999991,
+      "cpu_seconds": 7.732962837999999,
+      "resources_end": {
+        "cpu_seconds": 34.153250207,
+        "rss_bytes": 70410240,
+        "peak_rss_bytes": 70082560,
+        "minor_faults": 19156,
+        "major_faults": 0,
+        "block_inputs": 824,
+        "block_outputs": 126032,
+        "process_io": {
+          "rchar": 492737230,
+          "wchar": 64019345,
+          "syscr": 154670,
+          "syscw": 15947,
+          "read_bytes": 421888,
+          "write_bytes": 64528384,
+          "cancelled_write_bytes": 0
+        }
+      },
+      "resource_delta": {
+        "cpu_seconds": 7.732962837999999,
+        "rss_bytes": 8019968,
+        "peak_rss_bytes": 7995392,
+        "minor_faults": 1958,
+        "major_faults": 0,
+        "block_inputs": 0,
+        "block_outputs": 0
+      },
+      "process_io_delta": {
+        "rchar": 100495293,
+        "wchar": 0,
+        "syscr": 47197,
+        "syscw": 0,
+        "read_bytes": 0,
+        "write_bytes": 0,
+        "cancelled_write_bytes": 0
+      },
+      "io": {
+        "payload_reads": 3570,
+        "payload_read_bytes": 1004528,
+        "payload_check_reads": 7903,
+        "payload_check_bytes": 2228083,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 35843,
+        "query_rows": 216,
+        "pin_rows": 39649,
+        "maintenance_rows": 0,
+        "maintenance_removed_rows": 0
+      },
+      "io_high_water": {
+        "temporary_keys_peak": {
+          "before": 17,
+          "after": 17
+        }
+      }
+    }
+  },
+  "runtime_tree": "7347092a500a666710598fe4dcd31ae08d63848f",
+  "source_preserved": true
+}

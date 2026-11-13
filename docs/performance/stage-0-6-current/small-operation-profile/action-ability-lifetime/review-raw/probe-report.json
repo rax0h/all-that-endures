@@ -1,0 +1,9 @@
+{
+  "fingerprint_matches": true,
+  "clean_references_during_action": [
+    20
+  ],
+  "clean_bodies_after_return": 0,
+  "held_body_mutation_after_close_refused": "native record session is closed",
+  "actual_source_corruption_before_action_refused": "native source snapshot epoch differs from accepted authority"
+}

@@ -1,0 +1,31 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_one_practice_action_loads_each_canonical_ability_header_once _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_one_practice_action_loads0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f012ac5b490>
+
+    def test_one_practice_action_loads_each_canonical_ability_header_once(tmp_path, monkeypatch):
+        path, pair = ranked_fixture(tmp_path, size=4, configure=configure)
+        with fast_open(path, pair) as session:
+            loads = Counter()
+            original = records.read_record_header
+            def checked(*args, **kwargs):
+                header = original(*args, **kwargs)
+                if header[1] == 'advancement.AbilityProgress/v1':
+                    loads[args[2]] += 1
+                return header
+            monkeypatch.setattr(records, 'read_record_header', checked)
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert len(loads) == 20
+>           assert max(loads.values()) == 1, dict(loads)
+E           AssertionError: {8: 7, 16: 6, 104: 6, 112: 4, ...}
+E           assert 7 == 1
+E            +  where 7 = max(dict_values([7, 6, 6, 4, 6, 6, 6, 4, 6, 4, 4, 4, 4, 4, 6, 6, 4, 6, 4, 4]))
+E            +    where dict_values([7, 6, 6, 4, 6, 6, 6, 4, 6, 4, 4, 4, 4, 4, 6, 6, 4, 6, 4, 4]) = <built-in method values of Counter object at 0x7f01298f0140>()
+E            +      where <built-in method values of Counter object at 0x7f01298f0140> = Counter({8: 7, 16: 6, 104: 6, 120: 6, 128: 6, 136: 6, 152: 6, 56: 6, 64: 6, 80: 6, 112: 4, 144: 4, 160: 4, 24: 4, 32: 4, 40: 4, 48: 4, 72: 4, 88: 4, 96: 4}).values
+
+simulation/tests/test_stage_0_6_action_ability_lifetime.py:34: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_action_ability_lifetime.py::test_one_practice_action_loads_each_canonical_ability_header_once
+1 failed in 6.70s

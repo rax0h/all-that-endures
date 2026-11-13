@@ -394,3 +394,20 @@ group, hosted correctness pending, and causality of observed warm/fresh timing
 increases unproven; no overall performance claim substitutes for those gates.
 One focused command is added to existing proof primitives for the new5cases.
 One bundled engine publication follows; original mature requests stay unchanged.
+
+## One-action canonical ability lifetime — November12
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| W10a | Warm profile plus actual complete20 action | Hold canonical ability bodies only for one action, before batch rank/selection passes. Real proof-backed RED101header reads/max7→GREEN20/max1. Production diff agency.py only; no cache/authority/format/RNG change. | Local source verified; hosted exact-source gate pending |
+| W10b | Independent review: milestone fixture did not advance body rank | Add last-laggard case: seed32 first use advances body1→2, later Bronze use gains progress, exactly one rank event; eager/native digest/RNG agree. Passed11.16s. | CLOSED locally |
+| W10c | Broad timing/memory claim risk | Complete20 action pairs2.162→1.253s and3.160→1.245s, same saved/reopened state. Separate annual pairs are mixed; no causal save/overall/mature claim. Independent probe20live clean bodies inside action/0after return; lease and source corruption refusal pass. Full evidence in ../small-operation-profile/action-ability-lifetime/. | Scoped evidence verified; Stage0.6 remains OPEN |
+| W10d | New rank-up save scenario | Reproduced unchanged baseline failure at AbilityProgress.response_model fresh-child validation. Trial value-eligibility change only exposed separately unsupported partial-retirement fallback and was reverted. Final negative cases preserve refusal and original-generation recovery; actual eager/native milestone and body changes agree before save. | Existing capability limit confirmed; general rank-up persistence remains an OPEN Stage0.6 blocker, not delivered by this change |
+| W10e | Independent review: complete20 module-path claim exceeded helper | Correct report to runtime-file fences; complete20 selects checkout imports but does not preserve loaded paths. Annual driver does separately audit actual loaded module paths. No raw trials repeated for wording correction. | CLOSED reporting precision |
+| W10f | Preliminary direct input open changed SQLite pin bookkeeping | Preserve changed diagnostic bytes separately, authenticate original ZIP and exact member SHA, restore original before all raw comparisons. All4annual trials independently verify original input remains exact. Preserve source-repair.json and raw diagnostic scope-ID limitation. | CLOSED recovery; no gameplay change |
+
+This is a bounded performance candidate, not completion of its hosted engine
+gate or Stage0.6. Empty/partial/full/ceiling cases save/reopen; milestone/body
+cases explicitly retain the baseline's unsupported publication refusal. Do not
+carry that blocker as a completed capability or start mature preparation. The
+previous compressed-batch run43336282110 is a separate runtime7347092a gate.

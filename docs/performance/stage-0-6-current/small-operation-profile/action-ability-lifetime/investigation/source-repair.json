@@ -1,0 +1,6 @@
+{
+  "reason": "A preliminary path-count probe opened the input directly; pin writes changed file bytes. Restored exact authenticated original ZIP member before further trials.",
+  "changed_sha256": "80a2c149a99e2cbf2919d3a89e10a3b46442d623c8169536b37654562a985376",
+  "restored_sha256": "2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554",
+  "archive_sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32"
+}

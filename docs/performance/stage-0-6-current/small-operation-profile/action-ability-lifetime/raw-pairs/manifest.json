@@ -1,0 +1,314 @@
+{
+  "status": "complete",
+  "source": {
+    "bytes": 26206208,
+    "format": 7,
+    "generation": 0,
+    "seed": 843000,
+    "sha256": "2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554",
+    "store_identity": "c8c84501-6f16-4b67-aacb-8213e8f52c7e",
+    "year": 1
+  },
+  "trees": {
+    "baseline": "7347092a500a666710598fe4dcd31ae08d63848f",
+    "candidate": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43"
+  },
+  "order": [
+    [
+      "pair1",
+      "baseline"
+    ],
+    [
+      "pair1",
+      "candidate"
+    ],
+    [
+      "pair2",
+      "candidate"
+    ],
+    [
+      "pair2",
+      "baseline"
+    ]
+  ],
+  "wall_limit_seconds": 120,
+  "context": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu_max": null,
+    "cpu_stat": null
+  },
+  "trials": [
+    {
+      "name": "pair1-baseline",
+      "status": "complete",
+      "started": "2026-11-13T01:26:31.895012+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 2.372095,
+          "cpu": 2.35496
+        },
+        "first_step": {
+          "wall": 9.817182,
+          "cpu": 9.795759
+        },
+        "save": {
+          "wall": 6.029136,
+          "cpu": 5.997139
+        },
+        "warm_step": {
+          "wall": 6.39208,
+          "cpu": 6.381288
+        },
+        "fresh_verify": {
+          "wall": 16.820518,
+          "cpu": 0.002188
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    },
+    {
+      "name": "pair1-candidate",
+      "status": "complete",
+      "started": "2026-11-13T01:27:18.958295+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.908485,
+          "cpu": 1.892484
+        },
+        "first_step": {
+          "wall": 8.156425,
+          "cpu": 8.123174
+        },
+        "save": {
+          "wall": 5.816745,
+          "cpu": 5.781827
+        },
+        "warm_step": {
+          "wall": 6.675251,
+          "cpu": 6.652708
+        },
+        "fresh_verify": {
+          "wall": 20.432497,
+          "cpu": 0.001874
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    },
+    {
+      "name": "pair2-candidate",
+      "status": "complete",
+      "started": "2026-11-13T01:28:06.349684+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.526817,
+          "cpu": 1.517278
+        },
+        "first_step": {
+          "wall": 7.251394,
+          "cpu": 7.235163
+        },
+        "save": {
+          "wall": 5.84664,
+          "cpu": 5.825362
+        },
+        "warm_step": {
+          "wall": 5.955983,
+          "cpu": 5.95081
+        },
+        "fresh_verify": {
+          "wall": 16.00085,
+          "cpu": 0.002113
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    },
+    {
+      "name": "pair2-baseline",
+      "status": "complete",
+      "started": "2026-11-13T01:28:47.928625+00:00",
+      "context_before": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      },
+      "timings": {
+        "open": {
+          "wall": 1.547743,
+          "cpu": 1.537562
+        },
+        "first_step": {
+          "wall": 7.226228,
+          "cpu": 7.213055
+        },
+        "save": {
+          "wall": 6.160217,
+          "cpu": 6.131814
+        },
+        "warm_step": {
+          "wall": 7.192952,
+          "cpu": 7.167278
+        },
+        "fresh_verify": {
+          "wall": 22.689293,
+          "cpu": 0.00602
+        }
+      },
+      "context_after": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "cpu_max": null,
+        "cpu_stat": null
+      }
+    }
+  ],
+  "saved": {
+    "year": 2,
+    "seed": 843000,
+    "generation": 1,
+    "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+  },
+  "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+}

@@ -1,0 +1,76 @@
+{
+  "kind": "raw-complete20-action-only",
+  "source_sha256": "9def3ca5364da531e210905e85b0de829eb5094d63babff1d5c3df124ebb86f3",
+  "commitment": "ebd2e412aa2acd7e88bcd4a6b8292d0e91e78c48e9743361b61b06cee7452ca3",
+  "context": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu_max": null,
+    "cpu_stat": null
+  },
+  "trials": [
+    {
+      "name": "pair1-baseline",
+      "status": "complete",
+      "timing": {
+        "wall": 2.1619417020001492,
+        "cpu": 2.161827691
+      },
+      "saved_digest": "80c7c2b10a93d1f0cf5e4bf434aaa39fb8dc09f3d4eeb8a75773a34f8fb97f0c",
+      "source_sha256": "9def3ca5364da531e210905e85b0de829eb5094d63babff1d5c3df124ebb86f3",
+      "runtime_tree": "7347092a500a666710598fe4dcd31ae08d63848f",
+      "agency_source_sha256": "38d0538421cc714fa51f602995cb7eeaa230b2d192c9a2d7fd68faeb0eacf01d"
+    },
+    {
+      "name": "pair1-candidate",
+      "status": "complete",
+      "timing": {
+        "wall": 1.2527412680001362,
+        "cpu": 1.252746159
+      },
+      "saved_digest": "80c7c2b10a93d1f0cf5e4bf434aaa39fb8dc09f3d4eeb8a75773a34f8fb97f0c",
+      "source_sha256": "9def3ca5364da531e210905e85b0de829eb5094d63babff1d5c3df124ebb86f3",
+      "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+      "agency_source_sha256": "2bd6693fe4640a80ba3bc07ad33d71fd1ed46fe65b413db9ce33828bc3bfc1ad"
+    },
+    {
+      "name": "pair2-candidate",
+      "status": "complete",
+      "timing": {
+        "wall": 1.2447805009999229,
+        "cpu": 1.244722978
+      },
+      "saved_digest": "80c7c2b10a93d1f0cf5e4bf434aaa39fb8dc09f3d4eeb8a75773a34f8fb97f0c",
+      "source_sha256": "9def3ca5364da531e210905e85b0de829eb5094d63babff1d5c3df124ebb86f3",
+      "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+      "agency_source_sha256": "2bd6693fe4640a80ba3bc07ad33d71fd1ed46fe65b413db9ce33828bc3bfc1ad"
+    },
+    {
+      "name": "pair2-baseline",
+      "status": "complete",
+      "timing": {
+        "wall": 3.160396799000182,
+        "cpu": 3.152983785
+      },
+      "saved_digest": "80c7c2b10a93d1f0cf5e4bf434aaa39fb8dc09f3d4eeb8a75773a34f8fb97f0c",
+      "source_sha256": "9def3ca5364da531e210905e85b0de829eb5094d63babff1d5c3df124ebb86f3",
+      "runtime_tree": "7347092a500a666710598fe4dcd31ae08d63848f",
+      "agency_source_sha256": "38d0538421cc714fa51f602995cb7eeaa230b2d192c9a2d7fd68faeb0eacf01d"
+    }
+  ],
+  "limit_seconds": 90,
+  "limitation": "Generated canonical20 proof fixture; action only, not a complete generated year or mature acceptance.",
+  "status": "complete"
+}
