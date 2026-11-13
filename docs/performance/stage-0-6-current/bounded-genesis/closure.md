@@ -358,3 +358,39 @@ is changed by this documentation/measurement group.
 Final benchmark-only harness validation:5controls pass0.57s; measured source
 copy and original failing output are preserved. No product engine/workflow or
 CI trigger changed, and the four successful timing trials were not repeated.
+
+## Owned-view engine green verified
+
+Hosted43281031469 at0d3bea3985a3c4163a2544e2d5ae4758b0bb23e1 matches runtime
+4654b019. Full5088tests passed5583.070s; proof32XMLs1931tests plus scaling pass
+(overlapping suites). Actual full artifact13977939892 archive SHA256
+8d7abf676b714e8d6474be901da5d95b7a819c18601a7bb0d39033ba73f9b454;
+proof13977996152 SHA256
+1cd16bd89e5b5af829125a4ab96bbe2a47aebe4110a00658133a9956fcf42246.
+Downloaded source and XML were verified; records are in
+../small-operation-profile/read-view-epoch/hosted-43281031469. W7 hosted engine
+validation is CLOSED. W3/U10 targets remain OPEN; mature job was skipped.
+
+## Compressed batch CPU work group
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| W9a | Actual save merge61122/includes1005848/_prefix164064 calls; single compressed leaf still walks65virtual positions | After original physical node validation, jump to the shared compressed prefix and resume remaining sorted ranges in a loop. No node/hash/count/path check or publication boundary removed. Single-leaf work≤4 RED→GREEN;56focused map/batch/node controls pass0.99s. | CLOSED locally pending package review/hosted gate |
+| W9b | Risk of wrapper stack growth, reordered deltas, unreachable intermediate nodes or skipped promoted corruption | Long-prefix seeded canonical-root/retained-snapshot equivalence and4095absent deletions pass; existing final-node-only, real65-level tree, malformed/late-failure rollback and promoted-sibling controls pass. Independent whole-package review/probes recorded in compressed-batch/review-raw. | CLOSED locally: independent4096exhaustive/320seeded/1209corruption/6SQLite fault probes pass; affected/hosted gates below |
+| W9c | Save improvement could be mistaken for overall simulation improvement | Preserve both rawA-B/B-A pairs: save5.163→4.587s/5.280→4.824s; warm4.770→4.994s/4.884→5.464s is slower. Full exact input/source/fresh state fences match. No overall or mature/interactive speed claim; warmed read cost remains separate. | CLOSED measurement scope clarification |
+
+W9 independent review found no actionable Critical/Important/Minor engine
+finding. Measured save tradeoffs remain explicit: save11.2%/8.6%lower, warm
+4.7%/11.9%higher and fresh restore+step also higher in both pairs. This is a
+CPU-work/save observation, not overall/mature target acceptance. Profilemerge
+61122→5277; actual save I/O/metadata counters identical. Hosted full/proof is the
+next engine gate after the final affected receipt; no expensive mature trigger.
+
+W9 final affected suite391passed105.23s/1deliberately deselected unchanged
+audited generated-two-save constructor reserved for hosted full validation.
+Independent whole-package review has no unresolved finding. Its declined items
+are explicit coordinator rulings: mature/endurance/default/main outside this
+group, hosted correctness pending, and causality of observed warm/fresh timing
+increases unproven; no overall performance claim substitutes for those gates.
+One focused command is added to existing proof primitives for the new5cases.
+One bundled engine publication follows; original mature requests stay unchanged.

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.190" timestamp="2026-11-12T18:10:26.625926-06:00" hostname="21b7803aebef"><testcase classname="simulation.tests.test_stage_0_6_proof_compressed_batch" name="test_single_compressed_leaf_update_has_constant_merge_work" file="simulation/tests/test_stage_0_6_proof_compressed_batch.py" line="13" time="0.003"><failure message="assert 65 &lt;= 4">def test_single_compressed_leaf_update_has_constant_merge_work():
+        storage = MemoryNodes(); m = proof_map(storage)
+        old = m.set(empty_root(DOMAIN), b'leaf', value('before'))
+        storage.reads.clear(); storage.writes.clear()
+        profile = cProfile.Profile()
+        profile.enable()
+        changed = batch.update_sorted(m, old, [(b'leaf', value('after'))])
+        profile.disable()
+        calls = sum(v[1] for (file, _, name), v in pstats.Stats(profile).stats.items()
+                    if file.endswith('persistence_proof_batch.py') and name == 'merge')
+&gt;       assert calls &lt;= 4
+E       assert 65 &lt;= 4
+
+simulation/tests/test_stage_0_6_proof_compressed_batch.py:24: AssertionError</failure></testcase></testsuite></testsuites>

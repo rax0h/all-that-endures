@@ -69,29 +69,39 @@ def update_sorted(proof_map, root, changes):
         return result, node
 
     def merge(ref, prefix, checked=None):
-        if not includes(prefix):
-            return ref, checked
-        if not ref.count:
-            return build(prefix)
-        if ref.count and checked is None:
-            checked = proof_map._read(ref, prefix)
-        depth = len(prefix)
-        if depth == 64:
-            locator, _, commitment = current
-            advance()
-            if commitment is None:
-                return proof_map.empty, None
-            if checked is not None and commitment == checked.commitment:
+        while True:
+            if not includes(prefix):
                 return ref, checked
-            leaf = Leaf(locator, commitment)
-            return proof_map._write(leaf), leaf
+            if not ref.count:
+                return build(prefix)
+            if checked is None:
+                checked = proof_map._read(ref, prefix)
+            depth = len(prefix)
+            if depth == 64:
+                locator, _, commitment = current
+                advance()
+                if commitment is None:
+                    return proof_map.empty, None
+                if commitment == checked.commitment:
+                    return ref, checked
+                leaf = Leaf(locator, commitment)
+                return proof_map._write(leaf), leaf
+            old_prefix = _prefix(checked)
+            shared = depth
+            while shared < len(old_prefix) and old_prefix[shared] == current[1][shared]:
+                shared += 1
+            if shared == depth:
+                break
+            # The node was already checked at this boundary. Process its shared
+            # compressed range directly, then loop for later sorted changes
+            # outside that range but still inside our original prefix.
+            ref, checked = merge(ref, old_prefix[:shared], checked)
 
         # A compressed node is carried down its virtual single-child path
         # without fetching it again. No intermediate single-child node is
         # encoded. Real branches keep only their bounded child inventory.
         old_children = {}
         if checked is not None:
-            old_prefix = _prefix(checked)
             if len(old_prefix) == depth:
                 old_children = dict(checked.children)
             else:
