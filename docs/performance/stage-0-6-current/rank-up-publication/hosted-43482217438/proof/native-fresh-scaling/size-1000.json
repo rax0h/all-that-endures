@@ -1,0 +1,23 @@
+{
+  "size": 1000,
+  "archive_unit": "retained history values",
+  "source": {
+    "head": "d2b0a38fac5e76f5938878bc0d66adcd77619f15",
+    "runtime_tree": "6b4e02da84294f98dd2a14595112109f36cacb5a",
+    "python": "3.12.16",
+    "sqlite": "3.45.1",
+    "driver_sha256": "8b8ede40d272806af4902c576ac55e41f79fee4435b1dbc9766aece09dfc5bc3",
+    "scenario": "fresh"
+  },
+  "construction_seconds": 0.99349339399987,
+  "audited_admission_seconds": 0.16129800099997738,
+  "traced_first_save_seconds": 0.7653512619999674,
+  "raw_save_seconds": 0.5810506790003274,
+  "raw_save_cpu_seconds": 0.5788263490000001,
+  "unrelated_history_body_reads": 0,
+  "sqlite_vm_steps": 2189100,
+  "full_world_audits_within_save": 0,
+  "database_bytes": 1835008,
+  "status": "complete",
+  "limitation": "Synthetic history scaling; not mature-world latency acceptance"
+}

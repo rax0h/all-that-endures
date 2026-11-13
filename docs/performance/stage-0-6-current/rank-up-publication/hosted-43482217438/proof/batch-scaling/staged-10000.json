@@ -1,0 +1,16 @@
+{
+  "keys": 10000,
+  "source": {
+    "driver_sha256": "177bc4e0e2b40943e2b64a828213f7da60fcb4e38ccf2b5ff3fd00b794b567dc",
+    "head": "d2b0a38fac5e76f5938878bc0d66adcd77619f15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "python": "3.12.16",
+    "runtime_tree": "6b4e02da84294f98dd2a14595112109f36cacb5a",
+    "sqlite": "3.45.1"
+  },
+  "staging": {
+    "temp_page_count": 154,
+    "temp_page_size": 4096,
+    "wall_seconds": 0.017584143000021868
+  }
+}

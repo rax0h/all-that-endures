@@ -437,3 +437,48 @@ Minors were resolved within this group (one Important; no separate Minor).
 Earlier failed experiment/harness outputs remain evidence, not open defects.
 Final bounded affected receipts and exact publication mapping are recorded in
 ../rank-up-publication/report.md. New hosted engine acceptance remains pending.
+
+## W11 hosted acceptance — November13
+
+Exact-source43482217438 at d2b0a38f/runtime6b4e02da is GREEN. Full5107passed
+plus2subtests; JUnit5109entries. Proof34XMLs1952overlapping tests plus scaling;
+rank-up/action command16passed. Downloaded archives match GitHub SHA256 and both
+source receipts match exact source/runtime. Evidence: ../rank-up-publication/hosted-43482217438/.
+W11a/b/c hosted engine gates CLOSED; earlier pending/negative statements above
+remain historical, superseded by this verified receipt. All W11 findings closed.
+W3/U10 performance targets remain OPEN. Continue with the existing small input
+profile before another expensive prerequisite construction.
+
+## W12 yearly rank ecology operand lifetime — November13
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| W12a | Fresh accepted-engine small-year profile; rank_ecology repeated ability loading | Move existing indexed candidate construction before PracticeBatch and reuse it in ceiling pass. Actual proof-backed RED80headers/max5→GREEN20/max1. No new persistent state or authority shortcut. | Focused1passed5.15s; semantic/affected/review pending |
+| W12b | Mastery semantic fixture lacked required world.local[1] | Preserve initial scenario failure (7passed/1failed); supply real LocalState in mastery fixture. Product code unchanged by this harness correction. | Targeted mastery check pending |
+| W12c | Cost/lifetime scope | Use existing qualified runtime and immutable input with disposable copies; fresh saved/warm digests retained. Profile timings include overhead; do not compare them to raw latency or infer mature speeds. Independent lifetime/lease/corruption review and raw annual pairs complete before publication. | OPEN group verification |
+
+W12 verification correction: the first related battery included unchanged
+final_advancement_graph.py with10000-entry imported-history construction, which
+does not call rank_ecology or Simulation. It reached180s file cap; full evidence
+retained in rank-ecology-lifetime/interrupted-unrelated-history/. Its preceding
+8completed files are reused. Remove this unrelated module from the local selection
+and reuse verified43482217438 (14cases262.43shosted) for its unchanged persistence
+code; it remains in the new hosted full suite. This timeout is not a product-test
+assertion failure or a pass. Future file selection must inspect prior durations
+before starting rather than relying solely on a cap.
+
+W12 local closure:119related tests across14files pass; new annual module8pass.
+Mastery fixture correction verified (targeted1pass12.51s; final module green).
+One independent whole-package review has zero actionable Critical/Important/Minor;
+normal/ceiling/exception release, old held aliases over save, actual cold header
+corruption and released pin refusal pass. W12a/b local checks CLOSED. Raw comparison
+and new hosted gate remain separate, with no performance claim before results.
+
+W12 final scope: raw A-B/B-A warm5.572→5.428s and6.816→5.413s, first-step/save
+mixed and candidate open higher in both pairs. Cause of opening gap unestablished;
+no overall/mature gain claim. Exact fresh saved/continued state, source and runtime
+fences pass all4trials. W12c measurement scope CLOSED. Keep the concrete80→20
+work reduction; W12 new hosted engine gate pending. Independent declined items
+(no mature/exhaustive concurrent-adversary claim; static next-person inspection)
+are accepted scope boundaries for this local-list-only change, covered by existing
+authority and forthcoming full suite. No unresolved review finding or Minor.

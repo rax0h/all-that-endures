@@ -1,0 +1,64 @@
+{
+  "absence": {
+    "payload_check_bytes": 0,
+    "payload_checks": 0,
+    "payload_decodes": 0,
+    "python_peak_bytes": 12683,
+    "sql_selects": {
+      "metadata": 10,
+      "proof": 5,
+      "unrelated": 0,
+      "version": 1
+    },
+    "wall_seconds": 0.0011061289999929613
+  },
+  "archive_records": 100000,
+  "baseline": {
+    "payload_check_bytes": 42,
+    "payload_checks": 1,
+    "payload_decodes": 1,
+    "python_peak_bytes": 2929,
+    "sql_selects": {
+      "metadata": 5,
+      "proof": 0,
+      "unrelated": 0,
+      "version": 1
+    },
+    "wall_seconds": 0.0005565900000306101
+  },
+  "exact": true,
+  "fixture_seconds": 3.9913676270000167,
+  "limitations": [
+    "Synthetic contents in real versioned store schema; no mature World or point-edit save.",
+    "One explicit full verify/construction outside point timers; zero clean-node Python cache.",
+    "Sequential warm/uncontrolled filesystem caches; no latency distribution or speedup claim.",
+    "A fetched record must be checked; one check here is not a zero-history-read save result.",
+    "SELECT counts are application work, not physical disk traffic; RSS includes setup and prior cases."
+  ],
+  "presence": {
+    "payload_check_bytes": 42,
+    "payload_checks": 1,
+    "payload_decodes": 0,
+    "python_peak_bytes": 14433,
+    "sql_selects": {
+      "metadata": 10,
+      "proof": 6,
+      "unrelated": 0,
+      "version": 1
+    },
+    "wall_seconds": 0.0014611649999665133
+  },
+  "process_peak_rss_bytes": 158052352,
+  "schema": "ate-proof-version-scaling/1",
+  "source": {
+    "driver_sha256": "44ec16a03b0abf669bf21727e757bd9c0bee9cde89c176ae7b4d1e3693088975",
+    "fixture_sha256": "b9da13b9ca59fafe4466f0076c31b776f36ec8a79375498d4fb33e6e2a08cedf",
+    "head": "d2b0a38fac5e76f5938878bc0d66adcd77619f15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "python": "3.12.16",
+    "runtime_tree": "6b4e02da84294f98dd2a14595112109f36cacb5a",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete",
+  "verified_construction_seconds": 5.595028807999995
+}

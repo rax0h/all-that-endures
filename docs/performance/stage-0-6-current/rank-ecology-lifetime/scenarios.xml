@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="68.791" timestamp="2026-11-13T14:09:11.342700-06:00" hostname="8953f5b585e7"><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_loads_each_canonical_ability_header_once" time="12.961" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[empty]" time="1.189" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[partial]" time="3.264" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[full]" time="6.795" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[ceiling]" time="6.246" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[milestone]" time="26.229" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[body_transition]" time="7.543" /><testcase classname="simulation.tests.test_stage_0_6_rank_ecology_lifetime" name="test_annual_training_matches_eager_rng_events_and_saved_identity[mastery]" time="3.831"><failure message="KeyError: 1">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_annual_training_matches_e6')
+mode = 'mastery'
+
+    def test_annual_training_matches_eager_rng_events_and_saved_identity(tmp_path, mode):
+        expected = []
+        def setup(world):
+            configure(world)
+            world.people[1].occupation = 'adventurer'
+            path = world.advancement.path(1)
+            if mode == 'empty':
+                path.abilities.clear()
+            elif mode == 'partial':
+                del path.abilities[4:]
+            elif mode == 'ceiling':
+                for ability in path.abilities:
+                    ability.rank = 5
+            elif mode == 'milestone':
+                for ability in path.abilities:
+                    ability.level = 9
+                    ability.progress = .99
+            elif mode == 'body_transition':
+                for ability in path.abilities:
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+                order = list(range(20))
+                RNG(32).stream('rank_ecology', world.year, 1).shuffle(order)
+                path.abilities[order[0]].rank = 1
+                path.abilities[order[0]].level = 9
+                path.abilities[order[0]].progress = .99
+            elif mode == 'mastery':
+                for ability in path.abilities:
+                    ability.rank = 3
+            world.people[1].rank = world.advancement.rank(1)
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        reference = ObservedRNG(32)
+        rank_ecology_step(eager, reference)
+&gt;       digest = eager.digest()
+
+simulation/tests/test_stage_0_6_rank_ecology_lifetime.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/rank_ecology.py:83: in rank_ecology_step
+    mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
+simulation/ate_sim/mastery_training.py:103: in mastery_training_step
+    for ability in candidates[:2]:trial(world,person,ability,rng)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = World(seed=843000, year=0, cells={}, people={1: Person(id=1, born=-30, settlement=1, household=1, alive=True, age=30, ...tEcologyState(threats={}, next_id=1, resolutions={}), next_person=1, next_household=1, next_settlement=1, next_event=1)
+person = Person(id=1, born=-30, settlement=1, household=1, alive=True, age=30, wealth=0.0, health=1.0, temperament=0.5, attachment=0.5, curiosity=0.5, inhibition=0.5, grief=0.0, fear=0.0, rank=3, species='human', occupation='adventurer', parents=())
+ability = AbilityProgress(essence='confluence-0f4e7a047a41', source='stone:Eyes', semantic_key='ability-1be25bc85e69ab675c27c19f...ted=0), milestone_event=None, understanding=Understanding(evidence={}, applications={}, transfers=[], integration=0.0))
+rng = &lt;ate_sim.core._FastRandom object at 0x7f5920dc8790&gt;
+
+    def trial(world,person,ability,rng):
+        if not needs_trial(ability):return False
+        model=ability.response_model
+        # Training is bounded by real annual time; unsuccessful measurements cost
+        # that attempt, too. Pressure/health affect whether useful work is possible.
+        if rng.random()&gt;.35+.35*person.curiosity+.20*person.health:return False
+        rank=ability.rank;n=3 if rank==3 else 5
+&gt;       local=world.local[person.settlement]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 1
+
+simulation/ate_sim/mastery_training.py:68: KeyError</failure></testcase></testsuite></testsuites>

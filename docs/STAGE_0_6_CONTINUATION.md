@@ -35,7 +35,7 @@ invocation. It explicitly excludes the expensive generated-two-save constructor,
 which is reserved for the hosted full suite. Its earlier accidental inclusion
 stalled a broad local run; `affected.log` is interrupted evidence, not a pass.
 The final local gate is521passed across24files; XML/log hashes and engine bytes
-were rechecked. The new engine needs one bundled hosted proof/full gate before acceptance.
+were rechecked. The exact-source hosted proof/full gate is now GREEN (receipt below).
 No mature request, default-format activation, main merge or endurance is authorized.
 
 Use the full qualified313 fingerprint in the saved fixture-construction receipt.
@@ -49,9 +49,38 @@ Published rank-up engine: `d2b0a38fac5e76f5938878bc0d66adcd77619f15`,
 tree `78976cd1b1c9a8573141edc878eb2337d75b0d2f`, runtime
 `6b4e02da84294f98dd2a14595112109f36cacb5a`. Exact local9c685ca tree.
 Publication receipt is in rank-up-publication/publication.json. Hosted result
-for this exact source must be checked before claiming engine acceptance.
+for this exact source was verified from downloaded source receipts and XML.
 
-Hosted bundled validation is IN PROGRESS:
+Hosted bundled validation is GREEN:
 https://github.com/rax0h/all-that-endures/actions/runs/43482217438
 at exact engine source d2b0a38fac5e76f5938878bc0d66adcd77619f15.
 This later pointer update is documentation only and does not start another run.
+
+## November13 verified rank-up acceptance
+
+Run43482217438 completed successfully at d2b0a38f/runtime6b4e02da.
+Full log:5107passed plus2subtests; JUnit5109entries, zero failures/errors.
+Proof:34XMLs/1952overlapping tests plus scaling, including16focused rank-up/action
+tests. Both artifact archives match their GitHub SHA256 digests and source fences;
+see rank-up-publication/hosted-43482217438/summary.json. W11 engine gate CLOSED.
+
+Next: bounded fresh profile of the existing authenticated small input to choose
+the next performance boundary. Evidence under post-rank-profile/. No mature
+constructor, main/default activation or endurance is requested. Mature targets
+remain W3/U10. Historical rank-up refusal notes are superseded by W11 green.
+
+## Current candidate: annual rank ecology lifetime
+
+Production only rank_ecology.py: construct its existing indexed list before
+PracticeBatch and reuse it in ceiling pass. Actual canonical20 header reads80→20
+(max5→1). Candidate runtime95c61911fedd093119439bc9d8d80c1d4f896738, engine
+commitd09948f.119related tests/14files pass; one whole-package review has no
+actionable findings. New file8cases preserves eager/native digest/RNG/events,
+rank/body/mastery behavior and save/reopen.
+
+Evidence and raw timing table: performance/stage-0-6-current/rank-ecology-lifetime/report.md.
+Warm lower in both raw pairs; first/save mixed, opening higher. No overall or
+mature improvement claim. Final hosted proof/full candidate gate still required.
+The unrelated10000-entry imported-history local timeout is preserved; its14tests
+were green on the unchanged persistence engine and remain in hosted full suite.
+No mature/main/default/endurance request.

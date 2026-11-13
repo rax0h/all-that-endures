@@ -1,0 +1,31 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_annual_training_loads_each_canonical_ability_header_once _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_annual_training_loads_eac0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f84acafb490>
+
+    def test_annual_training_loads_each_canonical_ability_header_once(tmp_path, monkeypatch):
+        path, pair = ranked_fixture(tmp_path, size=4, configure=configure)
+        with fast_open(path, pair) as session:
+            loads = Counter()
+            original = records.read_record_header
+            def checked(*args, **kwargs):
+                header = original(*args, **kwargs)
+                if header[1] == 'advancement.AbilityProgress/v1':
+                    loads[args[2]] += 1
+                return header
+            monkeypatch.setattr(records, 'read_record_header', checked)
+            rank_ecology_step(session.world, RNG(32))
+            assert len(loads) == 20
+>           assert max(loads.values()) == 1, dict(loads)
+E           AssertionError: {8: 5, 16: 4, 104: 4, 112: 4, ...}
+E           assert 5 == 1
+E            +  where 5 = max(dict_values([5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3]))
+E            +    where dict_values([5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3]) = <built-in method values of Counter object at 0x7f84ab986b20>()
+E            +      where <built-in method values of Counter object at 0x7f84ab986b20> = Counter({8: 5, 16: 4, 104: 4, 112: 4, 120: 4, 128: 4, 136: 4, 144: 4, 152: 4, 160: 4, 24: 4, 32: 4, 40: 4, 48: 4, 56: 4, 64: 4, 72: 4, 80: 4, 88: 4, 96: 3}).values
+
+simulation/tests/test_stage_0_6_rank_ecology_lifetime.py:24: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_rank_ecology_lifetime.py::test_annual_training_loads_each_canonical_ability_header_once
+1 failed in 6.13s

@@ -55,10 +55,11 @@ def rank_ecology_step(world,rng):
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())
   asp=_aspiration(world,p);member=p.id in members
+  indexed=list(enumerate(path.abilities))
   session=world.advancement.practice_batch(p.id);before=session.rank
   ceiling=min(5,max(1,before)+1)
-  if all(a.rank>=ceiling for a in path.abilities):continue
-  indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed)
+  if all(a.rank>=ceiling for _,a in indexed):continue
+  weakest=min((a.rank,a.level,a.progress) for _,a in indexed)
   career=_career_training(world,p,path,asp,member,strength,before)
   purposeful_reflection=None
   if career is not None:

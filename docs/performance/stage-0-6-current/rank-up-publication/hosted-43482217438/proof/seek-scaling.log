@@ -1,0 +1,3 @@
+1000: exact; index node reads/writes=4/4; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection
+10000: exact; index node reads/writes=5/5; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection
+100000: exact; index node reads/writes=6/6; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection

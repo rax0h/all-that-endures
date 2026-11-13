@@ -88,3 +88,11 @@ Hosted bundled validation is IN PROGRESS:
 https://github.com/rax0h/all-that-endures/actions/runs/43482217438
 at exact engine source d2b0a38fac5e76f5938878bc0d66adcd77619f15.
 This later pointer update is documentation only and does not start another run.
+
+## Verified hosted result
+
+Run43482217438 is GREEN at d2b0a38f/runtime6b4e02da: full5107passed plus2subtests,
+proof34XMLs1952overlapping tests plus scaling. Focused rank-up/action16passed.
+Downloaded archive digests and source/XML fences verified in hosted-43482217438/.
+This closes the new engine gate and supersedes pending statements above.
+Mature latency targets remain open.

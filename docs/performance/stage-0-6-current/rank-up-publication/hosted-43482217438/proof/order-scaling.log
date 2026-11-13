@@ -1,0 +1,3 @@
+1000: point reads=23, writes=5, heap=24643B, wall=0.008019s, page/rebuild exact
+10000: point reads=27, writes=5, heap=31552B, wall=0.008841s, page/rebuild exact
+100000: point reads=33, writes=6, heap=35679B, wall=0.011340s, page/rebuild exact

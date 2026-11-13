@@ -1,0 +1,3 @@
+1000 96.26 ms; graph reused, zero graph/unrelated bodies
+10000 101.66 ms; graph reused, zero graph/unrelated bodies
+100000 112.62 ms; graph reused, zero graph/unrelated bodies

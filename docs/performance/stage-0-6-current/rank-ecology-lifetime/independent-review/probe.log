@@ -1,0 +1,57 @@
+Fceiling observed 20 alive 0 clean 0
+.exception observed 20 alive 0 clean 0
+.old_lease observed 20 alive 0 clean 0
+.
+=================================== FAILURES ===================================
+____________________________ test_lifetime[normal] _____________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_lifetime_normal_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efd8b5ab100>
+mode = 'normal'
+
+    @pytest.mark.parametrize('mode', ['normal', 'ceiling', 'exception', 'old_lease'])
+    def test_lifetime(tmp_path, monkeypatch, mode):
+        def setup(world):
+            configure(world)
+            if mode == 'ceiling':
+                for a in world.advancement.path(1).abilities: a.rank=5
+        path,pair=ranked_fixture(tmp_path,size=4,configure=setup)
+        refs={}
+        original=records.RecursiveHistoryRuntime.load_record
+        def observed(self,value):
+            result=original(self,value)
+            if isinstance(result,AbilityProgress):refs[id(result)]=weakref.ref(result)
+            return result
+        monkeypatch.setattr(records.RecursiveHistoryRuntime,'load_record',observed)
+        with fast_open(path,pair) as session:
+            if mode=='old_lease':
+                held=session.world.advancement.path(1).abilities[0]
+                child=held.response_model
+                session.world.people[1].wealth+=.25
+                session.save()
+                assert held is session.world.advancement.path(1).abilities[0]
+                assert held.response_model is child
+            if mode=='exception':
+                def fail(*args,**kwargs):raise RuntimeError('review fault')
+                monkeypatch.setattr(ecology,'_career_training',fail)
+                try:ecology.rank_ecology_step(session.world,RNG(32))
+                except RuntimeError:pass
+                else:assert False
+            else:ecology.rank_ecology_step(session.world,RNG(32))
+            if mode=='old_lease':
+                assert held is session.world.advancement.path(1).abilities[0]
+                assert held.response_model is child
+                session.save()
+                del held,child
+            gc.collect()
+            alive=[r() for r in refs.values() if r() is not None]
+            # Dirty bodies have their ordinary publication lifetime; clean bodies
+            # must not be held by the annual caller after return or unwinding.
+>           clean=[a for a in alive if not records.record_backing(a)._dirty]
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'RecordBacking' object has no attribute '_dirty'
+
+../../72797495b7a4/rank-ecology-review/test_review.py:49: AttributeError
+=========================== short test summary info ============================
+FAILED ../../72797495b7a4/rank-ecology-review/test_review.py::test_lifetime[normal]
+1 failed, 3 passed in 21.86s

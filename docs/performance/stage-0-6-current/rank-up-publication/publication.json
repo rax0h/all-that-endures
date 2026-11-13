@@ -7,8 +7,14 @@
   "affected_tests": 521,
   "affected_files": 24,
   "independent_review": "no unresolved findings",
-  "status": "in_progress",
+  "status": "completed",
   "transport": "initial large tree request422 made no ref change; five large blobs uploaded independently then incremental trees; final tree matches local",
   "run_id": 43482217438,
-  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/43482217438"
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/43482217438",
+  "conclusion": "success",
+  "hosted_evidence": "hosted-43482217438/summary.json",
+  "full_passed": 5107,
+  "full_subtests": 2,
+  "proof_xml_tests": 1952,
+  "proof_xml_files": 34
 }

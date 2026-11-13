@@ -1,0 +1,245 @@
+{
+  "run_id": 43482217438,
+  "head": "d2b0a38fac5e76f5938878bc0d66adcd77619f15",
+  "runtime_tree": "6b4e02da84294f98dd2a14595112109f36cacb5a",
+  "archives": {
+    "full": {
+      "artifact_id": 14071353078,
+      "sha256": "9977090bf596b9e60a3301e7772185b53e3a7997a55521ab9d781821ad30f40b",
+      "sources": {
+        "source.json": {
+          "head": "d2b0a38fac5e76f5938878bc0d66adcd77619f15",
+          "python": "3.12.16",
+          "runtime_tree": "6b4e02da84294f98dd2a14595112109f36cacb5a",
+          "sqlite": "3.45.1"
+        }
+      },
+      "xmls": {
+        "full-suite.xml": {
+          "tests": 5109,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 5532.569
+        }
+      }
+    },
+    "proof": {
+      "artifact_id": 14068488330,
+      "sha256": "59835d2ba3a15e339dba28228d4d2682fe244eb5f2a507482d0a5ecaa8f2ccca",
+      "sources": {
+        "source.json": {
+          "head": "d2b0a38fac5e76f5938878bc0d66adcd77619f15",
+          "python": "3.12.16",
+          "runtime_tree": "6b4e02da84294f98dd2a14595112109f36cacb5a",
+          "sqlite": "3.45.1"
+        }
+      },
+      "xmls": {
+        "native-rank-tests.xml": {
+          "tests": 47,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 45.833
+        },
+        "native-insert-tests.xml": {
+          "tests": 403,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 719.3
+        },
+        "projection-tests.xml": {
+          "tests": 43,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.923
+        },
+        "compressed-batch-tests.xml": {
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 0.32
+        },
+        "rank-up-publication-tests.xml": {
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 103.863
+        },
+        "collection-directory-tests.xml": {
+          "tests": 31,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.352
+        },
+        "group-tests.xml": {
+          "tests": 72,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 12.246
+        },
+        "native-metadata-tests.xml": {
+          "tests": 39,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 33.287
+        },
+        "native-world-session-tests.xml": {
+          "tests": 45,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 119.781
+        },
+        "proof-open-tests.xml": {
+          "tests": 62,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 62.367
+        },
+        "native-value-tests.xml": {
+          "tests": 102,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 172.881
+        },
+        "sequence-event-extents-tests.xml": {
+          "tests": 47,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.621
+        },
+        "owner-target-tests.xml": {
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.801
+        },
+        "generation-tests.xml": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.946
+        },
+        "descriptor-fact-tests.xml": {
+          "tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 17.101
+        },
+        "scope-tests.xml": {
+          "tests": 55,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 4.656
+        },
+        "record-tests.xml": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 5.313
+        },
+        "publication-tests.xml": {
+          "tests": 67,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 5.847
+        },
+        "collection-tests.xml": {
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.56
+        },
+        "target-tests.xml": {
+          "tests": 36,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 3.25
+        },
+        "collection-publication-tests.xml": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.753
+        },
+        "world-manifest-tests.xml": {
+          "tests": 35,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 28.242
+        },
+        "proof-tests.xml": {
+          "tests": 262,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 12.362
+        },
+        "directory-publication-tests.xml": {
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.615
+        },
+        "target-group-tests.xml": {
+          "tests": 38,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 4.791
+        },
+        "seek-tests.xml": {
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.986
+        },
+        "inventory-tests.xml": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.706
+        },
+        "child-extents-tests.xml": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 5.014
+        },
+        "target-incoming-tests.xml": {
+          "tests": 44,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 4.811
+        },
+        "reference-closure-tests.xml": {
+          "tests": 38,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 8.222
+        },
+        "frozen-extents-tests.xml": {
+          "tests": 46,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.235
+        },
+        "read-view-epoch-tests.xml": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 21.297
+        },
+        "reference-tests.xml": {
+          "tests": 40,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.768
+        },
+        "node-factorization-tests.xml": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.461
+        }
+      }
+    }
+  }
+}

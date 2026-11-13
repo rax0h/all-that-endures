@@ -1,0 +1,16 @@
+[
+  "simulation/tests/test_advancement.py",
+  "simulation/tests/test_agency.py",
+  "simulation/tests/test_agency_hot_state.py",
+  "simulation/tests/test_mastery_training.py",
+  "simulation/tests/test_magic_understanding.py",
+  "simulation/tests/test_magic_progression_history.py",
+  "simulation/tests/test_rank_ontology.py",
+  "simulation/tests/test_rank_diagnostics.py",
+  "simulation/tests/test_persistence_lazy_advancement.py",
+  "simulation/tests/test_stage_0_6_rank_projection.py",
+  "simulation/tests/test_stage_0_6_proof_native_rank.py",
+  "simulation/tests/test_stage_0_6_action_ability_lifetime.py",
+  "simulation/tests/test_stage_0_6_rank_up_publication.py",
+  "simulation/tests/test_stage_0_6_rank_ecology_lifetime.py"
+]
