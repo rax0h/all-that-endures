@@ -4,14 +4,22 @@ Active local checkout: `/workspace/scratch/d88f8db353e8/ate`, branch
 `sol/durable-proof-map`. Other scratch checkouts are historical or detached
 measurement baselines. Do not restart from their HEADs.
 
-Last published candidate: `7a21fa434e32f97a1bdec5e6a97340136ead6a2d`, tree
+Previous compressed-batch candidate: `7a21fa434e32f97a1bdec5e6a97340136ead6a2d`, tree
 `b010805b93000f169a92d9aee56152b6c798a413`, runtime
 `7347092a500a666710598fe4dcd31ae08d63848f`. It is tree-identical to local18923a4.
 Its bundled full/proof gate is
 https://github.com/rax0h/all-that-endures/actions/runs/43336282110 . Both jobs
 were still active at the first hourly check; no mature constructor was enabled.
 
-Current local action-lifetime candidate starts at `f00e7e4`, runtime
+Published action-lifetime candidate: `551d8d5b22d534766eddd84ccbde1416f7f03c7f`,
+tree `80b70085073d0d5dfb4dc69b46d604621c62209f`, exactly matching localbb8582c.
+Validation https://github.com/rax0h/all-that-endures/actions/runs/43346515423 is
+PENDING behind43336282110 under the existing serialized workflow; no extra
+mature request or duplicate run was started. Check this exact candidate's result
+before treating the change as accepted. performance/stage-0-6-current/small-operation-profile/action-ability-lifetime/publication.json records the
+mapping; later pointer edits are documentation only.
+
+The local action-lifetime implementation starts at `f00e7e4`, runtime
 `8cc642b2a95d47b6d874dfe5260dacbe18f52d43`. Only agency.py changes production:
 hold canonical ability bodies locally for one existing practice action. Work
 regression: unchanged baseline loads some bodies seven times; candidate once.

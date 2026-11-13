@@ -1,0 +1,11 @@
+{
+  "published_head": "551d8d5b22d534766eddd84ccbde1416f7f03c7f",
+  "local_candidate_head": "bb8582c6f036634c2f4fc52ddd055deaa9de5c8b",
+  "exact_tree": "80b70085073d0d5dfb4dc69b46d604621c62209f",
+  "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+  "run_id": 43346515423,
+  "status": "pending",
+  "blocked_by": 43336282110,
+  "stage_0_6": "open",
+  "rank_up_fresh_child_persistence": "open"
+}

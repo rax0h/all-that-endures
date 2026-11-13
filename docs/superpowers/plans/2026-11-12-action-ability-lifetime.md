@@ -35,7 +35,7 @@ under small-operation-profile/action-ability-lifetime/.
   paired driver, A-B/B-A; pin candidate engine and input bytes. Verify original
   input, saved year2 and independent continued year3 digests. No concurrent tests
   or CPU probes during raw comparisons.
-- [ ] Independent package review, close all findings in bounded-genesis/closure.md;
+- [x] Independent package review, close all optimization-package findings in bounded-genesis/closure.md;
   retain or reject based on work/latency evidence, then choose one hosted bundle.
 
 Restart unit is a disposable small copy/trial. Existing phase budgets and outer
@@ -59,3 +59,9 @@ No overall/mature or causal save claim. The full-source hosted gate remains
 pending. Independent review's body-transition coverage and runtime-file wording
 findings are resolved in W10b/W10e. Full-stage acceptance remains open, including
 the confirmed pre-existing rank-up fresh-child publication blocker W10d.
+
+Published candidate551d8d5b22d534766eddd84ccbde1416f7f03c7f, exact localbb8582c
+tree80b70085073d0d5dfb4dc69b46d604621c62209f/runtime8cc642b2. Standard
+validation43346515423 is pending behind existing43336282110. These two distinct
+runtimes each have one bundle; no mature requests/default/main/endurance changed.
+Candidate acceptance and W10d capability remain open after publication.
