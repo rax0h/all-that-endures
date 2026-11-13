@@ -1,0 +1,127 @@
+F
+=================================== FAILURES ===================================
+____________________ test_initial_job_exact_types[2-False] _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-13/test_initial_job_exact_types_20')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fedf3c4b490>
+field = 2, replacement = False
+
+    @pytest.mark.parametrize('field,replacement',[(2,False),(3,1.0),(4,0)])
+    def test_initial_job_exact_types(tmp_path,monkeypatch,field,replacement):
+        path,pair=ranked_fixture(tmp_path,size=4,configure=configure)
+        with fast_open(path,pair) as s:
+            a=s.world.advancement.path(1).abilities[0]
+            a.response_model=ResponseModel()
+            original=manifests.commit_world_manifest
+            changed=[]
+            def corrupt(*args,**kw):
+                rows=[]
+                for c in kw['version_changes']:
+                    if c.namespace==retirement.NAMESPACE and not c.delete and not changed:
+                        v=list(c.value);v[field]=replacement
+                        c=replace(c,value=tuple(v));changed.append(c)
+                    rows.append(c)
+                kw['version_changes']=tuple(rows)
+                return original(*args,**kw)
+            with monkeypatch.context() as m:
+                m.setattr(manifests,'commit_world_manifest',corrupt)
+                m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('unexpected full audit'))
+>               s.save()
+
+../../72797495b7a4/rank-up-review/test_review_probes.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16733: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:124: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16806: in _save_native
+    return self._publish_committed_hybrid(plan, result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16589: in _publish_committed_hybrid
+    participant.validate_publication(participant.delta, result.pin)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_participants.FamilySaveParticipant object at 0x7fedf2ec57f0>
+delta = ParticipantDelta(participant='history-retirement', version_bytes=(b'["tuple",[["str","aux.lazy.history.retirement"],["..., ordinary_bytes=(), identity_bytes=(), fingerprint='ec65a89ba2fec9c5c0082989a81d960529670acbf8bac17a24a0ad21b16ba0b3')
+successor_pin = GenerationPin(token='09eddf43-8809-4949-95d0-1be795953366', store_identity='0bc21566-ee1a-4514-bfab-b9bfeb375983', captured_head=1)
+
+    def validate_publication(self, delta, successor_pin):
+        self._check(delta, successor_pin)
+        self._validated_pin = self._row_proved_pin = None
+        self._event_controls = ()
+        codec = self.store.codec
+        versions, ordinary, identities = delta.decode(codec)
+        from .persistence_events import EVENT_STORAGE, DESCRIPTOR_KEY
+        from .persistence_session import TAIL_DESCRIPTOR_KEY, COMMIT_DESCRIPTOR_KEY
+        event_controls = []
+        with self.store.read_snapshot(successor_pin):
+            # Ordinary rows carry only current authority; never read them for old pins.
+            if self.store.checked_head().generation != self.target_generation:
+                raise StoreConflictError('family publication successor was replaced')
+            for change in versions:
+                key = codec.encode(change.key)
+                row = self.store._visible_record_row(self.target_generation, change.namespace, key)
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError('deleted family version remains visible')
+                    continue
+                if row is None:
+                    raise StoreIntegrityError('saved family version is missing')
+                _, schema, _, _, memberships = self.store._check_record_row(change.namespace, key, row, decode=False)
+                expected = tuple((m.index_name, m.value, m.ordinal) for m in change.memberships)
+                if (self.adapter is not None and change.record_schema != self.adapter.record_schema
+                        or schema != change.record_schema or row[2] != codec.encode(change.value) or memberships != expected):
+                    message = ('saved nested authority evidence mismatch' if change.namespace.startswith('aux.lazy.nested.')
+                               else 'family version publication differs from frozen plan')
+>                   raise StoreIntegrityError(message)
+E                   ate_sim.incremental_store.StoreIntegrityError: family version publication differs from frozen plan
+
+simulation/ate_sim/persistence_lazy_participants.py:157: StoreIntegrityError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-13/test_initial_job_exact_types_20')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fedf3c4b490>
+field = 2, replacement = False
+
+    @pytest.mark.parametrize('field,replacement',[(2,False),(3,1.0),(4,0)])
+    def test_initial_job_exact_types(tmp_path,monkeypatch,field,replacement):
+        path,pair=ranked_fixture(tmp_path,size=4,configure=configure)
+>       with fast_open(path,pair) as s:
+             ^^^^^^^^^^^^^^^^^^^^
+
+../../72797495b7a4/rank-up-review/test_review_probes.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18062: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fedf2d5f250>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18020: StoreError
+=========================== short test summary info ============================
+FAILED ../../72797495b7a4/rank-up-review/test_review_probes.py::test_initial_job_exact_types[2-False]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 4.59s

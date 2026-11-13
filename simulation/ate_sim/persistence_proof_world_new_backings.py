@@ -33,6 +33,7 @@ class Forest:
         self.codec = store.codec
         self.backings, self.new_rows, self.children, self.edges = {}, set(), {}, set()
         self.old_targets = {}
+        self.closed_roots = set()
         self.projections = 0
         self._collect()
 
@@ -269,6 +270,26 @@ class Forest:
         count = sum(scope._resolve(self.store, self.request.pairs[1][0], scope.GroupScope(i)).count for i in old)
         if count > MAX_OLD_ALIASES:
             raise Unsupported()
+
+    def require_closed(self, roots):
+        """A fresh subtree attached to an old backing cannot reach old nodes.
+
+        This conservative slice makes a new cross-generation cycle impossible
+        without traversing the unrelated accepted graph. Ordinary fresh owners
+        retain their established old-target boundary.
+        """
+        outgoing = {}
+        for parent, child in self.edges:
+            outgoing.setdefault(parent, set()).add(child)
+        pending, seen = list(roots), set()
+        while pending:
+            incarnation = pending.pop()
+            if incarnation in seen:
+                continue
+            if incarnation not in self.backings:
+                raise Unsupported()
+            seen.add(incarnation)
+            pending.extend(outgoing.get(incarnation, ()))
 
     def facts(self, facts, child_root):
         OrderedSeekMap(self.store.db, b'').create_schema()

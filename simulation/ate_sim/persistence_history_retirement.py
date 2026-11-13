@@ -215,6 +215,20 @@ def prepare_world_retirement_delta(store, pin, coordinator, dependencies, *, row
     jobs = []
     previous_overlay = dict(coordinator.placement_overlay)
     with store.read_snapshot(pin):
+        background = prepare_retirement_delta(store, pin,
+            row_budget=row_budget,
+            protected_incarnations=(*dependencies.protected_incarnations(), *coordinator.dirty_incarnations))
+        # A reclaimed page/leaf is a physical catalog owner. Remove its exact
+        # placements in this same bounded central plan, without decoding it.
+        from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
+        from .persistence_lazy_identity_catalog import OWNER_NAMESPACE
+        for source in background.decode(store.codec)[0]:
+            if source.delete and source.namespace in AUXILIARY_OWNER_FAMILIES:
+                owner = source.namespace, source.key
+                if store._visible_record_row(pin.captured_head, OWNER_NAMESPACE, store.codec.encode(owner)) is not None:
+                    coordinator.retire_owner(owner)
+        # Background owner removals can orphan their children too. Queue all
+        # last-owner losses after those routes have joined the same overlay.
         for inc in sorted({i for i in coordinator._original.values() if i is not None}):
             group = coordinator.discover_group(inc)
             current = coordinator._current_placements(group)
@@ -254,18 +268,6 @@ def prepare_world_retirement_delta(store, pin, coordinator, dependencies, *, row
             # The checked old group was placed, so background cannot delete its
             # children. Foreground replacement wins over that queue cancellation.
             jobs.append(initial_retirement_change(kinds[0], inc, generation=pin.captured_head + 1))
-        background = prepare_retirement_delta(store, pin,
-            row_budget=row_budget,
-            protected_incarnations=(*dependencies.protected_incarnations(), *coordinator.dirty_incarnations))
-        # A reclaimed page/leaf is a physical catalog owner. Remove its exact
-        # placements in this same bounded central plan, without decoding it.
-        from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
-        from .persistence_lazy_identity_catalog import OWNER_NAMESPACE
-        for source in background.decode(store.codec)[0]:
-            if source.delete and source.namespace in AUXILIARY_OWNER_FAMILIES:
-                owner = source.namespace, source.key
-                if store._visible_record_row(pin.captured_head, OWNER_NAMESPACE, store.codec.encode(owner)) is not None:
-                    coordinator.retire_owner(owner)
     combined = {(c.namespace, store.codec.encode(c.key)): c for c in background.decode(store.codec)[0]}
     combined.update(((c.namespace, store.codec.encode(c.key)), c) for c in jobs)
     placements = tuple(change for marker, change in coordinator.placement_overlay.items()

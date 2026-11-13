@@ -7,7 +7,6 @@ import pytest
 
 from ate_sim.agency import _practice_path
 from ate_sim.core import Person
-from ate_sim.incremental_store import StoreIntegrityError
 from ate_sim import persistence_history_runtime as records
 from simulation.tests.test_stage_0_6_proof_open import ranked_fixture, fast_open
 
@@ -85,15 +84,6 @@ def test_action_matches_eager_state_rng_events_and_saved_identity(tmp_path, mode
             assert len(transitions) == 1
             assert transitions[0].data['from_rank'] == 1
             assert transitions[0].data['to_rank'] == 2
-        if mode in ('milestone', 'body_transition'):
-            # Existing proof publisher cannot certify this fresh-child
-            # replacement. Baseline and candidate both reject it; preserve
-            # the supported boundary instead of claiming rank-up save support.
-            before = session.pin.captured_head
-            with pytest.raises(StoreIntegrityError, match='AbilityProgress.response_model'):
-                session.save()
-            assert session.resolve_save() == before
-            return
         session.save()
         saved = session.proof_manifest
     with fast_open(path, saved) as restored:

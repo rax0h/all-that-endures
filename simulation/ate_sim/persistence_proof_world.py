@@ -354,12 +354,12 @@ def _audit_world(store,pin,ca,sa,ia,ra,da):
     floor=int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
     if not complete_selected(manifest,floor):raise StoreError('World proof construction requires explicit complete source format')
     from .persistence_proof_manifest_publish import _check_head
-    from .persistence_history_retirement import NAMESPACE as RETIREMENT
-    if next(iter(store.iter_keys(pin,RETIREMENT)),None) is not None:raise StoreError('partial retirement requires a separately checked World proof path')
     _fixed_world_sources(store,pin,manifest)
     _check_head(store,pin,ra);_check_events(store,pin,manifest)
     if store.db.execute('SELECT 1 FROM query_membership LIMIT 1').fetchone():raise StoreError('ordinary World query projection has no declared source contract')
     store.verify_all();checked_copy._verify_catalog(store,pin)
+    from .persistence_proof_world_retirement import audit_jobs
+    audit_jobs(store,pin)
     from .persistence_proof_world_adoption import audit as audit_adoption
     audit_adoption(store,pin)
     store.db.execute('CREATE TEMP TABLE ate_world_backings(inc INTEGER PRIMARY KEY,kind TEXT,namespace TEXT,key BLOB,descriptor BLOB) WITHOUT ROWID')

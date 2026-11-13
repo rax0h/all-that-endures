@@ -89,6 +89,7 @@ class BackingDependencyPool:
         self._persisted = {}
         self._new = set()
         self._prepared = None
+        self._prepared_new = None
         self._prepared_target = None
         self.closed = False
 
@@ -159,16 +160,22 @@ class BackingDependencyPool:
         row = self._aliases[alias._incarnation]
         self._aliases[alias._incarnation] = row[0], 'sequence'
 
-    def prepare_delta(self):
+    def prepare_delta(self, *, published_new=None):
         if self.closed:
             raise StoreError('backing dependency pool is closed')
+        published_new = None if published_new is None else frozenset(published_new)
+        if published_new is not None and any(type(i) is not int or i<1 for i in published_new):
+            raise ValueError('invalid new backing publication inventory')
         if self._prepared is not None:
+            if published_new != self._prepared_new:
+                raise StoreConflictError('backing dependency publication inventory changed while frozen')
             return self._prepared
         # Weak collection can remove an unpublished alias while checked reads
         # allocate. Capture its publication status before the target roster;
         # callbacks may prune live metadata, but cannot reclassify this plan.
         unpublished = self._new.copy()
-        target = {inc: row[1] for inc, row in tuple(self._aliases.items())}
+        target = {inc: row[1] for inc, row in tuple(self._aliases.items())
+                  if published_new is None or inc not in unpublished or inc in published_new}
         changes = []
         with self.store.read_snapshot(self.pin):
             for inc in sorted(set(target) ^ set(self._persisted)):
@@ -187,6 +194,7 @@ class BackingDependencyPool:
                 if value != previous:
                     changes.append(VersionChange(NAMESPACE, inc, value))
         self._prepared_target = target
+        self._prepared_new = published_new
         self._prepared = ParticipantDelta.freeze(self.store.codec, 'history-dependencies',
                                                  version_changes=changes)
         return self._prepared
@@ -212,11 +220,13 @@ class BackingDependencyPool:
         self.pin = pin
         self._persisted = self._prepared_target
         self._prepared = self._prepared_target = None
+        self._prepared_new = None
         self._new.difference_update(self._persisted)
 
     def abort_delta(self):
         # Only the central receipt/recovery authority may authorize this call.
         self._prepared = self._prepared_target = None
+        self._prepared_new = None
         self._new.intersection_update(self._aliases)
 
     def close(self, *, abandon_stale=False):
@@ -238,6 +248,7 @@ class BackingDependencyPool:
         # This is permanent lease invalidation, never a thaw for retry. Native
         # release rejects pending/committed attempts and an advanced own token.
         self._prepared = self._prepared_target = None
+        self._prepared_new = None
 
     def diagnostics(self):
         return {'dependencies': len(self._aliases), 'published_dependencies': len(self._persisted),

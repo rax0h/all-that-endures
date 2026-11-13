@@ -27,8 +27,9 @@ def candidates(store, request, rows, predecessor, affected):
             raise Unsupported()
         if old is None or old.memberships != codec.encode((('retired', True, old.valid_from),)):
             continue
-        if not item['change'].delete:
-            raise Unsupported()  # Pending-job rotations retain the checked path.
+        if not item['change'].delete and (item['payload'] != old.payload
+                or item['memberships_blob'] != codec.encode((('retired',True,request.pin.captured_head+1),))):
+            raise Unsupported()
         if len(result) >= ROW_BUDGET:
             raise Unsupported()
         if scope._resolve(store, sa, scope.GroupScope(inc)).count:

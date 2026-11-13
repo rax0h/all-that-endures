@@ -419,7 +419,8 @@ class IdentityCoordinator:
     def discard_private_owner_changes(self, owner):
         """Restore only journaled placements when their backing is not saved.
 
-        The caller has proved this physical backing has no current owner.
+        The caller has proved this physical backing has no current owner, or
+        that its checked header was restored exactly to its pinned bytes.
         Its private value overlay stays on the held alias; the published source
         and its checked placements must remain together until reattachment.
         Original identities came from checked mutation discovery, so cancelling

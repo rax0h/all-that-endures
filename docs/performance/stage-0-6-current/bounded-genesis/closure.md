@@ -411,3 +411,29 @@ gate or Stage0.6. Empty/partial/full/ceiling cases save/reopen; milestone/body
 cases explicitly retain the baseline's unsupported publication refusal. Do not
 carry that blocker as a completed capability or start mature preparation. The
 previous compressed-batch run43336282110 is a separate runtime7347092a gate.
+
+
+## November13 action-lifetime hosted acceptance and rank-up publication
+
+Run43346515423 is GREEN at source551d8d5b/runtime8cc642b2. Full log5098passed
+plus2subtests (JUnit5100entries),7374.682s; proof33XMLs1936overlapping tests
+plus scaling. Downloaded archives/source/XML verified in
+../small-operation-profile/action-ability-lifetime/hosted-43346515423/summary.json.
+W9a/b and W10a hosted gates are CLOSED. W10d is superseded by the following
+positive local capability work; its original negative evidence remains historical.
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| W11a | W10d actual rank-up save refused fresh child | Derive existing auxiliary record owner retargets from accepted headers/paths, validate closed fresh forests, replay exact canonical catalog and allocator gaps. Positive ability/body saves, eager digest/RNG/events, audited reopens, eight cleanup saves and fresh-process continuation. | Locally verified; new hosted engine gate pending |
+| W11b | Rank-up creates private unpublished intermediate values; restored header left stale routes | Filter new dependency publication to actually captured descriptors while retaining private aliases. Exact pinned header restoration cancels journaled outgoing owner edits before orphan release. Private revert/reattach and before/after commit recovery tests pass. | CLOSED locally; included in hosted gate |
+| W11c | Background cleanup deletes owners and advances physical scopes | Derive cascade queue after background owner removals; validate exact accepted pending jobs, last-owner losses, finite physical deletions, leases, retention, cursor exhaustion and backing/child semantic facts. Full audits accept actual partial cleanup. Six independent omission/live-deletion/cursor controls and true partial-audit corruption probe pass. | CLOSED locally; included in hosted gate |
+| W11d / RUP-R1 | Independent Important: Python tuple equality accepted bool/int/float aliases in initial jobs | Clean RED committed malformed cursorFalse and audited reopen rejected it. Compare canonical codec bytes and retain canonical initial tuple; three producer-frozen alias regressions reject before commit, preserve head and retry successfully (3passed16.69s). | CLOSED; no unresolved review finding |
+| W11e | Broad local batch accidentally included expensive hosted-only generated constructor | Preserve interrupted affected.log without pass claim. Final per-file runner excludes that exact unchanged test, caps180s/file and600s/invocation, validates source/test/log/XML receipts before compatible resume. First invocation reused21completed files after an11.83s remaining-budget timeout; runner now reserves full180s+cleanup before beginning another file. Original timeout evidence retained. Full constructor remains in hosted full suite. | CLOSED validation procedure correction |
+| W11f | Scope/performance overclaim risk | No allocator reuse relaxation, old-graph scan, format change or budget expansion. Unsupported old-target topology/sequence deletion uses checked fallback.10000-entry unrelated body read refusal is a work-bound control, not mature latency evidence. | CLOSED contract clarification; W3/U10 interactive targets remain OPEN |
+
+One independent whole-package review is retained at
+../rank-up-publication/independent-review/review.md. All findings including
+Minors were resolved within this group (one Important; no separate Minor).
+Earlier failed experiment/harness outputs remain evidence, not open defects.
+Final bounded affected receipts and exact publication mapping are recorded in
+../rank-up-publication/report.md. New hosted engine acceptance remains pending.

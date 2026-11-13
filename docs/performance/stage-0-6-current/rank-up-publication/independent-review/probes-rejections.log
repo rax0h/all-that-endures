@@ -1,0 +1,72 @@
+.F....                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_reject_frozen_retirement_tamper[omit-background-descriptor] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_reject_frozen_retirement_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fae80da3ad0>
+damage = 'omit-background-descriptor'
+
+    @pytest.mark.parametrize('damage',['omit-initial','omit-background-descriptor','omit-background-dependency','omit-background-job','delete-live-target','jump-initial'])
+    def test_reject_frozen_retirement_tamper(tmp_path,monkeypatch,damage):
+        path,pair=ranked_fixture(tmp_path,size=4,configure=configure)
+        if damage.startswith('omit-background'):
+            with fast_open(path,pair) as s:
+                s.world.advancement.path(1).abilities[0].response_model=ResponseModel()
+                s.save();pair=s.proof_manifest
+        with fast_open(path,pair) as s:
+            a=s.world.advancement.path(1).abilities[0]
+            live_inc=record_backing(a.response_model)._incarnation
+            if not damage.startswith('omit-background'):
+                a.response_model=ResponseModel()
+            else:
+                s.world.people[1].wealth+=.125
+            original=producer.prepare_world_retirement_delta
+            seen=[]
+            def corrupt(*args,**kw):
+                d=original(*args,**kw);v,o,i=d.decode(args[0].codec);v=list(v)
+                if damage=='omit-initial':
+                    v=[c for c in v if c.namespace!=producer.NAMESPACE]
+                elif damage.startswith('omit-background'):
+                    ns={'omit-background-descriptor':RECORDS,'omit-background-dependency':DEPENDENCIES,'omit-background-job':producer.NAMESPACE}[damage]
+                    assert any(c.namespace==ns and c.delete for c in v),(damage,v)
+                    v=[c for c in v if c.namespace!=ns]
+                elif damage=='delete-live-target':
+                    b=s.world.advancement.path(1).abilities[1].response_model
+                    inc=record_backing(b)._incarnation
+                    v.extend([VersionChange(RECORDS,(inc,0),delete=True),VersionChange(DEPENDENCIES,inc,delete=True)])
+                elif damage=='jump-initial':
+                    v=[replace(c,value=(c.value[0],c.value[1],1,c.value[3],True)) if c.namespace==producer.NAMESPACE else c for c in v]
+                seen.append(True)
+                return ParticipantDelta.freeze(args[0].codec,'history-retirement',version_changes=v,ordinary_changes=o,identity_changes=i)
+            old=s.pin.captured_head
+            with monkeypatch.context() as m:
+                m.setattr(producer,'prepare_world_retirement_delta',corrupt)
+                m.setattr(proof,'_audit_world',lambda *a,**k:(_ for _ in ()).throw(StoreError('unsupported/full audit rejected adversarial shape')))
+                with pytest.raises(StoreError):s.save()
+            assert seen
+            assert s.store.db.execute('select generation from save_head').fetchone()==(old,)
+>           assert s.resolve_save()==old
+                   ^^^^^^^^^^^^^^^^
+
+../../72797495b7a4/rank-up-review/test_review_rejections.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16815: in resolve_save
+    return self._resolve_save_native() if authority is None else authority.execute(self,self._resolve_save_native,recovery=True)
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:121: in execute
+    if not(recovery and self.pending is not None):self.guard()
+                                                  ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_world_session._WorldProofAuthority object at 0x7fae80efa710>
+
+    def guard(self):
+        if self.busy or self.epoch is None:return
+>       if self.uncertain:raise StoreError('native proof publication requires exact recovery')
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreError: native proof publication requires exact recovery
+
+simulation/ate_sim/persistence_proof_world_session.py:39: StoreError
+=========================== short test summary info ============================
+FAILED ../../72797495b7a4/rank-up-review/test_review_rejections.py::test_reject_frozen_retirement_tamper[omit-background-descriptor]
+1 failed, 5 passed in 32.34s

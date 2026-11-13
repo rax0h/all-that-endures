@@ -1,0 +1,8 @@
+REJECTION omit-initial StoreIntegrityError('last-owner removal and retirement jobs disagree') STATE recovery-required AUTHORITY unknown
+.REJECTION omit-background-descriptor StoreIntegrityError('hybrid save omits a touched identity owner payload: count=1, owners=((\'aux.lazy.records.headers\', b\'["tuple",[["int","3"],["int","0"]]]\'),)') STATE active AUTHORITY unknown
+.REJECTION omit-background-dependency StoreIntegrityError('retirement differs from its exact authorized slice') STATE recovery-required AUTHORITY unknown
+.REJECTION omit-background-job StoreIntegrityError('mandatory backing dependency authority is absent') STATE recovery-required AUTHORITY unknown
+.REJECTION delete-live-target StoreIntegrityError('identity owner/header commitment disagreement') STATE recovery-required AUTHORITY unknown
+.REJECTION jump-initial StoreIntegrityError('retirement transition lacks its accepted job') STATE recovery-required AUTHORITY unknown
+.
+6 passed in 34.55s

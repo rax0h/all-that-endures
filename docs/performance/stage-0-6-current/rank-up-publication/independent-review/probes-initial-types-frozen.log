@@ -1,0 +1,84 @@
+F
+=================================== FAILURES ===================================
+____________________ test_initial_job_exact_types[2-False] _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-14/test_initial_job_exact_types_20')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f665facb490>
+field = 2, replacement = False
+
+    @pytest.mark.parametrize('field,replacement',[(2,False),(3,1.0),(4,0)])
+    def test_initial_job_exact_types(tmp_path,monkeypatch,field,replacement):
+        path,pair=ranked_fixture(tmp_path,size=4,configure=configure)
+        with fast_open(path,pair) as s:
+            a=s.world.advancement.path(1).abilities[0]
+            a.response_model=ResponseModel()
+            original=retirement.prepare_world_retirement_delta
+            changed=[]
+            def corrupt(*args,**kw):
+                delta=original(*args,**kw)
+                versions,ordinary,identities=delta.decode(args[0].codec)
+                rows=[]
+                for c in versions:
+                    if c.namespace==retirement.NAMESPACE and not c.delete and not changed:
+                        v=list(c.value);v[field]=replacement
+                        c=replace(c,value=tuple(v));changed.append(c)
+                    rows.append(c)
+                from ate_sim.persistence_lazy_families import ParticipantDelta
+                return ParticipantDelta.freeze(args[0].codec,'history-retirement',version_changes=rows,ordinary_changes=ordinary,identity_changes=identities)
+            with monkeypatch.context() as m:
+                m.setattr(retirement,'prepare_world_retirement_delta',corrupt)
+                m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('unexpected full audit'))
+                s.save()
+            assert changed
+            pair=s.proof_manifest
+>       with open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1]):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../../72797495b7a4/rank-up-review/test_review_probes.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_session.py:238: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18173: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:40: in check_open
+    authority.check_restore(pin)
+simulation/ate_sim/persistence_proof_world_session.py:87: in check_restore
+    if not self.proof_only:return self.admit(pin)
+                                  ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:79: in admit
+    else:verified_epoch=self._audit(pin)
+                        ^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:44: in _audit
+    if guard is None:return self._audit_inner(pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:54: in _audit_inner
+    proof=world._audit_world(store,pin,*pairs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:362: in _audit_world
+    audit_jobs(store,pin)
+simulation/ate_sim/persistence_proof_world_retirement.py:247: in audit_jobs
+    job = producer._job(store,pin,inc)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f665ec310f0>
+pin = GenerationPin(token='ae5bae14-2f14-4f74-b87f-afd0e3cd35de', store_identity='010e5f76-6e6b-491a-94ef-fc42f64f2d4e', captured_head=1)
+incarnation = 3
+
+    def _job(store, pin, incarnation):
+        value = store.read_version(pin, NAMESPACE, incarnation, expected_record_schema=1).value
+        if (type(value) is not tuple or len(value) != 5 or value[0] not in (TAG, 'history-retirement/v1')
+                or value[1] not in SCOPES or type(value[2]) is not int
+                or not 0 <= value[2] < len(_scopes(value))
+                or type(value[3]) is not int or not 1 <= value[3] <= pin.captured_head
+                or type(value[4]) is not bool):
+>           raise StoreIntegrityError('invalid history retirement job')
+E           ate_sim.incremental_store.StoreIntegrityError: invalid history retirement job
+
+simulation/ate_sim/persistence_history_retirement.py:54: StoreIntegrityError
+=========================== short test summary info ============================
+FAILED ../../72797495b7a4/rank-up-review/test_review_probes.py::test_initial_job_exact_types[2-False]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 5.74s

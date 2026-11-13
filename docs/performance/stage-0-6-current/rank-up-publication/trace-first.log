@@ -1,0 +1,98 @@
+TRACE RETURN NONE 179 ns aux.lazy.history.dependencies key b'["int","174"]' owners 9 remain []
+F
+=================================== FAILURES ===================================
+___ test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2/test_rank_up_saves_reopens_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd93f9e9e00>
+body = False
+
+    @pytest.mark.parametrize('body', [False, True])
+    def test_rank_up_saves_reopens_and_maintains_without_full_world_audit(tmp_path, monkeypatch, body):
+        expected = []
+        def setup(world):
+            configure(world)
+            abilities = world.advancement.path(1).abilities
+            for ability in abilities:
+                ability.level = 9
+                ability.progress = .99
+                if body:
+                    ability.function = 'creation'
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+            if body:
+                abilities[19].rank = 1
+                abilities[19].level = 9
+                abilities[19].progress = .99
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        _practice_path(eager, eager.people[1], random.Random(32), 'work', .5)
+        session = fast_open(path, pair)
+        try:
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert session.world.digest() == eager.digest()
+            with monkeypatch.context() as patch:
+                patch.setattr(proof, '_audit_world', forbidden_audit)
+>               session.save()
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16733: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:124: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16764: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:161: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:216: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:340: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:522: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:312: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:3067: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:206: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:220: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fd93f9ebbb0>, GenerationPin(token='6b4d54b2-dbda-46a4-ab...\xce@', count=38)), b">:\x80O'\xe2\xfbf\xa6\xa3'\x7f\x84\xcbM\xfe|5\x95\x80\x81\xa0\xad3\x8d4\xbf3\x0e\x11\xfbH"), ...)
+kwargs = {}
+
+    def forbidden_audit(*args, **kwargs):
+>       raise AssertionError('rank-up or retirement scanned full World')
+E       AssertionError: rank-up or retirement scanned full World
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:14: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_rank_up_publication.py::test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False]
+1 failed in 7.98s

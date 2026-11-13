@@ -1,0 +1,8 @@
+..................................                                       [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_5_final_world_recursive_records.py::test_record_point_edit_save_and_noop_are_independent_of_unrelated_history
+  simulation/tests/test_stage_0_5_final_world_recursive_records.py:271: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_record_point_edit_save_and_noop_are_independent_of_unrelated_history(tmp_path, record_property):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+34 passed, 1 warning in 7.27s

@@ -33,16 +33,20 @@ def stage(store, request, pin, owners, placements, roots, facts):
         owner = scope.OwnerScope(ns, key)
         seek = OrderedSeekMap(store.db, scope._seek_domain(store, owner))
         owner_root = scope._resolve(store, sa, owner)
-        for projected_path, _inc, kind, fingerprint in projections:
+        current = {p[0]: p for p in projections}
+        removed = (getattr(request, 'owner_removed', None) or {}).get((ns, key), ())
+        edits = (*projections, *removed)
+        for projected_path, _inc, kind, fingerprint in edits:
             path = codec.encode(projected_path)
-            inc, old = by_path[ns, key, path], previous.get((ns, key, path))
+            inc = by_path[ns, key, path] if projected_path in current else None
+            old = previous.get((ns, key, path))
             old_raw = None if old is None else scope.RawOccurrence(ns, key, path, old)
             expected = None if old is None else scope.occurrence_member(
                 scope.occurrence_domain(store.store_identity, codec.version, owner), old_raw)
             if seek.get(owner_root, path) != expected:
                 raise StoreIntegrityError('owner edit differs from accepted predecessor scope')
-            raw = scope.RawOccurrence(ns, key, path, inc)
-            owner_root = seek.set(owner_root, path, scope.occurrence_member(
+            raw = None if inc is None else scope.RawOccurrence(ns, key, path, inc)
+            owner_root = seek.set(owner_root, path, None if raw is None else scope.occurrence_member(
                 scope.occurrence_domain(store.store_identity, codec.version, owner), raw))
             position = scope.group_order_key(ns, key, path)
             for selected, value in ((old, None), (inc, raw)):
@@ -65,7 +69,7 @@ def stage(store, request, pin, owners, placements, roots, facts):
             if (semantic.get(facts[1], position) != wanted or fingerprint is not None and
                     world._map(store, b'backing-inventory').get(facts[0], inc.to_bytes(8, 'big')) is not None):
                 raise StoreIntegrityError('owner edit lacks exact semantic predecessor authority')
-            facts[1] = semantic.set(facts[1], position,
+            facts[1] = semantic.set(facts[1], position, None if inc is None else
                 _digest(b'ate-world-placement/1', inc.to_bytes(8, 'big'), kind.encode()))
         roots[0] = scope._map(store, 0).set(roots[0], scope._scope_key(owner),
             scope._write_descriptor(store, owner, owner_root) if owner_root.count else None)
@@ -101,3 +105,40 @@ def scalar_replacement(store, request, change, before, by_key, forest):
     if old is None:
         raise StoreIntegrityError('scalar replacement lacks its old root')
     return projection, old
+
+
+def backing_replacement(store, request, change, before, forest, *, deleting=False):
+    """Authenticate a complete small old owner before changing its references."""
+    from .persistence_proof_world_backing_value import projection
+    from .persistence_proof_world_new_backings import Unsupported
+    from .persistence_record_headers import NAMESPACE as RECORDS, checked_record_header
+    from .core import Event
+    if not deleting:
+        if change.namespace != RECORDS:
+            return None
+        cls, _values, seal = checked_record_header(before)
+        after, _fields, next_seal = checked_record_header(change.value)
+        if cls is not after or cls is Event or seal != next_seal:
+            raise Unsupported()
+    old = projection(store, change.namespace, before)
+    new = () if deleting else forest.project(change)
+    if not deleting and {p[0]: p[2] for p in old} != {p[0]: p[2] for p in new}:
+        raise Unsupported()
+    if not deleting and old == new:
+        return None
+    codec = store.codec
+    owner = scope.OwnerScope(change.namespace, codec.encode(change.key))
+    if scope._resolve(store, request.pairs[1][0], owner).count != len(old):
+        raise StoreIntegrityError('changed backing owner lacks complete predecessor scope')
+    previous = {}
+    for path, inc, _kind, _fingerprint in old:
+        actual = accepted_placement(store, request, change.namespace, owner.typed_key, codec.encode(path))
+        if actual != inc:
+            raise StoreIntegrityError('changed backing differs from accepted predecessor placement')
+        previous[path] = inc
+    if not deleting:
+        fresh = [inc for path, inc, _kind, _fingerprint in new if previous[path] != inc]
+        if any(inc not in forest.backings for inc in fresh):
+            raise Unsupported()
+        forest.closed_roots.update(fresh)
+    return new, previous, old if deleting else ()

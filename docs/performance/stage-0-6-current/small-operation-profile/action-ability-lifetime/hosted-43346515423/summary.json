@@ -1,0 +1,237 @@
+{
+  "run_id": 43346515423,
+  "head": "551d8d5b22d534766eddd84ccbde1416f7f03c7f",
+  "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+  "archives": {
+    "full": {
+      "sha256": "aefabd98a3f7300c06f245e8e8ff75aeb1cc12d228c95810ccd739da67783ef2",
+      "sources": {
+        "source.json": {
+          "head": "551d8d5b22d534766eddd84ccbde1416f7f03c7f",
+          "python": "3.12.16",
+          "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+          "sqlite": "3.45.1"
+        }
+      },
+      "xmls": {
+        "full-suite.xml": {
+          "tests": 5100,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 7374.682
+        }
+      }
+    },
+    "proof": {
+      "sha256": "bbe59a672bebdafdd7ee0fd462266c261a28267e4c6feafe85cb245c729a16f2",
+      "sources": {
+        "source.json": {
+          "head": "551d8d5b22d534766eddd84ccbde1416f7f03c7f",
+          "python": "3.12.16",
+          "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+          "sqlite": "3.45.1"
+        }
+      },
+      "xmls": {
+        "child-extents-tests.xml": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 5.914
+        },
+        "collection-directory-tests.xml": {
+          "tests": 31,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.456
+        },
+        "collection-publication-tests.xml": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.35
+        },
+        "collection-tests.xml": {
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.657
+        },
+        "compressed-batch-tests.xml": {
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 0.665
+        },
+        "descriptor-fact-tests.xml": {
+          "tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 25.322
+        },
+        "directory-publication-tests.xml": {
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.297
+        },
+        "frozen-extents-tests.xml": {
+          "tests": 46,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 9.187
+        },
+        "generation-tests.xml": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 2.626
+        },
+        "group-tests.xml": {
+          "tests": 72,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 19.77
+        },
+        "inventory-tests.xml": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 3.856
+        },
+        "native-insert-tests.xml": {
+          "tests": 403,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1236.822
+        },
+        "native-metadata-tests.xml": {
+          "tests": 39,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 52.549
+        },
+        "native-rank-tests.xml": {
+          "tests": 47,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 68.476
+        },
+        "native-value-tests.xml": {
+          "tests": 102,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 269.806
+        },
+        "native-world-session-tests.xml": {
+          "tests": 45,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 231.593
+        },
+        "node-factorization-tests.xml": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 1.204
+        },
+        "owner-target-tests.xml": {
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 3.795
+        },
+        "projection-tests.xml": {
+          "tests": 43,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 3.469
+        },
+        "proof-open-tests.xml": {
+          "tests": 62,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 84.635
+        },
+        "proof-tests.xml": {
+          "tests": 262,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 13.748
+        },
+        "publication-tests.xml": {
+          "tests": 67,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.276
+        },
+        "read-view-epoch-tests.xml": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 24.787
+        },
+        "record-tests.xml": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 4.227
+        },
+        "reference-closure-tests.xml": {
+          "tests": 38,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 14.459
+        },
+        "reference-tests.xml": {
+          "tests": 40,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 10.686
+        },
+        "scope-tests.xml": {
+          "tests": 55,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 4.786
+        },
+        "seek-tests.xml": {
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 12.001
+        },
+        "sequence-event-extents-tests.xml": {
+          "tests": 47,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 10.777
+        },
+        "target-group-tests.xml": {
+          "tests": 38,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.32
+        },
+        "target-incoming-tests.xml": {
+          "tests": 44,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 6.714
+        },
+        "target-tests.xml": {
+          "tests": 36,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 4.14
+        },
+        "world-manifest-tests.xml": {
+          "tests": 35,
+          "failures": 0,
+          "errors": 0,
+          "seconds": 41.802
+        }
+      }
+    }
+  }
+}

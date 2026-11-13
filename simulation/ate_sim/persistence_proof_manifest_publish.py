@@ -104,6 +104,7 @@ class _Request:
     sequence_roots:object=None
     scalar_rows:object=None
     owner_previous:object=None
+    owner_removed:object=None
     adoption_rows:object=None
 
 @dataclass(frozen=True)

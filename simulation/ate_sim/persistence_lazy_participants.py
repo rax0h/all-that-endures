@@ -560,7 +560,13 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
         # already belong to the family sources and are never appended twice.
         try:
             if backing_dependencies is not None:
-                dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(), pin, plan.target_generation)
+                from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE as HISTORY
+                from .persistence_lazy_sequence import DESCRIPTOR_NAMESPACE as SEQUENCE
+                from .persistence_nonreflexive_keys import NAMESPACE as NAN
+                published_new = frozenset(c.key[0] if c.namespace in (RECORD_HEADERS,NAN) else c.key
+                    for c in all_versions if not c.delete and c.namespace in (HISTORY,SEQUENCE,RECORD_HEADERS,NAN))
+                dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(
+                    published_new=published_new if retire_world_backings else None), pin, plan.target_generation)
                 _check_unique_authorities(codec, captured + (dependency_participant.delta,))
             changed_values = set(_changed_backings(all_versions))
             # A descriptor edit changes the shared facade's value even when no

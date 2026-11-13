@@ -49,6 +49,14 @@ def _prepare(store, request, versions, ordinary, segments):
     codec = store.codec
     ca, sa, _ia, ra, da = request.pairs
     by_key = {(i['namespace'], i['typed_key']): i for i in versions}
+    allocator = request.pairs[1][0].next_incarnation_id
+    catalog_change = by_key.get((catalog.CATALOG_NAMESPACE,codec.encode(0)))
+    if catalog_change is not None:
+        descriptor = codec.decode(catalog_change['payload']) if not catalog_change['change'].delete else None
+        if (type(descriptor) is not tuple or len(descriptor)!=5 or type(descriptor[2]) is not int
+                or not allocator <= descriptor[2] <= allocator+512):
+            raise StoreIntegrityError('bounded insertion has invalid allocator successor')
+        allocator = descriptor[2]
     predecessors = {}
 
     def predecessor(ns, typed):
@@ -112,15 +120,24 @@ def _prepare(store, request, versions, ordinary, segments):
 
     from .persistence_proof_world_new_backings import Forest
     forest = Forest(store, request, by_key, predecessor)
+    from .persistence_proof_world_retirement import Retirements
+    retirement = Retirements(store, request, by_key, predecessor)
     owners, placements, incarnations, sources = [], [], set(forest.backings), []
     identities = {}
     catalog_rows, added = {}, 0
     declared = set()
     replacements = set()
     request.owner_previous = {}
-    def add_owner(change, projection, old_root=None):
+    request.owner_removed = {}
+    def add_owner(change, projection, old_root=None, removed=()):
         forest.check(change, projection)
         ns, typed = change.namespace, codec.encode(change.key)
+        old_paths = ({} if old_root is None else old_root if type(old_root) is dict else {():old_root})
+        for path, inc in old_paths.items():
+            request.owner_previous[ns, typed, codec.encode(path)] = inc
+        if removed:
+            request.owner_removed[ns, typed] = removed
+            placements.extend(IdentityOccurrenceChange(ns,change.key,path,delete=True) for path,*_ in removed)
         for path, inc, kind, fingerprint in projection:
             if inc is None:
                 leaf = by_key.get((catalog.OWNER_TREE_NAMESPACE,
@@ -141,8 +158,6 @@ def _prepare(store, request, versions, ordinary, segments):
                 raise StoreIntegrityError('fresh aliases disagree on kind or inline value')
             identities[inc] = identity
             placements.append(IdentityOccurrenceChange(ns, change.key, path, incarnation_id=inc))
-            if old_root is not None:
-                request.owner_previous[ns, typed, codec.encode(path)] = old_root
         owners.append((change, projection))
 
     for item in versions:
@@ -157,6 +172,11 @@ def _prepare(store, request, versions, ordinary, segments):
         if ns in catalog.CATALOG_NAMESPACES:
             catalog_rows[(ns, typed)] = item
             continue
+        if (ns,typed) in retirement.handled and ns not in world.AUXILIARY_OWNER_FAMILIES:
+            continue
+        from .persistence_history_retirement import NAMESPACE as RETIREMENT
+        if ns == RETIREMENT:
+            continue  # Initial jobs are checked after the exact owner edits.
         if ns == DEPENDENCIES:
             # validate_lease_updates checked publisher ownership. Fresh forest
             # rows additionally bind the lease kind to their new descriptor.
@@ -173,6 +193,15 @@ def _prepare(store, request, versions, ordinary, segments):
         if ns in catalog.IDENTITY_OWNER_FAMILIES and not branch:
             sources.append(frozen)
         if old is not None:
+            if ns in world.AUXILIARY_OWNER_FAMILIES:
+                from .persistence_proof_world_owner_edits import backing_replacement
+                deleting = change.delete and (ns,typed) in retirement.deleted
+                if not change.delete or deleting:
+                    replacement = backing_replacement(store,request,frozen,codec.decode(old.payload),forest,deleting=deleting)
+                    if replacement is not None:
+                        projection, previous, removed = replacement
+                        add_owner(frozen,projection,previous,removed)
+                        replacements.add((ns,typed))
             if not change.delete:
                 from .persistence_proof_world_owner_edits import scalar_replacement
                 replacement = scalar_replacement(store, request, frozen, codec.decode(old.payload), by_key, forest)
@@ -203,17 +232,21 @@ def _prepare(store, request, versions, ordinary, segments):
     ordinary_plan = prepare_ordinary(store, request, ordinary, ordinary_predecessor, forest)
     for change, projection in ordinary_plan.owners:
         add_owner(change, projection)
-    if (not owners or set(forest.backings) & {i for i, (_kind, fingerprint) in identities.items() if fingerprint is not None}
-            or sorted(incarnations) != list(range(sa[0].next_incarnation_id,
-                                                  sa[0].next_incarnation_id + len(incarnations)))
+    if (not owners and not retirement.handled and not retirement.initial and not catalog_rows
+            or set(forest.backings) & {i for i, (_kind, fingerprint) in identities.items() if fingerprint is not None}
+            or any(not 0 < inc < allocator for inc in incarnations)
             or not set(forest.backings) <= set(identities)):
         return None
-    forest.guard_alias_work([p.incarnation_id for p in placements] + list(request.owner_previous.values()))
+    forest.require_closed(forest.closed_roots)
+    forest.guard_alias_work([p.incarnation_id for p in placements if not p.delete] + list(request.owner_previous.values()))
+    retirement.finish(placements,request.owner_previous)
 
     fresh = {(c.namespace, codec.encode(c.key)) for c, _p in owners}
     remaining = []
     for item in versions:
         ns, typed = item['namespace'], item['typed_key']
+        if (ns,typed) in retirement.handled:
+            continue
         if ns not in catalog.CATALOG_NAMESPACES:
             if (ns, typed) not in fresh and (ns, typed) not in forest.new_rows:
                 remaining.append(item)
@@ -350,7 +383,7 @@ def _prepare(store, request, versions, ordinary, segments):
         try:
             delta = CheckedCatalog(CatalogStore()).prepare_delta(
                 request.pin, tuple(sources), tuple(placements), ordinary_changes=tuple(ordinary_sources),
-                next_incarnation_id=sa[0].next_incarnation_id + len(incarnations),
+                next_incarnation_id=allocator,
                 retirement_row_budget=ROW_BUDGET if proposed_retirements else 0)
         except _BudgetExceeded:
             return None
@@ -364,7 +397,8 @@ def _prepare(store, request, versions, ordinary, segments):
     if actual != wanted:
         raise StoreIntegrityError('fresh insertion catalog differs from canonical transition')
     request.tail_facts, request.tail_child_root = forest.facts(request.tail_facts or request.facts, request.tail_child_root)
-    return owners, placements, added, sa[0].next_incarnation_id + len(incarnations)
+    request.tail_facts, request.tail_child_root = retirement.facts(request.tail_facts,request.tail_child_root)
+    return owners, placements, added, allocator
 
 
 def stage(store, request, pin, ca, sa, ia):

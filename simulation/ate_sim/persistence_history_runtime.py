@@ -980,6 +980,16 @@ class RecursiveHistoryRuntime:
                 proxy = pending.popleft()
                 if proxy._incarnation in processed:
                     continue
+                if type(proxy) is RecordBacking and not proxy._new and not proxy.has_pending_overlay():
+                    # An intermediate checked read may have synchronized a
+                    # replacement which was then restored byte-for-byte. This
+                    # header will not publish: cancel only its journaled routes
+                    # before deciding whether the replaced private D is owned.
+                    removed = coord.discard_private_owner_changes((RECORD_NAMESPACE,(proxy._incarnation,0)))
+                    self.release_unowned_memos(removed)
+                    processed.add(proxy._incarnation)
+                    self._synchronized_backings.add(proxy._incarnation)
+                    continue
                 if proxy._new:
                     placements = session._registry.occurrences_for_incarnation(
                         IncarnationId(session.store.store_identity, proxy._incarnation))

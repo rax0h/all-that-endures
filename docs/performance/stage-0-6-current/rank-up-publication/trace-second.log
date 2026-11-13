@@ -1,0 +1,118 @@
+TRACE EXC persistence_proof_world_retirement.py finish 194 directory group exceeds allocator
+TRACE EXC persistence_proof_world_insert.py _prepare 243 directory group exceeds allocator
+TRACE DETAIL old_none True old_members None new_members b'["tuple",[["tuple",[["str","pending"],["bool",true],["int","1"]]]]]' backings [178, 179, 180, 183, 184, 185, 186, 191, 192, 193, 196, 197, 198, 199, 204, 205, 206, 209, 210, 211, 212] adoption frozenset()
+TRACE RETURN NONE 243 ns aux.lazy.history.retirement key b'["int","111"]' owners 12 remain []
+F
+=================================== FAILURES ===================================
+___ test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4/test_rank_up_saves_reopens_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff03039a190>
+body = False
+
+    @pytest.mark.parametrize('body', [False, True])
+    def test_rank_up_saves_reopens_and_maintains_without_full_world_audit(tmp_path, monkeypatch, body):
+        expected = []
+        def setup(world):
+            configure(world)
+            abilities = world.advancement.path(1).abilities
+            for ability in abilities:
+                ability.level = 9
+                ability.progress = .99
+                if body:
+                    ability.function = 'creation'
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+            if body:
+                abilities[19].rank = 1
+                abilities[19].level = 9
+                abilities[19].progress = .99
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        _practice_path(eager, eager.people[1], random.Random(32), 'work', .5)
+        session = fast_open(path, pair)
+        try:
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert session.world.digest() == eager.digest()
+            with monkeypatch.context() as patch:
+                patch.setattr(proof, '_audit_world', forbidden_audit)
+>               session.save()
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16733: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:124: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16764: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:161: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:247: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:216: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:340: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:522: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:312: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2940: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:186: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:173: in _guard
+    r.insertions=prepare_insertions(store,r,semantic,ordinary,segments)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:29: in prepare
+    return _prepare(store, request, versions, ordinary, segments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../72797495b7a4/trace_rank.py:20: in wrapped
+    try:return old(*a,**kw)
+               ^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_insert.py:243: in _prepare
+    retirement.finish(placements,request.owner_previous)
+simulation/ate_sim/persistence_proof_world_retirement.py:194: in finish
+    old = scope._resolve(self.store,self.request.pairs[1][0],scope.GroupScope(inc))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7ff03039bbb0>
+cert = ScopeDirectoryCertificate(store_identity='8fcc4b73-2862-46f2-b557-dd6abee5a88a', generation=0, codec_version=1, next_i...ount=1), Root(digest=b'\xabr\xd2`\x14\xdd_\x80e~r \xf1\x8f#\x1a\xe0\xd1T\xe2\x99[\x90!b\x08\x12xdf\xb5\xc9', count=0)))
+scope = GroupScope(incarnation_id=180)
+
+    def _resolve(store,cert,scope):
+        encoded=_scope_key(scope);kind=encoded[0]
+        if kind==4 and len(cert.roots)<5:raise StoreError('child inventory requires explicit verified construction')
+        if kind==5 and len(cert.roots)<6:raise StoreError('sequence inventory requires explicit verified construction')
+        if kind==6 and len(cert.roots)!=7:raise StoreError('rank index requires explicit verified construction')
+>       if kind==1 and scope.incarnation_id>=cert.next_incarnation_id:raise StoreIntegrityError('directory group exceeds allocator')
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreIntegrityError: directory group exceeds allocator
+
+simulation/ate_sim/persistence_proof_scope.py:158: StoreIntegrityError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_rank_up_publication.py::test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False]
+1 failed in 7.73s

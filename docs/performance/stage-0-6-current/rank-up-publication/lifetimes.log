@@ -1,0 +1,194 @@
+FF............................                                           [100%]
+=================================== FAILURES ===================================
+___ test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9/test_rank_up_saves_reopens_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbb37e1b100>
+body = False
+
+    @pytest.mark.parametrize('body', [False, True])
+    def test_rank_up_saves_reopens_and_maintains_without_full_world_audit(tmp_path, monkeypatch, body):
+        expected = []
+        def setup(world):
+            configure(world)
+            abilities = world.advancement.path(1).abilities
+            for ability in abilities:
+                ability.level = 9
+                ability.progress = .99
+                if body:
+                    ability.function = 'creation'
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+            if body:
+                abilities[19].rank = 1
+                abilities[19].level = 9
+                abilities[19].progress = .99
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        _practice_path(eager, eager.people[1], random.Random(32), 'work', .5)
+        session = fast_open(path, pair)
+        try:
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert session.world.digest() == eager.digest()
+            with monkeypatch.context() as patch:
+                patch.setattr(proof, '_audit_world', forbidden_audit)
+                session.save()
+            pair = session.proof_manifest
+        except BaseException:
+            if session._state == 'recovery-required':
+                session.resolve_save()
+            raise
+        finally:
+            session.close()
+>       with open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1]) as audited:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_session.py:238: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18173: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:40: in check_open
+    authority.check_restore(pin)
+simulation/ate_sim/persistence_proof_world_session.py:87: in check_restore
+    if not self.proof_only:return self.admit(pin)
+                                  ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:79: in admit
+    else:verified_epoch=self._audit(pin)
+                        ^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:44: in _audit
+    if guard is None:return self._audit_inner(pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:54: in _audit_inner
+    proof=world._audit_world(store,pin,*pairs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:362: in _audit_world
+    audit_jobs(store,pin)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fbb36cdbbb0>
+pin = GenerationPin(token='6f2021d7-a15e-47ae-a659-7eac639238ce', store_identity='3abc42ed-65fa-4177-97c7-f7df6d263677', captured_head=1)
+
+    def audit_jobs(store,pin):
+        """Explicit full audit: validate the existing partial-retirement boundary."""
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        catalog = IdentityCatalog(store)
+        for inc in store.iter_keys(pin,producer.NAMESPACE):
+            job = producer._job(store,pin,inc)
+            group = catalog.read_identity_group(pin,inc)
+            try:
+                if job[4] and group.occurrences:
+                    raise StoreIntegrityError('partly retired backing still has placements')
+            finally:
+                for values in (group.occurrences,group.links):
+                    if hasattr(values,'close'):
+                        values.close()
+            row = store.read_version(pin,producer.NAMESPACE,inc,expected_record_schema=1)
+>           if row.memberships != (producer.Membership('pending',True,row.valid_from),):
+               ^^^^^^^^^^^^^^^
+E           AttributeError: 'CheckedVersion' object has no attribute 'memberships'
+
+simulation/ate_sim/persistence_proof_world_retirement.py:256: AttributeError
+___ test_rank_up_saves_reopens_and_maintains_without_full_world_audit[True] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9/test_rank_up_saves_reopens_and1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbb36920710>
+body = True
+
+    @pytest.mark.parametrize('body', [False, True])
+    def test_rank_up_saves_reopens_and_maintains_without_full_world_audit(tmp_path, monkeypatch, body):
+        expected = []
+        def setup(world):
+            configure(world)
+            abilities = world.advancement.path(1).abilities
+            for ability in abilities:
+                ability.level = 9
+                ability.progress = .99
+                if body:
+                    ability.function = 'creation'
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+            if body:
+                abilities[19].rank = 1
+                abilities[19].level = 9
+                abilities[19].progress = .99
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        _practice_path(eager, eager.people[1], random.Random(32), 'work', .5)
+        session = fast_open(path, pair)
+        try:
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert session.world.digest() == eager.digest()
+            with monkeypatch.context() as patch:
+                patch.setattr(proof, '_audit_world', forbidden_audit)
+                session.save()
+            pair = session.proof_manifest
+        except BaseException:
+            if session._state == 'recovery-required':
+                session.resolve_save()
+            raise
+        finally:
+            session.close()
+>       with open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1]) as audited:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_session.py:238: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18173: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:40: in check_open
+    authority.check_restore(pin)
+simulation/ate_sim/persistence_proof_world_session.py:87: in check_restore
+    if not self.proof_only:return self.admit(pin)
+                                  ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:79: in admit
+    else:verified_epoch=self._audit(pin)
+                        ^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:44: in _audit
+    if guard is None:return self._audit_inner(pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:54: in _audit_inner
+    proof=world._audit_world(store,pin,*pairs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:362: in _audit_world
+    audit_jobs(store,pin)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fbb36b2cb00>
+pin = GenerationPin(token='b2ca672b-1f0d-4dbc-95c2-59be08436edc', store_identity='4f78979b-37c4-4126-a701-a6c8878ba26d', captured_head=1)
+
+    def audit_jobs(store,pin):
+        """Explicit full audit: validate the existing partial-retirement boundary."""
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        catalog = IdentityCatalog(store)
+        for inc in store.iter_keys(pin,producer.NAMESPACE):
+            job = producer._job(store,pin,inc)
+            group = catalog.read_identity_group(pin,inc)
+            try:
+                if job[4] and group.occurrences:
+                    raise StoreIntegrityError('partly retired backing still has placements')
+            finally:
+                for values in (group.occurrences,group.links):
+                    if hasattr(values,'close'):
+                        values.close()
+            row = store.read_version(pin,producer.NAMESPACE,inc,expected_record_schema=1)
+>           if row.memberships != (producer.Membership('pending',True,row.valid_from),):
+               ^^^^^^^^^^^^^^^
+E           AttributeError: 'CheckedVersion' object has no attribute 'memberships'
+
+simulation/ate_sim/persistence_proof_world_retirement.py:256: AttributeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_rank_up_publication.py::test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False]
+FAILED simulation/tests/test_stage_0_6_rank_up_publication.py::test_rank_up_saves_reopens_and_maintains_without_full_world_audit[True]
+2 failed, 28 passed in 53.34s

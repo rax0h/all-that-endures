@@ -1,0 +1,16 @@
+{
+  "archive_occurrences": 100000,
+  "fixture_seconds": 12.019608844999993,
+  "group_commitment": "1ee19fd08a39f1652f0370b170155f0f28e227e173884699cccfcaa3f56fbb10",
+  "owner_commitment": "2183d742ba3d019966326204c852eaca973bf3858d96f0d157b1fdeaeed790b1",
+  "source": {
+    "driver_sha256": "680d435ef7016c73c5072a7416a3a3c9a9de163e80b2c5d4ecedae97134f8f2d",
+    "fixture_sha256": "f5582e20fc390e36fe15015f597560d246f48db1225249dc3ca628c8ebd3ad4f",
+    "head": "551d8d5b22d534766eddd84ccbde1416f7f03c7f",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "python": "3.12.16",
+    "runtime_tree": "8cc642b2a95d47b6d874dfe5260dacbe18f52d43",
+    "sqlite": "3.45.1"
+  },
+  "verified_construction_seconds": 6.782121506999999
+}

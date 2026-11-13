@@ -38,6 +38,7 @@ def eligible(store,request,change,old):
     if ns==RECORDS:
         before,values,state=checked_record_header(old);after,fields,next_state=checked_record_header(new)
         if before is not after or before is Event or store.codec.encode(state)!=store.codec.encode(next_state):return False
+        if projection(store,ns,old)!=projection(store,ns,new):return False
         world._check_field_values(store,None,after,fields)
         return True
     descriptor=_parent(store,request,DESCRIPTOR_NAMESPACE,change.key[0])

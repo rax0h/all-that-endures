@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="30" time="53.343" timestamp="2026-11-13T08:23:30.710621-06:00" hostname="84c78001d844"><testcase classname="simulation.tests.test_stage_0_6_rank_up_publication" name="test_rank_up_saves_reopens_and_maintains_without_full_world_audit[False]" time="6.864"><failure message="AttributeError: 'CheckedVersion' object has no attribute 'memberships'">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9/test_rank_up_saves_reopens_and0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb37e1b100&gt;
+body = False
+
+    @pytest.mark.parametrize('body', [False, True])
+    def test_rank_up_saves_reopens_and_maintains_without_full_world_audit(tmp_path, monkeypatch, body):
+        expected = []
+        def setup(world):
+            configure(world)
+            abilities = world.advancement.path(1).abilities
+            for ability in abilities:
+                ability.level = 9
+                ability.progress = .99
+                if body:
+                    ability.function = 'creation'
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+            if body:
+                abilities[19].rank = 1
+                abilities[19].level = 9
+                abilities[19].progress = .99
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        _practice_path(eager, eager.people[1], random.Random(32), 'work', .5)
+        session = fast_open(path, pair)
+        try:
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert session.world.digest() == eager.digest()
+            with monkeypatch.context() as patch:
+                patch.setattr(proof, '_audit_world', forbidden_audit)
+                session.save()
+            pair = session.proof_manifest
+        except BaseException:
+            if session._state == 'recovery-required':
+                session.resolve_save()
+            raise
+        finally:
+            session.close()
+&gt;       with open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1]) as audited:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_session.py:238: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18173: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:40: in check_open
+    authority.check_restore(pin)
+simulation/ate_sim/persistence_proof_world_session.py:87: in check_restore
+    if not self.proof_only:return self.admit(pin)
+                                  ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:79: in admit
+    else:verified_epoch=self._audit(pin)
+                        ^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:44: in _audit
+    if guard is None:return self._audit_inner(pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:54: in _audit_inner
+    proof=world._audit_world(store,pin,*pairs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:362: in _audit_world
+    audit_jobs(store,pin)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fbb36cdbbb0&gt;
+pin = GenerationPin(token='6f2021d7-a15e-47ae-a659-7eac639238ce', store_identity='3abc42ed-65fa-4177-97c7-f7df6d263677', captured_head=1)
+
+    def audit_jobs(store,pin):
+        """Explicit full audit: validate the existing partial-retirement boundary."""
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        catalog = IdentityCatalog(store)
+        for inc in store.iter_keys(pin,producer.NAMESPACE):
+            job = producer._job(store,pin,inc)
+            group = catalog.read_identity_group(pin,inc)
+            try:
+                if job[4] and group.occurrences:
+                    raise StoreIntegrityError('partly retired backing still has placements')
+            finally:
+                for values in (group.occurrences,group.links):
+                    if hasattr(values,'close'):
+                        values.close()
+            row = store.read_version(pin,producer.NAMESPACE,inc,expected_record_schema=1)
+&gt;           if row.memberships != (producer.Membership('pending',True,row.valid_from),):
+               ^^^^^^^^^^^^^^^
+E           AttributeError: 'CheckedVersion' object has no attribute 'memberships'
+
+simulation/ate_sim/persistence_proof_world_retirement.py:256: AttributeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_rank_up_publication" name="test_rank_up_saves_reopens_and_maintains_without_full_world_audit[True]" time="5.771"><failure message="AttributeError: 'CheckedVersion' object has no attribute 'memberships'">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-9/test_rank_up_saves_reopens_and1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb36920710&gt;
+body = True
+
+    @pytest.mark.parametrize('body', [False, True])
+    def test_rank_up_saves_reopens_and_maintains_without_full_world_audit(tmp_path, monkeypatch, body):
+        expected = []
+        def setup(world):
+            configure(world)
+            abilities = world.advancement.path(1).abilities
+            for ability in abilities:
+                ability.level = 9
+                ability.progress = .99
+                if body:
+                    ability.function = 'creation'
+                    ability.rank = 2
+                    ability.level = 0
+                    ability.progress = 0.
+            if body:
+                abilities[19].rank = 1
+                abilities[19].level = 9
+                abilities[19].progress = .99
+            expected.append(deepcopy(world))
+        path, pair = ranked_fixture(tmp_path, size=4, configure=setup)
+        eager = expected.pop()
+        _practice_path(eager, eager.people[1], random.Random(32), 'work', .5)
+        session = fast_open(path, pair)
+        try:
+            _practice_path(session.world, session.world.people[1], random.Random(32), 'work', .5)
+            assert session.world.digest() == eager.digest()
+            with monkeypatch.context() as patch:
+                patch.setattr(proof, '_audit_world', forbidden_audit)
+                session.save()
+            pair = session.proof_manifest
+        except BaseException:
+            if session._state == 'recovery-required':
+                session.resolve_save()
+            raise
+        finally:
+            session.close()
+&gt;       with open_audited_proof_world_session(path,rules_id='private-catalog-copy',expected_commitment=pair[1]) as audited:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_rank_up_publication.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_session.py:238: in open_audited_proof_world_session
+    session=open_lazy_world_session(path,rules_id=rules_id,paged_household_members=paged_household_members,_proof_admission=admission)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:18173: in open_lazy_world_session
+    checked_identity_count = check_open(store, pin, head, manifest)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_complete_format.py:40: in check_open
+    authority.check_restore(pin)
+simulation/ate_sim/persistence_proof_world_session.py:87: in check_restore
+    if not self.proof_only:return self.admit(pin)
+                                  ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:79: in admit
+    else:verified_epoch=self._audit(pin)
+                        ^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:44: in _audit
+    if guard is None:return self._audit_inner(pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:54: in _audit_inner
+    proof=world._audit_world(store,pin,*pairs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world.py:362: in _audit_world
+    audit_jobs(store,pin)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = &lt;ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fbb36b2cb00&gt;
+pin = GenerationPin(token='b2ca672b-1f0d-4dbc-95c2-59be08436edc', store_identity='4f78979b-37c4-4126-a701-a6c8878ba26d', captured_head=1)
+
+    def audit_jobs(store,pin):
+        """Explicit full audit: validate the existing partial-retirement boundary."""
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        catalog = IdentityCatalog(store)
+        for inc in store.iter_keys(pin,producer.NAMESPACE):
+            job = producer._job(store,pin,inc)
+            group = catalog.read_identity_group(pin,inc)
+            try:
+                if job[4] and group.occurrences:
+                    raise StoreIntegrityError('partly retired backing still has placements')
+            finally:
+                for values in (group.occurrences,group.links):
+                    if hasattr(values,'close'):
+                        values.close()
+            row = store.read_version(pin,producer.NAMESPACE,inc,expected_record_schema=1)
+&gt;           if row.memberships != (producer.Membership('pending',True,row.valid_from),):
+               ^^^^^^^^^^^^^^^
+E           AttributeError: 'CheckedVersion' object has no attribute 'memberships'
+
+simulation/ate_sim/persistence_proof_world_retirement.py:256: AttributeError</failure></testcase><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_one_practice_action_loads_each_canonical_ability_header_once" time="3.924" /><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_action_matches_eager_state_rng_events_and_saved_identity[empty]" time="0.895" /><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_action_matches_eager_state_rng_events_and_saved_identity[partial]" time="1.948" /><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_action_matches_eager_state_rng_events_and_saved_identity[full]" time="5.338" /><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_action_matches_eager_state_rng_events_and_saved_identity[ceiling]" time="5.046" /><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_action_matches_eager_state_rng_events_and_saved_identity[milestone]" time="6.398" /><testcase classname="simulation.tests.test_stage_0_6_action_ability_lifetime" name="test_action_matches_eager_state_rng_events_and_saved_identity[body_transition]" time="5.963" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_retained_orphan_survives_unrelated_saves_on_one_publisher_pin[1000]" time="0.491" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_retained_orphan_survives_unrelated_saves_on_one_publisher_pin[10000]" time="0.674" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_dependency_fault_retains_the_exact_joint_plan[before_commit]" time="0.104" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_dependency_fault_retains_the_exact_joint_plan[after_commit]" time="0.088" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_missing_mandatory_dependency_rejects_save_without_dropping_edit" time="0.076" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_read_only_acquisition_does_not_create_a_generation" time="0.070" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_weak_alias_collection_defers_dependency_release_to_real_save" time="0.160" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_new_history_creates_dependency_authority_in_same_save" time="0.095" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_losing_writer_can_close_without_thawing_stale_plan" time="0.096" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_failed_publisher_release_preserves_dependency_and_usable_session[close]" time="0.112" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_lifetimes" name="test_world_failed_publisher_release_preserves_dependency_and_usable_session[detach]" time="0.124" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_last_owner_queues_without_pages_and_retained_alias_blocks_cleanup[1000]" time="0.246" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_last_owner_queues_without_pages_and_retained_alias_blocks_cleanup[10000]" time="0.454" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_old_reader_blocks_then_background_slices_finish_on_real_saves[1000]" time="0.265" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_old_reader_blocks_then_background_slices_finish_on_real_saves[10000]" time="0.492" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_retirement_enqueue_joins_exact_rollback_and_lost_ack[before_commit]" time="0.138" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_retirement_enqueue_joins_exact_rollback_and_lost_ack[after_commit]" time="0.112" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_revival_then_final_removal_requeues_before_background_cancellation" time="0.292" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_many_foreground_removals_do_not_impose_background_budget_on_user_edits" time="5.862" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_cold_last_owner_rejects_missing_backing_authority_before_freeze[aux.lazy.history.dependencies]" time="0.078" /><testcase classname="simulation.tests.test_stage_0_5_final_world_backing_retirement" name="test_world_cold_last_owner_rejects_missing_backing_authority_before_freeze[aux.lazy.nested.descriptors]" time="0.080" /></testsuite></testsuites>

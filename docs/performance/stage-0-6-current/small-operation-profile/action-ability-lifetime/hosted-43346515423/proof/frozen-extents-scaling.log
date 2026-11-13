@@ -1,0 +1,3 @@
+1000 {'frozen-list': 112.49, 'record': 75.14, 'nan-key': 86.33} ms; zero unrelated child bodies
+10000 {'frozen-list': 118.66, 'record': 78.98, 'nan-key': 92.09} ms; zero unrelated child bodies
+100000 {'frozen-list': 127.9, 'record': 85.19, 'nan-key': 99.33} ms; zero unrelated child bodies
