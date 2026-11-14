@@ -12,3 +12,5 @@ Task1 local gate complete:191selected tests across14files, exact engine/XML/log 
 Final ruling: raw/per-phase work and selected/hosted acceptance are separate gates; review declined their ownership because parent owns exact evidence — no performance assertion comes from reviewer probes. Hosted gate still pending.
 Final ruling: mature/endurance/main/default and arbitrary adversarial Python method replacement remain outside this two-context contract — preserve supported lease/epoch/codec/corruption tests; no broader security/scale guarantee.
 Ruling: retain evidence in lossless ZIPs plus SHA256 member indexes; exact original hosted ZIPs preserved. This avoids expanding transport with repeated machine receipts, and inspection/resume requires extraction. Extracted originals also retained in scratch.
+
+Published exact source tree to1d46590b5; bundled proof/full run43654058724 observed running at that SHA. No mature request changed. Next action: check this exact gate; no new optimization while it runs.

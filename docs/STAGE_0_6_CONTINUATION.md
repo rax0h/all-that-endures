@@ -19,7 +19,9 @@ and commit work unchanged. No mature/overall/interactive readiness claim.
 Evidence/report: performance/stage-0-6-current/family-publication-scope/.
 Original per-trial/profile/test receipts are losslessly packaged in evidence.zip,
 with member hashes in evidence-index.json; extract here for inspection/resume.
-Read publication.json for exact published source/run (later pointers docs-only).
+Published source1d46590bcd2725ebd75a39a5ab3170efca8e39b9; new run43654058724
+is running. Exact tree/runtime verified. publication.json binds source/run; later
+pointers are docs-only.
 
 NEXT: authenticate the exact new hosted proof/full gate before accepting this
 engine or starting a new optimization. Do not reconstruct a mature constructor

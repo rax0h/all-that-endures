@@ -1,0 +1,19 @@
+{
+  "published_head": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+  "tree": "e47500b145e2580e448eaab2ab48a83418836335",
+  "local_head": "bbfcc2fa3d7f7d7040ec804e5096eb048e027562",
+  "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+  "run": {
+    "id": 43654058724,
+    "status": "in_progress",
+    "conclusion": null,
+    "sha": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/43654058724"
+  },
+  "prior_green": {
+    "head": "b52b86b5502028c63bfb7e542e80b63cfafec990",
+    "run_id": 43617801034,
+    "passed": 5117,
+    "subtests": 2
+  }
+}

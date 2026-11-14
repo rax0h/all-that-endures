@@ -53,3 +53,5 @@ test XML/log/source receipts and RED/GREEN evidence, with every member SHA256 in
 evidence-index.json. Extract into this directory to inspect/resume compatible
 receipts. Independently bounded units survived; no expensive prefix was rerun.
 Hosted acceptance remains pending; no mature/default/main/endurance activation.
+
+Published candidate1d46590bcd2725ebd75a39a5ab3170efca8e39b9 has tree exactly equal to local verified e47500b1; new hosted run43654058724 is running. publication.json records the immutable gate boundary. This pointer is docs-only and does not start another gate.
