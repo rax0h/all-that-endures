@@ -112,3 +112,9 @@ per-trial CPU context are preserved in raw-pairs/. No raw trials were repeated.
 Hosted gate IN PROGRESS: https://github.com/rax0h/all-that-endures/actions/runs/43501337447
 at exact source457a619f84f6610f9b965829b2be8cb8389c5f9b/runtime95c61911.
 Later continuation pointers are documentation only [skip ci].
+
+## Hosted acceptance verified
+
+43501337447 GREEN:5115passed plus2subtests (XML5117), proof34XMLs1960overlapping
+tests plus scaling. Exact source/runtime/archive hashes and XML checked in
+hosted-43501337447/summary.json. W12 engine gate closed; mature performance open.

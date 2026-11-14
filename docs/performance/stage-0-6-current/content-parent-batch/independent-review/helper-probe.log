@@ -1,0 +1,6 @@
+PASS exact admission threshold, mixed-kind spill order, idempotent cleanup
+PASS duplicate locator rejection in memory and spill
+PASS partial spill collision cleanup
+PASS partial insert callback failure cleanup
+PASS retained accounting bound 3033 rows 552744 resident 1048364 charged
+ALL HELPER PROBES PASSED

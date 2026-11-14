@@ -8,7 +8,14 @@
   "related_files": 14,
   "review_findings": 0,
   "raw_trials": 4,
-  "status": "in_progress",
+  "status": "completed",
   "run_id": 43501337447,
-  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/43501337447"
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/43501337447",
+  "conclusion": "success",
+  "full_passed": 5115,
+  "full_subtests": 2,
+  "full_xml_entries": 5117,
+  "proof_xml_tests": 1960,
+  "proof_xml_files": 34,
+  "evidence": "hosted-43501337447/summary.json"
 }

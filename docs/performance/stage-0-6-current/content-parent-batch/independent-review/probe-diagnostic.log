@@ -1,0 +1,11 @@
+PASS full qualified runtime fingerprint
+PASS exhaustive sparse compressed-prefix models 5120 members; late invalid/duplicate checks 512
+PASS maximum depth 64 branches / 65 checked nodes
+PASS reader callback failure
+Changed tables after rejected commit: ['pin_attempts']
+pin_attempts [('fb7aa871-02a6-4311-87f8-7dd48978e4f7', b'["str","seed"]', 0, 'acknowledged', 1, '97b7b9d5f21a2f74f1594a0e894baac69dec1d99ca2cdc3392b163c4a3a294f0')] [('fb7aa871-02a6-4311-87f8-7dd48978e4f7', b'["str","retry"]', 1, 'pending', None, 'b01df1336fd33fe4d9853ae47bc151260eb78b283cdc14534f8de98748e4ee3e')]
+Traceback (most recent call last):
+  File "/workspace/scratch/72797495b7a4/content-parent-review/probe.py", line 81, in <module>
+    assert not changed
+           ^^^^^^^^^^^
+AssertionError

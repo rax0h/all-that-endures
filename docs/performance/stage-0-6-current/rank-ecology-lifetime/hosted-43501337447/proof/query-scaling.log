@@ -1,0 +1,3 @@
+1000: baseline payload checks=8, proof=0, proof node reads=20, exact
+10000: baseline payload checks=8, proof=0, proof node reads=22, exact
+100000: baseline payload checks=8, proof=0, proof node reads=22, exact

@@ -1,0 +1,55 @@
+{
+  "durations": {
+    "test_stage_0_5_proof_nodes": {
+      "cases": 21,
+      "seconds": 0.0
+    },
+    "test_stage_0_5_proof_map": {
+      "cases": 12,
+      "seconds": 0.22
+    },
+    "test_stage_0_5_proof_batch": {
+      "cases": 18,
+      "seconds": 0.34
+    },
+    "test_stage_0_6_proof_compressed_batch": {
+      "cases": 5,
+      "seconds": 0.43
+    },
+    "test_stage_0_5_proof_content": {
+      "cases": 14,
+      "seconds": 0.07
+    },
+    "test_stage_0_5_proof_publication": {
+      "cases": 67,
+      "seconds": 5.58
+    },
+    "test_stage_0_5_proof_record": {
+      "cases": 60,
+      "seconds": 4.09
+    },
+    "test_stage_0_5_proof_scope": {
+      "cases": 55,
+      "seconds": 4.28
+    },
+    "test_stage_0_6_proof_world_components": {
+      "cases": 28,
+      "seconds": 179.67
+    },
+    "test_stage_0_6_proof_open": {
+      "cases": 49,
+      "seconds": 80.72
+    },
+    "test_stage_0_6_proof_world_mixed": {
+      "cases": 20,
+      "seconds": 55.27
+    },
+    "test_stage_0_6_content_parent_batch": {
+      "cases": 0,
+      "seconds": 0
+    }
+  },
+  "file_budget": 300,
+  "invocation_budget": 900,
+  "policy": "180s file policy rejected before execution due to known179.67s hosted module; choose300s with cleanup reserve"
+}

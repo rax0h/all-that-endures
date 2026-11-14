@@ -1,0 +1,3 @@
+1000 values: 0.27852 s raw save; 927712 VM steps; zero unrelated history bodies
+10000 values: 0.277969 s raw save; 930076 VM steps; zero unrelated history bodies
+100000 values: 0.287482 s raw save; 935390 VM steps; zero unrelated history bodies

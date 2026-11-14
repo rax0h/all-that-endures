@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.388" timestamp="2026-11-13T20:22:32.451311-06:00" hostname="7bd2dbdbf381"><testcase classname="simulation.tests.test_stage_0_6_content_parent_batch" name="test_many_parent_checks_read_each_selected_node_once_without_writes" time="0.062"><failure message="ModuleNotFoundError: No module named 'ate_sim.persistence_proof_verify_batch'">def test_many_parent_checks_read_each_selected_node_once_without_writes():
+        storage = MemoryNodes()
+        m = proof_map(storage)
+        items = [(f'key:{i}'.encode(), value(str(i))) for i in range(512)]
+        root = update(m, empty_root(DOMAIN), iter(ordered(items)))
+        members = ordered(items + [(f'missing:{i}'.encode(), None) for i in range(128)])
+        for key, expected in members:
+            assert m.get(root, key) == expected
+        point_reads = len(storage.reads)
+        storage.reads.clear(); storage.writes.clear()
+&gt;       verify(m, root, iter(members))
+
+simulation/tests/test_stage_0_6_content_parent_batch.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_6_content_parent_batch.py:12: in verify
+    return importlib.import_module('ate_sim.persistence_proof_verify_batch').verify_sorted(m, root, members)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_verify_batch'
+import_ = &lt;function _gcd_import at 0x7efe510984a0&gt;
+
+&gt;   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_verify_batch'
+
+&lt;frozen importlib._bootstrap&gt;:1324: ModuleNotFoundError</failure></testcase></testsuite></testsuites>

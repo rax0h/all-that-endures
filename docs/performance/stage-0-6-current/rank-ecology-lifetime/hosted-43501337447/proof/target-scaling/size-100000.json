@@ -1,0 +1,20 @@
+{
+  "size": 100000,
+  "source": {
+    "head": "457a619f84f6610f9b965829b2be8cb8389c5f9b",
+    "runtime_tree": "95c61911fedd093119439bc9d8d80c1d4f896738",
+    "driver_sha256": "6a84c8308c59ee9648a38e176be8221745fc7e8b0179a115c0217b0131f77454",
+    "fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete",
+  "exact": true,
+  "construction_seconds": 28.716889320000064,
+  "target_read_ms": 28.284598000027472,
+  "python_peak_bytes": 41057,
+  "sqlite_vm_step_upper_bound": 40299,
+  "sql": {
+    "unrelated_payload": 0,
+    "selected_metadata": 7
+  }
+}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.505" timestamp="2026-11-13T20:24:21.368330-06:00" hostname="7bd2dbdbf381"><testcase classname="simulation.tests.test_stage_0_6_content_parent_batch" name="test_content_parent_checks_use_streamed_proofs_before_source_writes" time="0.146"><failure message="AssertionError: content parent repeats point proofs&#10;assert not True">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-0/test_content_parent_checks_use0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1d9ad5b490&gt;
+
+    def test_content_parent_checks_use_streamed_proofs_before_source_writes(tmp_path, monkeypatch):
+        from ate_sim.persistence_proof_map import ProofMap
+        from ate_sim.persistence_lazy_store import VersionChange
+        from simulation.tests.proof_publication_fixtures import (
+            make_publication_store, commit_publication, next_authorities, publication_module,
+        )
+        p = publication_module()
+        store, pin, authority = make_publication_store(tmp_path/'content.sqlite', 32)
+        original = p._guard_content_parent
+        get = ProofMap.get
+        active = False
+        validated = False
+        def guard(*args, **kwargs):
+            nonlocal active, validated
+            active = True
+            try:
+                result = original(*args, **kwargs)
+                validated = True
+                return result
+            finally:
+                active = False
+        def checked_get(*args, **kwargs):
+            assert not active, 'content parent repeats point proofs'
+            return get(*args, **kwargs)
+        def phase(name):
+            if name in ('during_version_writes', 'during_segment_writes'):
+                assert validated, 'source writes preceded authenticated parent'
+        monkeypatch.setattr(p, '_guard_content_parent', guard)
+        monkeypatch.setattr(ProofMap, 'get', checked_get)
+        store._phase_hook = phase
+        try:
+            changes = [VersionChange('people', 0, {'wealth': 2})]
+            changes += [VersionChange('archive', i, {'old': i+1}) for i in range(32)]
+&gt;           result = commit_publication(store, pin, authority, version_changes=changes)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_6_content_parent_batch.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:39: in commit_publication
+    return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+simulation/ate_sim/persistence_proof_publication.py:340: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:522: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:312: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2941: in commit
+    _guard_content_parent(self, _content_proof, version_prepared, segment_prepared)
+simulation/tests/test_stage_0_6_content_parent_batch.py:47: in guard
+    result = original(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:288: in _guard_content_parent
+    wanted=m.get(request.parent.versions,version_key(ns,key));row=_source_version(store,request.parent.generation,ns,key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (&lt;ate_sim.persistence_proof_map.ProofMap object at 0x7f1d9a30c2f0&gt;, Root(digest=b'\xa7\x1erIS\x99\x9b\xc6\xd1"\xe8\x91...0\x00\x00\x17ate-proof-key-version/1\x00\x00\x00\x00\x00\x00\x00\x06people\x00\x00\x00\x00\x00\x00\x00\x0b["int","0"]')
+kwargs = {}
+
+    def checked_get(*args, **kwargs):
+&gt;       assert not active, 'content parent repeats point proofs'
+E       AssertionError: content parent repeats point proofs
+E       assert not True
+
+simulation/tests/test_stage_0_6_content_parent_batch.py:53: AssertionError</failure></testcase></testsuite></testsuites>

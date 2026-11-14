@@ -1,0 +1,5 @@
+Changed tables after rejected commit: ['pin_attempts']
+PASS persisted fault rollback / no source writes / TEMP cleanup / new-token retry after resolve kind 0
+Changed tables after rejected commit: ['pin_attempts']
+PASS persisted fault rollback / no source writes / TEMP cleanup / new-token retry after resolve kind 1
+ALL PROBES PASSED

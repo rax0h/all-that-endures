@@ -1,0 +1,25 @@
+{
+  "size": 1000,
+  "source": {
+    "head": "457a619f84f6610f9b965829b2be8cb8389c5f9b",
+    "runtime_tree": "95c61911fedd093119439bc9d8d80c1d4f896738",
+    "sqlite": "3.45.1",
+    "driver_sha256": "6da3edbb8fd9f6afe6601a07c73b6406961687dd7d80223ffbd570e1e51faf8f",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "complete_fixture_sha256": "88281f0b2411223cb57bc2acf7ce20b99db7bd6f3b676634637b132a701b4cee",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "status": "complete",
+  "exact": true,
+  "construction_seconds": 0.828310977000001,
+  "checkpoint_ms": 165.78018599966526,
+  "python_peak_bytes": 338877,
+  "sqlite_vm_steps": 175703,
+  "sql": {
+    "history_body": 0,
+    "commit_descriptor_body": 2
+  },
+  "reaudited": false,
+  "archive_unit": "retained history values",
+  "vm_measurement": "separate interval-one guarded checkpoint"
+}

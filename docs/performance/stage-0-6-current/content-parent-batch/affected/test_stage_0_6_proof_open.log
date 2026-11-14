@@ -1,0 +1,9 @@
+.................................................                        [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_does_not_fetch_unselected_archived_segment_bodies[1]
+simulation/tests/test_stage_0_6_proof_open.py::test_proof_open_does_not_fetch_unselected_archived_segment_bodies[4]
+  simulation/tests/test_stage_0_6_proof_open.py:351: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_proof_open_does_not_fetch_unselected_archived_segment_bodies(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+49 passed, 2 warnings in 77.91s (0:01:17)

@@ -1,0 +1,859 @@
+[
+  [
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'get' of 'dict' objects>",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 2.5570000000000003e-06,
+      "cumulative_seconds": 2.5570000000000003e-06
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'append' of 'list' objects>",
+      "calls": 54961,
+      "primitive_calls": 54961,
+      "own_seconds": 0.013307021,
+      "cumulative_seconds": 0.013307021
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'encode' of 'str' objects>",
+      "calls": 8697,
+      "primitive_calls": 8697,
+      "own_seconds": 0.0035657080000000003,
+      "cumulative_seconds": 0.0035657080000000003
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'replace' of 'str' objects>",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.0009462470000000001,
+      "cumulative_seconds": 0.0009462470000000001
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'split' of 'str' objects>",
+      "calls": 2266,
+      "primitive_calls": 2266,
+      "own_seconds": 0.002003232,
+      "cumulative_seconds": 0.002003232
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'join' of 'str' objects>",
+      "calls": 4520,
+      "primitive_calls": 4520,
+      "own_seconds": 0.004703288,
+      "cumulative_seconds": 0.005752269
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'lower' of 'str' objects>",
+      "calls": 2262,
+      "primitive_calls": 2262,
+      "own_seconds": 0.0009386010000000001,
+      "cumulative_seconds": 0.0009386010000000001
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'rpartition' of 'str' objects>",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 9.8026e-05,
+      "cumulative_seconds": 9.8026e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'startswith' of 'str' objects>",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.0025187900000000004,
+      "cumulative_seconds": 0.0025187900000000004
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'join' of 'bytes' objects>",
+      "calls": 1132,
+      "primitive_calls": 1132,
+      "own_seconds": 0.003096882,
+      "cumulative_seconds": 0.009076873000000001
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'to_bytes' of 'int' objects>",
+      "calls": 53941,
+      "primitive_calls": 53941,
+      "own_seconds": 0.014928982,
+      "cumulative_seconds": 0.014928982
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method from_bytes>",
+      "calls": 54963,
+      "primitive_calls": 54963,
+      "own_seconds": 0.013322441,
+      "cumulative_seconds": 0.013322441
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.any>",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 5.49e-06,
+      "cumulative_seconds": 2.1468000000000002e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.getattr>",
+      "calls": 30466,
+      "primitive_calls": 30466,
+      "own_seconds": 0.007513409,
+      "cumulative_seconds": 0.007513409
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.len>",
+      "calls": 132136,
+      "primitive_calls": 132136,
+      "own_seconds": 0.025287172,
+      "cumulative_seconds": 0.025287172
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.next>",
+      "calls": 4374,
+      "primitive_calls": 4374,
+      "own_seconds": 0.002875264,
+      "cumulative_seconds": 0.005506598000000001
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.sum>",
+      "calls": 4382,
+      "primitive_calls": 4382,
+      "own_seconds": 0.01277104,
+      "cumulative_seconds": 0.023295267
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 33,
+      "function": "_read",
+      "calls": 5310,
+      "primitive_calls": 5310,
+      "own_seconds": 0.027523138000000003,
+      "cumulative_seconds": 0.6138731190000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 68,
+      "function": "_schemas",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 0.00039726400000000004,
+      "cumulative_seconds": 0.0009982720000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 85,
+      "function": "_load_root",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 3.6065e-05,
+      "cumulative_seconds": 0.0010903590000000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 90,
+      "function": "decode_node",
+      "calls": 5310,
+      "primitive_calls": 5310,
+      "own_seconds": 0.133842929,
+      "cumulative_seconds": 0.21144886100000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 277,
+      "function": "_guard_content_parent",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 0.011709604,
+      "cumulative_seconds": 0.941147625
+    },
+    {
+      "file": "<string>",
+      "line": 11,
+      "function": "__eq__",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 1.802e-06,
+      "cumulative_seconds": 2.763e-06
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_occurrence.py",
+      "line": 77,
+      "function": "_require_indexes",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.01183577,
+      "cumulative_seconds": 0.05120127
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_sqlite_guard.py",
+      "line": 100,
+      "function": "_note_fact_sql",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.008369188000000001,
+      "cumulative_seconds": 0.010887978000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 54,
+      "function": "get",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.030104063,
+      "cumulative_seconds": 0.720886632
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 57,
+      "function": "certificate_commitment",
+      "calls": 3,
+      "primitive_calls": 3,
+      "own_seconds": 4.0396000000000004e-05,
+      "cumulative_seconds": 0.0005125850000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 63,
+      "function": "_authority",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 7.579000000000001e-06,
+      "cumulative_seconds": 0.00017120200000000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_store.py",
+      "line": 31,
+      "function": "_read_bound_bytes",
+      "calls": 5310,
+      "primitive_calls": 5310,
+      "own_seconds": 0.027428111,
+      "cumulative_seconds": 0.236811078
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_projection.py",
+      "line": 70,
+      "function": "_require_closed_codec",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 3.0921000000000004e-05,
+      "cumulative_seconds": 5.6828000000000005e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_lazy_store.py",
+      "line": 1382,
+      "function": "_interval_rows",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.009568498,
+      "cumulative_seconds": 0.057899401
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 27,
+      "function": "_reference",
+      "calls": 6445,
+      "primitive_calls": 6445,
+      "own_seconds": 0.009134366000000001,
+      "cumulative_seconds": 0.010184344000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 117,
+      "function": "_source_version",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.014578027,
+      "cumulative_seconds": 0.15909261200000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 268,
+      "function": "_check_request",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 0.000689164,
+      "cumulative_seconds": 0.001672766
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_native_guard.py",
+      "line": 18,
+      "function": "authorize",
+      "calls": 154,
+      "primitive_calls": 154,
+      "own_seconds": 8.0024e-05,
+      "cumulative_seconds": 0.00010820500000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_sqlite_guard.py",
+      "line": 51,
+      "function": "execute",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.017912694,
+      "cumulative_seconds": 0.131990039
+    },
+    {
+      "file": "<string>",
+      "line": 2,
+      "function": "__init__",
+      "calls": 802,
+      "primitive_calls": 802,
+      "own_seconds": 0.0015798020000000002,
+      "cumulative_seconds": 0.0015798020000000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_sqlite_guard.py",
+      "line": 223,
+      "function": "execute",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.017535312,
+      "cumulative_seconds": 0.177055922
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_sqlite_guard.py",
+      "line": 196,
+      "function": "_reject_callback_sql",
+      "calls": 15150,
+      "primitive_calls": 15150,
+      "own_seconds": 0.013552389000000001,
+      "cumulative_seconds": 0.021029606000000003
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_version.py",
+      "line": 38,
+      "function": "version_domain",
+      "calls": 4,
+      "primitive_calls": 4,
+      "own_seconds": 1.149e-05,
+      "cumulative_seconds": 0.000263971
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 22,
+      "function": "__init__",
+      "calls": 8,
+      "primitive_calls": 8,
+      "own_seconds": 7.836000000000001e-06,
+      "cumulative_seconds": 9.351200000000001e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_store.py",
+      "line": 75,
+      "function": "reset_diagnostics",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 8.01e-07,
+      "cumulative_seconds": 8.01e-07
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 90,
+      "function": "<genexpr>",
+      "calls": 3,
+      "primitive_calls": 3,
+      "own_seconds": 9.935e-06,
+      "cumulative_seconds": 1.4539000000000001e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 27,
+      "function": "_integer",
+      "calls": 2417,
+      "primitive_calls": 2417,
+      "own_seconds": 0.001772078,
+      "cumulative_seconds": 0.002848848
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_store.py",
+      "line": 21,
+      "function": "_address",
+      "calls": 5310,
+      "primitive_calls": 5310,
+      "own_seconds": 0.0034453350000000003,
+      "cumulative_seconds": 0.0041020380000000006
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_store.py",
+      "line": 11,
+      "function": "__init__",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 2.301e-06,
+      "cumulative_seconds": 3.102e-06
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 45,
+      "function": "empty_root",
+      "calls": 8,
+      "primitive_calls": 8,
+      "own_seconds": 1.4764000000000001e-05,
+      "cumulative_seconds": 8.567600000000001e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_occurrence.py",
+      "line": 78,
+      "function": "<genexpr>",
+      "calls": 2258,
+      "primitive_calls": 2258,
+      "own_seconds": 0.00107055,
+      "cumulative_seconds": 0.00107055
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_sqlite_guard.py",
+      "line": 216,
+      "function": "cursor",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.007975909,
+      "cumulative_seconds": 0.015367077000000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 21,
+      "function": "_bytes",
+      "calls": 3535,
+      "primitive_calls": 3535,
+      "own_seconds": 0.001464105,
+      "cumulative_seconds": 0.001464105
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 46,
+      "function": "event_domain",
+      "calls": 4,
+      "primitive_calls": 4,
+      "own_seconds": 7.842e-06,
+      "cumulative_seconds": 5.9693000000000006e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 33,
+      "function": "_key",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.002438013,
+      "cumulative_seconds": 0.011498389000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 45,
+      "function": "version_key",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.001710946,
+      "cumulative_seconds": 0.014652684000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 18,
+      "function": "<genexpr>",
+      "calls": 59343,
+      "primitive_calls": 59343,
+      "own_seconds": 0.010524227,
+      "cumulative_seconds": 0.010524227
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 10,
+      "function": "<genexpr>",
+      "calls": 194025,
+      "primitive_calls": 194025,
+      "own_seconds": 0.039357911,
+      "cumulative_seconds": 0.039357911
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 68,
+      "function": "<genexpr>",
+      "calls": 4374,
+      "primitive_calls": 4374,
+      "own_seconds": 0.0026313340000000004,
+      "cumulative_seconds": 0.0026313340000000004
+    },
+    {
+      "file": "<string>",
+      "line": 8,
+      "function": "__eq__",
+      "calls": 5,
+      "primitive_calls": 5,
+      "own_seconds": 2.7610000000000003e-06,
+      "cumulative_seconds": 2.7610000000000003e-06
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 51,
+      "function": "<lambda>",
+      "calls": 5310,
+      "primitive_calls": 5310,
+      "own_seconds": 0.004412679,
+      "cumulative_seconds": 0.241223757
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 49,
+      "function": "key_locator",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.0009343200000000001,
+      "cumulative_seconds": 0.013194377
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 9,
+      "function": "_nibbles",
+      "calls": 2985,
+      "primitive_calls": 2985,
+      "own_seconds": 0.036807227000000005,
+      "cumulative_seconds": 0.07616513800000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 37,
+      "function": "_commitment",
+      "calls": 802,
+      "primitive_calls": 802,
+      "own_seconds": 0.008512352,
+      "cumulative_seconds": 0.016241359
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 36,
+      "function": "_digest",
+      "calls": 11769,
+      "primitive_calls": 11769,
+      "own_seconds": 0.067346081,
+      "cumulative_seconds": 0.13936731100000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 54,
+      "function": "<genexpr>",
+      "calls": 9,
+      "primitive_calls": 9,
+      "own_seconds": 6.3880000000000005e-06,
+      "cumulative_seconds": 8.321e-06
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 53,
+      "function": "node_digest",
+      "calls": 10620,
+      "primitive_calls": 10620,
+      "own_seconds": 0.016652227000000002,
+      "cumulative_seconds": 0.147584996
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 114,
+      "function": "_version_value",
+      "calls": 802,
+      "primitive_calls": 802,
+      "own_seconds": 0.0009602570000000001,
+      "cumulative_seconds": 0.027325033000000002
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_projection.py",
+      "line": 73,
+      "function": "<genexpr>",
+      "calls": 5,
+      "primitive_calls": 5,
+      "own_seconds": 5.7800000000000006e-06,
+      "cumulative_seconds": 1.1045e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_projection.py",
+      "line": 79,
+      "function": "<genexpr>",
+      "calls": 3,
+      "primitive_calls": 3,
+      "own_seconds": 2.187e-06,
+      "cumulative_seconds": 4.933e-06
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 34,
+      "function": "<genexpr>",
+      "calls": 4516,
+      "primitive_calls": 4516,
+      "own_seconds": 0.004001666,
+      "cumulative_seconds": 0.00597167
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 54,
+      "function": "_root_bytes",
+      "calls": 3,
+      "primitive_calls": 3,
+      "own_seconds": 7.491000000000001e-06,
+      "cumulative_seconds": 2.3988e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 76,
+      "function": "_row_checksum",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 2.927e-06,
+      "cumulative_seconds": 0.000289483
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 30,
+      "function": "_bytes",
+      "calls": 51237,
+      "primitive_calls": 51237,
+      "own_seconds": 0.015027438,
+      "cumulative_seconds": 0.015027438
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_nodes.py",
+      "line": 109,
+      "function": "<genexpr>",
+      "calls": 10872,
+      "primitive_calls": 10872,
+      "own_seconds": 0.004228208000000001,
+      "cumulative_seconds": 0.004228208000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 13,
+      "function": "_prefix",
+      "calls": 10620,
+      "primitive_calls": 10620,
+      "own_seconds": 0.004763263,
+      "cumulative_seconds": 0.05072238900000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_map.py",
+      "line": 17,
+      "function": "_count",
+      "calls": 5310,
+      "primitive_calls": 5310,
+      "own_seconds": 0.007002155,
+      "cumulative_seconds": 0.030297422
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 57,
+      "function": "version_commitment",
+      "calls": 802,
+      "primitive_calls": 802,
+      "own_seconds": 0.0049106620000000005,
+      "cumulative_seconds": 0.026364776000000003
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/incremental_store.py",
+      "line": 394,
+      "function": "_int_bytes",
+      "calls": 2406,
+      "primitive_calls": 2406,
+      "own_seconds": 0.0017953320000000002,
+      "cumulative_seconds": 0.0024211420000000003
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_publication.py",
+      "line": 49,
+      "function": "_map",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 1.0589000000000001e-05,
+      "cumulative_seconds": 5.8568000000000006e-05
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_sqlite_guard.py",
+      "line": 29,
+      "function": "require_persistent_sources",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 9.588e-06,
+      "cumulative_seconds": 0.00043862700000000003
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_lazy_store.py",
+      "line": 1388,
+      "function": "<genexpr>",
+      "calls": 3387,
+      "primitive_calls": 3387,
+      "own_seconds": 0.001048981,
+      "cumulative_seconds": 0.001048981
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_proof_content.py",
+      "line": 12,
+      "function": "_namespace",
+      "calls": 3071,
+      "primitive_calls": 3071,
+      "own_seconds": 0.002666088,
+      "cumulative_seconds": 0.003701254
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_lazy_store.py",
+      "line": 364,
+      "function": "_version_checksum",
+      "calls": 802,
+      "primitive_calls": 802,
+      "own_seconds": 0.0027666450000000003,
+      "cumulative_seconds": 0.023841630000000003
+    },
+    {
+      "file": "<string>",
+      "line": 9,
+      "function": "__eq__",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 7.750000000000001e-07,
+      "cumulative_seconds": 7.750000000000001e-07
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/incremental_store.py",
+      "line": 110,
+      "function": "version",
+      "calls": 1608,
+      "primitive_calls": 1608,
+      "own_seconds": 0.00046095,
+      "cumulative_seconds": 0.00046095
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/persistence_lazy_store.py",
+      "line": 360,
+      "function": "_optional_int",
+      "calls": 802,
+      "primitive_calls": 802,
+      "own_seconds": 0.0006190900000000001,
+      "cumulative_seconds": 0.0006190900000000001
+    },
+    {
+      "file": "/workspace/scratch/d88f8db353e8/content-parent-baseline/simulation/ate_sim/incremental_store.py",
+      "line": 386,
+      "function": "_framed_sha",
+      "calls": 1604,
+      "primitive_calls": 1604,
+      "own_seconds": 0.012542192,
+      "cumulative_seconds": 0.025018918
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'update' of '_hashlib.HASH' objects>",
+      "calls": 101090,
+      "primitive_calls": 101090,
+      "own_seconds": 0.032029102000000004,
+      "cumulative_seconds": 0.032029102000000004
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'digest' of '_hashlib.HASH' objects>",
+      "calls": 12571,
+      "primitive_calls": 12571,
+      "own_seconds": 0.013084146000000001,
+      "cumulative_seconds": 0.013084146000000001
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'hexdigest' of '_hashlib.HASH' objects>",
+      "calls": 1604,
+      "primitive_calls": 1604,
+      "own_seconds": 0.0023671,
+      "cumulative_seconds": 0.0023671
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method _hashlib.openssl_sha256>",
+      "calls": 14175,
+      "primitive_calls": 14175,
+      "own_seconds": 0.012579458,
+      "cumulative_seconds": 0.012579458
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<function _NativeGuardCursor.execute at 0x7f90aaa5f880>",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.09421505000000001,
+      "cumulative_seconds": 0.09432325500000001
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'fetchall' of 'sqlite3.Cursor' objects>",
+      "calls": 1129,
+      "primitive_calls": 1129,
+      "own_seconds": 0.006776219,
+      "cumulative_seconds": 0.006776219
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'fetchone' of 'sqlite3.Cursor' objects>",
+      "calls": 6446,
+      "primitive_calls": 6446,
+      "own_seconds": 0.018066434000000003,
+      "cumulative_seconds": 0.018066434000000003
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<function GuardedConnection.cursor at 0x7f90aaa34d60>",
+      "calls": 7575,
+      "primitive_calls": 7575,
+      "own_seconds": 0.007391168,
+      "cumulative_seconds": 0.007391168
+    },
+    {
+      "file": "<frozen importlib._bootstrap>",
+      "line": 645,
+      "function": "parent",
+      "calls": 2,
+      "primitive_calls": 2,
+      "own_seconds": 2.0115e-05,
+      "cumulative_seconds": 0.000118141
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'disable' of '_lsprof.Profiler' objects>",
+      "calls": 1,
+      "primitive_calls": 1,
+      "own_seconds": 8.2296e-05,
+      "cumulative_seconds": 8.2296e-05
+    }
+  ]
+]

@@ -482,3 +482,44 @@ work reduction; W12 new hosted engine gate pending. Independent declined items
 (no mature/exhaustive concurrent-adversary claim; static next-person inspection)
 are accepted scope boundaries for this local-list-only change, covered by existing
 authority and forthcoming full suite. No unresolved review finding or Minor.
+
+## W12 hosted acceptance and W13 content-parent batching
+
+43501337447 at457a619f/runtime95c61911 GREEN: full5115passed plus2subtests;
+proof34XMLs1960overlapping tests plus scaling. Downloaded archive hashes, exact
+source/runtime and all XML failures/errors checked. W12 hosted gate CLOSED.
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| W13a | Save profile plus repeated content-parent point proofs | New stateless streaming membership verifier checks each selected shared path once. Same _read hash/canonical/count/prefix authority. Physical predecessors staged in TEMP sorted spool and checked before source writes. Unit/integration RED→GREEN; focused94pass4.72s. | Final related/work/timing gates pending |
+| W13b | Recovery, malformed/corrupt paths and bounded memory | One independent whole-package review:256sparse maps5120memberships,64depth65reads, late input/callback faults, persisted failures on both parent checks and retry pass; no actionable findings including Minors. Parent-added max-depth and two persisted fault regressions pass. | CLOSED review; included in final gates |
+| W13c | Prior broad tests timed out on known expensive inputs | Read prior hosted file durations before execution. Preflight rejects180s policy for known179.67s module; choose300s/file900s/invocation with full310s reserve before starting next file. No expensive trial was launched by the rejected policy. | CLOSED procedural correction |
+| W13d | Measurement setup attempted relative helper creation in baseline checkout | Failed before any fixture/profile opened. Correct absolute helper location; preserve work-setup-error.log. | CLOSED setup correction |
+
+| W13e | Same independent review, documentation Minor after scope amendment | TEMP-only prototype full-save10.164→10.645s/8.851→10.116s despite lower node work. Not promoted. Amended design/plan with1MiB charged retained-input buffer, resident_bytes(row)+128 plus initial list, unchanged TEMP overflow and separately bounded current source/input row. Explicitly no total-RSS claim. | CLOSED documentation; revised raw acceptance pending |
+
+## W13 final disposition: experiment archived, engine unchanged
+
+TEMP-only variant:379related tests/12files and independent mathematical/persisted
+probes pass; actual guard5310→2043node reads with1129physical checks retained.
+Full-save pairs10.164→10.645s and8.851→10.116s were worse. A bounded-memory/spill
+amendment passed34focused cases and amended independent review; its complete-save
+pairs7.379→7.991s/11.604→7.378s are mixed. No credible causal whole-save gain is
+established. Neither prototype is promoted; runtime95c61911 and original tests/
+workflow are restored byte-for-byte. No new hosted suite is warranted.
+
+All source variants, raw data, exact fresh state/source/runtime fences and review
+logs remain in content-parent-batch/, including prototype/ reproduction files.
+W13e documentation Minor was independently verified closed. Other declined
+review claims (no mature/universal/runtime/raw claim in advance, selected-path
+scope and ordinary collision assumption) remain explicit contract limits. No
+unresolved actionable finding or Minor is deferred. W13 is CLOSED as a negative/
+inconclusive performance experiment, not delivered runtime optimization. W3/U10
+remain OPEN. Do not mislabel379TEMP-only related passes or34memory-focused passes
+as final buffered broad/hosted acceptance; those later gates were not spent.
+
+Next-save-work.md records the measured whole-save preparation/commit/acknowledgement
+boundary and required same-engine controls. The isolated parent guard is too
+small to explain overall latency. Do not assume TEMP caused the observed gap or
+attempt another blind patch. Preserve the last verified engine and reuse its
+5115passed+2subtest hosted gate43501337447.

@@ -1,0 +1,9 @@
+PASS full qualified runtime fingerprint
+PASS exhaustive sparse compressed-prefix models 5120 members; late invalid/duplicate checks 512
+PASS maximum depth 64 branches / 65 checked nodes
+PASS reader callback failure
+Traceback (most recent call last):
+  File "/workspace/scratch/72797495b7a4/content-parent-review/probe.py", line 77, in <module>
+    assert snapshot=={n:store.db.execute('SELECT * FROM "'+n+'"').fetchall() for (n,) in before}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

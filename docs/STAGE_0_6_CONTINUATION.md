@@ -1,95 +1,51 @@
 # Stage 0.6 continuation
 
 Active checkout: `/workspace/scratch/d88f8db353e8/ate`, branch
-`sol/durable-proof-map`. Other checkouts are historical or measurement baselines.
+`sol/durable-proof-map`. Other checkouts are historical/measurement baselines.
 
-## Accepted previous engine
+## Accepted engine
 
-Hosted run https://github.com/rax0h/all-that-endures/actions/runs/43346515423
-is GREEN at source `551d8d5b22d534766eddd84ccbde1416f7f03c7f`, runtime
-`8cc642b2a95d47b6d874dfe5260dacbe18f52d43`. Full log reports5098passed plus2subtests;
-JUnit5100entries, zero failures/errors,7374.682s. Proof has33XMLs/1936overlapping
-tests plus successful scaling controls. Source/artifact receipts are retained in
-`performance/stage-0-6-current/small-operation-profile/action-ability-lifetime/hosted-43346515423/`.
-The mature constructor was skipped. This closes W9/W10 hosted engine gates.
+Published source457a619f84f6610f9b965829b2be8cb8389c5f9b, runtime
+95c61911fedd093119439bc9d8d80c1d4f896738 is verified GREEN in
+https://github.com/rax0h/all-that-endures/actions/runs/43501337447 .
+Full5115passed plus2subtests (XML5117entries),9646.182s. Proof34XMLs1960overlapping
+tests plus scaling. Downloaded archive digests, source/runtime and XML checked in
+performance/stage-0-6-current/rank-ecology-lifetime/hosted-43501337447/summary.json.
+Rank-up saving W11 and annual operand-lifetime W12 engine gates are CLOSED.
+No hosted run is pending for this current engine.
 
-## Current work: rank-up publication
+## Latest investigation: W13 not promoted
 
-The actual rank-up save failure at AbilityProgress.response_model has positive
-local regressions now. Existing-record child retargeting uses accepted old owner
-paths and a closed fresh forest. Initial and bounded background retirement
-changes are validated against accepted roots; full audits accept valid partial
-cleanup. Private unpublished children retain aliases without orphan dependency
-publication, and restoring an exact pinned record header cancels stale outgoing
-placement edits. Old-incarnation private publication retains the checked fallback.
+Both content-parent batching prototypes are archived, not active engine code.
+The TEMP-only guard cut proof-node reads5310→2043 while keeping1129physical
+predecessor checks, but saves were slower in both matched pairs. A bounded1MiB
+memory variant had mixed complete-save results7.379→7.991s/11.604→7.378s.
+Whole-save causality/speed gain is unestablished. It was not promoted on a
+lower-level work count alone. Restore exact green engine and test/workflow state;
+no additional full CI is needed for this documentation/evidence update.
 
-Read `superpowers/plans/2026-11-13-rank-up-publication.md` and
-`performance/stage-0-6-current/rank-up-publication/report.md`. One independent
-whole-package review found one Important canonical-type defect; it was reproduced,
-fixed and verified in this group. No unresolved Critical/Important/Minor findings.
-Full raw failures/probes are preserved; the closure register is
-`performance/stage-0-6-current/bounded-genesis/closure.md`.
+Read performance/stage-0-6-current/content-parent-batch/report.md and prototype/.
+All source variants, eight exact-state raw trials, qualified runtime receipts,
+379-related TEMP-only passes,34focused memory/spill passes, independent review
+and original corrected diagnostic failures are preserved. One documentation Minor
+was closed; no unresolved review finding. The memory variant's final broad gate
+was intentionally not run after deciding not to promote. Do not claim it passed.
 
-The final affected battery is restartable per file, with180s/file and600s per
-invocation. It explicitly excludes the expensive generated-two-save constructor,
-which is reserved for the hosted full suite. Its earlier accidental inclusion
-stalled a broad local run; `affected.log` is interrupted evidence, not a pass.
-The final local gate is521passed across24files; XML/log hashes and engine bytes
-were rechecked. The exact-source hosted proof/full gate is now GREEN (receipt below).
-No mature request, default-format activation, main merge or endurance is authorized.
+Next bounded work is whole-save phase attribution/acknowledgement investigation,
+not another blind parent-guard patch. Read content-parent-batch/next-save-work.md.
+Existing evidence shows substantial preparation/commit/acknowledgement work
+outside this guard; same-engine controls are needed before another implementation.
+No new expensive constructor or full-suite repetition while choosing the next
+boundary. Preserve compatible completed outputs and inspect prior durations.
 
-Use the full qualified313 fingerprint in the saved fixture-construction receipt.
+## Bounds and open acceptance
+
+Mature targets remain W3/U10:10sopen/2ssave/1swarm, exact state and deterministic
+continuation. No mature constructor, endurance, main merge or default-format
+activation is authorized by this work. Stage0.6 remains OPEN.
+
+Use the complete qualified313 fingerprint in fixture-construction's receipt.
 Authenticated original small input SHA2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554
-must only be used through disposable copies; its archive expires December11.
-Rank-up tests build disposable small fixtures and include a10000-entry unrelated
-history read refusal, not a mature-world latency measurement. Mature
-open10s/save2s/warm1s targets remain OPEN. Do not infer Stage0.6 completion.
-
-Published rank-up engine: `d2b0a38fac5e76f5938878bc0d66adcd77619f15`,
-tree `78976cd1b1c9a8573141edc878eb2337d75b0d2f`, runtime
-`6b4e02da84294f98dd2a14595112109f36cacb5a`. Exact local9c685ca tree.
-Publication receipt is in rank-up-publication/publication.json. Hosted result
-for this exact source was verified from downloaded source receipts and XML.
-
-Hosted bundled validation is GREEN:
-https://github.com/rax0h/all-that-endures/actions/runs/43482217438
-at exact engine source d2b0a38fac5e76f5938878bc0d66adcd77619f15.
-This later pointer update is documentation only and does not start another run.
-
-## November13 verified rank-up acceptance
-
-Run43482217438 completed successfully at d2b0a38f/runtime6b4e02da.
-Full log:5107passed plus2subtests; JUnit5109entries, zero failures/errors.
-Proof:34XMLs/1952overlapping tests plus scaling, including16focused rank-up/action
-tests. Both artifact archives match their GitHub SHA256 digests and source fences;
-see rank-up-publication/hosted-43482217438/summary.json. W11 engine gate CLOSED.
-
-Next: bounded fresh profile of the existing authenticated small input to choose
-the next performance boundary. Evidence under post-rank-profile/. No mature
-constructor, main/default activation or endurance is requested. Mature targets
-remain W3/U10. Historical rank-up refusal notes are superseded by W11 green.
-
-## Current candidate: annual rank ecology lifetime
-
-Production only rank_ecology.py: construct its existing indexed list before
-PracticeBatch and reuse it in ceiling pass. Actual canonical20 header reads80→20
-(max5→1). Candidate runtime95c61911fedd093119439bc9d8d80c1d4f896738, engine
-commitd09948f.119related tests/14files pass; one whole-package review has no
-actionable findings. New file8cases preserves eager/native digest/RNG/events,
-rank/body/mastery behavior and save/reopen.
-
-Evidence and raw timing table: performance/stage-0-6-current/rank-ecology-lifetime/report.md.
-Warm lower in both raw pairs; first/save mixed, opening higher. No overall or
-mature improvement claim. Final hosted proof/full candidate gate still required.
-The unrelated10000-entry imported-history local timeout is preserved; its14tests
-were green on the unchanged persistence engine and remain in hosted full suite.
-No mature/main/default/endurance request.
-
-Published annual lifetime source457a619f84f6610f9b965829b2be8cb8389c5f9b,
-exact tree0d414678e3d18bc7b9225c78052bb796e6822f78 matching local28cefdc;
-runtime95c61911. Read rank-ecology-lifetime/publication.json for hosted status.
-No extra mature request was changed.
-
-Hosted gate IN PROGRESS: https://github.com/rax0h/all-that-endures/actions/runs/43501337447
-at exact source457a619f84f6610f9b965829b2be8cb8389c5f9b/runtime95c61911.
-Later continuation pointers are documentation only [skip ci].
+must only be used via disposable copies. Its archive expires December11. Never
+open the original in a writable native session; pin bookkeeping changes bytes.
+Consolidated closure register: performance/stage-0-6-current/bounded-genesis/closure.md.

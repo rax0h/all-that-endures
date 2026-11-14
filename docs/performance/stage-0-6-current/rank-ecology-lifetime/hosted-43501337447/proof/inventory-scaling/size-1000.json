@@ -1,0 +1,21 @@
+{
+  "size": 1000,
+  "source": {
+    "head": "457a619f84f6610f9b965829b2be8cb8389c5f9b",
+    "runtime_tree": "95c61911fedd093119439bc9d8d80c1d4f896738",
+    "driver_sha256": "986bd5d306ef49816ca01a6de4171b1f3e1685a03a44cb9052c7ba2f6ae39d43",
+    "fixture_sha256": "f7e7ae9885fee7801956a5e32d0ce861d7230389d5a5c9ee462a8f26e0d2c463",
+    "sqlite": "3.45.1"
+  },
+  "exact": true,
+  "status": "complete",
+  "namespace_count": 4,
+  "construction_seconds": 0.9003585699999803,
+  "save_ms": 64.90791199996693,
+  "python_peak_bytes": 129818,
+  "sqlite_vm_step_upper_bound": 95399,
+  "sql": {
+    "unrelated_payload": 0,
+    "selected_payload": 3
+  }
+}

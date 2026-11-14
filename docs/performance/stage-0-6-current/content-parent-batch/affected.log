@@ -1,0 +1,13 @@
+simulation/tests/test_stage_0_5_proof_nodes.py 21 passed 0.7 s
+simulation/tests/test_stage_0_5_proof_map.py 12 passed 0.99 s
+simulation/tests/test_stage_0_5_proof_batch.py 18 passed 0.94 s
+simulation/tests/test_stage_0_6_proof_compressed_batch.py 5 passed 1.09 s
+simulation/tests/test_stage_0_5_proof_content.py 14 passed 0.64 s
+simulation/tests/test_stage_0_5_proof_publication.py 67 passed 4.37 s
+simulation/tests/test_stage_0_5_proof_record.py 60 passed 2.25 s
+simulation/tests/test_stage_0_5_proof_scope.py 55 passed 3.61 s
+simulation/tests/test_stage_0_6_proof_world_components.py 28 passed 223.46 s
+simulation/tests/test_stage_0_6_proof_open.py 49 passed 78.5 s
+simulation/tests/test_stage_0_6_proof_world_mixed.py 20 passed 60.55 s
+simulation/tests/test_stage_0_6_content_parent_batch.py 30 passed 1.54 s
+Total 379 tests passed; reserved constructor excluded

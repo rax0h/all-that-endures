@@ -1,0 +1,14 @@
+[
+  "simulation/tests/test_stage_0_5_proof_nodes.py",
+  "simulation/tests/test_stage_0_5_proof_map.py",
+  "simulation/tests/test_stage_0_5_proof_batch.py",
+  "simulation/tests/test_stage_0_6_proof_compressed_batch.py",
+  "simulation/tests/test_stage_0_5_proof_content.py",
+  "simulation/tests/test_stage_0_5_proof_publication.py",
+  "simulation/tests/test_stage_0_5_proof_record.py",
+  "simulation/tests/test_stage_0_5_proof_scope.py",
+  "simulation/tests/test_stage_0_6_proof_world_components.py",
+  "simulation/tests/test_stage_0_6_proof_open.py",
+  "simulation/tests/test_stage_0_6_proof_world_mixed.py",
+  "simulation/tests/test_stage_0_6_content_parent_batch.py"
+]

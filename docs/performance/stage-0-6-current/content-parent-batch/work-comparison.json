@@ -1,0 +1,32 @@
+{
+  "baseline": {
+    "counts": {
+      "get": 1129,
+      "_read": 5310,
+      "_source_version": 1129,
+      "_read_bound_bytes": 5310
+    },
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+  },
+  "candidate": {
+    "counts": {
+      "get": 0,
+      "_read": 2043,
+      "_source_version": 1129,
+      "_read_bound_bytes": 2043
+    },
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+  }
+}

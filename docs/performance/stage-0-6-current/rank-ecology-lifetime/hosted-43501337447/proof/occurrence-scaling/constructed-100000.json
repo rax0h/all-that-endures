@@ -1,0 +1,16 @@
+{
+  "archive_occurrences": 100000,
+  "fixture_seconds": 6.661911836000002,
+  "group_commitment": "6bf49c199fe3f112feb9be68c4fda830b04541c06a85c56b0ec69a8f763e9f70",
+  "owner_commitment": "842008f096bcb24601c35d9b3035fdd2680465bab597a2273a3dccfbe001ffde",
+  "source": {
+    "driver_sha256": "680d435ef7016c73c5072a7416a3a3c9a9de163e80b2c5d4ecedae97134f8f2d",
+    "fixture_sha256": "f5582e20fc390e36fe15015f597560d246f48db1225249dc3ca628c8ebd3ad4f",
+    "head": "457a619f84f6610f9b965829b2be8cb8389c5f9b",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
+    "python": "3.12.16",
+    "runtime_tree": "95c61911fedd093119439bc9d8d80c1d4f896738",
+    "sqlite": "3.45.1"
+  },
+  "verified_construction_seconds": 4.324338343000022
+}

@@ -1,0 +1,25 @@
+Changed tables after rejected commit: ['pin_attempts']
+Traceback (most recent call last):
+  File "/workspace/scratch/72797495b7a4/content-parent-review/persisted-probe.py", line 37, in <module>
+    result=commit_publication(store,pin,authority,token='retry'); assert result.commit.outcome=='committed'
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/tests/proof_publication_fixtures.py", line 39, in commit_publication
+    return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        scope_authority=authorities.scope,commit_token=token,**arguments)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_publication.py", line 353, in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_scope.py", line 522, in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_proof_record.py", line 312, in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 2875, in commit
+    self._register_attempt(
+    ~~~~~~~~~~~~~~~~~~~~~~^
+        pin, encoded_commit_token, current_generation
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/scratch/d88f8db353e8/ate/simulation/ate_sim/persistence_lazy_store.py", line 954, in _register_attempt
+    raise StoreConflictError("commit token is already the pin's latest attempt")
+ate_sim.incremental_store.StoreConflictError: commit token is already the pin's latest attempt
