@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_publication_scope_respects_configured_small_catalog_budget ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_publication_scope_respect0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc180617490>
+
+    def test_publication_scope_respects_configured_small_catalog_budget(tmp_path, monkeypatch):
+        from simulation.tests.test_stage_0_5_publication_proof_reuse import prepared, make_store
+        from simulation.ate_sim.persistence_lazy_participants import CoordinatorSaveParticipant as Participant
+        from simulation.ate_sim.persistence_validation_scope import ValidationScope
+        with make_store(tmp_path/'budget.sqlite') as store:
+            coord, delta, pin = prepared(store)
+            coord.catalog.byte_limit = 128
+            part = Participant(coord, delta, coord.pin, pin.captured_head)
+            seen = []
+            original = ValidationScope.remember
+            def remember(scope, *args, **kwargs):
+                result = original(scope, *args, **kwargs)
+                seen.append((scope.byte_limit, scope.bytes))
+                return result
+            monkeypatch.setattr(ValidationScope, 'remember', remember)
+            part.validate_publication(delta, pin)
+>           assert seen and all(limit <= coord.catalog.byte_limit//6 and size <= limit
+                                for limit, size in seen), seen
+E           AssertionError: [(262144, 1013), (262144, 2026)]
+E           assert ([(262144, 1013), (262144, 2026)] and False)
+E            +  where False = all(<generator object test_publication_scope_respects_configured_small_catalog_budget.<locals>.<genexpr> at 0x7fc17f0b7a00>)
+
+simulation/tests/test_stage_0_6_publication_read_scope.py:54: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_6_publication_read_scope.py::test_publication_scope_respects_configured_small_catalog_budget
+1 failed, 1 deselected in 0.40s

@@ -1,0 +1,11 @@
+[
+  "simulation/tests/test_stage_0_5_final_identity_catalog.py",
+  "simulation/tests/test_stage_0_5_final_identity_coordinator.py",
+  "simulation/tests/test_stage_0_6_read_view_epoch.py",
+  "simulation/tests/test_stage_0_6_proof_open.py",
+  "simulation/tests/test_stage_0_6_rank_up_publication.py",
+  "simulation/tests/test_stage_0_6_proof_world_mixed.py",
+  "simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py",
+  "simulation/tests/test_stage_0_5_final_world_unpublished_promotion.py",
+  "simulation/tests/test_stage_0_5_final_backing_dependencies.py"
+]

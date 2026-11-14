@@ -1,0 +1,7 @@
+Qualified runtime full fingerprint verified
+normal OK scope_peak 2026 catalog_budget 2097152 scopes [(True, 262144)]
+borrowed OK scope_peak 0 catalog_budget 2097152 scopes []
+exception OK scope_peak 0 catalog_budget 2097152 scopes []
+small_budget OK scope_peak 0 catalog_budget 128 scopes [(True, 21)]
+corruption_after_validation OK scope_peak 2026 catalog_budget 2097152 scopes [(True, 262144)]
+rollback_after_validation OK scope_peak 2026 catalog_budget 2097152 scopes [(True, 262144)]

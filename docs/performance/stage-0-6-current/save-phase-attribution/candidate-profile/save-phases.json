@@ -1,0 +1,104 @@
+[
+  {
+    "phase": "prepare",
+    "status": "complete",
+    "wall_seconds": 2.286078736000036,
+    "cpu_seconds": 2.285656015,
+    "before": {
+      "payload_reads": 6353,
+      "payload_read_bytes": 1493991,
+      "payload_check_reads": 13383,
+      "payload_check_bytes": 3179929,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 47964,
+      "query_rows": 210,
+      "pin_rows": 36543,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 17,
+      "maintenance_removed_rows": 0
+    },
+    "after": {
+      "payload_reads": 7317,
+      "payload_read_bytes": 1632065,
+      "payload_check_reads": 15371,
+      "payload_check_bytes": 3469142,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 54643,
+      "query_rows": 216,
+      "pin_rows": 44007,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 17,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "phase": "commit",
+    "status": "complete",
+    "wall_seconds": 5.2449200290000135,
+    "cpu_seconds": 5.224592733,
+    "before": {
+      "payload_reads": 7317,
+      "payload_read_bytes": 1632065,
+      "payload_check_reads": 15371,
+      "payload_check_bytes": 3469142,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 54643,
+      "query_rows": 216,
+      "pin_rows": 44007,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 17,
+      "maintenance_removed_rows": 0
+    },
+    "after": {
+      "payload_reads": 7317,
+      "payload_read_bytes": 1632065,
+      "payload_check_reads": 19427,
+      "payload_check_bytes": 4198058,
+      "payload_writes": 1146,
+      "payload_write_bytes": 239010,
+      "metadata_rows": 59896,
+      "query_rows": 523,
+      "pin_rows": 45208,
+      "maintenance_rows": 256,
+      "temporary_keys_peak": 17,
+      "maintenance_removed_rows": 128
+    }
+  },
+  {
+    "phase": "acknowledge",
+    "status": "complete",
+    "wall_seconds": 3.272059347000095,
+    "cpu_seconds": 3.271612457,
+    "before": {
+      "payload_reads": 7317,
+      "payload_read_bytes": 1632065,
+      "payload_check_reads": 19427,
+      "payload_check_bytes": 4198058,
+      "payload_writes": 1146,
+      "payload_write_bytes": 239010,
+      "metadata_rows": 59896,
+      "query_rows": 523,
+      "pin_rows": 45208,
+      "maintenance_rows": 256,
+      "temporary_keys_peak": 17,
+      "maintenance_removed_rows": 128
+    },
+    "after": {
+      "payload_reads": 9332,
+      "payload_read_bytes": 2020056,
+      "payload_check_reads": 25070,
+      "payload_check_bytes": 5233117,
+      "payload_writes": 1146,
+      "payload_write_bytes": 239010,
+      "metadata_rows": 69275,
+      "query_rows": 529,
+      "pin_rows": 59280,
+      "maintenance_rows": 256,
+      "temporary_keys_peak": 17,
+      "maintenance_removed_rows": 128
+    }
+  }
+]

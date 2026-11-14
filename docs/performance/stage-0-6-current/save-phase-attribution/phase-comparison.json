@@ -1,0 +1,60 @@
+{
+  "baseline": {
+    "phases": {
+      "prepare": {
+        "instrumented_wall_seconds": 2.2907934969999815,
+        "sql_execute_calls": 57042,
+        "proof_node_reads": 7624,
+        "checked_head_calls": 3688
+      },
+      "commit": {
+        "instrumented_wall_seconds": 5.245597505999967,
+        "sql_execute_calls": 98479,
+        "proof_node_reads": 29324,
+        "checked_head_calls": 819
+      },
+      "acknowledge": {
+        "instrumented_wall_seconds": 4.069633984999996,
+        "sql_execute_calls": 102387,
+        "proof_node_reads": 17438,
+        "checked_head_calls": 6993
+      }
+    },
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+  },
+  "candidate": {
+    "phases": {
+      "prepare": {
+        "instrumented_wall_seconds": 2.286078736000036,
+        "sql_execute_calls": 57042,
+        "proof_node_reads": 7624,
+        "checked_head_calls": 3688
+      },
+      "commit": {
+        "instrumented_wall_seconds": 5.2449200290000135,
+        "sql_execute_calls": 98479,
+        "proof_node_reads": 29324,
+        "checked_head_calls": 819
+      },
+      "acknowledge": {
+        "instrumented_wall_seconds": 3.272059347000095,
+        "sql_execute_calls": 88855,
+        "proof_node_reads": 15519,
+        "checked_head_calls": 3550
+      }
+    },
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+  }
+}

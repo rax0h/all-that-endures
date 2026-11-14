@@ -1,0 +1,10 @@
+simulation/tests/test_stage_0_5_final_identity_catalog.py 24 passed 13.52 s
+simulation/tests/test_stage_0_5_final_identity_coordinator.py 9 passed 13.11 s
+simulation/tests/test_stage_0_6_read_view_epoch.py 17 passed 11.1 s
+simulation/tests/test_stage_0_6_proof_open.py 49 passed 35.31 s
+simulation/tests/test_stage_0_6_rank_up_publication.py 9 passed 91.79 s
+simulation/tests/test_stage_0_6_proof_world_mixed.py 20 passed 29.1 s
+simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py 11 passed 2.53 s
+simulation/tests/test_stage_0_5_final_world_unpublished_promotion.py 7 passed 1.73 s
+simulation/tests/test_stage_0_5_final_backing_dependencies.py 14 passed 0.68 s
+Total 160 tests passed; reserved constructor excluded

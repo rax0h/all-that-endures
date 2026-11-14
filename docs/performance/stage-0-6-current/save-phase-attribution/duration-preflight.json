@@ -1,0 +1,43 @@
+{
+  "files": {
+    "test_stage_0_5_final_identity_catalog": {
+      "cases": 24,
+      "seconds": 22.2
+    },
+    "test_stage_0_5_final_identity_coordinator": {
+      "cases": 9,
+      "seconds": 21.35
+    },
+    "test_stage_0_6_read_view_epoch": {
+      "cases": 17,
+      "seconds": 24.62
+    },
+    "test_stage_0_6_proof_open": {
+      "cases": 49,
+      "seconds": 80.72
+    },
+    "test_stage_0_6_rank_up_publication": {
+      "cases": 9,
+      "seconds": 161.04
+    },
+    "test_stage_0_6_proof_world_mixed": {
+      "cases": 20,
+      "seconds": 55.27
+    },
+    "test_stage_0_5_final_world_backing_lifetimes": {
+      "cases": 11,
+      "seconds": 4.47
+    },
+    "test_stage_0_5_final_world_unpublished_promotion": {
+      "cases": 7,
+      "seconds": 2.54
+    },
+    "test_stage_0_5_final_backing_dependencies": {
+      "cases": 14,
+      "seconds": 1.7
+    }
+  },
+  "file_cap": 300,
+  "invocation_cap": 900,
+  "reused_focused_cases": 44
+}

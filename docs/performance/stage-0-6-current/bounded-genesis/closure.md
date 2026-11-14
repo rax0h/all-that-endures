@@ -523,3 +523,20 @@ boundary and required same-engine controls. The isolated parent guard is too
 small to explain overall latency. Do not assume TEMP caused the observed gap or
 attempt another blind patch. Preserve the last verified engine and reuse its
 5115passed+2subtest hosted gate43501337447.
+
+## W14 coordinator publication read scope
+
+| ID | Origin | Concrete action/evidence | Status |
+|---|---|---|---|
+| W14a | Fresh95c61911 phase attribution | Prepare57042SQL, commit98479SQL, acknowledgement102387SQL. Acknowledgement coordinator validation opens outer borrowed snapshot disabling existing closed metadata sharing. Let existing checked_read_operation own this one closed scope; no new cache or acceptance shortcut. Real native32person RED147checked-head calls→GREEN≤10, exactsave/reopen and no retained scope. | Focused gate passed; work/raw acceptance pending |
+| W14b / R1 | Independent Minor: custom catalog budget bypass | New outer scope default262144 retained2026bytes for catalog budget128. RED permanent regression reproduces. Pass min(256KiB,catalog.byte_limit//6); GREEN custom scope21/retained0. Independent six-case probe rerun verifies normal/borrowed/exception/corruption/rolled-back-write cases. | CLOSED; no unresolved review finding |
+
+W14 local closure:44focused plus160additional related tests pass (204distinct);
+full engine/XML/log/reviewer hashes and qualified runtime verified. Same source
+phase work: acknowledgement102387→88855SQL,17438→15519proof-node reads,6993→3550
+head checks; preparation/commit SQL unchanged. Two sequential pinned A-B/B-A
+small-input saves4.268→4.099s/4.431→4.211s (4.0%/5.0%lower), exact fresh saved/
+continued state and original bytes preserved. No concurrent CPU probes/tests.
+No latency distribution, overall or mature readiness claim. Retain measured
+small save improvement for one bundled hosted proof/full gate. R1 Minor closed
+in same independent review; no unresolved findings. Hosted engine gate pending.

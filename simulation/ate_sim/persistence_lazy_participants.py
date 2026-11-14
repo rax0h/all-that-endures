@@ -252,7 +252,9 @@ class CoordinatorSaveParticipant:
         self._publication_proof = None
         from .persistence_publication_proof import publication_epoch
         entry = publication_epoch(self.store) if not self.store.db.in_transaction else None
-        with self.store.read_snapshot(successor_pin):
+        from .persistence_validation_scope import checked_read_operation
+        with checked_read_operation(self.store, successor_pin,
+                byte_limit=min(256*1024, self.coordinator.catalog.byte_limit//6)):
             if self.store.checked_head().generation != self.target_generation:
                 raise StoreConflictError('coordinator publication successor was replaced')
             if self.accepted:

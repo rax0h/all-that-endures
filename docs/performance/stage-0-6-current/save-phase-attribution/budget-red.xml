@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.396" timestamp="2026-11-13T23:56:19.082478-06:00" hostname="298dd0d169f6"><testcase classname="simulation.tests.test_stage_0_6_publication_read_scope" name="test_publication_scope_respects_configured_small_catalog_budget" time="0.156"><failure message="AssertionError: [(262144, 1013), (262144, 2026)]&#10;assert ([(262144, 1013), (262144, 2026)] and False)&#10; +  where False = all(&lt;generator object test_publication_scope_respects_configured_small_catalog_budget.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fc17f0b7a00&gt;)">tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-3/test_publication_scope_respect0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc180617490&gt;
+
+    def test_publication_scope_respects_configured_small_catalog_budget(tmp_path, monkeypatch):
+        from simulation.tests.test_stage_0_5_publication_proof_reuse import prepared, make_store
+        from simulation.ate_sim.persistence_lazy_participants import CoordinatorSaveParticipant as Participant
+        from simulation.ate_sim.persistence_validation_scope import ValidationScope
+        with make_store(tmp_path/'budget.sqlite') as store:
+            coord, delta, pin = prepared(store)
+            coord.catalog.byte_limit = 128
+            part = Participant(coord, delta, coord.pin, pin.captured_head)
+            seen = []
+            original = ValidationScope.remember
+            def remember(scope, *args, **kwargs):
+                result = original(scope, *args, **kwargs)
+                seen.append((scope.byte_limit, scope.bytes))
+                return result
+            monkeypatch.setattr(ValidationScope, 'remember', remember)
+            part.validate_publication(delta, pin)
+&gt;           assert seen and all(limit &lt;= coord.catalog.byte_limit//6 and size &lt;= limit
+                                for limit, size in seen), seen
+E           AssertionError: [(262144, 1013), (262144, 2026)]
+E           assert ([(262144, 1013), (262144, 2026)] and False)
+E            +  where False = all(&lt;generator object test_publication_scope_respects_configured_small_catalog_budget.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fc17f0b7a00&gt;)
+
+simulation/tests/test_stage_0_6_publication_read_scope.py:54: AssertionError</failure></testcase></testsuite></testsuites>
