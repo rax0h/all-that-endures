@@ -1,0 +1,14 @@
+[
+  {
+    "pair": "pair1",
+    "baseline_save_seconds": 4.001575,
+    "candidate_save_seconds": 3.826966,
+    "reduction_percent": 4.363506869170259
+  },
+  {
+    "pair": "pair2",
+    "baseline_save_seconds": 3.998132,
+    "candidate_save_seconds": 3.866569,
+    "reduction_percent": 3.2906117156712154
+  }
+]

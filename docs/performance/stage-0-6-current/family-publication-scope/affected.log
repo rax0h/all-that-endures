@@ -1,0 +1,15 @@
+simulation/tests/test_stage_0_6_family_publication_scope.py 2 passed 2.53 s
+simulation/tests/test_stage_0_5_validation_scope.py 12 passed 0.62 s
+simulation/tests/test_stage_0_5_publication_proof_reuse.py 21 passed 1.18 s
+simulation/tests/test_stage_0_5_final_world_participants.py 9 passed 0.98 s
+simulation/tests/test_stage_0_5_final_participant_abort.py 9 passed 0.62 s
+simulation/tests/test_stage_0_5_final_backing_dependencies.py 14 passed 0.62 s
+simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py 11 passed 2.48 s
+simulation/tests/test_stage_0_5_final_world_unpublished_promotion.py 7 passed 1.73 s
+simulation/tests/test_stage_0_6_proof_world_mixed.py 20 passed 30.81 s
+simulation/tests/test_stage_0_6_proof_open.py 49 passed 37.03 s
+simulation/tests/test_stage_0_6_read_view_epoch.py 17 passed 11.36 s
+simulation/tests/test_stage_0_6_publication_read_scope.py 2 passed 2.28 s
+simulation/tests/test_stage_0_6_rank_up_publication.py 9 passed 92.39 s
+simulation/tests/test_stage_0_5_final_identity_coordinator.py 9 passed 12.5 s
+Total 191 tests passed; reserved constructor excluded

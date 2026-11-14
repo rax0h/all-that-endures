@@ -1,0 +1,92 @@
+[
+  {
+    "kind": "family",
+    "mode": "owned",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "borrowed",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "exception",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "corrupt",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "write_rollback",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "codec",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "lease",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "wrong_plan",
+    "passed": true
+  },
+  {
+    "kind": "family",
+    "mode": "wrong_pin",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "owned",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "borrowed",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "exception",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "corrupt",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "write_rollback",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "codec",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "lease",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "wrong_plan",
+    "passed": true
+  },
+  {
+    "kind": "dependencies",
+    "mode": "wrong_pin",
+    "passed": true
+  }
+]

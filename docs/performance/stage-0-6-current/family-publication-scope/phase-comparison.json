@@ -1,0 +1,54 @@
+{
+  "baseline": {
+    "phases": {
+      "prepare": {
+        "sql_execute_calls": 57042,
+        "checked_head_calls": 3688,
+        "proof_node_reads": 7624
+      },
+      "commit": {
+        "sql_execute_calls": 98479,
+        "checked_head_calls": 819,
+        "proof_node_reads": 29324
+      },
+      "acknowledge": {
+        "sql_execute_calls": 88855,
+        "checked_head_calls": 3550,
+        "proof_node_reads": 15519
+      }
+    },
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+  },
+  "candidate": {
+    "phases": {
+      "prepare": {
+        "sql_execute_calls": 57042,
+        "checked_head_calls": 3688,
+        "proof_node_reads": 7624
+      },
+      "commit": {
+        "sql_execute_calls": 98479,
+        "checked_head_calls": 819,
+        "proof_node_reads": 29324
+      },
+      "acknowledge": {
+        "sql_execute_calls": 80020,
+        "checked_head_calls": 460,
+        "proof_node_reads": 15383
+      }
+    },
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3"
+  }
+}

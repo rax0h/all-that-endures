@@ -540,3 +540,13 @@ continued state and original bytes preserved. No concurrent CPU probes/tests.
 No latency distribution, overall or mature readiness claim. Retain measured
 small save improvement for one bundled hosted proof/full gate. R1 Minor closed
 in same independent review; no unresolved findings. Hosted engine gate pending.
+
+W14 hosted acceptance CLOSED:43617801034 at b52b86b5/runtime030b9c93; full5117passed plus2subtests, proof35XMLs1962overlapping tests plus scaling. Actual downloaded archive SHA256, source and XML/log receipts verified in save-phase-attribution/hosted-43617801034/. No mature job ran; W3/U10 remain OPEN.
+
+## W15 family/dependency closed publication scope — November14
+
+FamilySaveParticipant.validate_publication and BackingDependencyPool.validate_publication reuse existing checked_read_operation. No per-row validation or second dependency acceptance validation is removed. Real native32person family35head reads and actual32row generic dependencies33read RED become<=10; exact values/token rosters preserved.
+
+191selected tests/14files pass with prior hosted-duration preflight and source/XML/log receipts. One independent whole-package review:0Critical/0Important/0Minor;18tiny fault/borrowed/rollback/lease/codec/frozen-plan/reopen probes pass. No unresolved finding. Same-engine instrumented acknowledgement3550→460headchecks,88855→80020SQL,15383proof-node reads; prepare/commit unchanged. Pinned raw A-B/B-A saves4.002→3.827s/3.998→3.867s, original bytes/exact saved/fresh continued state preserved. Modest small-input observation only. W15 local/review/performance gates CLOSED; new hosted engine gate pending.
+
+Evidence: family-publication-scope/report.md, summary.json, independent-review/, phase/raw-comparison.json. Lossless evidence.zip with SHA256 member index retains full original raw/profile/XML/log receipts; original hosted43617801034 ZIPs similarly retained in save-phase-attribution/hosted-43617801034. Extract to inspect/resume compatible outputs. Compression changes no evidence bytes or persistence authority. W3/U10 mature10sopen/2ssave/1swarm remains OPEN; no mature/default/main/endurance activation.

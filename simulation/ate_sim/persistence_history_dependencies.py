@@ -210,7 +210,8 @@ class BackingDependencyPool:
 
     def validate_publication(self, delta, pin):
         self._check_plan(delta, pin)
-        with self.store.read_snapshot(pin):
+        from .persistence_validation_scope import checked_read_operation
+        with checked_read_operation(self.store, pin):
             for change in delta.decode(self.store.codec)[0]:
                 if _checked_value(self.store, pin, change.key) != change.value:
                     raise StoreIntegrityError('backing dependency publication disagrees with frozen plan')

@@ -134,8 +134,9 @@ class FamilySaveParticipant:
         versions, ordinary, identities = delta.decode(codec)
         from .persistence_events import EVENT_STORAGE, DESCRIPTOR_KEY
         from .persistence_session import TAIL_DESCRIPTOR_KEY, COMMIT_DESCRIPTOR_KEY
+        from .persistence_validation_scope import checked_read_operation
         event_controls = []
-        with self.store.read_snapshot(successor_pin):
+        with checked_read_operation(self.store, successor_pin):
             # Ordinary rows carry only current authority; never read them for old pins.
             if self.store.checked_head().generation != self.target_generation:
                 raise StoreConflictError('family publication successor was replaced')

@@ -1,0 +1,22 @@
+{
+  "per_file_seconds": 300,
+  "invocation_seconds": 900,
+  "next_file_reserve": 310,
+  "prior_hosted_seconds": {
+    "simulation/tests/test_stage_0_6_family_publication_scope.py": null,
+    "simulation/tests/test_stage_0_5_validation_scope.py": 0.76,
+    "simulation/tests/test_stage_0_5_publication_proof_reuse.py": 1.642,
+    "simulation/tests/test_stage_0_5_final_world_participants.py": 1.144,
+    "simulation/tests/test_stage_0_5_final_participant_abort.py": 0.5660000000000001,
+    "simulation/tests/test_stage_0_5_final_backing_dependencies.py": 1.6750000000000003,
+    "simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py": 3.841,
+    "simulation/tests/test_stage_0_5_final_world_unpublished_promotion.py": 2.187,
+    "simulation/tests/test_stage_0_6_proof_world_mixed.py": 47.1,
+    "simulation/tests/test_stage_0_6_proof_open.py": 69.512,
+    "simulation/tests/test_stage_0_6_read_view_epoch.py": 20.596999999999998,
+    "simulation/tests/test_stage_0_6_publication_read_scope.py": 2.843,
+    "simulation/tests/test_stage_0_6_rank_up_publication.py": 135.241,
+    "simulation/tests/test_stage_0_5_final_identity_coordinator.py": 18.981
+  },
+  "exclusion": "not test_generated_world_continues_through_two_proof_saves"
+}

@@ -89,3 +89,7 @@ interpretation is a separate note and does not relax formal W3/U10 targets.
 (nine files) all passed:204distinct cases. XML/log/engine hashes and independent
 review source fences checked; full qualified313 fingerprint rechecked before
 publication. No later source change occurred. The new hosted gate remains required.
+
+## Hosted acceptance — November14
+
+Run43617801034 at publishedb52b86b5502028c63bfb7e542e80b63cfafec990 / runtime030b9c934f5ea4f59101d6f6677216aa7b52a03e is GREEN. Full5117passed plus2subtests in8593.35s. Proof35XMLs1962overlapping tests and scaling passed. Both archives match the GitHub SHA256 digests; source.json head/runtime match; all XML failures/errors are zero. Evidence: hosted-43617801034/summary.json and extracted logs/XML. Mature job was skipped; no mature measurement or Stage0.6 closure follows.
