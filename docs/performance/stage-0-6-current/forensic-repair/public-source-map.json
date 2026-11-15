@@ -1,0 +1,97 @@
+{
+  "ba0cc454d74fb6b443a4beb8fde94082d2357a0c": {
+    "public_commit": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+    "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+    "scope": "exact engine Python file inventory and SHA256s; full local commit/harness equivalence not asserted",
+    "members": [
+      {
+        "archive": "docs/performance/stage-0-6-current/family-publication-scope/evidence.zip",
+        "member": "candidate-profile/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/family-publication-scope/evidence.zip",
+        "member": "raw-pairs/pair1-candidate/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/family-publication-scope/evidence.zip",
+        "member": "raw-pairs/pair2-candidate/report.json"
+      }
+    ]
+  },
+  "e32f95096b57f0dc821b6288370e65e29f7a7f61": {
+    "public_commit": "b66c2aa77f7a4e7282a4405a0f4a5d057727a9df",
+    "runtime_tree": "fd20cf1784a331de07f4979db71dda0f3d301771",
+    "scope": "exact engine Python file inventory and SHA256s; full local commit/harness equivalence not asserted",
+    "members": [
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "candidate-profile/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "save-profile/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-pairs/pair1-candidate/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-pairs/pair2-candidate/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-confirmation/confirm1-candidate/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-confirmation/confirm2-candidate/report.json"
+      }
+    ]
+  },
+  "fb41c31ade9d974bcc63aa4b0acd9effdaa4797f": {
+    "public_commit": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+    "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+    "scope": "exact engine Python file inventory and SHA256s; full local commit/harness equivalence not asserted",
+    "members": [
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-pairs/pair1-baseline/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-pairs/pair2-baseline/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-confirmation/confirm1-baseline/report.json"
+      },
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "raw-confirmation/confirm2-baseline/report.json"
+      }
+    ]
+  },
+  "61959199a8fee4823f650f3964258704e24cfe37": {
+    "public_commit": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+    "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+    "scope": "exact engine Python file inventory and SHA256s; full local commit/harness equivalence not asserted",
+    "members": [
+      {
+        "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+        "member": "baseline-warm-profile/report.json"
+      }
+    ]
+  },
+  "02743cf4fcdb09e99bb668164fc6eaddb4a10d3d": {
+    "public_commit": "b66c2aa77f7a4e7282a4405a0f4a5d057727a9df",
+    "runtime_tree": "fd20cf1784a331de07f4979db71dda0f3d301771",
+    "scope": "exact full Git tree equality",
+    "tree": "800dec0765056ad3537366756697bd0dc955ae03",
+    "members": [
+      {
+        "file": "docs/performance/stage-0-6-current/membership-read-scope/publication.json"
+      }
+    ]
+  }
+}

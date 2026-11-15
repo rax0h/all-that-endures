@@ -13,12 +13,9 @@ import time
 
 
 ROOT = Path(__file__).resolve().parents[6]
-BASELINE = ROOT.parent / 'read-view-baseline'
-SOURCE = ROOT.parent / 'small-proof-profile/source.sqlite/candidate.sqlite'
 DRIVER = Path('docs/performance/stage-0-6-current/small-operation-profile/factorization/compare.py')
 INPUT = ROOT / 'docs/performance/stage-0-6-current/small-operation-profile/input.json'
 WARM_DIGEST = 'a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3'
-SOURCES = {'baseline': BASELINE, 'candidate': ROOT}
 EXPECTED_TREES = {'baseline': '41d21d8dfd2eedd44b35c12c894cbb4a59ba6058',
                   'candidate': '4654b0194149f735a15c79507a6e57c88a7acbb2'}
 ORDER = [('pair1', 'baseline'), ('pair1', 'candidate'),
@@ -72,6 +69,12 @@ def machine():
                        ('cpu_stat', '/sys/fs/cgroup/cpu.stat')]:
         p = Path(path)
         result[name] = p.read_text().strip() if p.exists() else None
+    result['load_average'] = Path('/proc/loadavg').read_text().split()[:3]
+    result['cpu_totals'] = next(line.split()[1:] for line in Path('/proc/stat').read_text().splitlines()
+                                if line.startswith('cpu '))
+    pressure = Path('/proc/pressure/cpu')
+    result['cpu_pressure'] = pressure.read_text().strip() if pressure.exists() else None
+    result['observation_limit'] = 'Boundary samples describe host load; they do not prove an idle or exclusive host.'
     return result
 
 
@@ -104,35 +107,36 @@ def stop_group(proc):
         proc.wait(timeout=5)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--output', type=Path)
-    parser.add_argument('--dry-run', action='store_true')
-    args = parser.parse_args()
+def run(args):
+    source=args.source.resolve()
+    sources={'baseline':args.baseline_root.resolve(),'candidate':args.candidate_root.resolve()}
+    heads={'baseline':args.baseline_commit,'candidate':args.candidate_commit}
     info = json.loads(INPUT.read_text())
-    if sha(SOURCE) != info['database']['sha256']:
+    if sha(source) != info['database']['sha256']:
         raise ValueError('source database differs from the recorded input')
     expected = {}
-    for label, root in SOURCES.items():
+    for label, root in sources.items():
+        head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+        if head!=heads[label]:raise ValueError(f'{label} checkout differs from explicit commit')
         tree = subprocess.check_output(['git', 'rev-parse', 'HEAD:simulation/ate_sim'],
                                        cwd=root, text=True).strip()
         if tree != EXPECTED_TREES[label]:
             raise ValueError(f'{label} runtime tree is not the recorded tree')
-        subprocess.run(['git', 'diff', '--quiet', 'HEAD', '--', 'simulation/ate_sim'],
-                       cwd=root, check=True)
+        if subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],cwd=root,text=True):
+            raise ValueError(f'{label} checkout is dirty')
         if not (root / DRIVER).is_file():
             raise FileNotFoundError(f'{label} driver is missing')
         expected[label] = pinned_runtime_files(root)
     if args.dry_run:
         print(json.dumps(dict(source=info['database']['sha256'], trees=EXPECTED_TREES,
-                              order=ORDER, context=machine())))
+                              heads=heads, order=ORDER, context=machine())))
         return
-    if args.output is None:
-        parser.error('--output is required unless --dry-run is used')
     out = args.output.resolve()
+    if (source.is_relative_to(out) or any(out.is_relative_to(root) for root in sources.values())):
+        raise ValueError('trial output must be separate from immutable source/checkouts')
     out.mkdir(parents=True, exist_ok=False)
     manifest = dict(status='running', source=info['database'], trees=EXPECTED_TREES,
-                    order=ORDER, wall_limit_seconds=120, context=machine(), trials=[])
+                    heads=heads, order=ORDER, wall_limit_seconds=120, context=machine(), trials=[])
     record(out / 'manifest.json', manifest)
     saved = None
     for pair, label in ORDER:
@@ -144,8 +148,11 @@ def main():
         proc = None
         try:
             with (out / f'{name}.log').open('w') as log:
-                proc = subprocess.Popen([sys.executable, str(DRIVER), str(SOURCE), str(out / name)],
-                                        cwd=SOURCES[label], stdout=log, stderr=subprocess.STDOUT,
+                selected=sources[label]
+                proc = subprocess.Popen([sys.executable, str(DRIVER), str(source), str(out / name)],
+                                        cwd=selected, stdout=log, stderr=subprocess.STDOUT,
+                                        env=dict(os.environ,PYTHONPATH=str(selected)+os.pathsep+str(selected/'simulation'),
+                                                 PYTHONDONTWRITEBYTECODE='1'),
                                         start_new_session=True)
                 status = proc.wait(timeout=120)
             if status:
@@ -153,7 +160,7 @@ def main():
             result = json.loads((out / name / 'report.json').read_text())
             if (result['status'] != 'complete' or not result['source_preserved']
                     or not result['runtime_preserved'] or result['runtime_files'] != expected[label]
-                    or result['input'] != info or result['python'] != sys.version
+                    or result['input'] != info or result['python'] != sys.version or result['head']!=heads[label]
                     or result['restored']['warm_year'] != 3
                     or result['restored']['warm_digest'] != WARM_DIGEST):
                 raise ValueError('source, runtime, input or continuation differs')
@@ -181,6 +188,24 @@ def main():
     manifest['saved'] = saved
     manifest['warm_digest'] = WARM_DIGEST
     record(out / 'manifest.json', manifest)
+
+
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--source',type=Path,required=True)
+    parser.add_argument('--baseline-root',type=Path,required=True)
+    parser.add_argument('--candidate-root',type=Path,required=True)
+    parser.add_argument('--baseline-commit',required=True)
+    parser.add_argument('--candidate-commit',required=True)
+    parser.add_argument('--output',type=Path)
+    parser.add_argument('--dry-run',action='store_true')
+    args=parser.parse_args()
+    if not args.dry_run and args.output is None:
+        parser.error('--output is required unless --dry-run is used')
+    def terminate(signum,frame):raise SystemExit(128+signum)
+    previous=signal.signal(signal.SIGTERM,terminate)
+    try:return run(args)
+    finally:signal.signal(signal.SIGTERM,previous)
 
 
 if __name__ == '__main__':

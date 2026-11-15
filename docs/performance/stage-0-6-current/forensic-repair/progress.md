@@ -24,3 +24,10 @@ Secondhostedsmoke43734152539 passed28tests and createdprivate draft446184821, bu
 Repairedengine84626841/locala18014f4: completeharness322passed253.52s,5additionalrealworkflowclassificationcasespassed0.55s,69source/epochcasespassed151.29s. IndependentwholepackagereviewclosedallfindingsincludingImportantdiff-failureclassification. Rawfailedtestauthoringattemptspreservedandcorrectedcasesrepassed. Newhostedenginequalificationrequired; oldlauncherqualificationremainsfailclosed.
 
 Final workflow contract refinement: full-suite runs only for engine/test changes; proof-script changes run proof-map only; workflow/harness-only changes remain quick. The obsolete monolithic mature job is explicitly disabled. Eight executable classification cases and related gate/legacy boundaries:36passed1.38s; engine unchanged. Final full collection330cases;322complete local pass plus final focused verification retained, one bundled hosted gate next.
+
+## Hosted qualification and preservation authenticated
+Engine4eadb668/84626841run43735593694success: full5123pass+2subtests,35proofXML/1968cases,330harnesscases. ExactZIPdigests,producerjobs/source/software verified. Both jobs usePython3.12.16/SQLite3.46.1; launcher softwareguard updatedtoactualqualifiedtuple. Privatepreservation43734650623fullyrestored bothoriginalZIPs andallmanifest/partpins verified.
+
+Task3consumer/reproductionwholepackagereviewclosedallfindings. Explicitpubliccommit replaycompleted4trialswithintactsource/digestsandmixedtimings; no uniformspeedclaim. Baseline saveprofilebacking foundandall6graphs verified. Additional actualoutermainfence foundstaleOLD_REQUEST; coordinatedexecutionbindingregressionRED/GREEN retained, allsourceauthorityfields unchanged. Finalfullharnessandliveconsumer/stagedsmokepending.
+
+FinalTask3local gate:356passed282.47s. The exact candidate tree with realpublic4eadb668parent passedcheck_sourceandfence48criticalpaths. Reviewerclosurelimit resolved. Publishhelper-onlysourcewithstagedrequestunchangedfirst; actualread-only-tokenconsumerhopinquickharness precedesactivationofsmoke-request-template.json. No engine/full/proof rerun.

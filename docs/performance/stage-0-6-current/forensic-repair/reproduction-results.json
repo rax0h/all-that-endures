@@ -1,0 +1,30 @@
+{
+  "scope": "NON-MATURE replay of historical b45/fd20 engines; current846 engine is separate",
+  "results": {
+    "pair1": {
+      "save": {
+        "baseline": 5.370294,
+        "candidate": 7.267114,
+        "change_percent": 35.320598834998606
+      },
+      "warm_step": {
+        "baseline": 6.390989,
+        "candidate": 7.476482,
+        "change_percent": 16.984742111119267
+      }
+    },
+    "pair2": {
+      "save": {
+        "baseline": 7.123041,
+        "candidate": 5.999711,
+        "change_percent": -15.770371109754954
+      },
+      "warm_step": {
+        "baseline": 6.654559,
+        "candidate": 5.666538,
+        "change_percent": -14.847279887367437
+      }
+    }
+  },
+  "conclusion": "All four trials preserve source, runtime and exact continuation. Mixed timings do not establish uniform warm benefit or a causal save regression. Historical host load cannot be reconstructed."
+}

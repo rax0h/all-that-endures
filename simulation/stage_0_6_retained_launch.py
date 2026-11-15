@@ -81,7 +81,8 @@ def prepare_retained(root, config, identity, source, accepted, database, authori
         raise FileExistsError('retained input destination already exists')
     try:
         retained_transport = download_retained(
-            staged, database_bytes=database['bytes'], metadata_max_bytes=r.METADATA_MAX_BYTES)
+            staged, database_bytes=database['bytes'], metadata_max_bytes=r.METADATA_MAX_BYTES,
+            carrier='preserved')
         performance, historical = authenticate_staged(
             staged, config, identity, source, accepted, database, authority)
         moved = []

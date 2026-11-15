@@ -1,0 +1,17 @@
+{
+  "schema": "ate-proof-genesis-resume-request/1",
+  "request_id": "preserved-current-engine-smoke-2026-11-15-1",
+  "mode": "smoke",
+  "smoke_run_id": 0,
+  "resume_run_id": 0,
+  "budgets": {
+    "source_digest": 300,
+    "capture": 300,
+    "catalog": 300,
+    "rebase": 300,
+    "after_digest": 300,
+    "proofs": 300,
+    "measure": 300,
+    "fresh_restore": 300
+  }
+}

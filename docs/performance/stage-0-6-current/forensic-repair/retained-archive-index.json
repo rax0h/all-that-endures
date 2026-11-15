@@ -1,0 +1,22 @@
+{
+  "qualified-full.zip": {
+    "bytes": 197417,
+    "sha256": "b3393da9ad43cde9f2f0b6c52df6f901cc690873858b24d5d82a854ec11f339d"
+  },
+  "qualified-proof.zip": {
+    "bytes": 216213,
+    "sha256": "e95ebd40424c19adef6a9d82ec63403259f41ae56f815736b483703ca8769fcd"
+  },
+  "qualified-harness.zip": {
+    "bytes": 6454,
+    "sha256": "006e833211cb05e6163a14dc1962fc68812fd7842e7f1085a78fe44c0c436c34"
+  },
+  "preserved-fixtures-evidence.zip": {
+    "bytes": 12257,
+    "sha256": "1bd21fc2496a0604549b717a1adb6a595a6474484a08a50573cd4b26096cfaee"
+  },
+  "preserved-fixtures-smoke.zip": {
+    "bytes": 3189,
+    "sha256": "7a73e2cdf3999a163c50e2a816161292fb8aa8ea057f586ae62e71828257768f"
+  }
+}

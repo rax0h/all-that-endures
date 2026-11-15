@@ -1,3 +1,17 @@
+# November15 authenticated green and preserved-input launch
+
+Current engine84626841/public4eadb668 is qualified by hostedrun43735593694:5123full tests plus2subtests,1968proof cases and330harness cases passed. Both source receipts recordPython3.12.16/SQLite3.46.1. Reuse these exact engine gates; do not repeat them for the harness-only launch repair.
+
+Both original fixtures are preserved in private draft446184821 and were completely restored/checksummed in43734650623. New consumer retains original accepted-state authority and no longer needs the original Actions carrier to remain live. Finallocalharness356passed282.47s and exactpublic-parent source guards passed. Live read-token consumer check and then a fresh compatible staged smoke are next. A prepared smoke-request-template.json uses300sper-phase compute caps; staged execution is not triggered by the helper-only publication. The mature template and restart/publication requirements are in performance/stage-0-6-current/forensic-repair/mature-budget-template.json.
+
+The nested stale launch declaration is repaired alongside the true green tuple. Original DB/world/generation/year1002digest remain unchanged. New helpers require a new compatible smoke; no old checkpoint or green is relabelled.
+
+Historical b45/fd20public-commit replay succeeded functionally but gave mixed timings. These are NON-MATURE observations, separate from current846engine and mature targets. All raw results and original profiles are retained. Stage0.6 remains OPEN; current mature10sopen/2ssave/1swarm and exact year1002continuation remain UNMEASURED. No interactive-response/default/main/endurance/gameplay migration claim.
+
+Current report: performance/stage-0-6-current/forensic-repair/launch-report.md. Owning findings: closure-register.md in that directory. Earlier boundary notes follow as historical records.
+
+---
+
 # November15 forensic repair — current boundary
 
 Critical-path repairs are locally verified on engine84626841: full.github/tests322passed plus5new workflow-detector cases. External002's12reproduced failures are resolved locally. Independent whole-package review is closed. Current candidate requires one new exact-engine hosted quick-harness/proof/full qualification; previous greenenginefd20cf17 cannot qualify this recovery change.

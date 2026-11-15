@@ -78,8 +78,12 @@ def _stream_archive(url, archive, *, archive_sha256, archive_bytes):
     return copied
 
 
-def download_retained(destination, *, database_bytes, metadata_max_bytes):
+def download_retained(destination, *, database_bytes, metadata_max_bytes, carrier='original'):
     """Authenticate live producer, stream pinned ZIP, and stage exact six members."""
+    if carrier=='preserved':
+        from simulation.stage_0_6_preserved_transport import download_retained as preserved
+        return preserved(destination,database_bytes=database_bytes,metadata_max_bytes=metadata_max_bytes)
+    if carrier!='original':raise ValueError('invalid retained carrier')
     started = time.monotonic()
     destination = Path(destination)
     if destination.exists() or destination.is_symlink():

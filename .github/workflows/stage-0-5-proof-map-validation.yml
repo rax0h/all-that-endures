@@ -103,6 +103,13 @@ jobs:
           set -euo pipefail
           mkdir -p "$TMPDIR" harness-evidence
           timeout --signal=TERM --kill-after=30s 10m python -m pytest -q .github/tests --basetemp="$TMPDIR/pytest" --junitxml=harness-evidence/tests.xml 2>&1 | tee harness-evidence/tests.log
+      - name: Verify preserved small input through actual read-only consumer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=10s 2m python -m simulation.stage_0_6_preserved_transport --key small-year1 --output "$RUNNER_TEMP/stage06-small-original.zip" > harness-evidence/preserved-consumer.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

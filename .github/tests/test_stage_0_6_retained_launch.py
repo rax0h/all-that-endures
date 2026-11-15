@@ -204,6 +204,7 @@ def test_real_saved_and_accepted_bundle_supports_a_different_current_runtime(
     original_hash = r.file_hash(source_dir/'candidate.sqlite')
 
     def download(destination, **caps):
+        assert caps.pop('carrier') == 'preserved'
         return extract_retained(archive, destination, archive_sha256=r.file_hash(archive),
                                 archive_bytes=archive.stat().st_size, **caps)
 

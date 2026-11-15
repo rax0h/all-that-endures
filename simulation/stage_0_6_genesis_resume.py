@@ -24,18 +24,18 @@ from simulation import checkpoint_artifacts as github
 from simulation import continuation_receipts as r
 from simulation.stage_0_6_retained_transport import _stream_archive,_signed_url
 
-GREEN_RUN=42823293423
-GREEN_JOBS={'full-suite':129854000533,'proof-map':129853999993}
-GREEN_SHA='9e6f022fa556c25394dfd381f4d7d0356e5d8711'
-RUNTIME='94267bb00a219702a4bd1700a2fc0600a5c5aa56'
+GREEN_RUN=43735593694
+GREEN_JOBS={'full-suite':132878528722,'proof-map':132878528733}
+GREEN_SHA='4eadb66855289b9983677815f402af1ceb94b37e'
+RUNTIME='84626841aa84b87a0564eda15200d83ea1478bb4'
 REQUEST='simulation/stage_0_6_genesis_resume_request.json'
 OLD_REQUEST='simulation/stage_0_6_proof_genesis_request.json'
 CRITICAL=('simulation/stage_0_6_genesis_checkpoint.py','simulation/stage_0_6_genesis_transport.py',
     'simulation/stage_0_6_genesis_stages.py','simulation/stage_0_6_genesis_resume.py',
     '.github/tests/run_genesis_recovery_drill.py',c.WORKFLOW)
 GREEN_ARTIFACTS={
-    'full-suite':(13778449621,'stage-0-5-proof-map-suite-'+GREEN_SHA,'2c1bd46f45c878bef22131acf4d3b1b70bb9ceef7527bc3f1a1a1652be7cb333'),
-    'proof-map':(13774870495,'stage-0-5-proof-map-'+GREEN_SHA,'24fd08053d558e6f9bad1a19b187afef143e7536db5137f3d75c7a6862b8ec87')}
+    'full-suite':(14175812342,'stage-0-5-proof-map-suite-'+GREEN_SHA,'b3393da9ad43cde9f2f0b6c52df6f901cc690873858b24d5d82a854ec11f339d'),
+    'proof-map':(14171548007,'stage-0-5-proof-map-'+GREEN_SHA,'e95ebd40424c19adef6a9d82ec63403259f41ae56f815736b483703ca8769fcd')}
 TIMEOUTS=dict(source_digest=120,capture=240,catalog=240,rebase=240,after_digest=180,proofs=350,measure=150,fresh_restore=180)
 
 
@@ -57,7 +57,7 @@ def runtime_description():
 
 
 def check_software(value):
-    if value.get('python')!='3.12.16' or value.get('sqlite')!='3.45.1':raise ValueError('hosted software differs from green evidence; qualify before expensive work')
+    if value.get('python')!='3.12.16' or value.get('sqlite')!='3.46.1':raise ValueError('hosted software differs from green evidence; qualify before expensive work')
 
 
 def git(root,*args):return subprocess.check_output(['git',*args],cwd=root,text=True).strip()
@@ -267,8 +267,8 @@ def gate(root,workspace,*,input_mode='',input_resume_run=0,input_smoke_run=0):
         _output(mode=mode,resume_index=c.ORDER.index(value['stage'])-1,resume_artifact_id=ref['artifact_id'],resume_run_id=ref['run_id'],has_database='false',fresh='false')
         return
     if mode=='mature':
-        from simulation.stage_0_6_retained_producer import inspect_retained_producer
-        inspect_retained_producer();ctx=mature_context(root);data_ref={'kind':'retained-original'};db=None
+        from simulation.stage_0_6_preserved_transport import inspect_preserved
+        inspect_preserved();ctx=mature_context(root);data_ref={'kind':'retained-original'};db=None
     else:
         from ate_sim.worldgen import generate_world
         from ate_sim.engine import Simulation

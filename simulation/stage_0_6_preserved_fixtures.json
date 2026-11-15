@@ -1,0 +1,140 @@
+{
+  "fixtures": {
+    "mature-year1001": {
+      "asset": {
+        "bytes": 2823,
+        "id": 751584587,
+        "name": "mature-year1001-4f040569fb91cef4.manifest.json",
+        "sha256": "2bcddbd6a72d7acbf8ad2544c264a06c4b03d5f50bd7e8b67bc19f948d284dd8"
+      },
+      "manifest": {
+        "original": {
+          "archive_bytes": 4419106896,
+          "archive_sha256": "4f040569fb91cef482bd5706230bcada058788a747278b99df7cca2c137d373f",
+          "key": "mature-year1001",
+          "source": {
+            "artifact_id": 12849181590,
+            "head_sha": "b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+            "job": "retain",
+            "name": "stage-0-6-authenticated-input-b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+            "run_id": 40760930962,
+            "workflow": ".github/workflows/stage-0-6-current-mature-performance.yml"
+          }
+        },
+        "parts": [
+          {
+            "bytes": 536870912,
+            "id": 751570983,
+            "name": "mature-year1001-4f040569fb91cef4.part-0000",
+            "offset": 0,
+            "sha256": "8b01a6ab8f8399555f78214494f6e4c21d48024342b6b65f6bae25609851e302"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751572765,
+            "name": "mature-year1001-4f040569fb91cef4.part-0001",
+            "offset": 536870912,
+            "sha256": "f78dda05da3532385a41733f3a2f913c850c02efae975aeabbc01a6a0b520a9a"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751574428,
+            "name": "mature-year1001-4f040569fb91cef4.part-0002",
+            "offset": 1073741824,
+            "sha256": "7068d39c8c23a6b464ebf070cb7acd5aca5c5d8f3b940d362f7a17f59fd6a664"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751576011,
+            "name": "mature-year1001-4f040569fb91cef4.part-0003",
+            "offset": 1610612736,
+            "sha256": "185dfb482857dd22b98f47026c9d96ce86f61a3a171878caf6416bc3f395aec4"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751577713,
+            "name": "mature-year1001-4f040569fb91cef4.part-0004",
+            "offset": 2147483648,
+            "sha256": "1e226c7659dab79e901e4fcd26f380243fed0c91520f4bbfad8babc72ff6d31f"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751579443,
+            "name": "mature-year1001-4f040569fb91cef4.part-0005",
+            "offset": 2684354560,
+            "sha256": "578b8ab9c93f725a71a1f3bfe62104f4865a9c4090b54cb8e3eb1db702687b40"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751581177,
+            "name": "mature-year1001-4f040569fb91cef4.part-0006",
+            "offset": 3221225472,
+            "sha256": "6a3e27767cd0ca13bd5e059e175cb2dad439fd5aa776350caf842da8073aab5e"
+          },
+          {
+            "bytes": 536870912,
+            "id": 751582593,
+            "name": "mature-year1001-4f040569fb91cef4.part-0007",
+            "offset": 3758096384,
+            "sha256": "7ae1ca1c68cfb6652a54b80c8d7432d0c505316e4fa05092b281c48d862fd675"
+          },
+          {
+            "bytes": 124139600,
+            "id": 751584188,
+            "name": "mature-year1001-4f040569fb91cef4.part-0008",
+            "offset": 4294967296,
+            "sha256": "af74b0bbf2a1bea36001667b05a5e363c2e5c7b97b24e0fafe06c45d7826e34b"
+          }
+        ],
+        "release_id": 446184821,
+        "repository": "rax0h/all-that-endures",
+        "schema": "ate-preserved-fixture/1",
+        "verified_archive_sha256": "4f040569fb91cef482bd5706230bcada058788a747278b99df7cca2c137d373f"
+      }
+    },
+    "small-year1": {
+      "asset": {
+        "bytes": 938,
+        "id": 751565690,
+        "name": "small-year1-8844c45d2dac8151.manifest.json",
+        "sha256": "9f277922208ff0886f2cef2936e2efed90a0fd9d4da84ebea3d60cf7b995fbd3"
+      },
+      "manifest": {
+        "original": {
+          "archive_bytes": 7400318,
+          "archive_sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32",
+          "key": "small-year1",
+          "source": {
+            "artifact_id": 13829902355,
+            "head_sha": "b79039dbd026d20105702ade32533283b1efca0c",
+            "job": "proofs",
+            "name": "database-smoke-proofs-b79039dbd026d20105702ade32533283b1efca0c-1",
+            "run_id": 42961490569,
+            "workflow": ".github/workflows/stage-0-6-resumable-proof-genesis.yml"
+          }
+        },
+        "parts": [
+          {
+            "bytes": 7400318,
+            "id": 751565549,
+            "name": "small-year1-8844c45d2dac8151.part-0000",
+            "offset": 0,
+            "sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32"
+          }
+        ],
+        "release_id": 446184821,
+        "repository": "rax0h/all-that-endures",
+        "schema": "ate-preserved-fixture/1",
+        "verified_archive_sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32"
+      }
+    }
+  },
+  "preservation": {
+    "evidence_artifact": 14170356407,
+    "evidence_sha256": "1bd21fc2496a0604549b717a1adb6a595a6474484a08a50573cd4b26096cfaee",
+    "head_sha": "5fb3536a6c25f76378ab9354bf492e7190ee0e48",
+    "run_id": 43734650623
+  },
+  "release_id": 446184821,
+  "schema": "ate-preserved-fixtures/1"
+}

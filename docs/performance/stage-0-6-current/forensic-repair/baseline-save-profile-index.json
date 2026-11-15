@@ -1,0 +1,78 @@
+{
+  "baseline": {
+    "public_commit": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+    "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+    "archive": "docs/performance/stage-0-6-current/family-publication-scope/evidence.zip",
+    "archive_sha256": "987511c5cb82671d8dbc5fce80a7ef2527c10723b541edb023f5081311d7d426",
+    "members": {
+      "prepare": {
+        "path": "candidate-profile/prepare-calls.json",
+        "sha256": "eec70708f02accec5f41bcc37338595e3b9a576f79351010cbfead1b24e76533",
+        "counts": {
+          "read_identity_membership": 16,
+          "_checked_head_row": 3688,
+          "_visible_record_row": 1202,
+          "sql_execute_calls": 57042
+        }
+      },
+      "commit": {
+        "path": "candidate-profile/commit-calls.json",
+        "sha256": "bf62457429bf577c9f3662a41f5052b868ecadcebb68e5da64db8beec5989beb",
+        "counts": {
+          "read_identity_membership": 0,
+          "_checked_head_row": 819,
+          "_visible_record_row": 1931,
+          "sql_execute_calls": 98479
+        }
+      },
+      "acknowledge": {
+        "path": "candidate-profile/acknowledge-calls.json",
+        "sha256": "5b94d150c8fc680b78c439551dee97edf2f01329d376557f031332a8632b4e41",
+        "counts": {
+          "read_identity_membership": 0,
+          "_checked_head_row": 460,
+          "_visible_record_row": 2807,
+          "sql_execute_calls": 80020
+        }
+      }
+    }
+  },
+  "candidate": {
+    "public_commit": "b66c2aa77f7a4e7282a4405a0f4a5d057727a9df",
+    "runtime_tree": "fd20cf1784a331de07f4979db71dda0f3d301771",
+    "archive": "docs/performance/stage-0-6-current/membership-read-scope/evidence.zip",
+    "archive_sha256": "f0fd3d18960f80b36061a05e5658dff91fa5ad2b878cb077a4a3f7aa9780547f",
+    "members": {
+      "prepare": {
+        "path": "save-profile/prepare-calls.json",
+        "sha256": "b57b8adf2cb5bf26aacb212fc11fb284edefcb8c933f8c538fd249d95e0620be",
+        "counts": {
+          "read_identity_membership": 16,
+          "_checked_head_row": 3688,
+          "_visible_record_row": 1202,
+          "sql_execute_calls": 57042
+        }
+      },
+      "commit": {
+        "path": "save-profile/commit-calls.json",
+        "sha256": "13c05a9fccd15519426e01d27c254763ae118df4bdaebf6bf1146f95f44b79f2",
+        "counts": {
+          "read_identity_membership": 0,
+          "_checked_head_row": 819,
+          "_visible_record_row": 1931,
+          "sql_execute_calls": 98479
+        }
+      },
+      "acknowledge": {
+        "path": "save-profile/acknowledge-calls.json",
+        "sha256": "89c7354ea24d14963b55121d3d771c495921066856659bddc7e7b05ed663d3e1",
+        "counts": {
+          "read_identity_membership": 0,
+          "_checked_head_row": 460,
+          "_visible_record_row": 2807,
+          "sql_execute_calls": 80020
+        }
+      }
+    }
+  }
+}

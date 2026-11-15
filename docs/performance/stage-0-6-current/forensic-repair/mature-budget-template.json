@@ -1,0 +1,22 @@
+{
+  "schema": "ate-mature-budget-preflight/1",
+  "mode": "mature",
+  "compute_seconds": {
+    "source_digest": 3600,
+    "capture": 9000,
+    "catalog": 9000,
+    "rebase": 9000,
+    "after_digest": 7200,
+    "proofs": 12600,
+    "measure": 900,
+    "fresh_restore": 7200
+  },
+  "requirements": [
+    "Authenticate the new compatible complete hosted smoke and recovery drill",
+    "Use qualified84626841 engine without repeating its green proof/full suites",
+    "Recheck disposable disk and original preserved input before restoring",
+    "Retain each closed uploaded stage; restart the first incomplete stage only",
+    "Reserve data/metadata publication, cleanup and diagnostics in each job",
+    "Evaluate timings and fresh year1002 digest separately; do not mark targets from a badge"
+  ]
+}

@@ -3,13 +3,10 @@ name: Stage 0.6 resumable proof genesis
   push:
     branches:
     - sol/durable-proof-map
+    # Launch source transport only through an explicit reviewed request.
+    # Source/harness edits are covered by the separate required quick gate.
     paths:
-    - simulation/stage_0_6_genesis_*.py
     - simulation/stage_0_6_genesis_resume_request.json
-    - simulation/stage_0_6_genesis_control_compatibility.json
-    - .github/tests/test_stage_0_6_genesis_*.py
-    - .github/workflows/stage-0-6-resumable-proof-genesis.yml
-    - .github/tests/run_genesis_recovery_drill.py
   workflow_dispatch:
     inputs:
       mode:

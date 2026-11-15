@@ -1,0 +1,282 @@
+{
+  "new-engine-green-metadata.json": {
+    "bytes": 31564,
+    "sha256": "48502300971dd0e68b61ecab34d1048208bebba15035d0a6dd6a88865b19d3f3"
+  },
+  "preservation-authenticated-metadata.json": {
+    "bytes": 27479,
+    "sha256": "ae8f74cb6e0c0e59335d80b144070df01b6a0b532a7f6e2002f79eafc3f7091c"
+  },
+  "outer-binding-red.log": {
+    "bytes": 1068,
+    "sha256": "fb6e29382d55cf191daa088b12f1d2a0a6730954a12bb009c9e97b02cf6276b7"
+  },
+  "outer-binding-green.log": {
+    "bytes": 99,
+    "sha256": "a8057800bd2620aac79bf9457aa430ab20cea66692d28b16dade1f3bd30e64cb"
+  },
+  "outer-binding-review.json": {
+    "bytes": 969,
+    "sha256": "5c21289e99f88028be637e9b9d15b5e1adb7535da8e9cf0bf3460d8d2a9b8397"
+  },
+  "preserved-consumer-red.log": {
+    "bytes": 12746,
+    "sha256": "a39118e5b89fea8754d9d5061b91b220a900d79db477344f2df29d44e1ed027a"
+  },
+  "preserved-consumer-green.log": {
+    "bytes": 10981,
+    "sha256": "ade7de484ac56d27502b037c52a5fdc570b72244df3ce08c9e96fb106c64598c"
+  },
+  "preserved-consumer-integration.log": {
+    "bytes": 100,
+    "sha256": "8f96a475f410d9748f563ffd1fed17eee09522b5d24ef7e0cc67547aa3da5586"
+  },
+  "consumer-qualification-tests.log": {
+    "bytes": 99,
+    "sha256": "43136984323319fff14ab989f23dda86f40ea1f148db23a809ed1ce18d503916"
+  },
+  "reproduction-tests.log": {
+    "bytes": 98,
+    "sha256": "7675afcbf0656da4d29291a330ffc7200eb716c466b0dd4338f6eecaa12bf6a4"
+  },
+  "reproduction-final.log": {
+    "bytes": 99,
+    "sha256": "f2828c52f6ed22a3df0c91cd8b25ee97df6b2133c3a1c4ebd3beedb3b262ff8e"
+  },
+  "reproduction-dry-run.json": {
+    "bytes": 932,
+    "sha256": "a4f523faa75ba1ef7c5e2644bcb5ddc70ee29d266b7e6fb77322b46e262f86bb"
+  },
+  "forensic-reproduced-pairs.log": {
+    "bytes": 1144,
+    "sha256": "b37ed43075e0cead98c576c502ae08b15b31647ab0b182bb3b4f9b4ad253896d"
+  },
+  "forensic-reproduced-pairs/manifest.json": {
+    "bytes": 10902,
+    "sha256": "606b94bf20fe808a9f96efb0d31955b10faeb8e5f8340fe5ce2f53d835d52f09"
+  },
+  "forensic-reproduced-pairs/pair1-candidate.log": {
+    "bytes": 158,
+    "sha256": "713522ef593ea53b6e95587bae7731bd49f5c4f4977fc7c93cdac21e98b66d34"
+  },
+  "forensic-reproduced-pairs/pair2-baseline.log": {
+    "bytes": 157,
+    "sha256": "0eb9a0410821afb985e1899ae9ea69308d47c764e0bed8b82c30518ab463f8c6"
+  },
+  "forensic-reproduced-pairs/pair2-candidate.log": {
+    "bytes": 157,
+    "sha256": "74563cbcd3a70abb32c85b43f7ec512e28e4de2a26a4491bfcc23a6fec76d0a2"
+  },
+  "forensic-reproduced-pairs/pair1-baseline.log": {
+    "bytes": 157,
+    "sha256": "2284590d9b2d237f7c4b2dc43b70f9d65d5456e1192d3329bbf5a665836661d2"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/source-before.json": {
+    "bytes": 22935,
+    "sha256": "d2254b907b140178d35b9c25d4189cd7ecf6970743752489b656fb991eb17535"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/report.json": {
+    "bytes": 66287,
+    "sha256": "5cbeb7f3a79bf176fdd59a4a2e0ca74ea1b306d22026e0e7075f9fd8166449f3"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/source-before.json": {
+    "bytes": 22935,
+    "sha256": "f405cb721a48e72e1382a5d58b45742f329e474275681c76a816bb84e2e3c904"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/report.json": {
+    "bytes": 66424,
+    "sha256": "cb9efae6a891e7f628b624855e32e078d883e5bb2d420319ecb9be13f875adb3"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/source-before.json": {
+    "bytes": 22935,
+    "sha256": "d2254b907b140178d35b9c25d4189cd7ecf6970743752489b656fb991eb17535"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/report.json": {
+    "bytes": 66314,
+    "sha256": "10dc2bbb4aa2b5b645824f2b5dc9d3f4d6e721b29d5cab0d11d49d21a0fe64ed"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/source-before.json": {
+    "bytes": 22935,
+    "sha256": "f405cb721a48e72e1382a5d58b45742f329e474275681c76a816bb84e2e3c904"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/report.json": {
+    "bytes": 66424,
+    "sha256": "3bb8393c748cee847dccc3f626801d8cade9fb3c11454c2c769d5ff525a3280f"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-start-warm_step.json": {
+    "bytes": 113,
+    "sha256": "537c35ae80aae0797bc8395346351ac63b091e631322bcad454948756712869e"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-progress-warm_step.json": {
+    "bytes": 8092,
+    "sha256": "fe829b0151f8d9f7bc5f2975b9e443a23f489590e62ffb8a61b1e65cb32ddc6b"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-start-save.json": {
+    "bytes": 108,
+    "sha256": "d59efad1837cae8ec8148cdbaaea555a75abf157c2207ce46ecea0c0b7d2a65e"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-start-open.json": {
+    "bytes": 107,
+    "sha256": "3403e141aaf8cdc7b84f1f250597ab8d8fd0a70277a48019f99d9a1ceeec91d7"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-progress-fresh_verify.json": {
+    "bytes": 9741,
+    "sha256": "a71dfad489ed700269d685cd07e0a99b583eda9a40db191b0990e79d77909853"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-start-fresh_verify.json": {
+    "bytes": 116,
+    "sha256": "74ca543cf0b61ec97bda2b5af112e3212fcbf1efdd2cdab013f7660a0a0caad2"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-progress-open.json": {
+    "bytes": 1674,
+    "sha256": "a33ec5e5dfb496690884f75f41f0e527b963580fc873b23f9ab2733fe7cdd877"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-progress-first_step.json": {
+    "bytes": 3801,
+    "sha256": "9f05bf27fc097f47569b30ecf245c98821d142254d45df0fb31bacc6df885865"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-start-first_step.json": {
+    "bytes": 114,
+    "sha256": "9beb080817fc99b01d0811c0b7c1bd995bd88af99bf0c708332a574bb3404b0a"
+  },
+  "forensic-reproduced-pairs/pair2-baseline/phases/phase-progress-save.json": {
+    "bytes": 5952,
+    "sha256": "fedc80d34c216c3c85c8825c919da2525f865b73ac56e30e48f77991502f32c9"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-start-warm_step.json": {
+    "bytes": 113,
+    "sha256": "a59cf1097977c1d44ea6ebde3bd6ea2aa87c9fd7f6a5550362416e509e742763"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-progress-warm_step.json": {
+    "bytes": 8090,
+    "sha256": "c2aa809ee855994ab5f2dd27fc0cf5703a6b259d33b441b032a483317fd5d0db"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-start-save.json": {
+    "bytes": 108,
+    "sha256": "8acac6d5e0c5c0874f4f7f2362d3809e5f7bac9bb5ec59c7c8a1996af6c795b1"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-start-open.json": {
+    "bytes": 107,
+    "sha256": "dbaff447ebe4193cc49ce1b76b0672db38af34d5579a6c2e41ccbeb3d59a222d"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-progress-fresh_verify.json": {
+    "bytes": 9741,
+    "sha256": "eb3cf94de9aa61b05c60a483d8f15842a10ddcf79684f17d6f4e6f626ba0368b"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-start-fresh_verify.json": {
+    "bytes": 116,
+    "sha256": "0df3fc4bd36f78d0eda509ea39678b9d381695f82a6c2b1146b258243112ea6b"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-progress-open.json": {
+    "bytes": 1674,
+    "sha256": "dd8ece5b42863bfd30c1fc88785b94e8920fe6dea9525a2b4ab326dc7ea5197e"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-progress-first_step.json": {
+    "bytes": 3801,
+    "sha256": "fe3f9dd2a712a4dcafb79e3b53b05da59b5d1467b2a14db4b10e746a58dbb81c"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-start-first_step.json": {
+    "bytes": 114,
+    "sha256": "ee5815ab4154b3403bf8e30791aeef6745580218bd869885f78212c335ea7656"
+  },
+  "forensic-reproduced-pairs/pair1-candidate/phases/phase-progress-save.json": {
+    "bytes": 5957,
+    "sha256": "3c3fb19c40901b01f14d507c10e24b88f4effcc89701084270d5ee81102438bd"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-start-warm_step.json": {
+    "bytes": 112,
+    "sha256": "1f14a772af707183abfc4b82dfe1e8ca6d7c2388c100909e2fef772c2559fa9b"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-progress-warm_step.json": {
+    "bytes": 8109,
+    "sha256": "e369b8125859af7534bda15a63f1c9324a7a17c18085a793f6e79c4b05073ded"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-start-save.json": {
+    "bytes": 108,
+    "sha256": "88ffe9111e0e8882d48eaf76711368de2778003404f6a42ab534459869923ca9"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-start-open.json": {
+    "bytes": 107,
+    "sha256": "f672d51098c05944e4cf560ad3c962f4ba2197f0f862571665ad0c5d31866ab9"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-progress-fresh_verify.json": {
+    "bytes": 9768,
+    "sha256": "e0c1385c18c4472e5cfdaacebb16f9920c2a35e94d45cbab2c1ff826b7ddf138"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-start-fresh_verify.json": {
+    "bytes": 116,
+    "sha256": "8970ca831da6b6648583aebbe447fe8c083b0de4a718aab75bac6643cb75c1c2"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-progress-open.json": {
+    "bytes": 1670,
+    "sha256": "7a2bb987b08faa7c18e72773d7ba00b7df5e0b1a0bf44fe9aa570d8b674259e1"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-progress-first_step.json": {
+    "bytes": 3794,
+    "sha256": "47c03d54398387c5fba87f2cca4b9a898ccd8b437327ab98e0ee7df2c165c30f"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-start-first_step.json": {
+    "bytes": 114,
+    "sha256": "c4cd01b287819f0314c94035766b71747ca44b2428eac226138a7a6de0f30308"
+  },
+  "forensic-reproduced-pairs/pair1-baseline/phases/phase-progress-save.json": {
+    "bytes": 5961,
+    "sha256": "85a2d911188b1d9b4f2966d0e391e887e8a73c6b554b538c9d9475f5e9cff5e1"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-start-warm_step.json": {
+    "bytes": 113,
+    "sha256": "6a1d18960c96606ac49b00592c95f2b0b983daa854a99142c3c85b8b3c27cb78"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-progress-warm_step.json": {
+    "bytes": 8094,
+    "sha256": "8830710a98b588af063ca69d8850cf9c5ea54e5d1c9ea5750decad34ecf1882f"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-start-save.json": {
+    "bytes": 108,
+    "sha256": "d702ea21015655a3a056cf821c57b0ff2db8dad8728536710b0ebda16a20710b"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-start-open.json": {
+    "bytes": 107,
+    "sha256": "e52070b284f3a056ee2d6ed2fa29c61ac08d3bcee1cd233e3c3509427fb799cd"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-progress-fresh_verify.json": {
+    "bytes": 9741,
+    "sha256": "d71675a10fd64d42d9a786de1bfcc238fcee0cd51830912e9f49c14b4f12acd9"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-start-fresh_verify.json": {
+    "bytes": 116,
+    "sha256": "24b13ffc952e9b0f40243ea7b936e2445352b3ec3d550e88a8494147874079ed"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-progress-open.json": {
+    "bytes": 1674,
+    "sha256": "b3c171dd3f7c59c8e505a4dbcfc44d463c416d1865a842e96c97af83fba27690"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-progress-first_step.json": {
+    "bytes": 3789,
+    "sha256": "0ef5597072260c6c9fd9346248a72cc36422ccfef8871bebaaca5bb1a8b70b18"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-start-first_step.json": {
+    "bytes": 114,
+    "sha256": "3836413b7bf198defdbef1b47fb61b2cfac6b5ae738e283af9fd2fdb82f83c1c"
+  },
+  "forensic-reproduced-pairs/pair2-candidate/phases/phase-progress-save.json": {
+    "bytes": 5956,
+    "sha256": "6d1671a2c727498beaae493a0c7ee8ed944d27bf9447122135e5df9f2d7f90c0"
+  },
+  "launch-full-tests.log": {
+    "bytes": 870,
+    "sha256": "cbe37cfb244d81cc5b06538c4179f919954f6f9b0350c1eda3440e5f4f099723"
+  },
+  "launch-full-tests.xml": {
+    "bytes": 55357,
+    "sha256": "aa332f71312e0ab933d997173bc3f5005f10c71556221fd14dc8137f0c8fe6cc"
+  },
+  "public-source-fence-probe.json": {
+    "bytes": 4995,
+    "sha256": "7dcc50e639ff1816eee2a3981b3d89fb95c5bb367ad5abb41226b460ac7f00dd"
+  },
+  "prior-resumable-qualification-failure.log": {
+    "bytes": 56547,
+    "sha256": "68a0063f4b2bdd9e83d1022551567a222f93280ec0f9249fadc98a3fe7306dfb"
+  }
+}

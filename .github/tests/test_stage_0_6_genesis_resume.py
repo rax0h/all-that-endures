@@ -16,7 +16,7 @@ def green():
         path='.github/workflows/stage-0-5-proof-map-validation.yml',event='push',run_attempt=1,
         status='completed',conclusion='failure')
     jobs=[dict(id=m.GREEN_JOBS[name],name=name,head_sha=m.GREEN_SHA,status='completed',conclusion='success') for name in ('proof-map','full-suite')]
-    sources={name:dict(head=m.GREEN_SHA,runtime_tree=m.RUNTIME,python='3.12.16',sqlite='3.45.1') for name in ('proof-map','full-suite')}
+    sources={name:dict(head=m.GREEN_SHA,runtime_tree=m.RUNTIME,python='3.12.16',sqlite='3.46.1') for name in ('proof-map','full-suite')}
     return run,jobs,sources
 
 
@@ -63,8 +63,26 @@ def test_new_workflow_keeps_expensive_stages_protected_and_old_monolith_untouche
 def test_hosted_software_change_fails_before_reusing_engine_validation():
     m=api()
     assert hasattr(m,'check_software'),'hosted interpreter/SQLite tuple must be checked before engine work'
-    m.check_software(dict(python='3.12.16',sqlite='3.45.1',signature='a'*64))
+    m.check_software(dict(python='3.12.16',sqlite='3.46.1',signature='a'*64))
     with pytest.raises(ValueError):m.check_software(dict(python='3.13.5',sqlite='3.46.1',signature='b'*64))
+    with pytest.raises(ValueError):m.check_software(dict(python='3.12.16',sqlite='3.45.1',signature='b'*64))
+
+
+def test_outer_launch_binding_matches_qualified_engine_and_current_harness():
+    import hashlib,json,subprocess
+    from pathlib import Path
+    m=api();root=Path(__file__).resolve().parents[2]
+    value=json.loads((root/m.OLD_REQUEST).read_text())
+    assert value['green_commit']==m.GREEN_SHA
+    assert value['runtime_tree']==m.RUNTIME==subprocess.check_output(
+        ['git','rev-parse','HEAD:simulation/ate_sim'],cwd=root,text=True).strip()
+    required={m.CRITICAL[0],m.CRITICAL[1],m.CRITICAL[2],m.CRITICAL[3],m.CRITICAL[4],m.CRITICAL[5],
+        'simulation/stage_0_6_preserved_transport.py','simulation/stage_0_6_preserved_fixtures.json'}
+    assert required<=set(value['fingerprints'])
+    for path,digest in value['fingerprints'].items():
+        assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest,path
+    assert value['database']['sha256']=='4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2'
+    assert value['expected_saved_digest']=='2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7'
 
 
 def test_observed_full_scan_budget_keeps_restore_and_publication_reserve(tmp_path):

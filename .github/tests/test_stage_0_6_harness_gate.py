@@ -30,6 +30,10 @@ def test_full_engine_jobs_require_quick_harness_and_skip_harness_only_pushes():
         assert job['if']==expected
         assert not job.get('continue-on-error',False)
     assert value['jobs']['mature-genesis']['if'] is False
+    steps=gate['steps']
+    smoke=next(n for n,s in enumerate(steps) if 'preserved_transport --key small-year1' in s.get('run',''))
+    tests=next(n for n,s in enumerate(steps) if 'pytest -q .github/tests ' in s.get('run',''))
+    assert tests<smoke
 
 
 def test_complete_harness_precedes_every_mature_source_transport():
@@ -40,6 +44,8 @@ def test_complete_harness_precedes_every_mature_source_transport():
         ('stage-0-6-fixture-preservation.yml', ('smoke',)),
     ):
         value=workflow(name)
+        if name=='stage-0-6-resumable-proof-genesis.yml':
+            assert value['on']['push']['paths']==['simulation/stage_0_6_genesis_resume_request.json']
         for key in jobs:
             steps=value['jobs'][key]['steps']
             tests=[n for n,s in enumerate(steps) if 'python -m pytest -q .github/tests ' in s.get('run','')]

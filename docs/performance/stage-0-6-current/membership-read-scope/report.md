@@ -29,7 +29,7 @@ Profiler timings are not raw latency.
 ## Raw observations and retention decision
 
 Pinned A-B/B-A followed by reversed-order B-A/A-B confirmation:8independent
-120s trials. Tests/profilers/reviewer CPU probes were idle during all raw trials.
+120s trials. The operator reported no concurrent test/profiler/reviewer invocations; independent host-load samples were not retained, so host idleness cannot be verified.
 Full engine inventory/Git bytes, imports, runtime, input hash, exact saved/fresh
 continuation and original-source preservation checked. No trial/prefix was
 repeated after failure; confirmation addressed a new save-timing concern.
@@ -61,3 +61,9 @@ The warm attribution harness remains in ../warm-path-attribution/measure_warm.py
 Hosted acceptance is pending; no mature/default/main/endurance activation.
 
 Published candidateb66c2aa77f7a4e7282a4405a0f4a5d057727a9df has exact verified tree800dec07/runtimefd20cf17. Bundled hosted run43670981744 observed running at that SHA. This publication pointer is docs-only and starts no additional gate.
+
+## Reproduction and baseline profile correction (November15)
+
+Use the explicit source/root/public-commit arguments in ../forensic-repair/REPRODUCTION.md. Local raw head aliases identify historical workspaces; public baseline1d46590b/engineb45a0e4b and candidateb66c2aa7/enginefd20cf17 reproduce the engine sources. They are separate from the current repaired engine84626841.
+
+The baseline save profiles already exist in ../family-publication-scope/evidence.zip under candidate-profile/{prepare,commit,acknowledge}-calls.json. The matching candidate profiles are in this evidence.zip under save-profile/. ../forensic-repair/baseline-save-profile-index.json pins both archives and all6members, and their counts were recomputed against save-work-comparison.json. Identical work counts do not establish identical latency or explain the historical mixed save timings.
