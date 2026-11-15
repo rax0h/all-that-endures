@@ -31,3 +31,5 @@ F1: both original archives are preserved with complete checksum-verified hosted 
 |---|---|---|---|
 | Missing-output path used out-of-scope parser | Validate arguments in main before reading source | Omitted-output regression; independent review closure | Closed |
 | Parent found outer stale launch declaration | Bind actual qualified green/runtime and all reviewed execution helpers; preserve original source fields | outer-binding RED/GREEN and reviewed29fingerprints | Closed locally; live entrypoint verification next |
+
+| Live consumer preflight43775874916 | Draft GET403 for read-scope job token | Give only harness and staged gate/source-digest/capture the required draft access; retain read-only consumer code and other jobs' read scopes | Scope contract RED/48GREEN and independent focused approval | Closed locally; live hop retry pending |

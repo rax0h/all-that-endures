@@ -111,3 +111,17 @@ def test_bad_disposable_target_refused_before_any_asset_transfer(carrier,tmp_pat
     else:target.mkdir()
     with pytest.raises((ValueError,FileExistsError)):module.download_retained(target,**caps)
     assert not calls
+
+
+def test_draft_reader_permissions_are_scoped_to_actual_input_jobs():
+    import yaml
+    root=Path(__file__).resolve().parents[2]/'.github/workflows'
+    engine=yaml.safe_load((root/'stage-0-5-proof-map-validation.yml').read_text())
+    assert engine['permissions']['contents']=='read'
+    assert engine['jobs']['harness']['permissions']==dict(contents='write')
+    staged=yaml.safe_load((root/'stage-0-6-resumable-proof-genesis.yml').read_text())
+    assert staged['permissions']==dict(contents='read',actions='read')
+    for name,job in staged['jobs'].items():
+        if name in ('gate','source-digest','capture'):
+            assert job['permissions']==dict(contents='write',actions='read')
+        else:assert job.get('permissions',staged['permissions'])['contents']=='read'

@@ -84,6 +84,10 @@ jobs:
             echo 'enabled=false' >> "$GITHUB_OUTPUT"
           fi
   harness:
+    # GitHub requires push-capable tokens even for reading a private draft.
+    # The consumer issues GETs only; other jobs retain contents:read.
+    permissions:
+      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -103,7 +107,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$TMPDIR" harness-evidence
           timeout --signal=TERM --kill-after=30s 10m python -m pytest -q .github/tests --basetemp="$TMPDIR/pytest" --junitxml=harness-evidence/tests.xml 2>&1 | tee harness-evidence/tests.log
-      - name: Verify preserved small input through actual read-only consumer
+      - name: Verify preserved small input through actual archive consumer
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash

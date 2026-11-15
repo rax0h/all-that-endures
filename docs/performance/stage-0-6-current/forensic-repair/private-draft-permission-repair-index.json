@@ -1,0 +1,14 @@
+{
+  "private-draft-read-scope-failure.log": {
+    "bytes": 59013,
+    "sha256": "e3ded41f0439e9684b04f013f40d87138556d2b82776be8c64ec33ba4701a2e7"
+  },
+  "draft-permission-red.log": {
+    "bytes": 1005,
+    "sha256": "71ac2e66540cb731ce524a57fa9c89426c12b0d6528d4d8a7d2d4d7243683e9e"
+  },
+  "draft-permission-green.log": {
+    "bytes": 99,
+    "sha256": "5b2831cea935c5820c22a6e7f8c407884c16abd333667dcef3e5d8f075203788"
+  }
+}
