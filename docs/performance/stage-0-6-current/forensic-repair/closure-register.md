@@ -1,35 +1,54 @@
 # Forensic repair closure register
 
-Stage0.6 remains OPEN. This is the consolidated owning-group register; subsequent repairs extend it. External review002 is authoritative for known findings. Review001 has not been supplied; its missing detail is not silently accepted or marked closed.
+This is the current consolidated disposition of review002's F1–F18/N1–N6 and
+the independent findings raised by this repair. Historical raw evidence remains
+in the indexed ZIPs. No claim is made that the entire24finding programme or
+Stage0.6 is complete. Review001 itself has not been supplied;002's summaries do
+not replace missing particulars.
 
-| Origin | Finding | Action/evidence | Status |
-|---|---|---|---|
-| Preservation independent review P1 | Outer timeout left detached transfer alive | Scoped SIGTERM unwinds command and kills entire owned process group. Real GNU timeout with TERM-ignoring descendant: RED in timeout-probe.json; regression included in28-green receipt | Closed locally |
-| Preservation independent review P2 | Incomplete starter asset permanently prevented retry | Starter-only non-destructive successor names, actual manifest names, reuse, pagination and bounded exhaustion. Real ReleaseAPI path, full restore and retry tests. Uploaded conflicts remain refused | Closed locally |
-| External002 F1/N1 | Original mature carrier expiry | Authenticated draft-only archival and exact original ZIP restore implemented; real hosted smoke and both full restores still required | Preservation completed; consumer integration smoke pending |
-| External002 F2/B1 | Stale canonical compatibility pin | Reviewed agency lifetime-only change; actual candidate runtime84626841 and all original authority pins retained. Full322-test local harness pass | Closed locally; hosted qualification pending |
-| External002 F3/B2 | Audit epoch/acknowledgement recovery regression | Scoped audited successor receipt, late-writer refusal and exact original-attempt recovery. Full322harness and69source/epoch cases | Closed locally; hosted qualification pending |
-| External002 F4 | Harness outside required CI gate | Full harness precedes long engine/transport jobs; checked cost classification; historical monolith disabled;36focused cases | Closed locally; hosted verification pending |
-| External002 F5/B3 | Obsolete benchmark pins/workflow-count assertion | Explicit synthetic tiny-checkout tests; green ancestor engine equality; named lane contracts. Historical production lane deliberately inactive until requalified | Closed locally; selected launcher qualification remains Task3 |
-| External002 remaining F/N findings | Reconcile against concrete evidence and source001 details | No wholesale closure claim; owning plan Task4 | Open |
+| ID | Current action and evidence | Disposition |
+|---|---|---|
+| F1 | Both original ZIPs copied to private draft446184821, then fully restored and checksum matched in43734650623. Every manifest/part pin and producer attribution verified. Consumer implementation retains independent original hashes. | Archive and caller hop verified; original accepted-year admission still required |
+| F2 | Reviewed agency lifetime-only change; preserved historical source/member/digest pins; actual current runtime84626841 declared. Original7failures resolved. | Closed; hosted harness/proof/full green4eadb668 |
+| F3 | Scoped audited successor receipt, bounded refresh, late-writer refusal and original-attempt recovery; corruption remains blocked until repaired. Source/callback/codec/foreign-head fences retained. | Closed; exact2failures resolved and hosted gates green |
+| F4 | Complete.github/tests is a required predecessor to expensive engine/transport work. Checked detector fails closed and separates engine/proof/harness changes. | Closed;330hosted cases green, later357hosted cases and caller restoration green |
+| F5 | Synthetic small shell tests separate from true green qualification; named lane contracts; outer and inner launch bindings now match authenticated4eadb668/846. Historical format6lane remains inactive/fail-closed. | Implementation verified; fresh compatible staged smoke still required |
+| F6 | Issue17 explicitly defers versioned Iron/Bronze gameplay correction and old-fixture migration. Preserve current accepted source/continuation while doing persistence work. | Existing owner deferral; no gameplay migration performed |
+| F7 | Mature10sopen/2ssave/1swarm and exact year1002continuation require the protected current-engine measurement. Recent small timings are labelled separately. | Open; current mature targets unmeasured |
+| F8 | Persistence LOC alone does not establish architecture fitness. Use mature attribution before deciding a substantial refactor or Stage1 tradeoff. | Assessment/owner decision remains open |
+| F9 | emit invokes observe_experience by design;001's precise side-effect concern is unavailable. Removing the hook would change gameplay/causality. | Needs original finding/contract review; no silent removal |
+| F10 | Current branch/public source is explicit; historical refs retain review/fixture provenance. No branch deletion or main merge was part of these repairs. | Archive/branch policy remains open |
+| F11 | Supported lane roles and explicit-request staged launch documented; historical monolith disabled. | Broader workflow retirement remains open |
+| F12 | Current proof/resumable gates pin pytest9.2.0/PyYAML6.0.3 and interpreter. A repository-wide dependency manifest is separate unfinished work. | Open |
+| F13 | New archive and current proof-gate actions are SHA-pinned. Other historical/manual workflows retain floating references. | Partially addressed; repository-wide pinning open |
+| F14 | New raw evidence is losslessly packed with per-member hashes. Existing archives are cross-referenced rather than duplicated for profile claims. | Historical evidence migration policy remains open |
+| F15 | Current branch qualification is explicit; main's older CI is not current Stage0.6 acceptance. | Main-branch CI/integration policy remains open |
+| F16 | New source is covered by focused review; the original repo-wide166-line lint inventory is not supplied in001. | Legacy lint/refactor work remains open |
+| F17 | Review002 reports no real-format secrets. Exact001file/literal particulars are unavailable. | Needs original particulars; no blind test-literal deletion |
+| F18 | save_receipts uses operational wall time; logical simulation time/state is separate. Need001's exact concern before changing receipt semantics. | Contract adjudication remains open |
+| N1 | Preserve carriers first, repair source/runtime gates, then prove caller access and compatible staged smoke before mature. | Storage and code repaired; live launch gates still tracked |
+| N2 | All small data/replays labelled NON-MATURE; current mature and interactive status kept separate. | Reporting correction closed; performance acceptance remainsF7 |
+| N3 | Explicit required input/roots/public HEADs, exact full clean checkouts/import paths, public source map, successful4trial functional replay, preserved original input. | Reproduction verified; authenticated input-access hop separate |
+| N4 | Baseline graphs already existed in family-publication-scope/evidence.zip. Both archives and all6members/counts now pinned and tested. | Closed; no repeated profile needed |
+| N5 | All original mixed results retained. New bounded A-B/B-A public replay also mixed (+35.32%/−15.77% save; +16.98%/−14.85% warm). Exact source/digests preserved; boundary load recorded. | Investigation retained; no uniform benefit or causal explanation claimed |
+| N6 | Function-local cached import retained to keep its validation dependency local. No unsupported import-cycle assertion or unmeasured hot-path change. Existing work/profile/fence evidence retained. | Deliberate documented limit; no import hoist for an assumed speed gain |
 
-Independent whole-package preservation review inspected source authentication, draft visibility, byte identity, process limits, capacity, exact restoration, request/workflow and evidence. Final28tests passed2.49s on qualified local interpreter. No other actionable findings or Minors remained. This does not certify a World, hosted transport or mature performance.
+## Independent repair findings
 
-Retry contract: uploaded digest/size conflicts fail closed; only remote starter assets allow up to8 new successor names. Exhaustion retains all remote data and requires review of a new archive namespace. No automatic public release, deletion or clobber is permitted.
+| Origin | Resolution and verification | Status |
+|---|---|---|
+| Preservation P1: outer timeout left detached transfer alive | SIGTERM bridge and complete owned-process-group cleanup, including stubborn descendants; actual GNU-timeout regression | Closed |
+| Preservation P2: incomplete starter upload blocked retries forever | Bounded non-destructive successor names; actual names in manifests; reuse and full restore tests; uploaded conflicts still fail closed | Closed |
+| Hosted unbuffered output limit | Explicit file-size rejection even if a partial write exits0; reproduced RED and full unbuffered GREEN | Closed |
+| Draft discovery after creation | Bind observed exact private release ID/tag; never duplicate-create based on an absent list result | Closed |
+| Engine-gate detector swallowed diff failure | Checked assignments; real shell tests for engine/harness/workflow/proof/legacy request/unchanged/unknown ancestry | Closed |
+| Repro parser reference escaped scope | Validate required output in main before source reads; omitted-output regression | Closed |
+| Additional outer launch declaration stale | All29 reviewed execution fingerprints and actual green/runtime aligned; original source/world/pin/year1002digest unchanged; real public-parent guards passed48paths | Closed |
+| Live draft read denied by read-scope token | Scope required draft access to the four actual input-reader jobs; consumer remains GET/download-only; other jobs retain read scopes | Closed; live caller hop43776600177passed |
 
-Original probe JSON and exact green log are byte-preserved in preservation-review.zip with preservation-review-index.json hashes. Full baseline remains in baseline-and-preservation-tests.zip.
-
-| Hostedpreservationpreflight43733859161 | Unbuffered short write can exit0 at file limit | Explicit actual-file-size rejection; locally reproduced RED;28passed2.33s under same env. Independent reviewer inspected fix | Closed locally; hosted retry pending |
-
-Task2 independent whole-package review closed with no actionable findings, including Minors. Its Important request-detector finding is repaired: unknown ancestry fails closed. Full/proof job conditions and inactive historical request lane are tested with the actual shell. Complete local suite322passed253.52s; final workflow delta36focused passed1.38s. No new engine qualification or mature result inferred.
-
-## Authenticated critical-path update
-
-F1: both original archives are preserved with complete checksum-verified hosted restorations; immutable part/manifest metadata and producer evidence authenticated. Consumer is implemented, awaiting its live read-token smoke. F2/F3/F4: exact repaired engine4eadb668/84626841 has green hosted harness/proof/full and audit diagnostic. F5: selected route's outer and inner qualification bindings now agree with actual green source; live staged smoke pending. N3: explicit public source/input arguments, exact source-map and successful4trial replay; input lifetime fixed by preserved copies. N4: all6existing raw save profiles are now bound/cross-referenced. N2/N5: timings explicitly labelled non-mature; mixed new replay retained, no uniform benefit/cause asserted. These updates do not close the entire24finding programme.
-
-| Task3 independent finding | Resolution | Evidence | Status |
-|---|---|---|---|
-| Missing-output path used out-of-scope parser | Validate arguments in main before reading source | Omitted-output regression; independent review closure | Closed |
-| Parent found outer stale launch declaration | Bind actual qualified green/runtime and all reviewed execution helpers; preserve original source fields | outer-binding RED/GREEN and reviewed29fingerprints | Closed locally; live entrypoint verification next |
-
-| Live consumer preflight43775874916 | Draft GET403 for read-scope job token | Give only harness and staged gate/source-digest/capture the required draft access; retain read-only consumer code and other jobs' read scopes | Scope contract RED/48GREEN and independent focused approval | Closed locally; live hop retry pending |
+Raw history and exact hashes: baseline-and-preservation-tests.zip,
+preservation-review.zip, preservation-hosted-preflight.zip,
+preservation-draft-id.zip, repair-validation.zip,
+launch-and-reproduction-evidence.zip, private-draft-permission-repair.zip and
+their adjacent indexes. Original qualified engine and preservation archives are
+listed in retained-archive-index.json. Current chronology is in progress.md.

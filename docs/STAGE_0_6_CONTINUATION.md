@@ -1,3 +1,11 @@
+# November15 current launch pointer
+
+Private input caller hop43776600177passed:357harness cases and exact original archive restore. Prepared current-engine staged smoke request is activated with300second compute caps per phase. Engine4eadb668/84626841 remains the qualified baseline; its full/proof suites are reused. Current staged run ID is recorded after publication.
+
+Mature input is preserved and source guards repaired. The smoke must finish exact fresh restoration/recovery before one protected mature run. Stage0.6 targets and current mature year1002continuation remain UNMEASURED until that run. Consolidated24finding dispositions remain in performance/stage-0-6-current/forensic-repair/closure-register.md; broader open work is not labelled complete.
+
+---
+
 # November15 authenticated green and preserved-input launch
 
 Current engine84626841/public4eadb668 is qualified by hostedrun43735593694:5123full tests plus2subtests,1968proof cases and330harness cases passed. Both source receipts recordPython3.12.16/SQLite3.46.1. Reuse these exact engine gates; do not repeat them for the harness-only launch repair.

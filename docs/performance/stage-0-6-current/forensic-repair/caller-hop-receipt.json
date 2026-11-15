@@ -1,0 +1,14 @@
+{
+  "run_id": 43776600177,
+  "producer_head": "87e2216c904cfb861c0af92197909ddb5274672a",
+  "job_id": 133004170287,
+  "artifact_id": 14186114734,
+  "archive_sha256": "fa9e090e5e033a66605fed599837a7be3607cc85b4b43d1576d18ba6a316a0e4",
+  "harness_cases": 357,
+  "archive_bytes": 7477,
+  "restored_original": {
+    "bytes": 7400318,
+    "sha256": "8844c45d2dac81515d5a8f2cdb072f03456515421849558d2f56e8712c6e9f32"
+  },
+  "scope": "Exact private input archive access verified; no World or mature performance acceptance"
+}
