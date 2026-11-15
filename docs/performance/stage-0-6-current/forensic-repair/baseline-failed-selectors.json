@@ -1,0 +1,21 @@
+[
+  ".github/tests/test_stage_0_6_audit_epoch.py::test_external_write_after_verified_audit_requires_fresh_audit[False]",
+  ".github/tests/test_stage_0_6_audit_epoch.py::test_external_write_after_verified_audit_requires_fresh_audit[True]",
+  ".github/tests/test_stage_0_6_benchmark.py::test_actual_small_checkpoint_has_separate_phases_and_immutable_source",
+  ".github/tests/test_stage_0_6_benchmark.py::test_exact_workflow_measure_and_verify_launchers_on_small_fixture",
+  ".github/tests/test_stage_0_6_benchmark.py::test_single_stage06_mature_workflow_and_bounded_diagnostic_lane",
+  ".github/tests/test_stage_0_6_benchmark.py::test_bounded_first_year_sample_has_profile_and_never_saves",
+  ".github/tests/test_stage_0_6_benchmark.py::test_bounded_sample_timeout_keeps_profile_without_claiming_complete_year",
+  ".github/tests/test_stage_0_6_benchmark.py::test_exact_workflow_sample_launcher_on_small_authenticated_fixture",
+  ".github/tests/test_stage_0_6_benchmark.py::test_profile_stops_at_budget_before_slow_exception_unwind",
+  ".github/tests/test_stage_0_6_benchmark.py::test_sample_rehashes_original_even_if_close_raises",
+  ".github/tests/test_stage_0_6_benchmark.py::test_actual_sample_shell_timeout_preserves_explicit_diagnostics[TERM]",
+  ".github/tests/test_stage_0_6_benchmark.py::test_actual_sample_shell_timeout_preserves_explicit_diagnostics[KILL]",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_reviewed_compatibility_pair_checks_all_model_and_codec_bytes",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_mature_import_requires_the_actual_original_member_and_source",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[digest]",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[method]",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[source_artifact]",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[member]",
+  ".github/tests/test_stage_0_6_genesis_source_control.py::test_checkpoint_consumption_rejects_relabelled_imported_control[compatibility]"
+]

@@ -1,0 +1,18 @@
+{
+  "harness-baseline.log": "685cac55640fa5c1db4329f5ece11138d0102d050ede320ed27936e9d1af0492",
+  "harness-baseline.xml": "2140e48058a6bf4157c8d431d1150166216fba3bf165096a8aa17f90e59e5f01",
+  "harness-qualified-red.log": "664b53d89365ddcf031a95afc19653adc7f65d511e7e76804a20c8d8b7c2b2cc",
+  "harness-qualified-red.xml": "3f240faf52824608cb170382e26c0d93c2d2cddefa2d04cf0ede4e177fc0e672",
+  "harness-workspace-red.log": "05c61f9d2fe7c3aaf73fe9a1d0c495c8d07a188156121bea2d39892c80a167ce",
+  "harness-workspace-red.xml": "91d5e5f2144737c2416716321e25466085a8493d9ea11a9ef55859675bcdd4c1",
+  "preservation-final.log": "3cba0581d1f0f4530c829f261d51cca62ac4b957992b569e2dfc49ca6eb90162",
+  "preservation-final.xml": "9a81ed596c7858fe4428d45cc800dd20d4221767da14fabf2c3c10fbb81eedbf",
+  "preservation-green.log": "b9e3ed3fbc1aea774b1124381f493c6bf92d988825e0a74ad5098f3203f387ed",
+  "preservation-green.xml": "522089ae645296332d729e21af9230a4aa393f57ace8ac988287f5e72d6a6326",
+  "preservation-red.log": "dffc3539c683b056d56fe68f8db005a0a6f3c55a3995c26d45cd01de74399f8f",
+  "preservation-red.xml": "129388fbf846f27204c159f214ae904ef92e6af19200dfb7f3e54f034c8061c3",
+  "preservation-verified.log": "c6b3e7593768202af9bf2f5b5e9aae1fc2b099d1f5ea3e0e52731812fcc17e12",
+  "preservation-verified.xml": "94492edac31cd3c33fbefa8936146c4b77fee6690161b3597df1fd6a8c2720a3",
+  "restore-red.log": "973d7d5720f0621d69ec87abb046e6fff2e99c5fd5840eb187fd235fe7cb7bf3",
+  "restore-red.xml": "a8590184523d4d9c997f2d484ab90e542c1b16fa5d51baaa2d00f729114a05f3"
+}
