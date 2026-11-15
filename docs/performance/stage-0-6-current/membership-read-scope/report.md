@@ -59,3 +59,5 @@ initial warm profile as baseline-warm-profile/. Member hashes are recorded in
 evidence-index.json. Extract here for inspection and compatible test resumption.
 The warm attribution harness remains in ../warm-path-attribution/measure_warm.py.
 Hosted acceptance is pending; no mature/default/main/endurance activation.
+
+Published candidateb66c2aa77f7a4e7282a4405a0f4a5d057727a9df has exact verified tree800dec07/runtimefd20cf17. Bundled hosted run43670981744 observed running at that SHA. This publication pointer is docs-only and starts no additional gate.

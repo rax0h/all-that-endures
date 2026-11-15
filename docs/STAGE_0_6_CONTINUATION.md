@@ -23,7 +23,9 @@ cause unestablished. No save, mature or general interactive acceptance claim.
 Evidence/report: performance/stage-0-6-current/membership-read-scope/.
 evidence.zip+member index preserve raw pairs, confirmation, baseline/current
 profiles and selected XML/log/source receipts; extract for inspection/resume.
-Read publication.json for exact published source/run; later pointer docs-only.
+Publishedb66c2aa77f7a4e7282a4405a0f4a5d057727a9df; new hosted run43670981744
+observed running at that exact SHA. Tree/runtime match local verified source.
+publication.json binds source/run; later pointer docs-only.
 NEXT: authenticate this exact candidate's hosted proof/full gate. Do not start
 new optimization, reconstruct mature prefixes or rerun compatible green stages
 while waiting. Mature request unchanged.

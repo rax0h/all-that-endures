@@ -13,3 +13,5 @@ Task1 local/performance/review gates CLOSED:248selected tests and22independent p
 Final ruling: parent's raw/work,248related tests and pending hosted gate own performance/validation judgments; independent probes do not supply those claims.
 Final ruling: review limits on whole-operation RSS, arbitrary monkeypatch/cross-thread/callback combinations and historical shapes remain unchanged contract limits covered by existing general suites and forthcoming full hosted tests, not unresolved findings. No total-RSS/security/mature/default/endurance claim.
 Ruling: lossless evidence ZIP with member SHA256 index preserves all receipts; extraction required to inspect/resume compatible outputs.
+
+Published exact verified tree tob66c2aa7; new proof/full run43670981744 observed running. Mature request unchanged. Next action exact-source hosted gate, no new optimization while active.
