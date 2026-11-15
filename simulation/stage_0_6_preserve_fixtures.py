@@ -192,6 +192,8 @@ def command(arguments, *, output=None, ceiling=None, seconds=600):
                     except ProcessLookupError: pass
                     proc.wait(timeout=5)
                 raise
+            if ceiling is not None and os.fstat(output.fileno()).st_size>ceiling:
+                raise RuntimeError('GitHub CLI output exceeds its byte allowance')
             if code:
                 # Do not echo signed redirects, HTTP authorization or command output.
                 raise RuntimeError('GitHub CLI operation failed, exit '+str(code))

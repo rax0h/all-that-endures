@@ -1,0 +1,14 @@
+{
+  "preserve-hosted-first-failure.log": {
+    "bytes": 22826,
+    "sha256": "cbf1d0f2da03dc2b98142d7d94c24dc135da47c7e95d26fec317ea53142d0662"
+  },
+  "preserve-unbuffered-red.log": {
+    "bytes": 1518,
+    "sha256": "752342691f2d375912a81c928e3a0c16ceabc4ed8f0e1fdc6d69e0af8856176c"
+  },
+  "preserve-unbuffered-green.log": {
+    "bytes": 99,
+    "sha256": "e5f786b21afd84209b2e7bcb29eb5c57eb3289db74761ccd8676ef8ab70f933a"
+  }
+}

@@ -18,3 +18,5 @@ Independent whole-package preservation review inspected source authentication, d
 Retry contract: uploaded digest/size conflicts fail closed; only remote starter assets allow up to8 new successor names. Exhaustion retains all remote data and requires review of a new archive namespace. No automatic public release, deletion or clobber is permitted.
 
 Original probe JSON and exact green log are byte-preserved in preservation-review.zip with preservation-review-index.json hashes. Full baseline remains in baseline-and-preservation-tests.zip.
+
+| Hostedpreservationpreflight43733859161 | Unbuffered short write can exit0 at file limit | Explicit actual-file-size rejection; locally reproduced RED;28passed2.33s under same env. Independent reviewer inspected fix | Closed locally; hosted retry pending |
