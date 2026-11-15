@@ -855,7 +855,8 @@ class IdentityCatalog:
     def read_identity_membership(self, pin, owner, path):
         """Prove an exact path's membership or absence through its owner root."""
         placement_path(*owner, path)
-        with self.store.read_snapshot(pin):
+        from .persistence_validation_scope import checked_read_operation
+        with checked_read_operation(self.store, pin, byte_limit=min(256*1024, self.byte_limit//6)):
             self._descriptor(pin)
             try:
                 header = self._owner(pin, owner)

@@ -1,0 +1,34 @@
+{
+  "baseline": {
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3",
+    "work": {
+      "read_identity_membership": 180,
+      "_checked_head_row": 9165,
+      "_visible_record_row": 4694,
+      "_checked_pin_row": 11056
+    },
+    "sql_execute_calls": 240130
+  },
+  "candidate": {
+    "saved": {
+      "year": 2,
+      "seed": 843000,
+      "generation": 1,
+      "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+    },
+    "warm_digest": "a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3",
+    "work": {
+      "read_identity_membership": 180,
+      "_checked_head_row": 7865,
+      "_visible_record_row": 4556,
+      "_checked_pin_row": 9756
+    },
+    "sql_execute_calls": 222140
+  }
+}

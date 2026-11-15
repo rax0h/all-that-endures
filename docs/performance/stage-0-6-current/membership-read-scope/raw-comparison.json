@@ -1,0 +1,202 @@
+[
+  {
+    "pair": "pair1",
+    "baseline": {
+      "open": {
+        "wall": 1.148947,
+        "cpu": 1.137575
+      },
+      "first_step": {
+        "wall": 5.574737,
+        "cpu": 5.569304
+      },
+      "save": {
+        "wall": 3.636699,
+        "cpu": 3.614728
+      },
+      "warm_step": {
+        "wall": 4.638248,
+        "cpu": 4.633018
+      },
+      "fresh_verify": {
+        "wall": 11.597795,
+        "cpu": 0.001634
+      }
+    },
+    "candidate": {
+      "open": {
+        "wall": 1.218051,
+        "cpu": 1.200019
+      },
+      "first_step": {
+        "wall": 5.020629,
+        "cpu": 5.012191
+      },
+      "save": {
+        "wall": 3.864138,
+        "cpu": 3.8379
+      },
+      "warm_step": {
+        "wall": 4.051792,
+        "cpu": 4.047321
+      },
+      "fresh_verify": {
+        "wall": 11.479128,
+        "cpu": 0.001126
+      }
+    },
+    "warm_reduction_percent": 12.643912097843844,
+    "save_reduction_percent": -6.253995725244238,
+    "step_save_step_reduction_percent": 6.593110716461118
+  },
+  {
+    "pair": "pair2",
+    "baseline": {
+      "open": {
+        "wall": 1.173757,
+        "cpu": 1.14076
+      },
+      "first_step": {
+        "wall": 5.803705,
+        "cpu": 5.783791
+      },
+      "save": {
+        "wall": 4.213302,
+        "cpu": 4.181845
+      },
+      "warm_step": {
+        "wall": 4.687505,
+        "cpu": 4.679271
+      },
+      "fresh_verify": {
+        "wall": 11.552935,
+        "cpu": 0.001957
+      }
+    },
+    "candidate": {
+      "open": {
+        "wall": 1.152003,
+        "cpu": 1.136421
+      },
+      "first_step": {
+        "wall": 5.696348,
+        "cpu": 5.681448
+      },
+      "save": {
+        "wall": 4.394895,
+        "cpu": 4.367594
+      },
+      "warm_step": {
+        "wall": 4.211465,
+        "cpu": 4.206131
+      },
+      "fresh_verify": {
+        "wall": 11.183385,
+        "cpu": 0.001272
+      }
+    },
+    "warm_reduction_percent": 10.155509167456895,
+    "save_reduction_percent": -4.309992495197362,
+    "step_save_step_reduction_percent": 2.7325218273139584
+  },
+  {
+    "pair": "confirm1",
+    "baseline": {
+      "open": {
+        "wall": 1.04931,
+        "cpu": 1.038147
+      },
+      "first_step": {
+        "wall": 5.377555,
+        "cpu": 5.344252
+      },
+      "save": {
+        "wall": 3.767069,
+        "cpu": 3.737195
+      },
+      "warm_step": {
+        "wall": 4.231149,
+        "cpu": 4.230821
+      },
+      "fresh_verify": {
+        "wall": 11.57321,
+        "cpu": 0.001016
+      }
+    },
+    "candidate": {
+      "open": {
+        "wall": 1.062055,
+        "cpu": 1.053751
+      },
+      "first_step": {
+        "wall": 4.963153,
+        "cpu": 4.959561
+      },
+      "save": {
+        "wall": 3.928818,
+        "cpu": 3.900404
+      },
+      "warm_step": {
+        "wall": 4.085203,
+        "cpu": 4.084875
+      },
+      "fresh_verify": {
+        "wall": 10.878897,
+        "cpu": 0.001007
+      }
+    },
+    "warm_reduction_percent": 3.449323103487973,
+    "save_reduction_percent": -4.293762604295286,
+    "step_save_step_reduction_percent": 2.980007211545836
+  },
+  {
+    "pair": "confirm2",
+    "baseline": {
+      "open": {
+        "wall": 1.095882,
+        "cpu": 1.088036
+      },
+      "first_step": {
+        "wall": 5.334353,
+        "cpu": 5.324145
+      },
+      "save": {
+        "wall": 3.830517,
+        "cpu": 3.802981
+      },
+      "warm_step": {
+        "wall": 4.427832,
+        "cpu": 4.423977
+      },
+      "fresh_verify": {
+        "wall": 11.518567,
+        "cpu": 0.001037
+      }
+    },
+    "candidate": {
+      "open": {
+        "wall": 1.055352,
+        "cpu": 1.044224
+      },
+      "first_step": {
+        "wall": 5.11415,
+        "cpu": 5.098395
+      },
+      "save": {
+        "wall": 3.713813,
+        "cpu": 3.691894
+      },
+      "warm_step": {
+        "wall": 3.917308,
+        "cpu": 3.914673
+      },
+      "fresh_verify": {
+        "wall": 10.960984,
+        "cpu": 0.001084
+      }
+    },
+    "warm_reduction_percent": 11.529886409421147,
+    "save_reduction_percent": 3.0466905642240962,
+    "step_save_step_reduction_percent": 6.234455813126781
+  }
+]

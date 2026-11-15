@@ -55,3 +55,7 @@ receipts. Independently bounded units survived; no expensive prefix was rerun.
 Hosted acceptance remains pending; no mature/default/main/endurance activation.
 
 Published candidate1d46590bcd2725ebd75a39a5ab3170efca8e39b9 has tree exactly equal to local verified e47500b1; new hosted run43654058724 is running. publication.json records the immutable gate boundary. This pointer is docs-only and does not start another gate.
+
+## Hosted acceptance
+
+43654058724 at1d46590b5/runtimeb45a0e4b GREEN:5119passed+2subtests in9553.00s; proof35XMLs1964overlapping tests plus scaling. Exact original GitHub archives retained in hosted-43654058724/; API SHA256, source/head/runtime and zero XML errors/failures verified. W15 hosted engine gate CLOSED; mature job skipped and Stage0.6 remains OPEN.

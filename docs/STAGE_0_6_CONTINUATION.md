@@ -5,45 +5,44 @@ Historical/measurement baselines are separate.
 
 ## Current candidate
 
-Family/dependency closed publication scope, local engineba0cc454,
-runtimeb45a0e4b15c7f6f2954d57776706eddda2d9c7de. Only two production contexts
-change from read_snapshot to existing checked_read_operation; every frozen row,
-lease/root/checksum and dependency revalidation remains. Native32person family
-and actual32dependency work regressions RED→GREEN.191selected cases passed;
-one independent review found0issues and18tiny probes passed. Reviewed source
-hashes, XML/log/runtime and exact-state fences verified.
+Exact membership closed read scope, local enginee32f9509,
+runtimefd20cf1784a331de07f4979db71dda0f3d301771. One context uses existing
+checked_read_operation with min(256KiB,catalog.byte_limit//6); root/node/path
+collision/forward/source/witness checks and absence rules remain. Native point
+RED23headchecks→GREEN<=2; generic present/absent,128byte budget and corruption
+checks pass.248related tests/17files,22independent tiny probes,0reviewfindings.
+Final source/XML/log/runtime/test/workflow hashes verified.
 
-Raw pinned small-input A-B/B-A saves4.002→3.827s/3.998→3.867s (4.36%/3.29%).
-Instrumented acknowledgement3550→460head checks and88855→80020SQL; prepare
-and commit work unchanged. No mature/overall/interactive readiness claim.
-Evidence/report: performance/stage-0-6-current/family-publication-scope/.
-Original per-trial/profile/test receipts are losslessly packaged in evidence.zip,
-with member hashes in evidence-index.json; extract here for inspection/resume.
-Published source1d46590bcd2725ebd75a39a5ab3170efca8e39b9; new run43654058724
-is running. Exact tree/runtime verified. publication.json binds source/run; later
-pointers are docs-only.
+Current-engine warm profile:180membership calls retained;SQL240130→222140,
+head9165→7865,pin11056→9756. Existing descriptor facts remain fenced. All8raw
+trials preserve original bytes/exact saved/fresh continued state. Warm improves
+in all4paired comparisons (3.45–12.64%); step/save/step sequence2.73–6.59%.
+Save timings mixed (3higher/1lower); save work counts unchanged and latency
+cause unestablished. No save, mature or general interactive acceptance claim.
 
-NEXT: authenticate the exact new hosted proof/full gate before accepting this
-engine or starting a new optimization. Do not reconstruct a mature constructor
-prefix or rerun compatible completed stages while waiting for the gate.
+Evidence/report: performance/stage-0-6-current/membership-read-scope/.
+evidence.zip+member index preserve raw pairs, confirmation, baseline/current
+profiles and selected XML/log/source receipts; extract for inspection/resume.
+Read publication.json for exact published source/run; later pointer docs-only.
+NEXT: authenticate this exact candidate's hosted proof/full gate. Do not start
+new optimization, reconstruct mature prefixes or rerun compatible green stages
+while waiting. Mature request unchanged.
 
 ## Last accepted engine
 
-Publishedb52b86b5502028c63bfb7e542e80b63cfafec990/runtime030b9c93 is GREEN
-43617801034:5117passed+2subtests, proof35XMLs1962overlapping tests plus scaling.
-Exact downloaded archive SHA256/source/XML/log receipts are in save-phase-
-attribution/hosted-43617801034 (full.zip/proof.zip are original GitHub bytes).
-W14 hosted engine acceptance CLOSED. W13 parent batching remains archived and
-not promoted; do not resurrect it or treat fewer nodes as a whole-save win.
+Published1d46590bcd2725ebd75a39a5ab3170efca8e39b9/runtimeb45a0e4b is GREEN
+43654058724:5119passed+2subtests, proof35XMLs1964overlapping tests plus scaling.
+Exact original artifact ZIPs/hash/source/XML summaries are in family-publication-
+scope/hosted-43654058724/. W15 hosted engine gate CLOSED. W13 parent batching
+remains archived/unpromoted; no inference from lower work alone.
 
 ## Open goals and inputs
 
-Stage0.6 remains OPEN: mature10sopen/2ssave/1swarm, exact deterministic continuation.
-No mature/default/main/endurance action authorized here. Annual throughput is
-not player input latency; no interactive UI/background responsiveness demonstrated.
-
-Use unchanged complete-qualified313 full fingerprint. Original small input
+Stage0.6 OPEN: mature10sopen/2ssave/1swarm, exact deterministic continuation.
+No mature/default/main/endurance activation authorized here. Annual throughput
+is not player input latency; no interactive UI/background response demonstrated.
+Use full complete-qualified313 fingerprint. Original small input
 SHA2555675bd19ede5c6ed9b7619fab56d59098a8b358d9a9c3569cabccba22c554 only through
-disposable copies (pin bookkeeping changes bytes). Archive expires December11.
-Inspect prior durations, budget each phase and reserve cleanup/publication time.
-Consolidated finding register:performance/stage-0-6-current/bounded-genesis/closure.md.
+disposable copies (pin bookkeeping changes bytes); archive expires December11.
+Inspect prior durations, phase budgets and cleanup/publication reserve.
+Consolidated register:performance/stage-0-6-current/bounded-genesis/closure.md.

@@ -1,0 +1,249 @@
+{
+  "run_id": 43654058724,
+  "head": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+  "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+  "archives": {
+    "full": {
+      "artifact_id": 14141768959,
+      "sha256": "4ad4aba3d3a37c4f7b96263052ba4be44d5acde8cab30f1714647973e72b1442",
+      "source": {
+        "head": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+        "python": "3.12.16",
+        "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+        "sqlite": "3.46.1"
+      },
+      "xmls": {
+        "full-suite.xml": {
+          "tests": 5121,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 9552.783
+        }
+      },
+      "log_tail": "ion/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843002]\n======= 5119 passed, 1 warning, 2 subtests passed in 9553.00s (2:39:13) ========\n"
+    },
+    "proof": {
+      "artifact_id": 14139620405,
+      "sha256": "c78dedb00c662caefa32dc5449823f8d19430e8f4d8f58dd28c1548191520341",
+      "source": {
+        "head": "1d46590bcd2725ebd75a39a5ab3170efca8e39b9",
+        "python": "3.12.16",
+        "runtime_tree": "b45a0e4b15c7f6f2954d57776706eddda2d9c7de",
+        "sqlite": "3.46.1"
+      },
+      "xmls": {
+        "child-extents-tests.xml": {
+          "tests": 34,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 4.723
+        },
+        "collection-directory-tests.xml": {
+          "tests": 31,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 2.083
+        },
+        "collection-publication-tests.xml": {
+          "tests": 12,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 1.235
+        },
+        "collection-tests.xml": {
+          "tests": 20,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 1.358
+        },
+        "compressed-batch-tests.xml": {
+          "tests": 5,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 0.462
+        },
+        "descriptor-fact-tests.xml": {
+          "tests": 29,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 21.025
+        },
+        "directory-publication-tests.xml": {
+          "tests": 22,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 2.238
+        },
+        "frozen-extents-tests.xml": {
+          "tests": 46,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 6.844
+        },
+        "generation-tests.xml": {
+          "tests": 60,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 2.026
+        },
+        "group-tests.xml": {
+          "tests": 72,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 14.893
+        },
+        "inventory-tests.xml": {
+          "tests": 34,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 3.216
+        },
+        "native-insert-tests.xml": {
+          "tests": 403,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 910.409
+        },
+        "native-metadata-tests.xml": {
+          "tests": 39,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 38.103
+        },
+        "native-rank-tests.xml": {
+          "tests": 47,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 52.161
+        },
+        "native-value-tests.xml": {
+          "tests": 102,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 206.285
+        },
+        "native-world-session-tests.xml": {
+          "tests": 45,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 148.382
+        },
+        "node-factorization-tests.xml": {
+          "tests": 17,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 1.018
+        },
+        "owner-target-tests.xml": {
+          "tests": 20,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 3.039
+        },
+        "projection-tests.xml": {
+          "tests": 43,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 2.92
+        },
+        "proof-open-tests.xml": {
+          "tests": 62,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 62.412
+        },
+        "proof-tests.xml": {
+          "tests": 262,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 11.753
+        },
+        "publication-read-scope-tests.xml": {
+          "tests": 4,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 5.618
+        },
+        "publication-tests.xml": {
+          "tests": 67,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 6.244
+        },
+        "rank-up-publication-tests.xml": {
+          "tests": 24,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 193.522
+        },
+        "read-view-epoch-tests.xml": {
+          "tests": 17,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 19.786
+        },
+        "record-tests.xml": {
+          "tests": 60,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 4.133
+        },
+        "reference-closure-tests.xml": {
+          "tests": 38,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 10.441
+        },
+        "reference-tests.xml": {
+          "tests": 40,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 7.691
+        },
+        "scope-tests.xml": {
+          "tests": 55,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 4.843
+        },
+        "seek-tests.xml": {
+          "tests": 54,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 8.627
+        },
+        "sequence-event-extents-tests.xml": {
+          "tests": 47,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 8.186
+        },
+        "target-group-tests.xml": {
+          "tests": 38,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 4.632
+        },
+        "target-incoming-tests.xml": {
+          "tests": 44,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 5.12
+        },
+        "target-tests.xml": {
+          "tests": 36,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 3.328
+        },
+        "world-manifest-tests.xml": {
+          "tests": 35,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 31.729
+        }
+      },
+      "log_tail": null
+    }
+  }
+}
