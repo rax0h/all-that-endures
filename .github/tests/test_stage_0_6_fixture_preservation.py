@@ -213,22 +213,29 @@ def test_outer_timeout_stops_transfer_and_its_descendants(tmp_path):
 def test_incomplete_starter_asset_uses_non_destructive_retry_name(tmp_path,monkeypatch):
     module=api();source,identity=fixture(tmp_path)
     rows=[dict(id=1,name=source.name,state='starter',size=0)]
-    uploads=[]
+    uploads=[];observations=[];delay=0
     def remote(path):
-        if '/assets?' in path:return rows
+        nonlocal delay
+        if '/assets?' in path:
+            if delay:delay-=1;return rows[:-1]
+            return rows
         return dict(id=3,draft=True,tag_name=module.TAG)
     def upload(arguments,**kwargs):
+        nonlocal delay
         uploads.append(arguments)
         path=Path(arguments[3])
         rows.append(dict(id=len(rows)+1,name=path.name,state='uploaded',size=path.stat().st_size,
             digest='sha256:'+module.sha(path)))
+        delay=2
     monkeypatch.setattr(module.github,'_api',remote)
     monkeypatch.setattr(module,'command',upload)
+    monkeypatch.setattr(module.time,'sleep',observations.append)
     client=module.ReleaseAPI()
     result=client.put(dict(id=3,draft=True),source)
     assert result['name']==source.name+'.retry-1'
     assert result['state']=='uploaded' and rows[0]['state']=='starter'
     assert len(uploads)==1 and '--clobber' not in uploads[0]
+    assert observations==[1,1]
     assert client.put(dict(id=3,draft=True),source)==result
     assert len(uploads)==1
 
@@ -266,3 +273,19 @@ def test_starter_retry_limit_fails_closed_without_deleting_assets(tmp_path,monke
     with pytest.raises(ValueError,match='retry slots exhausted'):
         module.ReleaseAPI().put(dict(id=3,draft=True),source)
     assert not commands and len(rows)==module.RETRY_SLOTS+1
+
+
+@pytest.mark.parametrize('damage',['none','id','tag','public'])
+def test_existing_draft_is_bound_by_id_without_recreating_or_listing(tmp_path,monkeypatch,damage):
+    module=api();requests=[];commands=[]
+    release=dict(id=module.RELEASE_ID,draft=True,tag_name=module.TAG)
+    if damage=='id':release['id']+=1
+    elif damage=='tag':release['tag_name']='foreign'
+    elif damage=='public':release['draft']=False
+    def fetch(path):requests.append(path);return release
+    monkeypatch.setattr(module.github,'_api',fetch)
+    monkeypatch.setattr(module,'command',lambda *args,**kw:commands.append(args))
+    if damage=='none':assert module.ReleaseAPI().draft()==release
+    else:
+        with pytest.raises(ValueError):module.ReleaseAPI().draft()
+    assert requests==[f'/releases/{module.RELEASE_ID}'] and not commands

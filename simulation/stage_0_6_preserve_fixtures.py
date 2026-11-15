@@ -15,6 +15,7 @@ import shutil
 import signal
 import subprocess
 import tempfile
+import time
 
 from simulation import checkpoint_artifacts as github
 from simulation.stage_0_6_retained_producer import PIN, inspect_retained_producer
@@ -22,6 +23,7 @@ from simulation.stage_0_6_retained_transport import _signed_url, _stream_archive
 
 REPOSITORY = 'rax0h/all-that-endures'
 TAG = 'ate-stage-0-6-fixtures-2026-11'
+RELEASE_ID = 446184821  # Created by hosted smoke43734152539; remains a private draft.
 CHUNK = 512 * 1024**2
 RESERVE = 2 * 1024**3
 RETRY_SLOTS = 8
@@ -210,15 +212,14 @@ class ReleaseAPI:
         raise ValueError('release inventory exceeds bounded pagination')
 
     def draft(self):
-        matches = [r for r in self.listing('/releases') if r.get('tag_name') == TAG]
-        if not matches:
-            command(['release','create',TAG,'--repo',REPOSITORY,'--draft',
-                '--target',os.environ['GITHUB_SHA'],'--title','Stage0.6 authenticated fixture archive',
-                '--notes','Private draft transport archive. Do not publish or delete; original byte/provenance manifests remain authoritative.'])
-            matches = [r for r in self.listing('/releases') if r.get('tag_name') == TAG]
-        if len(matches) != 1 or matches[0].get('draft') is not True:
-            raise ValueError('preservation requires one private draft release')
-        return matches[0]
+        # A just-created draft need not immediately appear in the list endpoint.
+        # Reuse the observed immutable release ID; never create duplicate drafts
+        # or infer publication/absence from an eventually consistent listing.
+        release=github._api(f'/releases/{RELEASE_ID}')
+        if (release.get('id')!=RELEASE_ID or release.get('tag_name')!=TAG
+                or release.get('draft') is not True):
+            raise ValueError('preservation requires its exact private draft release')
+        return release
 
     def put(self, release, path):
         current = github._api(f'/releases/{release["id"]}')
@@ -235,7 +236,12 @@ class ReleaseAPI:
                     upload=Path(directory)/name
                     os.link(path,upload)
                     command(['release','upload',TAG,str(upload),'--repo',REPOSITORY])
-                matches=find()
+                # Observe the server's new asset before checking identity. A
+                # missing list entry never authorizes another upload/clobber.
+                for observation in range(6):
+                    matches=find()
+                    if matches:break
+                    if observation<5:time.sleep(1)
             if len(matches)!=1:raise ValueError('release asset name is missing or ambiguous')
             if matches[0].get('state')=='starter':continue
             # Uploaded conflicts are returned for strict size/digest checks;
