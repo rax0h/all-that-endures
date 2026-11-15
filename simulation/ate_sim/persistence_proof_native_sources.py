@@ -49,8 +49,16 @@ def _epoch(store, authority):
     actual, expected = authority._epoch(), authority.epoch
     guard = getattr(store.db, '_native_write_guard', None)
     owned = authority.busy and guard is not None and guard is getattr(authority, '_write_guard', None)
+    receipt = authority._publication_read_receipt
+    if (owned and authority.pending is not None and receipt is not None
+            and authority.read_pin == receipt[0] and authority.pair is receipt[1]):
+        expected = receipt[2]
     if (actual[:3] != expected[:3] or actual[4] != expected[4]
             or not owned and actual != expected):
+        if owned and authority.pending is not None:
+            # Epoch drift does not prove a competing head. Retain the original
+            # token/parent so public recovery can resolve and audit that attempt.
+            raise StoreError('native publication epoch drift requires exact recovery')
         raise StoreConflictError('native source snapshot epoch differs from accepted authority')
 
 

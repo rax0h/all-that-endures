@@ -16,6 +16,7 @@ def check_source(root,config,expected_sha):
     def git(*args):return subprocess.check_output(['git',*args],cwd=root,text=True).strip()
     if git('rev-parse','HEAD')!=expected_sha or git('rev-parse','HEAD:simulation/ate_sim')!=config['runtime_tree']:raise ValueError('execution SHA/runtime differs from reviewed source')
     subprocess.run(['git','merge-base','--is-ancestor',config['green_commit'],'HEAD'],cwd=root,check=True)
+    if git('rev-parse',config['green_commit']+':simulation/ate_sim')!=config['runtime_tree']:raise ValueError('green ancestor runtime differs from execution engine')
     if git('status','--porcelain','--untracked-files=no') or git('status','--porcelain','--untracked-files=all','--','simulation/ate_sim'):raise ValueError('execution source is dirty')
     identity=base._runtime_identity()
     if Path(identity['root']).resolve()!=root or identity['head']!=expected_sha:raise ValueError('imported runtime differs from execution checkout')

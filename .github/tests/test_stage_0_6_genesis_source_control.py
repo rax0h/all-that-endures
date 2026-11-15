@@ -25,7 +25,7 @@ def test_reviewed_compatibility_pair_checks_all_model_and_codec_bytes(tmp_path):
     manifest=json.loads((root/m.COMPATIBILITY).read_text())
     pairs=dict(historical_runtime_sha='2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a',
         historical_runtime_tree='76dee76973928dbce72860156feb32f2d7f02f86',
-        current_runtime_tree='94267bb00a219702a4bd1700a2fc0600a5c5aa56')
+        current_runtime_tree=r.load_receipt(root/api().COMPATIBILITY)['current_runtime_tree'])
     (tmp_path/m.COMPATIBILITY).parent.mkdir(parents=True)
     shutil.copyfile(root/m.COMPATIBILITY,tmp_path/m.COMPATIBILITY)
     for name in manifest['files']:
@@ -36,7 +36,7 @@ def test_reviewed_compatibility_pair_checks_all_model_and_codec_bytes(tmp_path):
         with pytest.raises(ValueError):m.check_compatibility(tmp_path,**{**pairs,key:'0'*len(pairs[key])})
     # Changing a stored model definition, codec, schema or ordering must reject,
     # even when a caller still declares the reviewed runtime tuple.
-    for name in ('materials.py','social.py','persistence_schema.py','incremental_store.py',
+    for name in ('agency.py','materials.py','social.py','persistence_schema.py','incremental_store.py',
                  'canonical_stream.py','persistence_adapters.py','persistence_event_ids.py'):
         path=tmp_path/'simulation/ate_sim'/name;before=path.read_bytes();path.write_bytes(before+b'\n# changed definition\n')
         with pytest.raises(ValueError):m.check_compatibility(tmp_path,**pairs)
@@ -48,21 +48,21 @@ def test_mature_import_requires_the_actual_original_member_and_source(accepted_c
     root=Path(__file__).resolve().parents[2]
     member,_,options,_=accepted_case
     with pytest.raises(ValueError):
-        m.mature_control(root,member,options['source'],current_runtime_tree='94267bb00a219702a4bd1700a2fc0600a5c5aa56')
-    contract=m.mature_control_contract(root,current_runtime_tree='94267bb00a219702a4bd1700a2fc0600a5c5aa56')
+        m.mature_control(root,member,options['source'],current_runtime_tree=r.load_receipt(root/api().COMPATIBILITY)['current_runtime_tree'])
+    contract=m.mature_control_contract(root,current_runtime_tree=r.load_receipt(root/api().COMPATIBILITY)['current_runtime_tree'])
     assert contract['digest']=='57f60fdf49e221af24ffc0a1f2d5a3885dd37c07db00d153171adcb91c579eed'
     assert contract['acceptance_member_bytes']==570001
     assert contract['acceptance_member_sha256']=='5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45'
     # Merely possessing a valid small accepted receipt cannot promote it into
     # this mature source context, even if the caller declares its original DB.
     with pytest.raises(ValueError):
-        m.mature_control(root,member,contract['source'],current_runtime_tree='94267bb00a219702a4bd1700a2fc0600a5c5aa56')
+        m.mature_control(root,member,contract['source'],current_runtime_tree=r.load_receipt(root/api().COMPATIBILITY)['current_runtime_tree'])
 
 
 @pytest.mark.parametrize('damage',['digest','method','source_artifact','member','compatibility'])
 def test_checkpoint_consumption_rejects_relabelled_imported_control(damage):
     m=api();assert hasattr(m,'validate_control_chain'),'imported baseline authority is not checked on consumption'
-    root=Path(__file__).resolve().parents[2];runtime='94267bb00a219702a4bd1700a2fc0600a5c5aa56'
+    root=Path(__file__).resolve().parents[2];runtime=r.load_receipt(root/m.COMPATIBILITY)['current_runtime_tree']
     control=m.mature_control_contract(root,current_runtime_tree=runtime)
     context=dict(mode='mature',runtime_tree=runtime,critical_blobs={'test.py':'a'*40},
         source=control['source'],rules_id=control['rules_id'],rank_proofs=True,
@@ -173,3 +173,13 @@ def test_imported_control_preserves_actual_post_rebase_check(tmp_path,monkeypatc
     out=tmp_path/'after'
     actual=stages.run_stage('after_digest',row,source,out,producer=producer('after_digest'),budget=60)
     assert actual['baseline_digest']==control['digest'] and original is stages._digest
+
+
+def test_reviewed_current_canonical_pair_names_actual_committed_engine():
+    import subprocess
+    root=Path(__file__).resolve().parents[2]
+    declared=r.load_receipt(root/api().COMPATIBILITY)
+    actual=subprocess.check_output(['git','rev-parse','HEAD:simulation/ate_sim'],cwd=root,text=True).strip()
+    assert declared['current_runtime_tree']==actual
+    api().check_compatibility(root,historical_runtime_sha=declared['historical_runtime_sha'],
+        historical_runtime_tree=declared['historical_runtime_tree'],current_runtime_tree=actual)

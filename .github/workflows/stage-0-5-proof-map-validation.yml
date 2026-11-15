@@ -3,6 +3,9 @@ name: Stage 0.6 durable proof map validation
   push:
     branches: [sol/durable-proof-map]
     paths:
+      - .github/tests/**
+      - simulation/stage_0_6*.py
+      - simulation/stage_0_6*.json
       - simulation/ate_sim/**
       - simulation/tests/**
       - .github/tests/run_proof_map_scaling.py
@@ -49,8 +52,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       enabled: ${{ steps.request.outputs.enabled }}
+      engine_changed: ${{ steps.request.outputs.engine_changed }}
+      proof_changed: ${{ steps.request.outputs.proof_changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
@@ -60,24 +65,66 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --name-only "$BEFORE" "$GITHUB_SHA" -- simulation/stage_0_6_proof_genesis_request.json | grep -q .; then
+          engine_changes=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- simulation/ate_sim simulation/tests)
+          if test -n "$engine_changes"; then
+            echo 'engine_changed=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'engine_changed=false' >> "$GITHUB_OUTPUT"
+          fi
+          proof_changes=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- '.github/tests/run_proof*')
+          if test -n "$proof_changes"; then
+            echo 'proof_changed=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'proof_changed=false' >> "$GITHUB_OUTPUT"
+          fi
+          request_changes=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- simulation/stage_0_6_proof_genesis_request.json)
+          if test -n "$request_changes"; then
             echo 'enabled=true' >> "$GITHUB_OUTPUT"
           else
             echo 'enabled=false' >> "$GITHUB_OUTPUT"
           fi
+  harness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TMPDIR: ${{ github.workspace }}/.harness-tmp
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12.16'
+      - run: python -m pip install pytest==9.2.0 pyyaml==6.0.3
+      - name: Require complete quick harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$TMPDIR" harness-evidence
+          timeout --signal=TERM --kill-after=30s 10m python -m pytest -q .github/tests --basetemp="$TMPDIR/pytest" --junitxml=harness-evidence/tests.xml 2>&1 | tee harness-evidence/tests.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: stage-0-6-harness-${{ github.sha }}
+          path: harness-evidence/*
+          retention-days: 90
+          if-no-files-found: error
   proof-map:
+    needs: [harness, mature-genesis-request]
+    if: needs.mature-genesis-request.outputs.engine_changed == 'true' || needs.mature-genesis-request.outputs.proof_changed == 'true'
     runs-on: ubuntu-latest
     # The previous green job used 52m; retain room for the added forest matrix
     # and observed hosted variance. Individual scaling commands stay bounded.
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ github.sha }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: '3.12'
-      - run: python -m pip install pytest pyyaml
+          python-version: '3.12.16'
+      - run: python -m pip install pytest==9.2.0 pyyaml==6.0.3
       - name: Record proof job candidate source
         shell: bash
         run: |
@@ -163,7 +210,7 @@ jobs:
           python -m pytest -q simulation/tests/test_stage_0_5_proof_world.py --junitxml=evidence/world-manifest-tests.xml 2>&1 | tee evidence/world-manifest-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_world_manifest_scaling.py --output evidence/world-manifest-scaling 2>&1 | tee evidence/world-manifest-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: stage-0-5-proof-map-${{ github.sha }}
@@ -174,18 +221,20 @@ jobs:
           retention-days: 14
           if-no-files-found: error
   full-suite:
+    needs: [harness, mature-genesis-request]
+    if: needs.mature-genesis-request.outputs.engine_changed == 'true'
     runs-on: ubuntu-latest
     # The last run passed every reported test but hit the 135m command cap at
     # 96%. Keep the whole suite bounded, with room for current hosted variance.
     timeout-minutes: 195
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ github.sha }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: '3.12'
-      - run: python -m pip install pytest pyyaml
+          python-version: '3.12.16'
+      - run: python -m pip install pytest==9.2.0 pyyaml==6.0.3
       - name: Record source and run all simulation tests
         shell: bash
         run: |
@@ -200,7 +249,7 @@ jobs:
           r.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),python=platform.python_version(),sqlite=sqlite3.sqlite_version))
           PY
           timeout --signal=TERM --kill-after=30s 180m python -m pytest -v simulation/tests --durations=30 -o junit_family=legacy --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: stage-0-5-proof-map-suite-${{ github.sha }}
@@ -209,21 +258,23 @@ jobs:
           if-no-files-found: error
   mature-genesis:
     needs: [proof-map, full-suite, mature-genesis-request]
-    if: ${{ needs.mature-genesis-request.outputs.enabled == 'true' }}
+    # Historical monolithic construction is inactive; use the protected staged
+    # resumable workflow after explicit current-engine qualification.
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 350
     permissions:
       contents: read
       actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: '3.12'
-      - run: python -m pip install pytest pyyaml
+          python-version: '3.12.16'
+      - run: python -m pip install pytest==9.2.0 pyyaml==6.0.3
       - name: Validate mature execution boundaries
         shell: bash
         run: |
@@ -247,7 +298,7 @@ jobs:
           timeout --signal=TERM --kill-after=30s 330m python -m simulation.stage_0_6_proof_mature_genesis run --root "$GITHUB_WORKSPACE" --config simulation/stage_0_6_proof_genesis_request.json 2>&1 | tee evidence/genesis.log || status=$?
           python -m simulation.stage_0_6_proof_mature_genesis record-exit --root "$GITHUB_WORKSPACE" --status "$status"
           exit "$status"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: stage-0-6-mature-proof-genesis-${{ github.sha }}

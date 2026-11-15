@@ -55,13 +55,13 @@ jobs:
       with:
         python-version: 3.12.16
     - run: python -m pip install pytest==9.2.0 pyyaml==6.0.3
-    - name: Verify only new harness and affected transport boundaries
+    - name: Require complete quick harness before source transport
       shell: bash
       run: 'set -euo pipefail
 
         mkdir -p resume-tests
 
-        python -m pytest -q .github/tests/test_stage_0_6_genesis_*.py .github/tests/test_stage_0_6_retained_*.py .github/tests/test_stage_0_6_proof_mature_genesis.py
+        timeout --signal=TERM --kill-after=30s 10m python -m pytest -q .github/tests
         --junitxml=resume-tests/harness.xml 2>&1 | tee resume-tests/harness.log
 
         '

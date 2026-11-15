@@ -15,6 +15,7 @@ class _WorldProofAuthority:
         self.proof_only=proof_only;self._opening_admitted=False
         self.expected=expected;self.store=None;self.pair=None;self.epoch=None
         self.busy=False;self.uncertain=False;self.pending=None;self._postcommit_verified_epoch=None
+        self._publication_read_receipt=None
         self.read_pin=None
         self.read_components=None
 
@@ -119,7 +120,7 @@ class _WorldProofAuthority:
             with NativeWriteGuard(self.store.db) as guard:
                 self._write_guard=guard
                 if not(recovery and self.pending is not None):self.guard()
-                guard.check();entry=self.epoch;self.busy=True;self._can_settle=not recovery;self._postcommit_verified_epoch=None
+                guard.check();entry=self.epoch;self.busy=True;self._can_settle=not recovery;self._postcommit_verified_epoch=None;self._publication_read_receipt=None
                 try:
                     result=callback();guard.check();observed=self._epoch()
                     if self._can_settle:
@@ -142,7 +143,16 @@ class _WorldProofAuthority:
                         self.pending=None;self.uncertain=False;self.epoch=verified
                     if guard.denied:raise StoreIntegrityError(guard.denied) from exc
                     raise
-        finally:self._postcommit_verified_epoch=None;self._write_guard=None;self.busy=False
+        finally:self._postcommit_verified_epoch=None;self._publication_read_receipt=None;self._write_guard=None;self.busy=False
+
+    def _handoff_audit(self,pin,verified):
+        # Acknowledgement reads may use this exact audited successor only inside
+        # the owning operation. Keep the public epoch at its parent until the
+        # final execute checks have completed. One refresh is bounded: a later
+        # writer must be refused by the normal before/after-BEGIN source fence.
+        if verified is None or verified!=self._epoch():verified=self._audit(pin)
+        self._publication_read_receipt=(self.read_pin,self.pair,verified)
+        return verified
 
     def commit(self,session,plan):
         from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
@@ -170,7 +180,7 @@ class _WorldProofAuthority:
         if result.commit.outcome=='committed' and result.reaudited:
             # Reuse only this committed attempt's fully verified postcommit epoch.
             # execute() falls back to the original audit when the epoch changes.
-            self._postcommit_verified_epoch=self._audit(result.commit.pin)
+            self._postcommit_verified_epoch=self._handoff_audit(result.commit.pin,self._audit(result.commit.pin))
         return result.commit
 
     def resolve(self,session,plan):
@@ -183,7 +193,7 @@ class _WorldProofAuthority:
         if result.manifest:
             self.pair=result.manifest
             self.read_pin=result.commit.pin
-            self._audit(result.commit.pin)
+            self._handoff_audit(result.commit.pin,self._audit(result.commit.pin))
         return result.commit
 
 

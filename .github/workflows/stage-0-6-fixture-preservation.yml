@@ -24,7 +24,7 @@ jobs:
   smoke:
     if: github.repository == 'rax0h/all-that-endures'
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p preservation-tests
-          python -m pytest -q .github/tests/test_stage_0_6_fixture_preservation.py --junitxml=preservation-tests/tests.xml
+          timeout --signal=TERM --kill-after=30s 10m python -m pytest -q .github/tests --junitxml=preservation-tests/tests.xml
       - name: Prove actual private draft upload, download and full restore
         run: |
           set -euo pipefail

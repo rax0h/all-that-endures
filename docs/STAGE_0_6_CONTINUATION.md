@@ -1,3 +1,17 @@
+# November15 forensic repair — current boundary
+
+Critical-path repairs are locally verified on engine84626841: full.github/tests322passed plus5new workflow-detector cases. External002's12reproduced failures are resolved locally. Independent whole-package review is closed. Current candidate requires one new exact-engine hosted quick-harness/proof/full qualification; previous greenenginefd20cf17 cannot qualify this recovery change.
+
+Private draft fixture archive446184821: real hosted small upload/download/restore smoke succeeded in43734650623; full original small/mature ZIP preservation and restoration was observed running. Do not claim completion until its immutable manifest/checksum receipts are authenticated.
+
+Selected mature route: stage-0-6-resumable-proof-genesis.yml. Its production green tuple remains deliberately on the old qualified engine until the new hosted jobs are authenticated. Canonical compatibility is repaired; mature activation requires a coordinated qualification update, real compatible hosted smoke and preserved input binding.
+
+Stage0.6 is OPEN. Current-engine mature open/save/warm-year and year1002continuation remain UNMEASURED. Recent small year1figures below are NON-MATURE diagnostics. No general interactive-response result is established. No main/default/endurance action.
+
+Repair evidence, review and owning register: performance/stage-0-6-current/forensic-repair/repair-report.md and closure-register.md.
+
+---
+
 # Stage0.6 continuation
 
 Active checkout /workspace/scratch/d88f8db353e8/ate, branch sol/durable-proof-map.

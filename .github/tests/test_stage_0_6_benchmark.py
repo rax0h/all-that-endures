@@ -8,6 +8,18 @@ from simulation.tests.test_stage_0_5_packed_action_reconciliation_cost import fi
 def mod():return importlib.import_module('simulation.stage_0_6_mature_benchmark')
 
 
+def smoke_config(repo):
+ # Synthetic shell-regression authority only. This temporary config is never
+ # published as a production launch or evidence of successful hosted CI.
+ import hashlib,json,subprocess
+ config=json.loads((repo/'simulation/stage_0_6_benchmark_launch.json').read_text())
+ def git(*args):return subprocess.check_output(['git',*args],cwd=repo,text=True).strip()
+ config.update(launch_id='unit-small-checkout-smoke',green_commit=git('rev-parse','HEAD'),
+  runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),
+  fingerprints={name:hashlib.sha256((repo/name).read_bytes()).hexdigest() for name in config['fingerprints']})
+ return config
+
+
 def test_actual_small_checkpoint_has_separate_phases_and_immutable_source(tmp_path):
  s=fixture(tmp_path,16);a=source_authority(s)
  value=mod().run(s,tmp_path/'measurement',authority=a,budgets={'open':30,'first_step':30,'save':30,'warm_step':30})
@@ -81,7 +93,7 @@ def test_exact_workflow_measure_and_verify_launchers_on_small_fixture(tmp_path):
  control=tmp_path/'control.sqlite';shutil.copyfile(s,control)
  with open_lazy_world_session(control,rules_id=a['rules_id']) as session:
   Simulation(session.world).run(1);expected=session.world.digest()
- config=json.loads((repo/'simulation/stage_0_6_benchmark_launch.json').read_text());config.update(database=dict(name='candidate.sqlite',**a['database']),world=a['world'],pin={k:a['pin'][k] for k in ('store_identity','captured_head')},expected_saved_digest=expected,budgets={'open':30,'first_step':30,'save':30,'warm_step':30},verification_budget_seconds=60)
+ config=smoke_config(repo);config.update(database=dict(name='candidate.sqlite',**a['database']),world=a['world'],pin={k:a['pin'][k] for k in ('store_identity','captured_head')},expected_saved_digest=expected,budgets={'open':30,'first_step':30,'save':30,'warm_step':30},verification_budget_seconds=60)
  path=tmp_path/'smoke-config.json';path.write_text(json.dumps(config));r.publish_receipt(root/'evidence/source-authority.json',a)
  workflow=yaml.safe_load((repo/'.github/workflows/stage-0-6-current-mature-performance.yml').read_text());env=dict(os.environ,GITHUB_WORKSPACE=str(root),GITHUB_SHA=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),PYTHONPATH='.:simulation')
  for name in ('measure','restore'):
@@ -140,11 +152,9 @@ def test_shell_timeout_retains_started_phase_and_censored_command_receipt(tmp_pa
  assert (output/'result.json').is_file()
 
 
-def test_single_stage06_mature_workflow_and_bounded_diagnostic_lane():
+def test_named_mature_lanes_keep_transport_and_diagnostics_bounded():
  import yaml
  root=Path(__file__).resolve().parents[2]
- paths=sorted((root/'.github/workflows').glob('stage-0-6-*.yml'))
- assert [p.name for p in paths]==['stage-0-6-audit-attribution.yml','stage-0-6-current-mature-performance.yml']
  workflow=yaml.safe_load((root/'.github/workflows/stage-0-6-current-mature-performance.yml').read_text())
  assert set(workflow['on'])=={'workflow_dispatch','push'}
  assert workflow['on']['push']['paths']==['simulation/stage_0_6_fixture_retention_request.json']
@@ -160,6 +170,12 @@ def test_single_stage06_mature_workflow_and_bounded_diagnostic_lane():
  commands='\n'.join(step.get('run','') for step in diagnostic['jobs']['audit-probe']['steps'])
  assert 'timeout --signal=TERM --kill-after=10s 10m python docs/performance/stage-0-6-current/audit_probe.py' in commands
  assert not any(name in commands for name in ('stage_0_6_mature_benchmark','stage_0_6_benchmark_launch','run_long_history','download_ref'))
+ resumable=yaml.safe_load((root/'.github/workflows/stage-0-6-resumable-proof-genesis.yml').read_text())
+ assert resumable['jobs']['source-digest']['needs']==['gate']
+ preservation=yaml.safe_load((root/'.github/workflows/stage-0-6-fixture-preservation.yml').read_text())
+ assert preservation['jobs']['preserve']['needs']=='smoke'
+ assert not any('stage_0_6_genesis_resume' in step.get('run','') or 'mature_benchmark' in step.get('run','')
+  for job in preservation['jobs'].values() for step in job['steps'])
 
 
 def test_bounded_first_year_sample_has_profile_and_never_saves(tmp_path):
@@ -218,7 +234,7 @@ def test_exact_workflow_sample_launcher_on_small_authenticated_fixture(tmp_path)
  from simulation import continuation_receipts as r
  repo=Path(__file__).resolve().parents[2];s=fixture(tmp_path,16);a=source_authority(s)
  root=tmp_path/'workspace';(root/'source').mkdir(parents=True);(root/'evidence').mkdir();shutil.copyfile(s,root/'source/candidate.sqlite')
- config=json.loads((repo/'simulation/stage_0_6_benchmark_launch.json').read_text());config.update(database=dict(name='candidate.sqlite',**a['database']),world=a['world'],pin={k:a['pin'][k] for k in ('store_identity','captured_head')})
+ config=smoke_config(repo);config.update(database=dict(name='candidate.sqlite',**a['database']),world=a['world'],pin={k:a['pin'][k] for k in ('store_identity','captured_head')})
  path=tmp_path/'smoke-config.json';path.write_text(json.dumps(config));r.publish_receipt(root/'evidence/source-authority.json',a)
  workflow=yaml.safe_load((repo/'.github/workflows/stage-0-6-current-mature-performance.yml').read_text())
  command=next(step['run'] for step in workflow['jobs']['retain']['steps'] if step.get('id')=='sample').replace('simulation/stage_0_6_benchmark_launch.json',str(path))
@@ -283,3 +299,16 @@ def test_actual_sample_shell_timeout_preserves_explicit_diagnostics(tmp_path,sig
  assert (root/'evidence/sample/first_step.prof').is_file()==(signum=='TERM')
  if signum=='KILL':assert result['profile_available'] is False
  assert r.file_hash(s)==a['database']['sha256']
+
+
+def test_green_ancestor_with_another_engine_does_not_qualify_candidate(tmp_path,monkeypatch):
+ import subprocess
+ def git(*args):return subprocess.check_output(['git',*args],cwd=tmp_path,text=True,stderr=subprocess.DEVNULL).strip()
+ git('init');git('config','user.email','fixture@example.invalid');git('config','user.name','Fixture')
+ runtime=tmp_path/'simulation/ate_sim';runtime.mkdir(parents=True)
+ module=runtime/'module.py';module.write_text('value=1\n');git('add','.');git('commit','-m','prior green');green=git('rev-parse','HEAD')
+ module.write_text('value=2\n');git('add','.');git('commit','-m','untested changed engine');head=git('rev-parse','HEAD')
+ monkeypatch.setattr(mod().base,'_runtime_identity',lambda:dict(root=str(tmp_path),head=head))
+ config=dict(green_commit=green,runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),fingerprints={})
+ with pytest.raises(ValueError,match='green ancestor runtime differs'):
+  mod().check_source(tmp_path,config,head)

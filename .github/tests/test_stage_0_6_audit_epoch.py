@@ -66,6 +66,106 @@ def test_external_write_after_verified_audit_requires_fresh_audit(tmp_path, monk
         assert list(restored.world.settlements[1].memory['new']) == [1, 2, 3]
 
 
+@pytest.mark.parametrize('corrupt', [False, True])
+def test_writer_after_audited_handoff_keeps_original_attempt_recoverable(tmp_path, monkeypatch, corrupt):
+    path, pair = fixture(tmp_path)
+    session = opened(path, pair)
+    authority = session.store._world_proof_authority
+    parent_epoch = authority.epoch
+    publish = session._publish_committed_hybrid
+    checksum = None
+
+    def race_publication(*args):
+        nonlocal checksum
+        assert authority.epoch == parent_epoch
+        assert authority._publication_read_receipt is not None
+        assert authority.pending[1][1] == pair[1]
+        with sqlite3.connect(path) as external:
+            if corrupt:
+                checksum = external.execute("SELECT payload_checksum FROM records "
+                    "WHERE namespace='world.settlements'").fetchone()[0]
+                external.execute("UPDATE records SET payload_checksum='corrupt' "
+                    "WHERE namespace='world.settlements'")
+            else:
+                external.execute('CREATE TABLE diagnostic_after_handoff(value INTEGER)')
+        return publish(*args)
+
+    try:
+        session.world.settlements[1].memory['new'] = [1, 2, 3]
+        with monkeypatch.context() as patch:
+            patch.setattr(session, '_publish_committed_hybrid', race_publication)
+            with pytest.raises(StoreError, match='epoch drift requires exact recovery'):
+                session.save()
+        assert session._state == 'recovery-required'
+        assert authority.uncertain and authority.pending is not None
+        assert authority._publication_read_receipt is None
+        assert authority.epoch == parent_epoch
+        assert session.store.db.execute('SELECT generation FROM save_head').fetchone() == (1,)
+        if corrupt:
+            with pytest.raises(StoreError, match='checksum mismatch'):
+                session.resolve_save()
+            assert session._state == 'recovery-required'
+            assert authority._publication_read_receipt is None
+            with sqlite3.connect(path) as external:
+                external.execute("UPDATE records SET payload_checksum=? "
+                    "WHERE namespace='world.settlements'", (checksum,))
+        assert session.resolve_save() == 1
+        assert authority._publication_read_receipt is None
+        assert not authority.uncertain and authority.pending is None
+        child = session.proof_manifest
+        assert session.save() == 1
+        assert authority._publication_read_receipt is None
+    finally:
+        session.close()
+    with opened(path, child) as restored:
+        assert list(restored.world.settlements[1].memory['new']) == [1, 2, 3]
+
+
+@pytest.mark.parametrize('borrow', ['pin', 'pair', 'guard'])
+def test_audited_handoff_cannot_be_borrowed_by_another_context(tmp_path, monkeypatch, borrow):
+    from ate_sim import persistence_proof_native_sources as sources
+
+    path, pair = fixture(tmp_path)
+    session = opened(path, pair)
+    authority = session.store._world_proof_authority
+    audit, publish = authority._audit, session._publish_committed_hybrid
+    calls = []
+
+    def drift_once(pin):
+        verified = audit(pin)
+        calls.append(verified)
+        if len(calls) == 1:
+            with sqlite3.connect(path) as external:
+                external.execute('CREATE TABLE diagnostic_before_handoff(value INTEGER)')
+        return verified
+
+    def check_context(*args):
+        assert authority.epoch != authority._epoch()
+        pin, accepted, guard = authority.read_pin, authority.pair, authority._write_guard
+        try:
+            if borrow == 'pin': authority.read_pin = authority.pending[0]
+            elif borrow == 'pair': authority.pair = (accepted[0], accepted[1])
+            else: authority._write_guard = object()
+            with pytest.raises(StoreError): sources._epoch(session.store, authority)
+        finally:
+            authority.read_pin, authority.pair, authority._write_guard = pin, accepted, guard
+        sources._epoch(session.store, authority)
+        return publish(*args)
+
+    try:
+        session.world.settlements[1].memory['new'] = [1, 2, 3]
+        with monkeypatch.context() as patch:
+            patch.setattr(authority, '_audit', drift_once)
+            patch.setattr(session, '_publish_committed_hybrid', check_context)
+            assert session.save() == 1
+        assert len(calls) == 2 and authority._publication_read_receipt is None
+        child = session.proof_manifest
+    finally:
+        session.close()
+    with opened(path, child) as restored:
+        assert list(restored.world.settlements[1].memory['new']) == [1, 2, 3]
+
+
 def test_matching_epoch_does_not_admit_in_place_codec_hook(tmp_path, monkeypatch):
     from types import MethodType
 

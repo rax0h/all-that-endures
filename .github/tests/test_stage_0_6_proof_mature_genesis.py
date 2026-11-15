@@ -82,7 +82,7 @@ def test_no_mature_execution_before_both_validation_jobs_pass():
     workflow=yaml.safe_load(path.read_text())
     job=workflow['jobs']['mature-genesis']
     assert set(job['needs'])=={'proof-map','full-suite','mature-genesis-request'}
-    assert "outputs.enabled == 'true'" in job['if']
+    assert job['if'] is False  # Historical monolith cannot launch on request-only pushes.
     assert job['timeout-minutes']<=360
     script='\n'.join(s.get('run','') for s in job['steps'])
     assert '330m python -m simulation.stage_0_6_proof_mature_genesis run' in script
