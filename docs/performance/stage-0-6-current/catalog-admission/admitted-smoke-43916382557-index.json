@@ -1,0 +1,64 @@
+{
+  "archive": "admitted-smoke-43916382557-evidence.zip",
+  "bytes": 119074,
+  "database_note": "all3newdatabaseZIPsandrawmembers downloaded/hashverified; remote IDs/digests retained without git duplication",
+  "members": {
+    "authenticated-summary.json": {
+      "bytes": 5398,
+      "sha256": "08f3ba488b67708ecbe9be1657646ca28e27b2d4763b0972bf29739d9ff62d81"
+    },
+    "hosted-metadata.json": {
+      "bytes": 65419,
+      "sha256": "73cd4539708a43ad504ae6df6586fbd985c9f985bb37548c9e3bcf083b92c890"
+    },
+    "original-artifacts/14249504258.zip": {
+      "bytes": 8301,
+      "sha256": "87d31fb304da581ea5e67bd44f346a73d37f5819d5c14487d9dea0e8bc29a023"
+    },
+    "original-artifacts/14249569064.zip": {
+      "bytes": 8482,
+      "sha256": "24e23bbd39a4898869f57b5861634fb8c8a21832d9a5dc7bc4a39267d33627b3"
+    },
+    "original-artifacts/14249753626.zip": {
+      "bytes": 8279,
+      "sha256": "a95804ea25b7c50cb1fa0dedc5faba38c6541e5aadb317faa606f8a32688b25b"
+    },
+    "original-artifacts/14249938229.zip": {
+      "bytes": 10750,
+      "sha256": "37fc323ff10739e1e064f356ef624c10f9026cbc96156de489d98693e6844018"
+    },
+    "original-artifacts/14249998072.zip": {
+      "bytes": 14617,
+      "sha256": "3bcfc93c01eb24f85ec0538d27db8174038584c421148e74a1011f8b78ebcdd2"
+    },
+    "original-artifacts/14250266281.zip": {
+      "bytes": 10354,
+      "sha256": "db7077c9741929965cd710f3e7e52cb5f89143b251b57534213594abb62c2765"
+    },
+    "original-artifacts/14250776654.zip": {
+      "bytes": 14433,
+      "sha256": "1db53dbbd2149b7b471ab4b3aaf369ec1ca8901b703d4bd2af8cb76352ec4d23"
+    },
+    "original-artifacts/14250986642.zip": {
+      "bytes": 2638,
+      "sha256": "8a99c365dd63d9510c41abba9c2d6de84aaeb1cb3fdacde7603c31bce98f88a2"
+    },
+    "original-artifacts/14251161413.zip": {
+      "bytes": 16349,
+      "sha256": "4aa5b9d119c606e2bcf4a2ad49647c4cf99c1faf66d46b4247feb046a65a5c51"
+    },
+    "original-artifacts/14252095253.zip": {
+      "bytes": 17231,
+      "sha256": "d28f26ce91203441910ade44be106b18784f435f166d71ed3e0d44bad484fc68"
+    },
+    "original-artifacts/14252280082.zip": {
+      "bytes": 9506,
+      "sha256": "9928a65610443127a9ed43daa3c1d3b3c509356a2c065bc1ccb7574cf8600298"
+    },
+    "verify-hosted-smoke.py": {
+      "bytes": 5329,
+      "sha256": "9c06f46dd5d45afc3caff8884ffa48a72a0533e6e2b20d4f753e8b07d1b72a87"
+    }
+  },
+  "sha256": "62bb4897495fda39bcd9eee62912320b749f3862b649391b8c970964811f1eac"
+}

@@ -35,6 +35,6 @@ Interfaces: structural transition validator, validate_chain(root,value), inspect
 ### Task3: review and protected launch
 - [x] Update actual qualification pins/fingerprints, commit clean before full quick harness.
 - [x] Independent whole-package review; close all findings including Minors.
-- [ ] Helper publication, explicit old-small-catalog smoke with actual crash/retry/fresh restore; authenticate result.
+- [x] Helper publication, explicit old-small-catalog smoke with actual crash/retry/fresh restore; authenticate result.
 - [ ] One mature resume request with compatible smoke and old mature catalog; confirm skipped prefix and current stage.
 - [ ] Retain exact results and outstanding targets in continuation/closure register.

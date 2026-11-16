@@ -10,7 +10,7 @@ The preceding qualified engine was **84626841aa84b87a0564eda15200d83ea1478bb4**,
 
 The repaired engine passed [hosted qualification43877554746](https://github.com/rax0h/all-that-endures/actions/runs/43877554746) at public1de9adc6:5,125full-suite tests+2subtests,1,968proofcases and359harnesscases. Exact ZIPs and source/software/producer receipts are authenticated and retained under performance/stage-0-6-current/catalog-admission/. Current launch pins now bind this actual green engine.
 
-The explicit retained-catalog handoff is implemented and reviewed. A new rebase receipt retains its original old-context catalog parent and complete chain verbatim; a pinned contract and attestation bind both contexts and exact bytes. Every consumption checks original producer/publication/expiry again. Local helper391pass and post-review38admission cases pass; independent review has no remaining findings. Complete hosted helper gate and actual admitted small recovery/fresh restore still precede mature activation.
+The explicit retained-catalog handoff is implemented and reviewed. [Admitted smoke43916382557](https://github.com/rax0h/all-that-endures/actions/runs/43916382557) at public43b9fbb2 passed399quicktests, actual exit77 crash/unchanged-parent retention, ordinary retry, rebase, exact after_digest, proofs, measurement, fresh restore and acceptance. Source/capture/catalog were skipped. All checkpoint/database producer timestamps, ZIP hashes, three raw database hashes, exact old parent chain,50criticalpaths and hosted-runtime signature were independently authenticated. Exact fresh year2/gen1/digestcebc2fcd matched. This is functional smoke evidence, not mature timing acceptance.
 
 ## Mature run and retained checkpoint
 
@@ -18,7 +18,7 @@ The explicit retained-catalog handoff is implemented and reviewed. A new rebase 
 
 The last completed restart point is **catalog**, metadata **14197005279**, closed database **14195829058**. Its exact original receipt/control chain and producing job/upload timestamps were authenticated. The closed database is year 1001, seed 843000, generation 126, 29,389,029,376 bytes, SHA256 `8cc3dd2cd49ec143dd318a2ae6928f90b168ea06862c3939bec4aa32d6022562`. Its artifact expires December 16, 2026. Source/capture/catalog do not need a blind replay.
 
-The original context remains attached to the old catalog. The narrowly scoped handoff supports exactly the admitted small/mature catalog inputs; ordinary compatibility is unchanged. After helper qualification, resume the old small catalog through the real crash/retry and fresh restore path. A successful compatible admitted smoke is required to resume mature rebase; source/capture/catalog are skipped. Rebase remains the first incomplete expensive mature stage.
+Request admitted-mature-catalog-2026-11-16-1 now selects the retained mature catalog through this successful smoke. It uses resume43780946218,smoke43916382557 and the reviewed mature budgets. The original context/chain stays attached to the old catalog; only the new rebase receipt uses the current context. Ordinary compatibility stays strict. Rebase is first incomplete; source/capture/catalog are skipped. Later retries prefer their own completed checkpoints and fail closed if none is usable.
 
 ## Preserved original input
 
@@ -35,4 +35,4 @@ Private draft **446184821** retains both original fixture ZIPs independently of 
 
 New SQLite probes are synthetic locator-only data, not mature performance measurements. A timing miss or green engine badge does not complete Stage 0.6. The broader forensic closure register remains at `performance/stage-0-6-current/forensic-repair/closure-register.md`; owner-deferred and missing-review-001 items remain explicit. No main merge, default-format activation, gameplay migration or endurance run is included.
 
-**Next:** pass the hosted helper gate and admitted small recovery/fresh restore, then activate the retained mature-catalog resume. Preserve existing outputs and original control digests throughout.
+**Next:** confirm mature entry and skipped prefix, then retain actual rebase/after_digest/proofs and operation timings. Preserve original control digests and exact year1002acceptance.

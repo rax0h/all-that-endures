@@ -1,17 +1,17 @@
 {
   "schema": "ate-proof-genesis-resume-request/1",
-  "request_id": "admitted-small-catalog-smoke-2026-11-16-1",
-  "mode": "smoke",
-  "smoke_run_id": 0,
-  "resume_run_id": 43778758497,
+  "request_id": "admitted-mature-catalog-2026-11-16-1",
+  "mode": "mature",
+  "smoke_run_id": 43916382557,
+  "resume_run_id": 43780946218,
   "budgets": {
-    "source_digest": 300,
-    "capture": 300,
-    "catalog": 300,
-    "rebase": 300,
-    "after_digest": 300,
-    "proofs": 300,
-    "measure": 300,
-    "fresh_restore": 300
+    "source_digest": 3600,
+    "capture": 9000,
+    "catalog": 9000,
+    "rebase": 9000,
+    "after_digest": 7200,
+    "proofs": 12600,
+    "measure": 900,
+    "fresh_restore": 7200
   }
 }

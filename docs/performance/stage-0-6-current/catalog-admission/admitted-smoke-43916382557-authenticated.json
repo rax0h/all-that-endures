@@ -1,0 +1,143 @@
+{
+  "acceptance": {
+    "acceptance": "smoke-functional-only",
+    "saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+  },
+  "admission": {
+    "contract_sha256": "5e5da5681fe65c8f692c3b6893923c387537b6eb9ebe9ebb3435d44dc2aca0a2",
+    "from_context_sha256": "434af624d543abdfa207099e015ddee647437a05cfa288998fc623d2b6aee185",
+    "parent_database": {
+      "bytes": 16961536,
+      "format": 6,
+      "generation": 3,
+      "seed": 843000,
+      "sha256": "22d55427d96cff799cd1e09b2d3da8130f91f418c30b7283d4ee462390332e1c",
+      "store_identity": "8d0a9438-1a28-4d9a-b413-a392588a0476",
+      "year": 1
+    },
+    "parent_sha256": "5d5276b5ae84c1bca762348a74760355b5683e3791eaf59940f59856e42f9e67",
+    "schema": "ate-catalog-runtime-admission/1",
+    "to_context_sha256": "a6fe3e48837d8206da6687d2d213520f91a594f9ccbba434de97cbdd79baa440"
+  },
+  "archives": [
+    {
+      "bytes": 9506,
+      "id": 14252280082,
+      "name": "checkpoint-smoke-after_digest-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "9928a65610443127a9ed43daa3c1d3b3c509356a2c065bc1ccb7574cf8600298"
+    },
+    {
+      "bytes": 17231,
+      "id": 14252095253,
+      "name": "resume-evidence-smoke-after_digest-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "d28f26ce91203441910ade44be106b18784f435f166d71ed3e0d44bad484fc68"
+    },
+    {
+      "bytes": 2724311,
+      "id": 14252085073,
+      "name": "database-smoke-rebase-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "c90c56a5022a5ace65772946bb38e5ec8b0295b9859bf21e5b8b500535fc247c"
+    },
+    {
+      "bytes": 16349,
+      "id": 14251161413,
+      "name": "checkpoint-smoke-fresh_restore-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "4aa5b9d119c606e2bcf4a2ad49647c4cf99c1faf66d46b4247feb046a65a5c51"
+    },
+    {
+      "bytes": 2638,
+      "id": 14250986642,
+      "name": "resume-evidence-smoke-fresh_restore-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "8a99c365dd63d9510c41abba9c2d6de84aaeb1cb3fdacde7603c31bce98f88a2"
+    },
+    {
+      "bytes": 14433,
+      "id": 14250776654,
+      "name": "resume-evidence-smoke-measure-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "1db53dbbd2149b7b471ab4b3aaf369ec1ca8901b703d4bd2af8cb76352ec4d23"
+    },
+    {
+      "bytes": 10354,
+      "id": 14250266281,
+      "name": "resume-evidence-gate-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "db7077c9741929965cd710f3e7e52cb5f89143b251b57534213594abb62c2765"
+    },
+    {
+      "bytes": 7406606,
+      "id": 14250096799,
+      "name": "database-smoke-proofs-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "ce3b3b2ff8f32e1f6810cfd6ef4b10666bf32b6e5b323df92558ebdeef96cd83"
+    },
+    {
+      "bytes": 14617,
+      "id": 14249998072,
+      "name": "checkpoint-smoke-measure-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "3bcfc93c01eb24f85ec0538d27db8174038584c421148e74a1011f8b78ebcdd2"
+    },
+    {
+      "bytes": 10750,
+      "id": 14249938229,
+      "name": "checkpoint-smoke-proofs-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "37fc323ff10739e1e064f356ef624c10f9026cbc96156de489d98693e6844018"
+    },
+    {
+      "bytes": 8720006,
+      "id": 14249788674,
+      "name": "database-smoke-measure-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "15380b5152d14dbde55ddf46fd9088a1a69cf5706a6c84ebea386c090a394101"
+    },
+    {
+      "bytes": 8279,
+      "id": 14249753626,
+      "name": "resume-evidence-smoke-proofs-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "a95804ea25b7c50cb1fa0dedc5faba38c6541e5aadb317faa606f8a32688b25b"
+    },
+    {
+      "bytes": 8482,
+      "id": 14249569064,
+      "name": "resume-evidence-smoke-rebase-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "24e23bbd39a4898869f57b5861634fb8c8a21832d9a5dc7bc4a39267d33627b3"
+    },
+    {
+      "bytes": 8301,
+      "id": 14249504258,
+      "name": "checkpoint-smoke-rebase-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+      "sha256": "87d31fb304da581ea5e67bd44f346a73d37f5819d5c14487d9dea0e8bc29a023"
+    }
+  ],
+  "critical_paths": 50,
+  "engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "harness": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 399
+  },
+  "head": "43b9fbb273cbcb658fbfde0fb6996d02ae456629",
+  "hosted_runtime": {
+    "python": "3.12.16",
+    "signature": "a6cc6e5e404ca8bd7cfdf50e08b3f0c163405fb3941b77d83921f492213b3982",
+    "sqlite": "3.46.1"
+  },
+  "mature_status": "unmeasured",
+  "original_catalog_sha256": "5d5276b5ae84c1bca762348a74760355b5683e3791eaf59940f59856e42f9e67",
+  "recovery": {
+    "database_sha256": "22d55427d96cff799cd1e09b2d3da8130f91f418c30b7283d4ee462390332e1c",
+    "interrupted_stage": "rebase",
+    "next_action": "ordinary rebase step restores the same immutable parent in a fresh process",
+    "receipt_sha256": "5d5276b5ae84c1bca762348a74760355b5683e3791eaf59940f59856e42f9e67",
+    "retained_stage": "catalog",
+    "status": "passed",
+    "worker_exit": 77
+  },
+  "restored": {
+    "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+    "generation": 1,
+    "seed": 843000,
+    "world_audits": 0,
+    "year": 2
+  },
+  "run_id": 43916382557,
+  "schema": "ate-authenticated-admitted-smoke/1",
+  "scope": "Offline recorded-evidence verification; never impersonates hosted execution."
+}
