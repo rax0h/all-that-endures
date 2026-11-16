@@ -1,0 +1,14 @@
+{
+  "local_head": "83bcdd06fbddd210a10a563fcaeb63f2cca3463b",
+  "public_equivalent": "64e32ff40fcee2816bdc28cfcc6962fbf189fa0a",
+  "tree": "394b0c0195b5d4814047c2965b23594ccfd62428",
+  "check_source": "passed",
+  "fence": "passed",
+  "critical_paths": 50,
+  "old_catalog_source_checks": [
+    "smoke",
+    "mature"
+  ],
+  "engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "scope": "actual clean source/metadata checks only; live hosted gates separately required"
+}

@@ -233,3 +233,24 @@ def test_every_consumption_reauthenticates_old_catalog_authority(tmp_path,monkey
         else:a.require_small_cut(ROOT,row)
     assert calls
     if boundary=='seal':assert (tmp_path/'out/checkpoint.json').read_bytes()==before
+
+
+@pytest.mark.parametrize('input_resume',[0,43778758497])
+def test_rerun_gate_resumes_its_current_outputs_before_old_catalog(tmp_path,monkeypatch,capsys,input_resume):
+    from simulation import stage_0_6_genesis_resume as m
+    a=api();target=tmp_path/a.CONTRACT;target.parent.mkdir(parents=True)
+    target.write_bytes((ROOT/a.CONTRACT).read_bytes())
+    monkeypatch.setattr(m,'config',lambda root:dict(mode='smoke',smoke_run_id=0,resume_run_id=43778758497))
+    monkeypatch.setattr(m,'inspect_green',lambda root:{'green_run':m.GREEN_RUN})
+    monkeypatch.setattr(m,'runtime_description',lambda:({'python':'test','sqlite':'test','signature':'a'*64},{}))
+    monkeypatch.setenv('GITHUB_RUN_ID','900');monkeypatch.setenv('GITHUB_RUN_ATTEMPT','2')
+    def prohibit(*a,**k):raise AssertionError('rerun replays the old catalog instead of retained current output')
+    monkeypatch.setattr(a,'restore_prior',prohibit)
+    def retained(root,run,mode,workspace):
+        assert run==900 and mode=='smoke'
+        return {'artifact_id':77,'run_id':900},{'stage':'proofs'}
+    monkeypatch.setattr(m,'discover',retained)
+    m.gate(tmp_path,tmp_path/'work',input_mode='smoke',input_resume_run=input_resume)
+    output=json.loads(capsys.readouterr().out)
+    assert output['resume_run_id']==900 and output['resume_artifact_id']==77
+    assert output['resume_index']==c.ORDER.index('proofs')-1

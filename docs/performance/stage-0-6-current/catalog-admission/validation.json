@@ -1,5 +1,12 @@
 {
   "engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "hosted_helper": {
+    "cases": 397,
+    "commit": "64e32ff40fcee2816bdc28cfcc6962fbf189fa0a",
+    "engine_jobs": "skipped",
+    "failures": 0,
+    "run": 43914808199
+  },
   "independent_review": {
     "findings": {
       "CA-R1": "closed: five boundary RED then live-reference revalidation,38admission checks pass"
@@ -8,7 +15,7 @@
     "postfix_boundary_pass": 106,
     "remaining_findings": []
   },
-  "next_required_gate": "complete hosted helper gate, then actual admitted small crash/retry/fresh restore before mature",
+  "next_required_gate": "actual admitted small crash/retry/fresh restore before mature",
   "qualified_run": 43877554746,
   "results": {
     "admission-both.xml": {
@@ -67,6 +74,12 @@
       "tests": 19.0,
       "time": 0.136
     }
+  },
+  "reviewed_retry_selector": {
+    "focused_green": 40,
+    "independent_selector_green": 2,
+    "red": 2,
+    "scope": "initial smoke bundle; stagedcurrent399gate still required"
   },
   "scope": "helper admission; engine unchanged and hosted qualification reused"
 }

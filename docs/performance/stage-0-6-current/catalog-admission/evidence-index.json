@@ -1,8 +1,8 @@
 {
   "archives": {
     "evidence.zip": {
-      "bytes": 26172,
-      "sha256": "acefa34d41ba98a762c79d7f6c0f947a2fb1aa711f3b7c0a4eee1aa831b5d686"
+      "bytes": 41182,
+      "sha256": "2e0877a084661aa4069c111f3cbdd600fb26b585ee369149bae5b0628abc0c72"
     },
     "qualified-full.zip": {
       "bytes": 197895,
@@ -41,6 +41,22 @@
     "admission-r1-red.xml": {
       "bytes": 10608,
       "sha256": "39efba1cd517c2cf982c7d89cc4a24841241a54ec60057f8fc9b0c3a14691d82"
+    },
+    "admission-rerun-green.log": {
+      "bytes": 99,
+      "sha256": "49a3d0c61bf32557725b746f99dc905e7eaa3b12cab10be76feba1ecb00c8c2a"
+    },
+    "admission-rerun-green.xml": {
+      "bytes": 6733,
+      "sha256": "18de1cd030726d7304eb617d391d07ca75cb47b9b534b78dc5900139bc8e8d63"
+    },
+    "admission-rerun-red.log": {
+      "bytes": 6054,
+      "sha256": "2b604a9efba2d10c835a4d91b9cd3d683270b5d0aa7ed9a8f929f96845c0d471"
+    },
+    "admission-rerun-red.xml": {
+      "bytes": 6216,
+      "sha256": "0a9a500a8a6c26dd27eb52ffadae438ff7765d6043ff9197572390787838aa5f"
     },
     "admission-stage-green.log": {
       "bytes": 99,
@@ -89,6 +105,14 @@
     "catalog-admission-runtime.json": {
       "bytes": 2883,
       "sha256": "2e15ca3b8969a843c3daf32390bbea6ff1695e1da36e764f11edd7e264729c5a"
+    },
+    "catalog-helper-43914808199-metadata.json": {
+      "bytes": 25376,
+      "sha256": "ed799492f3bc3a6f01ca5466e715f1b4e67803de633bb32ebb88e1f899d6e602"
+    },
+    "catalog-helper-43914808199.zip": {
+      "bytes": 8221,
+      "sha256": "9cd941f025a734ea59d195787e105d3942cb33dfd094839fdb8623f62d91253c"
     },
     "green-43877554746-metadata.json": {
       "bytes": 33039,

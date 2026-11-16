@@ -72,3 +72,5 @@ Qualified engine0d9dab5d/public1de9adc6 passed43877554746:5,125tests+2subtests,1
 | CA-R1: later consumption did not reauthenticate old artifact availability/expiry/publication | Five chain/control/seal/restore/require-small boundary tests RED, then reauthenticate both fixed old refs at consumption;38admission checks and independent106boundary cases pass. | Closed |
 
 Full local helper391pass preceded review correction; focused38pass and independent106pass verify correction. Hosted complete helper gate and actual admitted small crash/retry/fresh restore remain mandatory before mature execution. Evidence: ../catalog-admission/. Engine unchanged; existing expensive prefix retained.
+
+CA-R2: rerun-all previously retained a positive initial oldresume and could replay completed current stages. Two cfg/dispatch REDcases; gate now selects current run on every attempt>1, failing closed when no completedcurrent checkpoint.40admission checks pass; independent selector/firstattempt/no-fallback probes pass. Closed; no engine change or generic compatibility relaxation. Hostedhelper397green; stagedcurrent399gate precedes the admitted smoke.

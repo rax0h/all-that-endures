@@ -263,7 +263,9 @@ def gate(root,workspace,*,input_mode='',input_resume_run=0,input_smoke_run=0):
         require_smoke(root,smoke_run,workspace)
         controls.mature_control_contract(root,current_runtime_tree=git(root,'rev-parse','HEAD:simulation/ate_sim'))
     resume_run=input_resume_run or (cfg['resume_run_id'] if mode==cfg['mode'] else 0)
-    if not resume_run and int(os.environ['GITHUB_RUN_ATTEMPT'])>1:resume_run=int(os.environ['GITHUB_RUN_ID'])
+    # A rerun must prefer its own retained outputs, not an initial catalog
+    # selection carried forward in the request or workflow-dispatch inputs.
+    if int(os.environ['GITHUB_RUN_ATTEMPT'])>1:resume_run=int(os.environ['GITHUB_RUN_ID'])
     if resume_run:
         if admission.eligible(root,mode,resume_run):
             pair=admission.contract(root)['catalogs'][mode]
