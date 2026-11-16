@@ -68,14 +68,26 @@ def test_hosted_software_change_fails_before_reusing_engine_validation():
     with pytest.raises(ValueError):m.check_software(dict(python='3.12.16',sqlite='3.45.1',signature='b'*64))
 
 
-def test_outer_launch_binding_matches_qualified_engine_and_current_harness():
+def test_outer_launch_binding_matches_qualified_engine_and_refuses_untested_successor(monkeypatch):
     import hashlib,json,subprocess
     from pathlib import Path
     m=api();root=Path(__file__).resolve().parents[2]
     value=json.loads((root/m.OLD_REQUEST).read_text())
     assert value['green_commit']==m.GREEN_SHA
+    # Engine qualification must be able to run before a new engine is admitted
+    # to mature execution. Keep the real qualified ancestor binding intact.
     assert value['runtime_tree']==m.RUNTIME==subprocess.check_output(
-        ['git','rev-parse','HEAD:simulation/ate_sim'],cwd=root,text=True).strip()
+        ['git','rev-parse',m.GREEN_SHA+':simulation/ate_sim'],cwd=root,text=True).strip()
+    current=subprocess.check_output(['git','rev-parse','HEAD:simulation/ate_sim'],cwd=root,text=True).strip()
+    if current!=m.RUNTIME:
+        actual_git=m.git
+        def clean_git(root,*args):
+            if args==('status','--porcelain','--untracked-files=no'):
+                return ''
+            return actual_git(root,*args)
+        monkeypatch.setattr(m,'git',clean_git)
+        with pytest.raises(ValueError,match='execution source/runtime is dirty or untested'):
+            m.fence(root)
     required={m.CRITICAL[0],m.CRITICAL[1],m.CRITICAL[2],m.CRITICAL[3],m.CRITICAL[4],m.CRITICAL[5],
         'simulation/stage_0_6_preserved_transport.py','simulation/stage_0_6_preserved_fixtures.json'}
     assert required<=set(value['fingerprints'])

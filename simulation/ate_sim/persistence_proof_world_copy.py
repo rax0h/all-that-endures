@@ -26,15 +26,17 @@ def _bounded_rows(db, table, keys, fields):
     columns = ','.join(keys)
     while True:
         where = '' if watermark is None else ' WHERE ('+columns+')>('+','.join('?' for _ in keys)+')'
-        cursor = db.execute('SELECT '+columns+' FROM '+table+where+' ORDER BY '+columns+' LIMIT 64', watermark or ())
+        cursor = db.execute('SELECT rowid,'+columns+' FROM '+table+where+' ORDER BY '+columns+' LIMIT 64', watermark or ())
         batch = cursor.fetchall()
         cursor.close()
         if not batch:
             return
-        watermark = batch[-1]
+        watermark = batch[-1][1:]
         for locator in batch:
-            row = db.execute('SELECT '+','.join(fields)+' FROM '+table+' WHERE '+
-                ' AND '.join(key+'=?' for key in keys), locator).fetchone()
+            # These private tables have rowids. A logical-key lookup can choose
+            # a covering index on namespace alone and rescan it for every row.
+            row = db.execute('SELECT '+','.join(fields)+' FROM '+table+' WHERE rowid=?',
+                (locator[0],)).fetchone()
             if row is None:
                 raise StoreIntegrityError('private genesis row disappeared')
             yield row

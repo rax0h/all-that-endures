@@ -1,0 +1,107 @@
+{
+  "archive": "evidence.zip",
+  "bytes": 81223,
+  "members": {
+    "hosted/failed-run-metadata.json": {
+      "bytes": 55940,
+      "sha256": "e1b39f3b7c6ad9e752c0bdf9161924c5bff330895daf4baa537a1ae934ce7e70"
+    },
+    "hosted/last-good-authenticated.json": {
+      "bytes": 1372,
+      "sha256": "62c12b3f19ed14a1cc961c2eb5746db35df6fca0bfffba95e05595b30a916bc8"
+    },
+    "hosted/original-catalog-metadata.zip": {
+      "bytes": 7931,
+      "sha256": "6239ebd5d486cbb00ecdb0e6206a288190cf4fb9d857fcbc90a3a674eda3b335"
+    },
+    "hosted/original-rebase-evidence.zip": {
+      "bytes": 5593,
+      "sha256": "9e1a57c577664cbf51123dcf67655e05bec94be7f631a479a0ae2772d105b2eb"
+    },
+    "hosted/rebase-job.log": {
+      "bytes": 211071,
+      "sha256": "17e90b8a19a63aab9fdf9d3f8aab83090a6e8cf714542bf493fd5f2b4a15d2e5"
+    },
+    "local/rebase-affected.log": {
+      "bytes": 191,
+      "sha256": "906ec4c3b4c33807f94f02256b3c1196fedd6200466f7d1704f440557b85cfb6"
+    },
+    "local/rebase-affected.xml": {
+      "bytes": 12982,
+      "sha256": "4bfa3f0a04e08051d8bd0ddc389e6e2707987aa6995b667573b10dafc4d7f2eb"
+    },
+    "local/rebase-canonical-declaration-red.log": {
+      "bytes": 1141,
+      "sha256": "3aa29f6cce9e47c44305ad31742bc2881c0a0a5143f1765656ece3088915cd84"
+    },
+    "local/rebase-clean-closure.log": {
+      "bytes": 98,
+      "sha256": "a3a6063a7d1ee73998b47a80055a1279a3bfcf13ec24876e958157e647c1b6f7"
+    },
+    "local/rebase-clean-closure.xml": {
+      "bytes": 880,
+      "sha256": "3fc93a69df099f6ebcede476873b10ca580a15f368206cff8a503223ce20dfa7"
+    },
+    "local/rebase-contract-green.log": {
+      "bytes": 99,
+      "sha256": "17d41b0ebeab1007f4db5bf35eda710e7e837a0266b277b5cf80aa3907504f88"
+    },
+    "local/rebase-contract-green.xml": {
+      "bytes": 5221,
+      "sha256": "b4ab29e055479d79d3fc77ad12cd2132d97c6db80176bfe2669de2ddfa7c9e79"
+    },
+    "local/rebase-declaration-green.log": {
+      "bytes": 110,
+      "sha256": "6fbf245f7ebd2862bc5560697380a58b1aa0d0a7761ff7647c85ac3680f2d3f3"
+    },
+    "local/rebase-declaration-green.xml": {
+      "bytes": 9536,
+      "sha256": "06c593ca1282fdd5afec05898f29248c72f294d10711c83d8c496beb2855c04d"
+    },
+    "local/rebase-harness.log": {
+      "bytes": 7030,
+      "sha256": "0d7f10fc1f0d89c4097e8b9e9ddd47e4172a2f874c3ba3a7dfa58e389fc0d34d"
+    },
+    "local/rebase-harness.xml": {
+      "bytes": 62259,
+      "sha256": "0e986a8378221d6cd21f1bfc38ac1d226ad1c0725e929edbbe6b6c717b6c70f1"
+    },
+    "local/rebase-locator-explicit-scaling.json": {
+      "bytes": 1584,
+      "sha256": "479fc62eb59fb2107e7b0f6ce06f32d7f627187c10d7f89cf2172b023151200a"
+    },
+    "local/rebase-locator-green.log": {
+      "bytes": 98,
+      "sha256": "e4083fe9e4460d574f7457091b53ead8da9062ae08a9bb4ccda3fb2e698522cc"
+    },
+    "local/rebase-locator-green.xml": {
+      "bytes": 587,
+      "sha256": "b49dac464abed7a3cb17446e08d0baa40e8e31941655f92159c3afa84575fb53"
+    },
+    "local/rebase-locator-red.log": {
+      "bytes": 2947,
+      "sha256": "ffabe266abb33715868391074ff2245e5b65df08affb82394f39075f231abe4f"
+    },
+    "local/rebase-locator-red.xml": {
+      "bytes": 3138,
+      "sha256": "f1ebb5b62594b2312a2df5462d4996d20c5b0da24e0aeaf19acc9e6e4dfcde06"
+    },
+    "local/rebase-qualification-contract-red.log": {
+      "bytes": 1228,
+      "sha256": "1ed9cea29e1877d4311cdc4db8c61fbd441827a9b6db63928e3b6fe4e8eac68b"
+    },
+    "local/rebase-qualified-runtime.json": {
+      "bytes": 2883,
+      "sha256": "2e15ca3b8969a843c3daf32390bbea6ff1695e1da36e764f11edd7e264729c5a"
+    },
+    "local/rebase-shell-clean.log": {
+      "bytes": 99,
+      "sha256": "79267c39e92ff8c58aee6fefdac07033b05e22bdbefa400d25bc99b6e2df4c96"
+    },
+    "local/rebase-shell-clean.xml": {
+      "bytes": 549,
+      "sha256": "74c6e01568d3fbdc751f5f43064f2b739ffa96e9b06e8c88548a5df83825c17c"
+    }
+  },
+  "sha256": "00aaec447de09b1241b46c1712c3b7126f43d3874be2475185c1f94900eaf710"
+}

@@ -46,6 +46,11 @@ not replace missing particulars.
 | Additional outer launch declaration stale | All29 reviewed execution fingerprints and actual green/runtime aligned; original source/world/pin/year1002digest unchanged; real public-parent guards passed48paths | Closed |
 | Live draft read denied by read-scope token | Scope required draft access to the four actual input-reader jobs; consumer remains GET/download-only; other jobs retain read scopes | Closed; live caller hop43776600177passed |
 | Runner mismatch at staged gate43777357586 | Pin observed qualified Ubuntu26.04; retain software guard. Raw logs, RED/58focusedGREEN and independent review retained. | Closed; complete compatible smoke43778758497passed |
+| Mature rebase namespace scan | Unique rowid payload lookup keeps stable pagination and bounded retention; real SQLite work-bound RED/GREEN, affected integrity tests and independent review. | Repaired locally; successor hosted qualification and catalog transition pending |
+| Circular prequalification harness assumption | Validate actual declared green ancestor and prove clean untested engine is refused; production launch fence/pins unchanged. | Repaired test contract; hosted full harness pending |
+| Rebase review Minors: dirty-status ambiguity and evidence labels | Isolate clean-status observation; distinguish helper blob from engine tree; state original no-ANALYZE RED accurately. | Closed by focused independent verification |
+| Rebase candidate canonical declaration stale | Existing guard reproduced the stale engine declaration; update only candidate tree and its exact fingerprint, preserving historical authority/model bytes and old green pins. Reconcile README distinction. | Local fix independently verified; not engine/catalog admission |
+| Local shell checks refused uncommitted harness source | First full local harness ran while its gate test was uncommitted; actual dirty-source guard correctly rejected two shell cases. Commit source and rerun those exact cases on clean tree. Raw failures retained. | 2 clean repeats passed20.01s; no production guard weakened |
 
 Raw history and exact hashes: baseline-and-preservation-tests.zip,
 preservation-review.zip, preservation-hosted-preflight.zip,
@@ -53,3 +58,6 @@ preservation-draft-id.zip, repair-validation.zip,
 launch-and-reproduction-evidence.zip, private-draft-permission-repair.zip and
 their adjacent indexes. Original qualified engine and preservation archives are
 listed in retained-archive-index.json. Current chronology is in progress.md.
+
+
+Latest mature result:43780946218failed rebase at its compute cap, before operation timings. Source/capture/catalog are retained and authenticated. Engine846remains last qualified; repair candidate0d9requires new hosted qualification. Stage0.6/F7remain open. Catalog-to-successor admission is not implemented; see ../rebase-locator-repair/README.md.

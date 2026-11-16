@@ -52,3 +52,6 @@ Baseline enginefd20cf17; green43670981744 newly observed successful, artifact au
 Status after the first two guarded launch attempts: original archives and live caller access verified; original12failures fixed and exact engine fully qualified; all source bindings aligned and real public ancestry verified; moving ubuntu-latest qualification resolved to explicit26.04. Fresh compatible smoke43778758497 is active. Mature execution, target/fresh acceptance and measured bottleneck work remain open. Full24finding register preserves broader unresolved/owner-deferred items.
 
 Compatible smoke43778758497now authenticated complete,359harness cases and exact fresh/recovery passed. Live original preserved inputs and qualified artifacts rechecked. Mature request activated with unchanged source/workflow and reviewed budgets; operational results remain pending.
+
+
+Nov16mature outcome:43780946218failed in rebase after source/capture/catalog passed. First-incomplete-stage recovery remains rebase; exact retained catalog is authenticated. Unique-locator repair candidate0d9has local work-bound and integrity gates. New hosted engine qualification and explicit cross-engine catalog transition remain prerequisites; no prefix replay or blind retry is activated. See performance/stage-0-6-current/rebase-locator-repair.

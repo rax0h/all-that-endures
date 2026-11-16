@@ -1,0 +1,94 @@
+{
+  "baseline_public": "6f3d0a88e910376427ce81bc0ae224bf4bc742e3",
+  "candidate_engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "full_local_harness_disposition": "356passed/3failed during initial run; two dirty-source guards intentionally refused uncommitted test source, canonical declaration was stale. Both causes addressed and exact cases repeated; do not report a complete local359green run. Final committed clean-tree closure repeated all three original failures plus unqualified-engine refusal:4passed.",
+  "hosted_new_engine_qualification": "not yet launched",
+  "mature_retry": "not admitted; explicit retained-catalog successor transition still required",
+  "mature_targets": "unmeasured",
+  "qualified_local_fingerprint": "exact full313fingerprint reverified",
+  "results": {
+    "rebase-affected": {
+      "errors": 0.0,
+      "failed_cases": [],
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 79.0,
+      "time": 357.918
+    },
+    "rebase-clean-closure": {
+      "errors": 0.0,
+      "failed_cases": [],
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 4.0,
+      "time": 9.978
+    },
+    "rebase-contract-green": {
+      "errors": 0.0,
+      "failed_cases": [],
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 32.0,
+      "time": 1.021
+    },
+    "rebase-declaration-green": {
+      "errors": 0.0,
+      "failed_cases": [],
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 58.0,
+      "time": 75.565
+    },
+    "rebase-harness": {
+      "errors": 0.0,
+      "failed_cases": [
+        ".github.tests.test_stage_0_6_benchmark::test_exact_workflow_measure_and_verify_launchers_on_small_fixture",
+        ".github.tests.test_stage_0_6_benchmark::test_exact_workflow_sample_launcher_on_small_authenticated_fixture",
+        ".github.tests.test_stage_0_6_genesis_source_control::test_reviewed_current_canonical_pair_names_actual_committed_engine"
+      ],
+      "failures": 3.0,
+      "skipped": 0.0,
+      "tests": 359.0,
+      "time": 558.635
+    },
+    "rebase-locator-green": {
+      "errors": 0.0,
+      "failed_cases": [],
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 2.0,
+      "time": 0.5
+    },
+    "rebase-locator-red": {
+      "errors": 0.0,
+      "failed_cases": [
+        "simulation.tests.test_stage_0_6_rebase_locator_cost::test_rebase_order_locator_reads_have_linear_work_with_real_indexes[False]"
+      ],
+      "failures": 1.0,
+      "skipped": 0.0,
+      "tests": 2.0,
+      "time": 1.207
+    },
+    "rebase-shell-clean": {
+      "errors": 0.0,
+      "failed_cases": [],
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 2.0,
+      "time": 20.019
+    }
+  },
+  "review": {
+    "agent": "rebase_locator_review",
+    "code_tests_metadata": "no remaining actionable issue",
+    "final_evidence_reconciliation": "passed",
+    "findings_closed": [
+      "clean-status isolation",
+      "ANALYZE wording",
+      "helper blob vs engine tree label",
+      "README canonical declaration reconciliation"
+    ],
+    "publication_scope": "new engine qualification only; no mature admission"
+  },
+  "schema": "ate-rebase-locator-validation/1"
+}

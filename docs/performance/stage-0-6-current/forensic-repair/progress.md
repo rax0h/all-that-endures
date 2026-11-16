@@ -46,3 +46,16 @@ Smokerequest05cb4ef9/run43777357586:357harnesscasespassed; gate thenrefusedunsup
 Live private draft/manifests/10fixture parts still match committed immutable pins; green engine artifacts unexpired. Prepared mature requestpreserved-current-engine-mature-2026-11-15-1, smoke43778758497/resume0, reviewed larger compute budgets. Mature-launch-preflight.md records restore/disk/publication/restart bounds. Engine remains846; no repeated full/proof qualification. Timings and deep year1002acceptance pending. Raw completed smoke evidence retained losslessly with index.
 
 Mature request validation:32resumable contracts passed0.53s; JUnit retained. Request and docs only; no critical source/workflow/engine changes.
+
+
+## Mature rebase timeout and unique-locator repair
+
+Mature43780946218/public6f3d0a88 completed source/capture/catalog then failed rebase at9000s compute cap in lazy_order_versions point lookup. Last catalog metadata14197005279/database14195829058 authenticated with exact producer timestamps and original control/context; source hash8cc3dd2c/year1001/generation126 retained, expiryDec16. No completed rebase checkpoint exists.
+
+Qualified local runtime recreated after old checkout disappeared; full executable/compiler/SQLite/extension/library fingerprint matches prior accepted313runtime exactly. Public source cloned to /workspace/scratch/c88cf88fdaa2/ate-rebase-repair. Engine0d9dab5d uses unique physical point locator while retaining stable logical pagination/batch64. Real-DDL1024row VM-bound RED(original fails without ANALYZE)/GREEN(2pass) and512/1024/2048synthetic scaling show quadratic original vs linear candidate.79affected integrity/recovery cases passed357.91s. Actual mature speed remains unmeasured.
+
+Prequalification harness contract originally required HEAD already equal previous green engine; reproduced RED on new engine, then test now checks actual qualified ancestor and clean successor refusal without changing production fences or pins. Independent review closed clean-status isolation and two wording/identity precision Minors. Complete local harness verification and one bundled hosted engine qualification precede recovery admission.
+
+No blind retry: existing compatible(), full context and recursive parent context correctly reject old catalog under changed engine. A separately scoped authenticated transition/admission must retain old chain/bytes and qualify exact allowed delta plus small recovery/corruption/equivalence before mature rebase. Old receipts are not relabelled and prefix not replayed. Evidence/validation: ../rebase-locator-repair/.
+
+Final local validation: initial full quick356pass/3fail558.66s; two dirty-source shell refusals resolved by clean committed tree, third canonical declaration corrected.58source/resume cases passed75.56s; final clean exact3failure cases plus untested-successor refusal4passed9.97s. All raw failures retained. No complete359local-green claim. Hosted complete clean gate remains required.
