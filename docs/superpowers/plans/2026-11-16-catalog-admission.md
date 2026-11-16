@@ -36,5 +36,7 @@ Interfaces: structural transition validator, validate_chain(root,value), inspect
 - [x] Update actual qualification pins/fingerprints, commit clean before full quick harness.
 - [x] Independent whole-package review; close all findings including Minors.
 - [x] Helper publication, explicit old-small-catalog smoke with actual crash/retry/fresh restore; authenticate result.
-- [ ] One mature resume request with compatible smoke and old mature catalog; confirm skipped prefix and current stage.
-- [ ] Retain exact results and outstanding targets in continuation/closure register.
+- [x] One mature resume request with compatible smoke and old mature catalog; confirm skipped prefix and current stage.
+- [x] Retain exact results and outstanding targets in continuation/closure register.
+
+Mature43918798385/public71967a3dentry399green, prefixskipped, rebaseactive. Admission/launch package complete; actual mature timings and year1002acceptance remain in the broader Stage0.6 plan.

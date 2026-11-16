@@ -1,0 +1,19 @@
+{
+  "archive": "mature-run-43918798385-entry-evidence.zip",
+  "bytes": 25144,
+  "members": {
+    "admitted-mature-43918798385-entry.json": {
+      "bytes": 28458,
+      "sha256": "8722dcedfec188d49ab514dd4f12d2695dc6f89c3085d85846483fda2e84717b"
+    },
+    "admitted-mature-43918798385-gate.log": {
+      "bytes": 56110,
+      "sha256": "931f30cfe7f4800d9b56c9700a36085f483ba7c8cf1a82f2adb0371fd6286089"
+    },
+    "admitted-mature-43918798385-gate.zip": {
+      "bytes": 10374,
+      "sha256": "81fa32e848f2328457e295c56ae7429c9b6224871c3ed6b3a1d0845c600c0cd6"
+    }
+  },
+  "sha256": "2042bdb30fa59966431dc7be147a79e0e77fa022dd59e4ac29907aa1f399eddd"
+}

@@ -18,7 +18,7 @@ The explicit retained-catalog handoff is implemented and reviewed. [Admitted smo
 
 The last completed restart point is **catalog**, metadata **14197005279**, closed database **14195829058**. Its exact original receipt/control chain and producing job/upload timestamps were authenticated. The closed database is year 1001, seed 843000, generation 126, 29,389,029,376 bytes, SHA256 `8cc3dd2cd49ec143dd318a2ae6928f90b168ea06862c3939bec4aa32d6022562`. Its artifact expires December 16, 2026. Source/capture/catalog do not need a blind replay.
 
-Request admitted-mature-catalog-2026-11-16-1 now selects the retained mature catalog through this successful smoke. It uses resume43780946218,smoke43916382557 and the reviewed mature budgets. The original context/chain stays attached to the old catalog; only the new rebase receipt uses the current context. Ordinary compatibility stays strict. Rebase is first incomplete; source/capture/catalog are skipped. Later retries prefer their own completed checkpoints and fail closed if none is usable.
+[Mature resume43918798385](https://github.com/rax0h/all-that-endures/actions/runs/43918798385), public71967a3d, was activated by request admitted-mature-catalog-2026-11-16-1 and selects the retained mature catalog through this successful smoke. It uses resume43780946218,smoke43916382557 and the reviewed mature budgets. The original context/chain stays attached to the old catalog; only the new rebase receipt uses the current context. Ordinary compatibility stays strict. Entry gate133480139824passed399tests; raw output confirms exact mature catalog14197005279/run43780946218. Source/capture/catalog are actually skipped and rebase133482798633is active (disk/restore preparation at observation). Rebase is first incomplete. Later retries prefer their own completed checkpoints and fail closed if none is usable.
 
 ## Preserved original input
 
@@ -35,4 +35,4 @@ Private draft **446184821** retains both original fixture ZIPs independently of 
 
 New SQLite probes are synthetic locator-only data, not mature performance measurements. A timing miss or green engine badge does not complete Stage 0.6. The broader forensic closure register remains at `performance/stage-0-6-current/forensic-repair/closure-register.md`; owner-deferred and missing-review-001 items remain explicit. No main merge, default-format activation, gameplay migration or endurance run is included.
 
-**Next:** confirm mature entry and skipped prefix, then retain actual rebase/after_digest/proofs and operation timings. Preserve original control digests and exact year1002acceptance.
+**Next:** retain completed rebase/after_digest/proofs and actual operation timings as they arrive. Resume from the latest completed compatible checkpoint if a later stage fails. Preserve original control digests and exact year1002acceptance.

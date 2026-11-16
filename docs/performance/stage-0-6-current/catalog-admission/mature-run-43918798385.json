@@ -1,0 +1,41 @@
+{
+  "commit": "71967a3d9a3713a038bc5ec360094945bf312700",
+  "engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "entry_gate": "success",
+  "entry_harness": {
+    "errors": 0,
+    "failures": 0,
+    "tests": 399
+  },
+  "equivalent_local_commit": "2363f2ce14460d7d021980dc55a96bcc283a063f",
+  "gate_selection": {
+    "fresh": "false",
+    "has_database": "false",
+    "mode": "mature",
+    "resume_artifact_id": 14197005279,
+    "resume_index": 2,
+    "resume_run_id": 43780946218
+  },
+  "hosted_runtime_signature": "a6cc6e5e404ca8bd7cfdf50e08b3f0c163405fb3941b77d83921f492213b3982",
+  "initial_observation": "in_progress; entry gate",
+  "mature_timings": "pending",
+  "mode": "mature",
+  "observed_skipped": [
+    "source-digest",
+    "capture",
+    "catalog"
+  ],
+  "qualified_engine_run": 43877554746,
+  "rebase_at_observation": "Reserve disposable stage disk before restore",
+  "rebase_job": 133482798633,
+  "resume_database": 14195829058,
+  "resume_metadata": 14197005279,
+  "resume_run_id": 43780946218,
+  "resume_stage": "catalog",
+  "run_id": 43918798385,
+  "schema": "ate-admitted-mature-launch/1",
+  "smoke_run_id": 43916382557,
+  "tree": "48646bdddd5ba8a0d701d6a65639aa0ccf531f84",
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/43918798385",
+  "year1002_exact_acceptance": "pending"
+}
