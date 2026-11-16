@@ -57,7 +57,7 @@ def runtime_description():
 
 
 def check_software(value):
-    if value.get('python')!='3.12.16' or value.get('sqlite')!='3.46.1':raise ValueError('hosted software differs from green evidence; qualify before expensive work')
+    if value.get('python')!='3.12.16' or value.get('sqlite')!='3.46.1':raise ValueError('hosted software differs from green evidence; observed Python '+repr(value.get('python'))+' / SQLite '+repr(value.get('sqlite'))+'; qualify before expensive work')
 
 
 def git(root,*args):return subprocess.check_output(['git',*args],cwd=root,text=True).strip()

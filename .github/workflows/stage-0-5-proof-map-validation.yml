@@ -49,7 +49,7 @@ env:
   PYTHONUNBUFFERED: '1'
 jobs:
   mature-genesis-request:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       enabled: ${{ steps.request.outputs.enabled }}
       engine_changed: ${{ steps.request.outputs.engine_changed }}
@@ -88,7 +88,7 @@ jobs:
     # The consumer issues GETs only; other jobs retain contents:read.
     permissions:
       contents: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     env:
       TMPDIR: ${{ github.workspace }}/.harness-tmp
@@ -124,7 +124,7 @@ jobs:
   proof-map:
     needs: [harness, mature-genesis-request]
     if: needs.mature-genesis-request.outputs.engine_changed == 'true' || needs.mature-genesis-request.outputs.proof_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # The previous green job used 52m; retain room for the added forest matrix
     # and observed hosted variance. Individual scaling commands stay bounded.
     timeout-minutes: 90
@@ -234,7 +234,7 @@ jobs:
   full-suite:
     needs: [harness, mature-genesis-request]
     if: needs.mature-genesis-request.outputs.engine_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # The last run passed every reported test but hit the 135m command cap at
     # 96%. Keep the whole suite bounded, with room for current hosted variance.
     timeout-minutes: 195
@@ -272,7 +272,7 @@ jobs:
     # Historical monolithic construction is inactive; use the protected staged
     # resumable workflow after explicit current-engine qualification.
     if: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 350
     permissions:
       contents: read

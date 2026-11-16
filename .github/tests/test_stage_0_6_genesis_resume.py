@@ -85,6 +85,22 @@ def test_outer_launch_binding_matches_qualified_engine_and_current_harness():
     assert value['expected_saved_digest']=='2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7'
 
 
+def test_staged_jobs_use_the_runner_observed_in_real_green_engine_logs():
+    from pathlib import Path
+    import yaml
+    root=Path(__file__).resolve().parents[2]/'.github/workflows'
+    staged=yaml.safe_load((root/'stage-0-6-resumable-proof-genesis.yml').read_text())
+    assert {job['runs-on'] for job in staged['jobs'].values()}=={'ubuntu-26.04'}
+    engine=yaml.safe_load((root/'stage-0-5-proof-map-validation.yml').read_text())
+    for name in ('harness','proof-map','full-suite'):
+        assert engine['jobs'][name]['runs-on']=='ubuntu-26.04'
+
+
+def test_software_refusal_reports_the_observed_versions():
+    with pytest.raises(ValueError,match='observed Python.*3.12.16.*SQLite.*3.45.1'):
+        api().check_software(dict(python='3.12.16',sqlite='3.45.1'))
+
+
 def test_observed_full_scan_budget_keeps_restore_and_publication_reserve(tmp_path):
     import json,yaml
     from pathlib import Path

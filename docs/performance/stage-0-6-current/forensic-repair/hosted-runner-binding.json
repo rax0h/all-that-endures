@@ -1,0 +1,16 @@
+{
+  "green_run": 43735593694,
+  "green_commit": "4eadb66855289b9983677815f402af1ceb94b37e",
+  "runtime_tree": "84626841aa84b87a0564eda15200d83ea1478bb4",
+  "full_job": 132878528722,
+  "proof_job": 132878528733,
+  "observed_runner": "ubuntu-26.04",
+  "observed_os": "Ubuntu26.04.1",
+  "observed_image_version": "20261111.196.1",
+  "python": "3.12.16",
+  "sqlite": "3.46.1",
+  "failed_staged_run": 43777357586,
+  "failed_staged_runner": "ubuntu-24.04",
+  "failed_before": "World/source stages",
+  "repair": "Pin explicit26.04 across qualified engine and staged jobs; retain strict software checks and record actual observed versions on refusal"
+}

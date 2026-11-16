@@ -1,6 +1,6 @@
 {
   "schema": "ate-proof-genesis-resume-request/1",
-  "request_id": "preserved-current-engine-smoke-2026-11-15-1",
+  "request_id": "preserved-current-engine-smoke-2026-11-15-2",
   "mode": "smoke",
   "smoke_run_id": 0,
   "resume_run_id": 0,

@@ -1,0 +1,22 @@
+{
+  "qualified-proof-runner.log": {
+    "bytes": 54768,
+    "sha256": "8a28e6e6b5a02d2393880c3f153eed4387b980c9f8fedff3ffdf839bc12041ed"
+  },
+  "qualified-full-runner.log": {
+    "bytes": 876296,
+    "sha256": "766de8903ff3bde4af2b423f0b9dba1f4be3e3aa8841e3b2ccf4049c439092c9"
+  },
+  "staged-runner-mismatch.log": {
+    "bytes": 57257,
+    "sha256": "ecf2508ce06db306dfbc64f1fa4738da936502363e4336b8593c497da7ec9d8d"
+  },
+  "runner-alignment-red.log": {
+    "bytes": 1870,
+    "sha256": "b06e708382fcc182c54e06911cf425449405349b4bb310dfcff9869173226ade"
+  },
+  "runner-alignment-green.log": {
+    "bytes": 99,
+    "sha256": "15edca3071b6a5615655639da59f5d84ba5a293504870683f3e17783b2e2db82"
+  }
+}

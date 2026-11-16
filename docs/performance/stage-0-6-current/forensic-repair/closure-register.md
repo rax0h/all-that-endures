@@ -52,3 +52,5 @@ preservation-draft-id.zip, repair-validation.zip,
 launch-and-reproduction-evidence.zip, private-draft-permission-repair.zip and
 their adjacent indexes. Original qualified engine and preservation archives are
 listed in retained-archive-index.json. Current chronology is in progress.md.
+
+| Runner mismatch atstagedgate43777357586 | GreenenginejobswereUbuntu26.04.1; stagedjobs24.04. Pin explicitqualified26.04, retain softwareguard and observed-version refusal | Raw runner logs and RED/58focusedGREEN, independent approval | Closed locally; fresh smoke pending |
