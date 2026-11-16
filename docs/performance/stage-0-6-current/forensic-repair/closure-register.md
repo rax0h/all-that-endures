@@ -61,3 +61,14 @@ listed in retained-archive-index.json. Current chronology is in progress.md.
 
 
 Latest mature result:43780946218failed rebase at its compute cap, before operation timings. Source/capture/catalog are retained and authenticated. Engine846remains last qualified; repair candidate0d9requires new hosted qualification. Stage0.6/F7remain open. Catalog-to-successor admission is not implemented; see ../rebase-locator-repair/README.md.
+
+
+## Catalog admission follow-up
+
+Qualified engine0d9dab5d/public1de9adc6 passed43877554746:5,125tests+2subtests,1,968proofcases,359harnesscases; exactarchives/source/software/producer evidence authenticated. One pinned catalog-to-rebase context cut preserves the original old parent chain and exact metadata/data references. Ordinary compatibility remains strict.
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| CA-R1: later consumption did not reauthenticate old artifact availability/expiry/publication | Five chain/control/seal/restore/require-small boundary tests RED, then reauthenticate both fixed old refs at consumption;38admission checks and independent106boundary cases pass. | Closed |
+
+Full local helper391pass preceded review correction; focused38pass and independent106pass verify correction. Hosted complete helper gate and actual admitted small crash/retry/fresh restore remain mandatory before mature execution. Evidence: ../catalog-admission/. Engine unchanged; existing expensive prefix retained.

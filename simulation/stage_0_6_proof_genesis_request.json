@@ -2,8 +2,8 @@
   "schema": "ate-stage06-proof-genesis-request/1",
   "request_id": "bounded-mature-proof-genesis-2026-11-10-timeout-repair-1",
   "operation": "convert-then-one-year",
-  "green_commit": "4eadb66855289b9983677815f402af1ceb94b37e",
-  "runtime_tree": "84626841aa84b87a0564eda15200d83ea1478bb4",
+  "green_commit": "1de9adc652f481e5e6471939ea605fb432589008",
+  "runtime_tree": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
   "database": {
     "bytes": 29922463744,
     "name": "candidate.sqlite",
@@ -31,11 +31,11 @@
     "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
     "simulation/profile_stage_0_5_performance.py": "79e9e3abc5c8cfe342b0114157d8fa7b3578461a8d3d3868d45b286f92fcaf95",
     "simulation/stage_0_5_save1002_preflight.json": "7f0648786159007816c2a64ee1b8501c0210d2121f011052c4a2179db5a62b7a",
-    "simulation/stage_0_6_genesis_checkpoint.py": "9d40491c825109936779f8fbc7c1394b28c99d0164444f055ca29748d3a19fa0",
+    "simulation/stage_0_6_genesis_checkpoint.py": "d525978d57e7c5d9cdce6c777f02626f529676fea71f319da645f1e89aa0e538",
     "simulation/stage_0_6_genesis_control_compatibility.json": "21306f5b826fa8355e52d8b23989bc0dc8637ec09e2be387588ec4d1c5dace7c",
-    "simulation/stage_0_6_genesis_resume.py": "d610733a0a0ce6372f5b795ce21d7f3315432568b8b6fd3771a369e7e49eabcb",
-    "simulation/stage_0_6_genesis_source_control.py": "dc5ccf1d4fe43daa250a4a2ca6f94227f91c704e5af47908f54173209bdd8c75",
-    "simulation/stage_0_6_genesis_stages.py": "4766e0efa81a304acfeeafb10d9229e7b664769fe46e9168647be1cf1ccbcaf9",
+    "simulation/stage_0_6_genesis_resume.py": "b12fe44853c3d76dd5739e6cdd8ba48f9cce37e34a8247a1c446a9561fdb6beb",
+    "simulation/stage_0_6_genesis_source_control.py": "c91ea53665c81e6b57e1784fab917b966ca81910e95b7a1308b98c501f67745b",
+    "simulation/stage_0_6_genesis_stages.py": "4a24abd902ad8f5ee3be5c351d4f52ba770bf86db107030736d2e3481f9402dd",
     "simulation/stage_0_6_genesis_transport.py": "5329b96b2cb23734e9eb27403d7ad3c261c7635d0122bbeab2886c1829be42bb",
     "simulation/stage_0_6_mature_benchmark.py": "1514455af928160a940e7d51e293abcd910b522e290478c027ae98263cd39629",
     "simulation/stage_0_6_preserve_fixtures.py": "b672f3efe9ab1a045e702f52c501f941e63d91cdbd24cebae76b32e6249a73e8",
@@ -46,7 +46,9 @@
     "simulation/stage_0_6_retained_archive.py": "eed53bfd67771c7cabecceabe2b0a01143e3c716135ae9808a1b7137ed2bd94b",
     "simulation/stage_0_6_retained_launch.py": "537c0bb700b822be41a118fe5f1fc928518e1c763d431025e28ec0c8116bf10d",
     "simulation/stage_0_6_retained_producer.py": "f6ce0cf2327f39559b868a662f7c385ccd4156df950e01ef9277ad9eff70de9e",
-    "simulation/stage_0_6_retained_transport.py": "07122d6a4cb86fd70f001cd2031dce1386faa50c3673c436520f65ab01fe0fff"
+    "simulation/stage_0_6_retained_transport.py": "07122d6a4cb86fd70f001cd2031dce1386faa50c3673c436520f65ab01fe0fff",
+    "simulation/stage_0_6_catalog_admission.py": "40f6477ff9ea1e49a777f892c052df9cfb5df8180826485176977a34972d869d",
+    "simulation/stage_0_6_catalog_admission.json": "5e5da5681fe65c8f692c3b6893923c387537b6eb9ebe9ebb3435d44dc2aca0a2"
   },
   "expected_saved_digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
   "budgets": {

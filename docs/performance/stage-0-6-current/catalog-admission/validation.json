@@ -1,0 +1,72 @@
+{
+  "engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "independent_review": {
+    "findings": {
+      "CA-R1": "closed: five boundary RED then live-reference revalidation,38admission checks pass"
+    },
+    "initial_affected_pass": 147,
+    "postfix_boundary_pass": 106,
+    "remaining_findings": []
+  },
+  "next_required_gate": "complete hosted helper gate, then actual admitted small crash/retry/fresh restore before mature",
+  "qualified_run": 43877554746,
+  "results": {
+    "admission-both.xml": {
+      "errors": 0.0,
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 38.0,
+      "time": 7.152
+    },
+    "admission-r1-green.xml": {
+      "errors": 0.0,
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 37.0,
+      "time": 6.242
+    },
+    "admission-r1-red.xml": {
+      "errors": 0.0,
+      "failures": 5.0,
+      "skipped": 0.0,
+      "tests": 5.0,
+      "time": 1.438
+    },
+    "admission-stage-green.xml": {
+      "errors": 0.0,
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 21.0,
+      "time": 2.766
+    },
+    "admission-transport.xml": {
+      "errors": 0.0,
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 32.0,
+      "time": 3.947
+    },
+    "catalog-admission-first-green.xml": {
+      "errors": 0.0,
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 19.0,
+      "time": 1.096
+    },
+    "catalog-admission-full.xml": {
+      "errors": 0.0,
+      "failures": 0.0,
+      "skipped": 0.0,
+      "tests": 391.0,
+      "time": 197.242
+    },
+    "catalog-admission-red.xml": {
+      "errors": 0.0,
+      "failures": 8.0,
+      "skipped": 0.0,
+      "tests": 19.0,
+      "time": 0.136
+    }
+  },
+  "scope": "helper admission; engine unchanged and hosted qualification reused"
+}

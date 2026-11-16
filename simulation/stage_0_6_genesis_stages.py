@@ -166,7 +166,8 @@ def _measure(source,path,receipt,output,deadline):
         saved_commitment=commitment.hex(),fresh_restore='pending separate durable stage')
 
 
-def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,progress=lambda _:None,source_control=None):
+def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,progress=lambda _:None,source_control=None,
+              successor_context=None,catalog_admission=None):
     """Caller must authenticate remote provenance before supplying its receipt.
 
     Successful publication is the only completion marker. A failure discards
@@ -176,6 +177,10 @@ def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,p
     from ate_sim.persistence_adapters import WorldCodec,SCHEMA
     from ate_sim.persistence_conversion_workspace import ConversionWorkspace
     from ate_sim.persistence_conversion_audit import construction_spills
+    if successor_context is not None or catalog_admission is not None:
+        if stage!='rebase' or successor_context is None or catalog_admission is None:
+            raise ValueError('catalog context admission is rebase-only')
+        c.check_context(successor_context);c.check_admission(input_receipt,successor_context,catalog_admission)
     c.validate(input_receipt)
     if stage not in c.STAGES or input_receipt['stage']!=c.ORDER[c.ORDER.index(stage)-1]:raise ValueError('stage requires its exact predecessor')
     c.integer(budget,'stage budget',1)
@@ -195,7 +200,9 @@ def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,p
     # Input + working growth + publication/SQLite journals; fail before work.
     size=input_receipt['database']['bytes']
     if shutil.disk_usage(destination.parent).free<2*size+64*1024*1024:raise ValueError('insufficient stage copy/journal headroom')
-    ctx=input_receipt['context'];rules=ctx['rules_id'];metrics={};result=None
+    ctx=successor_context if successor_context is not None else input_receipt['context']
+    rules=ctx['rules_id'];metrics={};result=None
+    if catalog_admission is not None:metrics['catalog_admission']=copy.deepcopy(catalog_admission)
     rec=Recorder(Path(tempfile.mkdtemp(prefix='evidence-'+stage+'-',dir=destination.parent)),{} if stage=='measure' else {stage:budget})
     with tempfile.TemporaryDirectory(prefix='.proof-stage-',dir=destination.parent) as directory:
         private=Path(directory);working=private/'working.sqlite'

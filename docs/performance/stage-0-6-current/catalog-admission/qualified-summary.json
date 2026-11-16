@@ -1,0 +1,386 @@
+{
+  "run": 43877554746,
+  "head": "1de9adc652f481e5e6471939ea605fb432589008",
+  "engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "results": {
+    "full-suite": {
+      "artifact": {
+        "id": 14245642394,
+        "node_id": "MDg6QXJ0aWZhY3QxNDI0NTY0MjM5NA==",
+        "name": "stage-0-5-proof-map-suite-1de9adc652f481e5e6471939ea605fb432589008",
+        "size_in_bytes": 197895,
+        "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/14245642394",
+        "archive_download_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/14245642394/zip",
+        "expired": false,
+        "digest": "sha256:3de9057bb6122b913925f45446eea7993d58a786ebb89727072948f2c739c8a0",
+        "created_at": "2026-11-16T16:22:34Z",
+        "updated_at": "2026-11-16T16:22:34Z",
+        "expires_at": "2026-11-30T16:22:33Z",
+        "workflow_run": {
+          "id": 43877554746,
+          "repository_id": 1362289798,
+          "head_repository_id": 1362289798,
+          "head_branch": "sol/durable-proof-map",
+          "head_sha": "1de9adc652f481e5e6471939ea605fb432589008"
+        }
+      },
+      "counts": {
+        "tests": 5127,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "source": {
+        "head": "1de9adc652f481e5e6471939ea605fb432589008",
+        "python": "3.12.16",
+        "runtime_tree": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+        "sqlite": "3.46.1"
+      },
+      "log_tails": [
+        [
+          "full-suite.log",
+          "o_year_pipeline_uses_fresh_processes\n52.93s call     simulation/tests/test_stage_0_5_closeout.py::test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]\n49.81s call     simulation/tests/test_stage_0_5_paged_household_world.py::test_r3_world_open_digest_append_atomic_save_reopen[10000]\n49.09s call     simulation/tests/test_stage_0_5_final_sequence.py::test_repeated_same_gap_splits_then_merges_and_stable_occurrences\n47.93s call     simulation/tests/test_stage_0_5_final_currency_root_copy.py::test_currency_root_point_save_does_not_walk_map_history\n47.74s call     simulation/tests/test_stage_0_5_final_maintenance.py::test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]\n46.23s call     simulation/tests/test_persistence_lazy_typed_institution_divinity.py::test_real_nested_histories_use_bounded_points_and_header_reads[10000]\n46.17s call     simulation/tests/test_stage_0_5_final_settlement_memory.py::test_scalar_settlement_edit_has_fixed_imported_memory_work\n45.69s call     simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843002]\n======= 5125 passed, 1 warning, 2 subtests passed in 9643.06s (2:40:43) ========\n"
+        ]
+      ]
+    },
+    "proof-map": {
+      "artifact": {
+        "id": 14233817733,
+        "node_id": "MDg6QXJ0aWZhY3QxNDIzMzgxNzczMw==",
+        "name": "stage-0-5-proof-map-1de9adc652f481e5e6471939ea605fb432589008",
+        "size_in_bytes": 216390,
+        "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/14233817733",
+        "archive_download_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/14233817733/zip",
+        "expired": false,
+        "digest": "sha256:2c704dc13bb0d76daf2da8c603539862c1a5893d8b0ed8ae97d5ef0045d2b2c6",
+        "created_at": "2026-11-16T14:25:47Z",
+        "updated_at": "2026-11-16T14:25:47Z",
+        "expires_at": "2026-11-30T14:25:46Z",
+        "workflow_run": {
+          "id": 43877554746,
+          "repository_id": 1362289798,
+          "head_repository_id": 1362289798,
+          "head_branch": "sol/durable-proof-map",
+          "head_sha": "1de9adc652f481e5e6471939ea605fb432589008"
+        }
+      },
+      "counts": {
+        "tests": 1968,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "source": {
+        "head": "1de9adc652f481e5e6471939ea605fb432589008",
+        "python": "3.12.16",
+        "runtime_tree": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+        "sqlite": "3.46.1"
+      },
+      "log_tails": [
+        [
+          "batch-scaling.log",
+          "1000: final nodes=1350, batch=0.063s, heap=52450B, point reads=4\n10000: final nodes=13850, batch=0.649s, heap=219869B, point reads=5\n100000: final nodes=137297, batch=6.879s, heap=242320B, point reads=6\n"
+        ],
+        [
+          "child-extents-tests.log",
+          "..................................                                       [100%]\n34 passed in 3.66s\n"
+        ],
+        [
+          "child-extents-scaling.log",
+          "1000 40.45 ms; zero unrelated child bodies\n10000 44.36 ms; zero unrelated child bodies\n100000 45.53 ms; zero unrelated child bodies\n"
+        ],
+        [
+          "collection-directory-scaling.log",
+          "1000 5.26 ms; zero body reads\n10000 5.18 ms; zero body reads\n100000 5.42 ms; zero body reads\n"
+        ],
+        [
+          "collection-directory-tests.log",
+          "...............................                                          [100%]\n31 passed in 1.97s\n"
+        ],
+        [
+          "collection-publication-scaling.log",
+          "1000 35.76 ms; zero unrelated bodies\n10000 40.86 ms; zero unrelated bodies\n100000 41.63 ms; zero unrelated bodies\n"
+        ],
+        [
+          "collection-publication-tests.log",
+          "............                                                             [100%]\n12 passed in 0.99s\n"
+        ],
+        [
+          "collection-scaling.log",
+          "1000 3.11 ms; zero body reads\n10000 3.92 ms; zero body reads\n100000 4.92 ms; zero body reads\n"
+        ],
+        [
+          "collection-tests.log",
+          "....................                                                     [100%]\n20 passed in 1.28s\n"
+        ],
+        [
+          "compressed-batch-tests.log",
+          ".....                                                                    [100%]\n5 passed in 0.31s\n"
+        ],
+        [
+          "descriptor-fact-tests.log",
+          ".............................                                            [100%]\n29 passed in 17.08s\n"
+        ],
+        [
+          "directory-publication-scaling.log",
+          "1000 46.32 ms; zero unrelated bodies\n10000 46.54 ms; zero unrelated bodies\n100000 49.61 ms; zero unrelated bodies\n"
+        ],
+        [
+          "directory-publication-tests.log",
+          "......................                                                   [100%]\n22 passed in 1.60s\n"
+        ],
+        [
+          "frozen-extents-scaling.log",
+          "1000 {'frozen-list': 53.93, 'record': 35.22, 'nan-key': 40.69} ms; zero unrelated child bodies\n10000 {'frozen-list': 57.41, 'record': 37.9, 'nan-key': 47.06} ms; zero unrelated child bodies\n100000 {'frozen-list': 62.36, 'record': 40.98, 'nan-key': 49.7} ms; zero unrelated child bodies\n"
+        ],
+        [
+          "frozen-extents-tests.log",
+          "..............................................                           [100%]\n46 passed in 5.81s\n"
+        ],
+        [
+          "generation-tests.log",
+          "............................................................             [100%]\n60 passed in 1.62s\n"
+        ],
+        [
+          "group-scaling.log",
+          "1000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799\n10000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799\n100000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799\n"
+        ],
+        [
+          "group-tests.log",
+          "........................................................................ [100%]\n72 passed in 11.06s\n"
+        ],
+        [
+          "inventory-tests.log",
+          "..................................                                       [100%]\n34 passed in 3.10s\n"
+        ],
+        [
+          "inventory-scaling.log",
+          "1000 57.14 ms; zero unrelated bodies\n10000 62.15 ms; zero unrelated bodies\n100000 61.22 ms; zero unrelated bodies\n"
+        ],
+        [
+          "native-fresh-scaling.log",
+          "1000 values: 0.540135 s raw save; 2119011 VM steps; zero unrelated history bodies\n10000 values: 0.558897 s raw save; 2127128 VM steps; zero unrelated history bodies\n100000 values: 0.573758 s raw save; 2148789 VM steps; zero unrelated history bodies\n"
+        ],
+        [
+          "native-insert-scaling.log",
+          "1000 values: 0.165086 s raw save; 687659 VM steps; zero unrelated history bodies\n10000 values: 0.161904 s raw save; 688686 VM steps; zero unrelated history bodies\n100000 values: 0.157573 s raw save; 690507 VM steps; zero unrelated history bodies\n"
+        ],
+        [
+          "native-insert-tests.log",
+          "........................................................................ [ 17%]\n........................................................................ [ 35%]\n........................................................................ [ 53%]\n........................................................................ [ 71%]\n........................................................................ [ 89%]\n...........................................                              [100%]\n403 passed in 661.89s (0:11:01)\n"
+        ],
+        [
+          "native-metadata-tests.log",
+          ".......................................                                  [100%]\n39 passed in 30.25s\n"
+        ],
+        [
+          "native-mixed-scaling.log",
+          "1000 values: 0.223293 s raw save; 918621 VM steps; zero unrelated history bodies\n10000 values: 0.227121 s raw save; 921661 VM steps; zero unrelated history bodies\n100000 values: 0.232772 s raw save; 926957 VM steps; zero unrelated history bodies\n"
+        ],
+        [
+          "native-rank-tests.log",
+          "...............................................                          [100%]\n47 passed in 42.25s\n"
+        ],
+        [
+          "native-value-scaling.log",
+          "1000 134.97 ms unprofiled native first-access save; 590.41 ms with allocation profiling; 206.12 ms backing value save; 208.83 ms tail resize; 262.97 ms page growth; zero unrelated history bodies\n10000 138.31 ms unprofiled native first-access save; 591.91 ms with allocation profiling; 215.7 ms backing value save; 209.59 ms tail resize; 245.56 ms page growth; zero unrelated history bodies\n100000 132.08 ms unprofiled native first-access save; 611.74 ms with allocation profiling; 212.77 ms backing value save; 211.25 ms tail resize; 261.89 ms page growth; zero unrelated history bodies\n"
+        ],
+        [
+          "native-value-tests.log",
+          "........................................................................ [ 70%]\n..............................                                           [100%]\n102 passed in 151.01s (0:02:31)\n"
+        ],
+        [
+          "native-world-session-tests.log",
+          ".............................................                            [100%]\n45 passed in 107.89s (0:01:47)\n"
+        ],
+        [
+          "node-factorization-tests.log",
+          ".................                                                        [100%]\n17 passed in 0.76s\n"
+        ],
+        [
+          "occurrence-scaling.log",
+          "1000: exact; group/owner proof reads=9/4; payload checks=0/0; old-frontier budget VM<=2599\n10000: exact; group/owner proof reads=11/4; payload checks=0/0; old-frontier budget VM<=2599\n100000: exact; group/owner proof reads=11/4; payload checks=0/0; old-frontier budget VM<=2599\n"
+        ],
+        [
+          "order-scaling.log",
+          "1000: point reads=23, writes=5, heap=24643B, wall=0.006460s, page/rebuild exact\n10000: point reads=27, writes=5, heap=31552B, wall=0.008581s, page/rebuild exact\n100000: point reads=33, writes=6, heap=35679B, wall=0.010300s, page/rebuild exact\n"
+        ],
+        [
+          "owner-target-scaling.log",
+          "1000 24.8 ms; zero archive bodies\n10000 27.61 ms; zero archive bodies\n100000 28.33 ms; zero archive bodies\n"
+        ],
+        [
+          "owner-target-tests.log",
+          "....................                                                     [100%]\n20 passed in 2.46s\n"
+        ],
+        [
+          "projection-scaling.log",
+          "1000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3599/3099\n10000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3599/2999\n100000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3699/3099\n"
+        ],
+        [
+          "projection-tests.log",
+          "...........................................                              [100%]\n43 passed in 2.61s\n"
+        ],
+        [
+          "proof-open-tests.log",
+          "..............................................................           [100%]\n62 passed in 51.85s\n"
+        ],
+        [
+          "proof-open-year.log",
+          ""
+        ],
+        [
+          "proof-tests.log",
+          "........................................................................ [ 27%]\n........................................................................ [ 54%]\n........................................................................ [ 82%]\n..............................................                           [100%]\n262 passed in 10.54s\n"
+        ],
+        [
+          "publication-read-scope-tests.log",
+          "........                                                                 [100%]\n8 passed in 5.22s\n"
+        ],
+        [
+          "publication-scaling.log",
+          "1000: actual unified save 47.18ms; unrelated bodies0; current/retained exact\n10000: actual unified save 50.36ms; unrelated bodies0; current/retained exact\n100000: actual unified save 69.32ms; unrelated bodies0; current/retained exact\n"
+        ],
+        [
+          "publication-tests.log",
+          "...................................................................      [100%]\n67 passed in 5.45s\n"
+        ],
+        [
+          "query-scaling.log",
+          "1000: baseline payload checks=8, proof=0, proof node reads=20, exact\n10000: baseline payload checks=8, proof=0, proof node reads=22, exact\n100000: baseline payload checks=8, proof=0, proof node reads=21, exact\n"
+        ],
+        [
+          "rank-up-publication-tests.log",
+          "........................                                                 [100%]\n24 passed in 135.93s (0:02:15)\n"
+        ],
+        [
+          "read-view-epoch-tests.log",
+          ".................                                                        [100%]\n17 passed in 16.29s\n"
+        ],
+        [
+          "record-scaling.log",
+          "1000: actual point save 14.18ms; unrelated bodies0; exact current/retained/successor\n10000: actual point save 13.16ms; unrelated bodies0; exact current/retained/successor\n100000: actual point save 13.30ms; unrelated bodies0; exact current/retained/successor\n"
+        ],
+        [
+          "record-tests.log",
+          "............................................................             [100%]\n60 passed in 3.43s\n"
+        ],
+        [
+          "reference-closure-scaling.log",
+          "1000 85.89 ms; zero unrelated internal bodies\n10000 90.68 ms; zero unrelated internal bodies\n100000 98.07 ms; zero unrelated internal bodies\n"
+        ],
+        [
+          "reference-closure-tests.log",
+          "......................................                                   [100%]\n38 passed in 7.86s\n"
+        ],
+        [
+          "reference-scaling.log",
+          "1000 88.09 ms; graph reused, zero graph/unrelated bodies\n10000 93.7 ms; graph reused, zero graph/unrelated bodies\n100000 103.76 ms; graph reused, zero graph/unrelated bodies\n"
+        ],
+        [
+          "reference-tests.log",
+          "........................................                                 [100%]\n40 passed in 6.08s\n"
+        ],
+        [
+          "scaling.log",
+          "{\"keys\": 1000, \"status\": \"complete\", \"point\": {\"wall_seconds\": 0.0023879020000094897, \"node_io\": {\"read_requests\": 4, \"read_nodes\": 4, \"read_bytes\": 1654, \"write_requests\": 4, \"written_nodes\": 4, \"written_bytes\": 1654, \"clean_cache_bytes\": 0}, \"sql_selects\": {\"proof\": 4, \"other\": 0}, \"python_peak_bytes\": 13780, \"process_peak_rss_bytes\": 31236096}}\n{\"keys\": 10000, \"status\": \"complete\", \"point\": {\"wall_seconds\": 0.00314482699999985, \"node_io\": {\"read_requests\": 6, \"read_nodes\": 6, \"read_bytes\": 2308, \"write_requests\": 5, \"written_nodes\": 4, \"written_bytes\": 2168, \"clean_cache_bytes\": 0}, \"sql_selects\": {\"proof\": 6, \"other\": 0}, \"python_peak_bytes\": 17302, \"process_peak_rss_bytes\": 32284672}}\n{\"keys\": 100000, \"status\": \"complete\", \"point\": {\"wall_seconds\": 0.00357854200001384, \"node_io\": {\"read_requests\": 7, \"read_nodes\": 7, \"read_bytes\": 2810, \"write_requests\": 6, \"written_nodes\": 5, \"written_bytes\": 2670, \"clean_cache_bytes\": 0}, \"sql_selects\": {\"proof\": 7, \"other\": 0}, \"python_peak_bytes\": 20042, \"process_peak_rss_bytes\": 34119680}}\n"
+        ],
+        [
+          "scope-scaling.log",
+          "1000: scoped point save 34.19ms; unrelated bodies0; allocator root sharing exact\n10000: scoped point save 38.06ms; unrelated bodies0; allocator root sharing exact\n100000: scoped point save 41.38ms; unrelated bodies0; allocator root sharing exact\n"
+        ],
+        [
+          "scope-tests.log",
+          ".......................................................                  [100%]\n55 passed in 4.35s\n"
+        ],
+        [
+          "seek-tests.log",
+          "......................................................                   [100%]\n54 passed in 6.32s\n"
+        ],
+        [
+          "seek-scaling.log",
+          "1000: exact; index node reads/writes=4/4; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection\n10000: exact; index node reads/writes=5/5; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection\n100000: exact; index node reads/writes=6/6; old group/owner/empty VM<=1799/1699/999; zero payloads, no budget rejection\n"
+        ],
+        [
+          "sequence-event-extents-scaling.log",
+          "1000 {'event-ids': 123.46, 'sequence': 61.75} ms; zero unrelated internal bodies\n10000 {'event-ids': 133.74, 'sequence': 63.35} ms; zero unrelated internal bodies\n100000 {'event-ids': 132.75, 'sequence': 66.4} ms; zero unrelated internal bodies\n"
+        ],
+        [
+          "sequence-event-extents-tests.log",
+          "...............................................                          [100%]\n47 passed in 6.28s\n"
+        ],
+        [
+          "target-group-scaling.log",
+          "1000 45.11 ms; zero archive bodies\n10000 50.86 ms; zero archive bodies\n100000 54.02 ms; zero archive bodies\n"
+        ],
+        [
+          "target-group-tests.log",
+          "......................................                                   [100%]\n38 passed in 3.70s\n"
+        ],
+        [
+          "target-incoming-scaling.log",
+          "1000 56.62 ms; zero archive bodies\n10000 58.66 ms; zero archive bodies\n100000 62.15 ms; zero archive bodies\n"
+        ],
+        [
+          "target-incoming-tests.log",
+          "............................................                             [100%]\n44 passed in 4.50s\n"
+        ],
+        [
+          "target-scaling.log",
+          "1000 19.88 ms; zero archive bodies\n10000 20.74 ms; zero archive bodies\n100000 22.87 ms; zero archive bodies\n"
+        ],
+        [
+          "target-tests.log",
+          "....................................                                     [100%]\n36 passed in 2.88s\n"
+        ],
+        [
+          "version-scaling.log",
+          "1000: exact; presence/absence node SELECTs=5/3; payload checks=1/0\n10000: exact; presence/absence node SELECTs=5/4; payload checks=1/0\n100000: exact; presence/absence node SELECTs=6/4; payload checks=1/0\n"
+        ],
+        [
+          "world-manifest-scaling.log",
+          "1000 132.02 ms checkpoint; zero history bodies\n10000 136.71 ms checkpoint; zero history bodies\n100000 133.39 ms checkpoint; zero history bodies\n"
+        ],
+        [
+          "world-manifest-tests.log",
+          "...................................                                      [100%]\n35 passed in 26.79s\n"
+        ]
+      ]
+    },
+    "harness": {
+      "artifact": {
+        "id": 14230414040,
+        "node_id": "MDg6QXJ0aWZhY3QxNDIzMDQxNDA0MA==",
+        "name": "stage-0-6-harness-1de9adc652f481e5e6471939ea605fb432589008",
+        "size_in_bytes": 7542,
+        "url": "https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/14230414040",
+        "archive_download_url": "https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/14230414040/zip",
+        "expired": false,
+        "digest": "sha256:8aff79a179d689cbb758a4ae0b8994c8fa99a4e0ed82ddff76996a4c5d383539",
+        "created_at": "2026-11-16T13:41:18Z",
+        "updated_at": "2026-11-16T13:41:18Z",
+        "expires_at": "2027-02-14T13:37:28Z",
+        "workflow_run": {
+          "id": 43877554746,
+          "repository_id": 1362289798,
+          "head_repository_id": 1362289798,
+          "head_branch": "sol/durable-proof-map",
+          "head_sha": "1de9adc652f481e5e6471939ea605fb432589008"
+        }
+      },
+      "counts": {
+        "tests": 359,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "source": null,
+      "log_tails": [
+        [
+          "tests.log",
+          "........................................................................ [ 20%]\n........................................................................ [ 40%]\n........................................................................ [ 60%]\n........................................................................ [ 80%]\n.......................................................................  [100%]\n=============================== warnings summary ===============================\n.github/tests/test_stage_0_6_retained_archive.py::test_reject_missing_extra_traversal_or_duplicate[names4]\n  /opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/zipfile/__init__.py:1650: UserWarning: Duplicate name: 'source/candidate.sqlite'\n    return self._open_to_write(zinfo, force_zip64=force_zip64)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n359 passed, 1 warning in 217.40s (0:03:37)\n"
+        ]
+      ]
+    }
+  }
+}

@@ -20,22 +20,23 @@ import zipfile
 from simulation import stage_0_6_genesis_checkpoint as c
 from simulation import stage_0_6_genesis_transport as t
 from simulation import stage_0_6_genesis_source_control as controls
+from simulation import stage_0_6_catalog_admission as admission
 from simulation import checkpoint_artifacts as github
 from simulation import continuation_receipts as r
 from simulation.stage_0_6_retained_transport import _stream_archive,_signed_url
 
-GREEN_RUN=43735593694
-GREEN_JOBS={'full-suite':132878528722,'proof-map':132878528733}
-GREEN_SHA='4eadb66855289b9983677815f402af1ceb94b37e'
-RUNTIME='84626841aa84b87a0564eda15200d83ea1478bb4'
+GREEN_RUN=43877554746
+GREEN_JOBS={'full-suite':133336650137,'proof-map':133336650164}
+GREEN_SHA='1de9adc652f481e5e6471939ea605fb432589008'
+RUNTIME='0d9dab5d4b36c89814dac6cb5904d589db4b8902'
 REQUEST='simulation/stage_0_6_genesis_resume_request.json'
 OLD_REQUEST='simulation/stage_0_6_proof_genesis_request.json'
 CRITICAL=('simulation/stage_0_6_genesis_checkpoint.py','simulation/stage_0_6_genesis_transport.py',
     'simulation/stage_0_6_genesis_stages.py','simulation/stage_0_6_genesis_resume.py',
     '.github/tests/run_genesis_recovery_drill.py',c.WORKFLOW)
 GREEN_ARTIFACTS={
-    'full-suite':(14175812342,'stage-0-5-proof-map-suite-'+GREEN_SHA,'b3393da9ad43cde9f2f0b6c52df6f901cc690873858b24d5d82a854ec11f339d'),
-    'proof-map':(14171548007,'stage-0-5-proof-map-'+GREEN_SHA,'e95ebd40424c19adef6a9d82ec63403259f41ae56f815736b483703ca8769fcd')}
+    'full-suite':(14245642394,'stage-0-5-proof-map-suite-'+GREEN_SHA,'3de9057bb6122b913925f45446eea7993d58a786ebb89727072948f2c739c8a0'),
+    'proof-map':(14233817733,'stage-0-5-proof-map-'+GREEN_SHA,'2c704dc13bb0d76daf2da8c603539862c1a5893d8b0ed8ae97d5ef0045d2b2c6')}
 TIMEOUTS=dict(source_digest=120,capture=240,catalog=240,rebase=240,after_digest=180,proofs=350,measure=150,fresh_restore=180)
 
 
@@ -235,6 +236,7 @@ def require_smoke(root,run_id,workspace):
     if run.get('status')!='completed' or run.get('conclusion')!='success':raise ValueError('small hosted smoke has not passed')
     ref,value=discover(root,run_id,'smoke',workspace/'smoke-proof')
     if value['stage']!='fresh_restore' or value['metrics'].get('restored',{}).get('digest')!=value['context']['expected_saved_digest']:raise ValueError('smoke lacks fresh-process completion')
+    admission.require_small_cut(root,value)
     return ref
 
 
@@ -263,7 +265,10 @@ def gate(root,workspace,*,input_mode='',input_resume_run=0,input_smoke_run=0):
     resume_run=input_resume_run or (cfg['resume_run_id'] if mode==cfg['mode'] else 0)
     if not resume_run and int(os.environ['GITHUB_RUN_ATTEMPT'])>1:resume_run=int(os.environ['GITHUB_RUN_ID'])
     if resume_run:
-        ref,value=discover(root,resume_run,mode,workspace)
+        if admission.eligible(root,mode,resume_run):
+            pair=admission.contract(root)['catalogs'][mode]
+            ref,value=admission.restore_prior(root,mode,resume_run,pair['metadata']['artifact_id'],workspace/'admitted-catalog')
+        else:ref,value=discover(root,resume_run,mode,workspace)
         _output(mode=mode,resume_index=c.ORDER.index(value['stage'])-1,resume_artifact_id=ref['artifact_id'],resume_run_id=ref['run_id'],has_database='false',fresh='false')
         return
     if mode=='mature':
@@ -305,15 +310,24 @@ def run(root,workspace,*,stage,mode,parent_run,parent_artifact):
     from simulation.stage_0_6_mature_benchmark import resources
     cfg=config(root);fence(root);workspace.mkdir(parents=True,exist_ok=True)
     previous=c.ORDER[c.ORDER.index(stage)-1]
-    ref=find_reference(root,parent_run,parent_artifact,mode=mode,stage=previous)
-    value=restore_receipt(root,ref,workspace/'input-metadata',mode=mode,stage=previous)
+    admitted=stage=='rebase' and admission.eligible(root,mode,parent_run,parent_artifact)
+    successor_context=None;catalog_admission=None
+    if admitted:
+        ref,value=admission.restore_prior(root,mode,parent_run,parent_artifact,workspace/'input-metadata')
+        runtime,blobs=fence(root);successor_context=copy.deepcopy(value['context'])
+        successor_context.update(runtime_tree=runtime,critical_blobs=blobs,execution_runtime=runtime_description()[0])
+        catalog_admission=admission.attest(root,value,successor_context)
+    else:
+        ref=find_reference(root,parent_run,parent_artifact,mode=mode,stage=previous)
+        value=restore_receipt(root,ref,workspace/'input-metadata',mode=mode,stage=previous)
     r.publish_receipt(workspace/'input-reference.json',dict(stage=stage,metadata_artifact=ref,database=value['database'],context_sha256=c.receipt_hash(value['context']),budget_seconds=cfg['budgets'][stage]))
     data_ref=value['data_ref'];transport=Recorder(workspace/'transport',{'restore':1800})
     def restore():
         if data_ref.get('kind')=='retained-original':return original_input(root,workspace/'original',value)
         cap=2*1024**3 if mode=='smoke' else 96*1024**3
         if value['database']['bytes']>cap:raise ValueError('checkpoint database exceeds admitted stage size')
-        t.restore(data_ref,workspace/'input-data',member='candidate.sqlite',member_bytes=value['database']['bytes'],compatible=lambda head:compatible(root,head))
+        callback=(lambda head:admission.verify_old_head(root,mode,head)) if admitted else (lambda head:compatible(root,head))
+        t.restore(data_ref,workspace/'input-data',member='candidate.sqlite',member_bytes=value['database']['bytes'],compatible=callback)
         path=workspace/'input-data/candidate.sqlite';c.verify_database(path,value['database']);return path
     database=transport.measure('restore',restore)
     active='start';sequence=0;stopped=threading.Event()
@@ -331,7 +345,8 @@ def run(root,workspace,*,stage,mode,parent_run,parent_artifact):
             source_control=controls.mature_control(root,workspace/'original/accepted/year-verified.json',
                 value['database'],current_runtime_tree=git(root,'rev-parse','HEAD:simulation/ate_sim'))
             progress('source_control.historical_control_reused')
-        run_stage(stage,value,database,workspace/'out',producer=producer(stage),budget=cfg['budgets'][stage],progress=progress,source_control=source_control)
+        run_stage(stage,value,database,workspace/'out',producer=producer(stage),budget=cfg['budgets'][stage],progress=progress,source_control=source_control,
+                  successor_context=successor_context,catalog_admission=catalog_admission)
     except BaseException as exc:
         r.publish_receipt(workspace/'failure.json',dict(stage=stage,status='timeout' if isinstance(exc,TimeoutError) or type(exc).__name__=='BudgetExpired' else 'error',error=type(exc).__name__+': '+str(exc),last_phase=active,notes=getattr(exc,'__notes__',[]),prior_checkpoint=ref))
         raise

@@ -84,6 +84,21 @@ def check_ref(value,*,remote=False):
         if type(value[k]) is not str or not value[k] or len(value[k])>256:raise ValueError('invalid artifact '+k)
 
 
+def check_admission(parent,context,value):
+    """Structural cut only. Consumers must also check committed admission pins."""
+    exact(value,{'schema','parent_sha256','parent_database','from_context_sha256',
+                 'to_context_sha256','contract_sha256'},'catalog admission')
+    if (value['schema']!='ate-catalog-runtime-admission/1' or parent['stage']!='catalog'
+            or parent['context']==context):raise ValueError('invalid catalog admission cut')
+    hexadecimal(value['contract_sha256'],64,'admission contract hash')
+    if (value['parent_sha256']!=receipt_hash(parent) or value['parent_database']!=parent['database']
+            or value['from_context_sha256']!=receipt_hash(parent['context'])
+            or value['to_context_sha256']!=receipt_hash(context)):
+        raise ValueError('catalog admission binding differs')
+    for key in CONTEXT_FIELDS-{'runtime_tree','critical_blobs'}:
+        if context[key]!=parent['context'][key]:raise ValueError('catalog admission authority changed: '+key)
+
+
 def validate(value,*,expected_context=None,require_remote=False,_depth=0):
     if _depth>=len(ORDER):raise ValueError('checkpoint chain too deep')
     exact(value,FIELDS,'checkpoint')
@@ -95,11 +110,15 @@ def validate(value,*,expected_context=None,require_remote=False,_depth=0):
     integer(p['run_id'],'run id',1);integer(p['attempt'],'run attempt',1);hexadecimal(p['head_sha'],40,'producer head')
     if p['job']!=JOB[value['stage']]:raise ValueError('wrong producing job')
     stage=value['stage'];index=ORDER.index(stage);parent=value['parent'];db=value['database'];ctx=value['context']
+    admission=value['metrics'].get('catalog_admission')
+    if 'catalog_admission' in value['metrics'] and (stage!='rebase' or admission is None):
+        raise ValueError('catalog admission is rebase-only')
     if stage=='source':
         if parent is not None or db!=ctx['source'] or value['baseline_digest'] is not None or value['proof_commitment'] is not None:raise ValueError('invalid source receipt')
     else:
         exact(parent,{'sha256','receipt'},'parent')
-        prior=validate(parent['receipt'],expected_context=ctx,require_remote=require_remote,_depth=_depth+1)
+        prior=validate(parent['receipt'],expected_context=None if admission is not None else ctx,require_remote=require_remote,_depth=_depth+1)
+        if admission is not None:check_admission(prior,ctx,admission)
         if parent['sha256']!=receipt_hash(prior) or prior['stage']!=ORDER[index-1]:raise ValueError('checkpoint parent/order differs')
         if stage=='source_digest':hexadecimal(value['baseline_digest'],64,'baseline digest')
         elif value['baseline_digest']!=prior['baseline_digest']:raise ValueError('baseline digest changed')

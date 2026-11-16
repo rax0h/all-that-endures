@@ -100,10 +100,13 @@ def mature_control(root,path,source,*,current_runtime_tree):
 def validate_control_chain(root,value,*,current_runtime_tree):
     """Bind imported baseline metadata to the exact original authority on use."""
     c.validate(value)
+    from simulation import stage_0_6_catalog_admission as admission
+    admitted=admission.validate_chain(root,value)
     if value['context']['mode']!='mature' or value['stage']=='source':return
     source=value
     while source['stage']!='source_digest':source=source['parent']['receipt']
     expected=mature_control_contract(root,current_runtime_tree=current_runtime_tree)
+    if admitted is not None:expected=admitted['source_control']
     if (source['context']['source']!=expected['source']
             or source['context']['rules_id']!=expected['rules_id']
             or source['baseline_digest']!=expected['digest']
