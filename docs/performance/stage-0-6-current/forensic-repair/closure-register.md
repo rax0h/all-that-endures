@@ -12,7 +12,7 @@ not replace missing particulars.
 | F2 | Reviewed agency lifetime-only change; preserved historical source/member/digest pins; actual current runtime84626841 declared. Original7failures resolved. | Closed; hosted harness/proof/full green4eadb668 |
 | F3 | Scoped audited successor receipt, bounded refresh, late-writer refusal and original-attempt recovery; corruption remains blocked until repaired. Source/callback/codec/foreign-head fences retained. | Closed; exact2failures resolved and hosted gates green |
 | F4 | Complete.github/tests is a required predecessor to expensive engine/transport work. Checked detector fails closed and separates engine/proof/harness changes. | Closed;330hosted cases green, later357hosted cases and caller restoration green |
-| F5 | Synthetic small shell tests separate from true green qualification; named lane contracts; outer and inner launch bindings now match authenticated4eadb668/846. Historical format6lane remains inactive/fail-closed. | Implementation verified; fresh compatible staged smoke still required |
+| F5 | Synthetic small shell tests separate from true green qualification; named lane contracts; outer and inner launch bindings now match authenticated4eadb668/846. Historical format6lane remains inactive/fail-closed. | Closed; compatible hosted smoke43778758497and exact fresh restoration passed |
 | F6 | Issue17 explicitly defers versioned Iron/Bronze gameplay correction and old-fixture migration. Preserve current accepted source/continuation while doing persistence work. | Existing owner deferral; no gameplay migration performed |
 | F7 | Mature10sopen/2ssave/1swarm and exact year1002continuation require the protected current-engine measurement. Recent small timings are labelled separately. | Open; current mature targets unmeasured |
 | F8 | Persistence LOC alone does not establish architecture fitness. Use mature attribution before deciding a substantial refactor or Stage1 tradeoff. | Assessment/owner decision remains open |
@@ -26,7 +26,7 @@ not replace missing particulars.
 | F16 | New source is covered by focused review; the original repo-wide166-line lint inventory is not supplied in001. | Legacy lint/refactor work remains open |
 | F17 | Review002 reports no real-format secrets. Exact001file/literal particulars are unavailable. | Needs original particulars; no blind test-literal deletion |
 | F18 | save_receipts uses operational wall time; logical simulation time/state is separate. Need001's exact concern before changing receipt semantics. | Contract adjudication remains open |
-| N1 | Preserve carriers first, repair source/runtime gates, then prove caller access and compatible staged smoke before mature. | Storage and code repaired; live launch gates still tracked |
+| N1 | Preserve carriers first, repair source/runtime gates, then prove caller access and compatible staged smoke before mature. | Storage, code and compatible smoke verified; mature measurement now requested |
 | N2 | All small data/replays labelled NON-MATURE; current mature and interactive status kept separate. | Reporting correction closed; performance acceptance remainsF7 |
 | N3 | Explicit required input/roots/public HEADs, exact full clean checkouts/import paths, public source map, successful4trial functional replay, preserved original input. | Reproduction verified; authenticated input-access hop separate |
 | N4 | Baseline graphs already existed in family-publication-scope/evidence.zip. Both archives and all6members/counts now pinned and tested. | Closed; no repeated profile needed |
@@ -45,6 +45,7 @@ not replace missing particulars.
 | Repro parser reference escaped scope | Validate required output in main before source reads; omitted-output regression | Closed |
 | Additional outer launch declaration stale | All29 reviewed execution fingerprints and actual green/runtime aligned; original source/world/pin/year1002digest unchanged; real public-parent guards passed48paths | Closed |
 | Live draft read denied by read-scope token | Scope required draft access to the four actual input-reader jobs; consumer remains GET/download-only; other jobs retain read scopes | Closed; live caller hop43776600177passed |
+| Runner mismatch at staged gate43777357586 | Pin observed qualified Ubuntu26.04; retain software guard. Raw logs, RED/58focusedGREEN and independent review retained. | Closed; complete compatible smoke43778758497passed |
 
 Raw history and exact hashes: baseline-and-preservation-tests.zip,
 preservation-review.zip, preservation-hosted-preflight.zip,
@@ -52,5 +53,3 @@ preservation-draft-id.zip, repair-validation.zip,
 launch-and-reproduction-evidence.zip, private-draft-permission-repair.zip and
 their adjacent indexes. Original qualified engine and preservation archives are
 listed in retained-archive-index.json. Current chronology is in progress.md.
-
-| Runner mismatch atstagedgate43777357586 | GreenenginejobswereUbuntu26.04.1; stagedjobs24.04. Pin explicitqualified26.04, retain softwareguard and observed-version refusal | Raw runner logs and RED/58focusedGREEN, independent approval | Closed locally; fresh smoke pending |

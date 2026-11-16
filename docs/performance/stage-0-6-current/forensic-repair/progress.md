@@ -37,3 +37,12 @@ Helperpublication1f1325a7/run43775874916: all356hostedharnesscasespassed, butliv
 Livecaller43776600177/public87e2216c:357harnesscasesandactualprivateoriginalsmallZIPrestorationpassed. Artifact14186114734/SHAfa9e090e... retained; exact7400318bytes/SHA8844... verified. Activateonlypreparedfreshsmokerequest(now300spercomputephase); reuseengine4ead/846green,noengine/proof/fullrepetition. Broader24findingregisterconsolidatedwithopen/owner-deferreditemsstillvisible.
 
 Smokerequest05cb4ef9/run43777357586:357harnesscasespassed; gate thenrefusedunsupportedsoftwarebeforeWorld/stages. Primaryfull/proofrunnerlogs show the real green usedubuntu26.04.1/image20261111.196.1 (ubuntu-latest had migrated); stagedjobswerepinned24.04. Explicit26.04nowusedinallengine/stagedjobs; stagedactionsSHA-pinnedtoexactgreen actions. Softwareguardunchangedexceptobserved-versiondiagnostics. Runner/diagnosticRED then58focusedGREEN1.47s, independentfocusedreviewapproved. Freshsmokerequestsuffix2; no compatible Worldprefixlost and no enginefull/proofrerun.
+
+
+## Compatible smoke authenticated; protected mature activation
+
+43778758497/public935df38b completed all10jobs;359harness cases passed. Exact fresh year2/generation1/digestcebc2fcd accepted. Recovery exit77retained the exact catalog; ordinary rebase succeeded from that parent. All checkpoint/database producers authenticated with raw step timestamps, downloaded ZIPs hash checked, catalog/rebase/measure DB bytes/hash verified. All48critical blobs and hosted runtime signature match. First offline evidence check on the divergent local branch correctly refused ancestry; exact candidate-tree probe032adfc1with real public935parent passed. No production fence bypass or local hosted-runtime substitution.
+
+Live private draft/manifests/10fixture parts still match committed immutable pins; green engine artifacts unexpired. Prepared mature requestpreserved-current-engine-mature-2026-11-15-1, smoke43778758497/resume0, reviewed larger compute budgets. Mature-launch-preflight.md records restore/disk/publication/restart bounds. Engine remains846; no repeated full/proof qualification. Timings and deep year1002acceptance pending. Raw completed smoke evidence retained losslessly with index.
+
+Mature request validation:32resumable contracts passed0.53s; JUnit retained. Request and docs only; no critical source/workflow/engine changes.

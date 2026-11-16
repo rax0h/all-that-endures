@@ -29,3 +29,10 @@ The first live caller preflight authenticated356passing tests, then403atGitHub's
 Live consumer retry43776600177 passed357harness cases and restored the original7,400,318-byte ZIP with SHA8844c45d... . Checksum-verified caller-hop-43776600177.zip and caller-hop-receipt.json retain the result. The private input access gate is closed. The prepared smoke request is now activated; compatible generated-year/recovery completion remains required before mature execution.
 
 The first fresh staged gate correctly stopped at the software check. Its explicit24.04 runner differed from both qualified engine jobs' observed26.04.1/image20261111.196.1. This was established from actual full/proof/failed job logs, not inferred from the moving ubuntu-latest alias. Both engine and staged workflows now pin the observed26.04 label; the exact Python/SQLite guard remains. Staged actions are also pinned to the exact verified commits. Refusals report observed version values. A fresh suffix2request retries the gate before any World prefix.
+
+
+## Compatible smoke complete; mature request activated
+
+Run43778758497/public935df38b completed every stage successfully, including359harness cases, actual interrupted-rebase recovery and exact year2/generation1fresh restoration. Recorded jobs/step timestamps and all downloaded archive hashes were authenticated; catalog/rebase/saved database bytes and hashes match sealed receipts. All48critical paths and hosted runtime match. Retained raw evidence and standalone verifier are indexed in smoke-43778758497-evidence-index.json.
+
+The private draft and every original manifest/part were rechecked against live metadata. Qualified engine artifacts are still unexpired. Requestpreserved-current-engine-mature-2026-11-15-1 uses this successful smoke, resume0and the reviewed mature budgets. No helper/workflow/engine bytes changed. Mature-launch-preflight.md records exact input authority, phase/transport/publication reserves, disk checks, compatible restart and target-miss policy. Actual mature operational timings and exact year1002acceptance remain open.

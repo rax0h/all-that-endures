@@ -1,0 +1,183 @@
+{
+  "acceptance": {
+    "acceptance": "smoke-functional-only",
+    "saved_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451"
+  },
+  "authenticated_archives": [
+    {
+      "bytes": 6497,
+      "id": 14188030345,
+      "name": "checkpoint-smoke-catalog-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "c114be275ab6a2b72a4579bf43f2404bc45c77b5ac62c22b1c9091437973f567"
+    },
+    {
+      "bytes": 17220,
+      "id": 14187915965,
+      "name": "resume-evidence-smoke-after_digest-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "27e642107471f74d65e73874ecc0d1bc4e50159e299c9174c24aa22b6772ccb2"
+    },
+    {
+      "bytes": 15227,
+      "id": 14187890788,
+      "name": "checkpoint-smoke-fresh_restore-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "57f70c6b24b089e67e0fb92cdff05077f3afafdbfb854b528fa5c63c6b9320f4"
+    },
+    {
+      "bytes": 2895,
+      "id": 14187880879,
+      "name": "checkpoint-smoke-source-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "c7a4f45d485ed83e285d417a5697b974dd7b27abec74534ab5fb881cc6b99377"
+    },
+    {
+      "bytes": 14208,
+      "id": 14187825960,
+      "name": "resume-evidence-smoke-measure-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "ef2a65b3cb0931a206c146d2854cc3af3693a4081768807be4a680178aaf1941"
+    },
+    {
+      "bytes": 13764,
+      "id": 14187821009,
+      "name": "checkpoint-smoke-measure-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "c4f921f5ef4ed85951a7a5f599f846a8e0c6b03f55289f16cd6cf94428f9c18a"
+    },
+    {
+      "bytes": 2630,
+      "id": 14187816121,
+      "name": "resume-evidence-smoke-fresh_restore-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "3b13eb915e1e549f2edd06a3d0379361340def1de92edbd4d48d095e9b7b7994"
+    },
+    {
+      "bytes": 2715258,
+      "id": 14187731783,
+      "name": "database-smoke-catalog-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "323ed728a2e9ad95fb78ba79dfd65283a3e0175a0d4966aaa88fe13eca14b2e2"
+    },
+    {
+      "bytes": 7438,
+      "id": 14187677093,
+      "name": "resume-evidence-smoke-capture-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "b0e6fde33bb081675ad04a43c12c4f36d9d3bb54f1b34566f53960fbc576bbde"
+    },
+    {
+      "bytes": 5393,
+      "id": 14187652417,
+      "name": "resume-evidence-smoke-catalog-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "609d96c1700b1b0e3af0108a1b85ff06a9374defb4d93d0dac5e93af926dc7a5"
+    },
+    {
+      "bytes": 8265,
+      "id": 14187617843,
+      "name": "resume-evidence-smoke-proofs-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "0145ac60f402ef8d02072d73486601af063f45937a7cbe4a199be199fb4db119"
+    },
+    {
+      "bytes": 2724311,
+      "id": 14187617640,
+      "name": "database-smoke-rebase-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "96cd9ea1eb882494a912e13dfbde14f59cea75da43a754da1c49c31c7c398b57"
+    },
+    {
+      "bytes": 4154,
+      "id": 14187546721,
+      "name": "checkpoint-smoke-source_digest-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "9e12c2f7dc5832b2efdbf96cbf33ac5709e8b6df8b7bf07bfbb3fb8b44775697"
+    },
+    {
+      "bytes": 8494,
+      "id": 14187537975,
+      "name": "resume-evidence-smoke-rebase-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "639f905e5ec23cc3748ec90748adace60accf4b64198adcde67bd710f639b7bd"
+    },
+    {
+      "bytes": 8727096,
+      "id": 14187513514,
+      "name": "database-smoke-measure-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "621c5b5ec6cd4bee1c36638b45c87e5e3807ba411a23532105dde9e896d98160"
+    },
+    {
+      "bytes": 7752,
+      "id": 14187498307,
+      "name": "checkpoint-smoke-rebase-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "ec965b487966c8212f869a2f726f1ac9239d47d075a09751daf4c60e28ff60a5"
+    },
+    {
+      "bytes": 8777,
+      "id": 14187493429,
+      "name": "checkpoint-smoke-after_digest-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "46123540648acef817018d2c6f44686fb583f1398456dba0308b314ffbdddc54"
+    },
+    {
+      "bytes": 5313,
+      "id": 14187323710,
+      "name": "checkpoint-smoke-capture-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "59934531a5513bd4935a50053d3216421012a9ad8ce7f2454f7da1a0f88e1acf"
+    },
+    {
+      "bytes": 10192,
+      "id": 14187124983,
+      "name": "checkpoint-smoke-proofs-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "f02c0a821502edfd18f0b638900cba7e84aa5275205ee632d5035b70d458997c"
+    },
+    {
+      "bytes": 9547,
+      "id": 14187064562,
+      "name": "resume-evidence-gate-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "943a7fe4f551bae5fb216c6583bd58b50c95c497c5d5c4d2a7b5e79e02e11513"
+    },
+    {
+      "bytes": 17207,
+      "id": 14186679954,
+      "name": "resume-evidence-smoke-source_digest-935df38b5f9267c25fddbea8bda0e3f50121b49f-1",
+      "sha256": "c154619f6bd64bfffcf267321ec4786348915707e9bf9b4510991ffafaeaa4a6"
+    }
+  ],
+  "checked_head": "032adfc14faa087ec8b7881513b42bc1c505f9d4",
+  "critical_paths": 48,
+  "engine": "84626841aa84b87a0564eda15200d83ea1478bb4",
+  "fresh_restored": {
+    "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+    "generation": 1,
+    "seed": 843000,
+    "world_audits": 0,
+    "year": 2
+  },
+  "harness": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 359
+  },
+  "hosted_runtime": {
+    "python": "3.12.16",
+    "signature": "a6cc6e5e404ca8bd7cfdf50e08b3f0c163405fb3941b77d83921f492213b3982",
+    "sqlite": "3.46.1"
+  },
+  "mature_status": "unmeasured",
+  "original_mature": {
+    "archive_bytes": 4419106896,
+    "archive_sha256": "4f040569fb91cef482bd5706230bcada058788a747278b99df7cca2c137d373f",
+    "key": "mature-year1001",
+    "source": {
+      "artifact_id": 12849181590,
+      "head_sha": "b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+      "job": "retain",
+      "name": "stage-0-6-authenticated-input-b524bbe2ff1b697f79d7fcbf3c8a3b7d9c82efdf",
+      "run_id": 40760930962,
+      "workflow": ".github/workflows/stage-0-6-current-mature-performance.yml"
+    }
+  },
+  "preservation_live_checked_at": "2026-11-16T00:28:22.431Z",
+  "producer_head": "935df38b5f9267c25fddbea8bda0e3f50121b49f",
+  "producer_run": 43778758497,
+  "recovery": {
+    "database_sha256": "22d55427d96cff799cd1e09b2d3da8130f91f418c30b7283d4ee462390332e1c",
+    "interrupted_stage": "rebase",
+    "next_action": "ordinary rebase step restores the same immutable parent in a fresh process",
+    "receipt_sha256": "5d5276b5ae84c1bca762348a74760355b5683e3791eaf59940f59856e42f9e67",
+    "retained_stage": "catalog",
+    "status": "passed",
+    "worker_exit": 77
+  },
+  "schema": "ate-authenticated-smoke-launch-preflight/1",
+  "scope": "recorded hosted evidence; no local hosted-runtime impersonation"
+}

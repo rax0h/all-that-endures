@@ -1,0 +1,6 @@
+{
+  "path": "docs/performance/stage-0-6-current/forensic-repair/historical-continuation-before-staged-smoke.md",
+  "bytes": 6939,
+  "sha256": "1037793e544bb06a783c0dfdcb1533392eb4939dcf17dcde3f47712e23c5a530",
+  "reason": "Preserve prior boundary notes while making the active continuation unambiguous"
+}
