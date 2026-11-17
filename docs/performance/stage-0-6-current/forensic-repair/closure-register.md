@@ -78,3 +78,15 @@ CA-R2: rerun-all previously retained a positive initial oldresume and could repl
 Hosted admitted small43916382557/public43b9fbb2closed recovery gate:399tests, originalcatalog retained onexit77, ordinaryretry, exact afterdigest andfreshyear2/gen1/digestcebc allpassed. Raw producer/ZIP/database/hash/source/runtime checks authenticated. Source/capture/catalog skipped. Mature retained-catalog request now activated with unchanged helper bytes and actualsuccessfulsmoke; currentmature targets andyear1002acceptance remainF7open.
 
 Mature resume43918798385/public71967a3dentrygatepassed399cases and selected the exact oldmaturecatalog14197005279/run43780946218. Source/capture/catalog skipped, rebase133482798633active. Actual gate producer/runtime/selection evidence retained under ../catalog-admission/. Admission/launch closure is complete; F7timings/year1002acceptance stillunmeasured.
+
+## Proof source audit repair follow-up
+
+The preceding active-rebase observation is historical: run43918798385 completed rebase and exact after-digest, then proofs exhausted its210-minute compute budget. Last completed after_digest metadata14267625292 and closed rebase database14261110486 are authenticated and retained. No operational timing stage ran.
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| Repeated proof paths in full source comparison | Real World regression RED4573reads/1460reachable nodes; exact source spool plus one checked traversal. Preserve every physical validator, reachable node and complete bidirectional comparison; no retained node cache. Synthetic profiles and corruption/recovery controls under ../proof-source-audit-repair/. | Implemented and independently reviewed; new engine hosted qualification pending |
+| Inherited catalog cut cannot be retargeted to admit an unrelated successor | Preserve both old context/contract and exact after_digest/database descriptors. Keep ordinary compatibility/old contract closed; real candidate launch refusal verified. Require a separate reviewed pinned boundary after actual new engine green and small recovery. | Current qualification boundary closed and tested; future admission remains a prerequisite, with no mature retry activated |
+| Entire manifest audit still exceeds measured scope | Scope/collection reconstruction, catalog/topology/fact passes remain unmeasured on mature state. Do not infer whole-stage speed or enlarge budget from a synthetic source-loop win. | F7 remains open; bounded mature attribution required before long retry |
+
+Independent whole-package review closed PS-R1primary error masking, PS-R2exact publication-window/raw-job-uniqueness checks and PS-R3historical positive-fixture qualification assumptions. All findings includingMinors resolved. Final engine5464caa; independent92affected and27finalclosure cases passed. Parent171affected/61focused checks, clean403helper checks and final5evidence checks passed in their stated sequence; groups overlap. Raw failures and exact records are under ../proof-source-audit-repair/. One hosted qualification remains required; oldengine0d9green is not attributed to this candidate.

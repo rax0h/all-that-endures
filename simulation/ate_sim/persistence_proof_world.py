@@ -5,6 +5,8 @@ incremental native save path. Same-input reuse belongs to manifest publication.
 """
 from dataclasses import dataclass,is_dataclass
 from functools import lru_cache
+from itertools import zip_longest
+import sqlite3
 from .incremental_store import StoreError,StoreIntegrityError,StoreConflictError,RecordChange
 from .persistence_proof_nodes import Root,_digest
 from .persistence_proof_store import ProofNodeStore
@@ -53,27 +55,70 @@ def _composite(store,label,roots,*,persist=True):
     return r
 
 
+def _check_source_map(store,proof,root,values,message):
+    """Compare all checked sources with every reachable checked node once.
+
+    Only fixed-size locators/commitments enter this transaction-local spool.
+    It carries no authority across snapshots and never caches node validation.
+    """
+    from .persistence_proof_nodes import key_locator
+    if not store.db.in_transaction:raise StoreError('World source audit requires transaction')
+    proof._reference(root)
+    store.db.execute('CREATE TEMP TABLE ate_world_source_content(locator BLOB PRIMARY KEY,commitment BLOB NOT NULL) WITHOUT ROWID')
+    primary=None
+    try:
+        count=0
+        for key,value in values:
+            try:store.db.execute('INSERT INTO ate_world_source_content VALUES(?,?)',(key_locator(proof.map_domain,key),value))
+            except sqlite3.IntegrityError as exc:raise StoreIntegrityError('duplicate World source proof locator') from exc
+            count+=1
+        if count!=root.count:raise StoreIntegrityError('World source inventory disagrees with content root counts')
+        cursor=store.db.execute('SELECT locator,commitment FROM ate_world_source_content ORDER BY locator')
+        try:
+            for actual,expected in zip_longest(proof.iter_leaves(root),cursor):
+                if actual!=expected:raise StoreIntegrityError(message)
+        finally:cursor.close()
+        return count
+    except BaseException as exc:
+        primary=exc
+        raise
+    finally:
+        try:store.db.execute('DROP TABLE ate_world_source_content')
+        except BaseException as cleanup:
+            if primary is None:raise
+            primary.add_note('World source audit cleanup failed: '+str(cleanup))
+
+
 def _check_sources(store,g,ca,sa,ia,ra,da):
     selected._checked_components(store,ca,sa,ia,ra)
     directory._preflight(store,type('PinContext',(),{'captured_head':g,'store_identity':store.store_identity})(),*da,1048576)
     if directory_publish._load(store,g)[0]!=da:raise StoreIntegrityError('World directory authority disagreement')
     scope._guard_construction(store.db);scope._guard_child_keys(store);scope._guard_sequence_keys(store)
     if scope._construct_roots(store,g,sa[0].next_incarnation_id,include_children=True,include_sequence=True,include_rank=len(sa[0].roots)==7)!=sa[0].roots:raise StoreIntegrityError('World physical scoped relations disagree with accepted roots')
-    counts=[0,0,0]
-    for ns,key in store.db.execute('SELECT namespace,typed_key FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(g,g)):
-        row=target.content._source_version(store,g,ns,key);actual=target.content._version_value(ns,key,row,store.codec.version)
-        if target.content._map(store).get(ca[0].versions,version_key(ns,key))!=actual:raise StoreIntegrityError('World version source disagrees with accepted content')
-        counts[0]+=1
+    def versions():
+        cursor=store.db.execute('SELECT namespace,typed_key FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(g,g))
+        try:
+            for ns,key in cursor:
+                row=target.content._source_version(store,g,ns,key)
+                yield version_key(ns,key),target.content._version_value(ns,key,row,store.codec.version)
+        finally:cursor.close()
+    _check_source_map(store,target.content._map(store),ca[0].versions,versions(),'World version source disagrees with accepted content')
     from . import persistence_proof_record as records
-    for ns,key,payload,codec,schema,revision in store.db.execute('SELECT namespace,typed_key,payload,codec_version,record_schema,last_changed_generation FROM records'):
-        actual=record_commitment(ns,key,last_changed_generation=revision,codec_version=codec,record_schema=schema,payload=payload)
-        if records._map(store).get(ra[0].root,record_key(ns,key))!=actual:raise StoreIntegrityError('World ordinary source disagrees with accepted content')
-        counts[1]+=1
-    for ns,ordinal in store.db.execute('SELECT namespace,ordinal FROM segments'):
-        row=target.content._source_event(store,g,ns,ordinal,64*1048576,1048576)
-        if target.content._map(store,True).get(ca[0].events,segment_key(ns,ordinal))!=target.content._event_value(ns,ordinal,row,store.codec.version):raise StoreIntegrityError('World event source disagrees with accepted content')
-        counts[2]+=1
-    if tuple(counts)!=(ca[0].versions.count,ra[0].root.count,ca[0].events.count):raise StoreIntegrityError('World source inventory disagrees with content root counts')
+    def ordinary():
+        cursor=store.db.execute('SELECT namespace,typed_key,payload,codec_version,record_schema,last_changed_generation FROM records')
+        try:
+            for ns,key,payload,codec,schema,revision in cursor:
+                yield record_key(ns,key),record_commitment(ns,key,last_changed_generation=revision,codec_version=codec,record_schema=schema,payload=payload)
+        finally:cursor.close()
+    _check_source_map(store,records._map(store),ra[0].root,ordinary(),'World ordinary source disagrees with accepted content')
+    def events():
+        cursor=store.db.execute('SELECT namespace,ordinal FROM segments')
+        try:
+            for ns,ordinal in cursor:
+                row=target.content._source_event(store,g,ns,ordinal,64*1048576,1048576)
+                yield segment_key(ns,ordinal),target.content._event_value(ns,ordinal,row,store.codec.version)
+        finally:cursor.close()
+    _check_source_map(store,target.content._map(store,True),ca[0].events,events(),'World event source disagrees with accepted content')
     m=OrderedSeekMap(store.db,directory.domain(store.store_identity,store.codec.version))
     def collections():
         for (ns,) in store.db.execute('SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY CAST(namespace AS BLOB)',(g,g)):

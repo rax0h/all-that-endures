@@ -1,0 +1,41 @@
+{
+  "candidate_engine": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "qualified_baseline_engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "affected_cases": 171,
+  "affected_wall_seconds": 70.88,
+  "whole_harness": {
+    "passed": 403,
+    "wall_seconds": 148.58,
+    "commit": "ce5a01505908f3d0d55a134ce0e68d49a030408e",
+    "final_docs_auth_delta": "5targeted cases passed0.51s; next hosted complete gate404"
+  },
+  "independent_review": "complete; PS-R1/PS-R2/PS-R3closed, no remaining findings includingMinors",
+  "hosted_qualification": "prepared; not yet green",
+  "mature_retry_activated": false,
+  "mature_operation_timings": "unmeasured",
+  "profile_limit": "Synthetic source loop; profiled wall timings may share CPU with concurrent tests. Work counts are direct counters; no mature or end-to-end inference.",
+  "initial_affected_engine": "b3adb8db86b8e8f6a8721256a199fa4d6a7fcb9b",
+  "initial_quick_harness": {
+    "passed": 398,
+    "failed": 1,
+    "wall_seconds": 152.34,
+    "cause": "Historical qualified positive fixture used candidate canonical declaration; production fence correctly remains closed."
+  },
+  "post_review_focused": {
+    "passed": 61,
+    "wall_seconds": 8.73
+  },
+  "review_findings": {
+    "PS-R1": "primary diagnostic preserved during spool cleanup failure; real SQLite authorizer regression",
+    "PS-R2": "exact successful publication-step authentication reused for old checkpoint and database refs",
+    "PS-R3": "historical qualified control fixture isolated; real current-root refusal asserted"
+  },
+  "independent_affected": {
+    "passed": 92,
+    "wall_seconds": 62.65
+  },
+  "independent_final_closure": {
+    "passed": 27,
+    "wall_seconds": 5.7
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "run_id": 43918798385,
+  "head_sha": "71967a3d9a3713a038bc5ec360094945bf312700",
+  "qualified_engine": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "after_digest_receipt_sha256": "8ecefa051366563baa88a93efa3e4eb169335f351af8370bce846d5796aa5792",
+  "rebase_receipt_sha256": "e42b143eb6e42fa18d55b87452390cb7c1af0eef7e85907c3d66ed0d72adfa45",
+  "critical_paths_checked": 50,
+  "database": {
+    "bytes": 29409034240,
+    "format": 6,
+    "generation": 0,
+    "seed": 843000,
+    "sha256": "b1c7ffcd9379d246002d9052065a44d5de539606bb00c43ef7997785962521a5",
+    "store_identity": "6d0b5191-fd61-4bb8-845a-4dddbd0e3213",
+    "year": 1001
+  },
+  "data_ref": {
+    "archive_bytes": 4447495807,
+    "archive_sha256": "bc71ac9e13f1d422cb2e242a9ae17613c9d1dc60a9e0db0ad52a668cf31ffd82",
+    "artifact_id": 14261110486,
+    "expires_at": "2026-12-16T19:08:03Z",
+    "head_sha": "71967a3d9a3713a038bc5ec360094945bf312700",
+    "job": "rebase",
+    "kind": "github",
+    "name": "database-mature-rebase-71967a3d9a3713a038bc5ec360094945bf312700-1",
+    "run_id": 43918798385
+  },
+  "original_catalog_cut_preserved": {
+    "contract_sha256": "5e5da5681fe65c8f692c3b6893923c387537b6eb9ebe9ebb3435d44dc2aca0a2",
+    "from_context_sha256": "c21158f0c5b1262d70c95cae84b7d0d658062965a7d03379c918909dfa749a4c",
+    "parent_database": {
+      "bytes": 29389029376,
+      "format": 6,
+      "generation": 126,
+      "seed": 843000,
+      "sha256": "8cc3dd2cd49ec143dd318a2ae6928f90b168ea06862c3939bec4aa32d6022562",
+      "store_identity": "6d0b5191-fd61-4bb8-845a-4dddbd0e3213",
+      "year": 1001
+    },
+    "parent_sha256": "037fdab52019adc4c01ee7613771d2e0d231f2a94de5255b8b5a5f6f9e7a94c2",
+    "schema": "ate-catalog-runtime-admission/1",
+    "to_context_sha256": "7fd554688ac3d963f93c7db30ed94f556475dca502810aeb822a8fe68d86f7e7"
+  },
+  "source_control_unchanged": true,
+  "raw_database_redownloaded": false,
+  "new_engine_admitted": false
+}

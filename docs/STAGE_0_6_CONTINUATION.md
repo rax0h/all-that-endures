@@ -35,4 +35,16 @@ Private draft **446184821** retains both original fixture ZIPs independently of 
 
 New SQLite probes are synthetic locator-only data, not mature performance measurements. A timing miss or green engine badge does not complete Stage 0.6. The broader forensic closure register remains at `performance/stage-0-6-current/forensic-repair/closure-register.md`; owner-deferred and missing-review-001 items remain explicit. No main merge, default-format activation, gameplay migration or endurance run is included.
 
-**Next:** retain completed rebase/after_digest/proofs and actual operation timings as they arrive. Resume from the latest completed compatible checkpoint if a later stage fails. Preserve original control digests and exact year1002acceptance.
+## Latest proof-construction failure and repair candidate
+
+Mature resume **43918798385 failed in proofs at its 12,600-second compute cap**. Rebase **133482798633** and after-digest **133544470271** completed successfully; the canonical baseline remained exact. The earlier observation that rebase was active is historical. Measure, fresh-restore and acceptance were skipped; all mature operation timings above remain unmeasured.
+
+The last completed restart point is now **after_digest**, metadata **14267625292**, sharing closed rebase database **14261110486**. This is year 1001, generation 0, seed 843000, 29,409,034,240 bytes, SHA256 `b1c7ffcd9379d246002d9052065a44d5de539606bb00c43ef7997785962521a5`. Original chain, contract, producer/runtime and 50 critical paths are authenticated under `performance/stage-0-6-current/proof-source-audit-repair/`. These completed stages must be preserved.
+
+The manifest audit repeatedly checked the same shared proof-tree paths for each physical source. A candidate replaces these point traversals with an exact temporary locator/commitment spool and one checked traversal of every reachable node, preserving physical validators, counts and two-way completeness. Synthetic profiling and real World regression establish reduced work; remaining mature audit costs are still unmeasured.
+
+Candidate engine **5464caa49acc4c27f24c247b60ee639afd9d150d** requires new hosted qualification. Previous engine0d9/public1de9 remains the qualified baseline. Ordinary compatibility and launch pins remain strict; the new engine is **not admitted** to the retained after-digest. A separate exact transition must preserve the inherited catalog cut. See the repair README for evidence, limits, restart unit and budgets.
+
+Independent review is complete with all findings closed, including cleanup diagnostics, exact publication authentication and the historical qualified test fixture. Local affected171, post-review61, clean helper403 and final evidence5 checks passed in the documented sequence; these groups overlap. The final hosted helper gate includes404cases.
+
+**Next:** one hosted harness/proof/full qualification, then authenticate actual new green evidence and prove the explicit retained-after-digest recovery boundary on a small hosted case. Measure the remaining proof audit before any long retry. Preserve original control digests and exact year1002acceptance.

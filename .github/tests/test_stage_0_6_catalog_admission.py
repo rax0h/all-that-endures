@@ -84,9 +84,40 @@ def execution(monkeypatch,parent):
     return ctx
 
 
+def historical_control_root(tmp_path):
+    """Positive fixtures model the pinned qualified engine during prequalification."""
+    import hashlib
+    import subprocess
+    from simulation import stage_0_6_genesis_source_control as controls
+    value=api().contract(ROOT);green=value['target_green_commit']
+    def committed(path):
+        return subprocess.check_output(['git','show',green+':'+path],cwd=ROOT)
+    raw=committed(controls.COMPATIBILITY);manifest=json.loads(raw)
+    assert manifest['current_runtime_tree']==value['target_engine_tree']
+    for name,hashes in manifest['files'].items():
+        data=(ROOT/name).read_bytes()
+        assert hashlib.sha256(data).hexdigest()==hashes['current_sha256'],name
+        path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data)
+    for name in ('simulation/stage_0_6_proof_genesis_request.json','simulation/stage_0_5_save1002_preflight.json'):
+        path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(committed(name))
+    (tmp_path/controls.COMPATIBILITY).write_bytes(raw)
+    return tmp_path
+
+
 @pytest.mark.parametrize('mode,artifact',[('smoke',14188030345),('mature',14197005279)])
-def test_pinned_contract_authenticates_exact_old_chain_and_current_execution(monkeypatch,mode,artifact):
+def test_pinned_contract_authenticates_exact_old_chain_and_current_execution(tmp_path,monkeypatch,mode,artifact):
     a=api();parent=old_catalog(mode);ctx=execution(monkeypatch,parent)
+    if mode=='mature':
+        from simulation import stage_0_6_genesis_source_control as controls
+        actual=controls.mature_control_contract
+        if json.loads((ROOT/controls.COMPATIBILITY).read_text())['current_runtime_tree']!=ctx['runtime_tree']:
+            with pytest.raises(ValueError,match='unreviewed canonical/runtime compatibility pair'):
+                actual(ROOT,current_runtime_tree=ctx['runtime_tree'])
+        historical=historical_control_root(tmp_path/'qualified-control')
+        def qualified(root,*,current_runtime_tree):
+            assert Path(root)==ROOT
+            return actual(historical,current_runtime_tree=current_runtime_tree)
+        monkeypatch.setattr(controls,'mature_control_contract',qualified)
     recorded_service(monkeypatch,snapshot(mode))
     stamp=a.attest(ROOT,parent,ctx);row=rebased(parent,ctx,stamp)
     assert a.validate_chain(ROOT,row)['metadata']['artifact_id']==artifact

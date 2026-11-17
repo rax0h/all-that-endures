@@ -1,0 +1,37 @@
+{
+  "scope": "new engine qualification only; no mature activation",
+  "candidate_engine": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "baseline_green": "1de9adc652f481e5e6471939ea605fb432589008",
+  "baseline_run": 43877554746,
+  "restart_unit": "one failed hosted job; retain completed compatible proof/full/harness evidence and never relabel it",
+  "jobs": {
+    "harness": {
+      "command_minutes": 10,
+      "consumer_minutes": 2,
+      "job_minutes": 15
+    },
+    "proof-map": {
+      "individual_command_minutes": 15,
+      "job_minutes": 90
+    },
+    "full-suite": {
+      "command_minutes": 180,
+      "job_minutes": 195,
+      "publication_and_setup_reserve_minutes": 15,
+      "previous_observed_suite_seconds": 9643.06
+    }
+  },
+  "retained_after_digest": {
+    "run": 43918798385,
+    "metadata": 14267625292,
+    "data": 14261110486,
+    "first_incomplete": "proofs",
+    "archive_expires_at": "2026-12-16T19:08:03Z",
+    "compatible_with_old_qualified_engine": true,
+    "admitted_to_candidate": false
+  },
+  "engine_previous_green_must_not_be_claimed_for_candidate": true,
+  "mature_request_unchanged": true,
+  "legacy_mature_job_disabled": true,
+  "remaining_mature_bottleneck_attribution_required": true
+}
