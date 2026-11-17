@@ -1,0 +1,28 @@
+{
+  "run_id": 43991230104,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/43991230104",
+  "head_sha": "24c0c612ab51908826f35e867413c86a83b01db6",
+  "engine_tree": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "source_tree": "79685d04e7da16306c0bfaa530ee0e17f9760479",
+  "branch": "sol/durable-proof-map",
+  "path": ".github/workflows/stage-0-5-proof-map-validation.yml",
+  "event": "push",
+  "observed_status": "in_progress",
+  "conclusion": null,
+  "created_at": "2026-11-17T00:53:11Z",
+  "jobs": [
+    {
+      "id": 133732017719,
+      "name": "harness",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 133732018194,
+      "name": "mature-genesis-request",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "scope": "Engine qualification only; mature request unchanged; no mature retry or acceptance"
+}

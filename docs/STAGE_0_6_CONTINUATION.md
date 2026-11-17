@@ -47,4 +47,6 @@ Candidate engine **5464caa49acc4c27f24c247b60ee639afd9d150d** requires new hoste
 
 Independent review is complete with all findings closed, including cleanup diagnostics, exact publication authentication and the historical qualified test fixture. Local affected171, post-review61, clean helper403 and final evidence5 checks passed in the documented sequence; these groups overlap. The final hosted helper gate includes404cases.
 
-**Next:** one hosted harness/proof/full qualification, then authenticate actual new green evidence and prove the explicit retained-after-digest recovery boundary on a small hosted case. Measure the remaining proof audit before any long retry. Preserve original control digests and exact year1002acceptance.
+[Hosted qualification43991230104](https://github.com/rax0h/all-that-endures/actions/runs/43991230104) is active at public **24c0c612ab51908826f35e867413c86a83b01db6**, engine5464caa. Request classifier133732018194passed; harness133732017719is running. This is engine qualification, not a mature simulation. Exact source tree and observed jobs are recorded in the repair's `qualification-launch.json`. No new mature request was activated.
+
+**Next:** inspect this qualification result and authenticate actual new green evidence, then prove the explicit retained-after-digest recovery boundary on a small hosted case. Measure the remaining proof audit before any long retry. Preserve original control digests and exact year1002acceptance.

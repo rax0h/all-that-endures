@@ -10,7 +10,12 @@
     "final_docs_auth_delta": "5targeted cases passed0.51s; next hosted complete gate404"
   },
   "independent_review": "complete; PS-R1/PS-R2/PS-R3closed, no remaining findings includingMinors",
-  "hosted_qualification": "prepared; not yet green",
+  "hosted_qualification": {
+    "run_id": 43991230104,
+    "head_sha": "24c0c612ab51908826f35e867413c86a83b01db6",
+    "status": "in_progress; request classification passed, harness active",
+    "qualified": false
+  },
   "mature_retry_activated": false,
   "mature_operation_timings": "unmeasured",
   "profile_limit": "Synthetic source loop; profiled wall timings may share CPU with concurrent tests. Work counts are direct counters; no mature or end-to-end inference.",
