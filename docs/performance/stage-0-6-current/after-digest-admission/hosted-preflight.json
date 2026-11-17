@@ -1,0 +1,74 @@
+{
+  "scope": "retained small after-digest recovery only",
+  "mode": "smoke",
+  "first_incomplete_stage": "proofs",
+  "completed_stages_skipped": [
+    "source_digest",
+    "capture",
+    "catalog",
+    "rebase",
+    "after_digest"
+  ],
+  "source": {
+    "kind": "github",
+    "artifact_id": 14252280082,
+    "run_id": 43916382557,
+    "head_sha": "43b9fbb273cbcb658fbfde0fb6996d02ae456629",
+    "name": "checkpoint-smoke-after_digest-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+    "job": "after-digest",
+    "archive_sha256": "9928a65610443127a9ed43daa3c1d3b3c509356a2c065bc1ccb7574cf8600298",
+    "archive_bytes": 9506,
+    "expires_at": "2026-12-16T17:19:33Z"
+  },
+  "database": {
+    "bytes": 16990208,
+    "format": 6,
+    "generation": 0,
+    "seed": 843000,
+    "sha256": "c6fa7723bf5b10efc450c2f4b16fa7d412b6ba35ed0b88968aea77386454f5b5",
+    "store_identity": "8d0a9438-1a28-4d9a-b413-a392588a0476",
+    "year": 1
+  },
+  "data_ref": {
+    "archive_bytes": 2724311,
+    "archive_sha256": "c90c56a5022a5ace65772946bb38e5ec8b0295b9859bf21e5b8b500535fc247c",
+    "artifact_id": 14252085073,
+    "expires_at": "2026-12-16T17:18:53Z",
+    "head_sha": "43b9fbb273cbcb658fbfde0fb6996d02ae456629",
+    "job": "rebase",
+    "kind": "github",
+    "name": "database-smoke-rebase-43b9fbb273cbcb658fbfde0fb6996d02ae456629-1",
+    "run_id": 43916382557
+  },
+  "engine": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "green_run": 43991230104,
+  "green_head": "24c0c612ab51908826f35e867413c86a83b01db6",
+  "green_expiry": {
+    "full-suite": "2026-12-01T03:34:49Z",
+    "proof-map": "2026-12-01T02:18:52Z",
+    "harness": "2027-02-15T00:53:11Z"
+  },
+  "restart_unit": "entire proof stage from immutable after_digest; no unsealed partial output accepted",
+  "crash": "exit77 immediately before World manifest; verify parent hash and no publication, then ordinary fresh restore/retry",
+  "checks_before_work": [
+    "actual qualified engine/full+proof source/software/artifact checks",
+    "strict current helper fence",
+    "all four historical metadata/data publication checks",
+    "exact old/new engine deltas and original catalog contract",
+    "full hosted runtime signature unchanged",
+    "exact archive and raw DB hash after download",
+    "archive+member disk bound then twice DB size+64MiB journal/growth reserve"
+  ],
+  "budgets": {
+    "proofs_compute_seconds": 12600,
+    "restore_minutes": 30,
+    "database_upload_minutes": 45,
+    "metadata_minutes": 5,
+    "diagnostics_minutes": 5,
+    "job_minutes": 350,
+    "recovery_drill_minutes": 5
+  },
+  "expected_small_digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+  "mature_retry_activated": false,
+  "mature_remaining_cost_attribution_required": true
+}

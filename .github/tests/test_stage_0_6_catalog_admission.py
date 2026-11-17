@@ -79,6 +79,9 @@ def api():
 def execution(monkeypatch,parent):
     from simulation import stage_0_6_genesis_resume as m
     ctx=successor(parent);observed=copy.deepcopy(ctx)
+    qualified=api().contract(ROOT)
+    monkeypatch.setattr(m,'RUNTIME',qualified['target_engine_tree'])
+    monkeypatch.setattr(m,'GREEN_SHA',qualified['target_green_commit'])
     monkeypatch.setattr(m,'fence',lambda root:(observed['runtime_tree'],observed['critical_blobs']))
     monkeypatch.setattr(m,'runtime_description',lambda:(observed['execution_runtime'],{}))
     return ctx
@@ -271,6 +274,8 @@ def test_rerun_gate_resumes_its_current_outputs_before_old_catalog(tmp_path,monk
     from simulation import stage_0_6_genesis_resume as m
     a=api();target=tmp_path/a.CONTRACT;target.parent.mkdir(parents=True)
     target.write_bytes((ROOT/a.CONTRACT).read_bytes())
+    proof_contract=tmp_path/m.proof_admission.CONTRACT
+    proof_contract.write_bytes((ROOT/m.proof_admission.CONTRACT).read_bytes())
     monkeypatch.setattr(m,'config',lambda root:dict(mode='smoke',smoke_run_id=0,resume_run_id=43778758497))
     monkeypatch.setattr(m,'inspect_green',lambda root:{'green_run':m.GREEN_RUN})
     monkeypatch.setattr(m,'runtime_description',lambda:({'python':'test','sqlite':'test','signature':'a'*64},{}))

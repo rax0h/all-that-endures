@@ -568,6 +568,15 @@ jobs:
 
         '
       if: needs.gate.outputs.mode == 'mature'
+    - id: recovery-drill
+      name: Crash a small proof worker and retain its verified after-digest
+      env:
+        MODE: ${{ needs.gate.outputs.mode }}
+        PARENT_ID: ${{ needs.after-digest.outputs.artifact_id || needs.gate.outputs.artifact_id }}
+        PARENT_RUN: ${{ needs.after-digest.outputs.artifact_id && github.run_id || needs.gate.outputs.run_id }}
+      run: python .github/tests/run_genesis_recovery_drill.py
+      if: needs.gate.outputs.mode == 'smoke'
+      timeout-minutes: 5
     - id: run
       name: Restore verified predecessor and execute only this stage
       env:
@@ -610,7 +619,13 @@ jobs:
 
           resume-work/evidence-*/**/*.json
 
-          resume-work/transport/**/*.json'
+          resume-work/transport/**/*.json
+
+          recovery-work/*.json
+
+          recovery-work/*.log
+
+          recovery-work/evidence-*/**/*.json'
         retention-days: 30
         if-no-files-found: error
         compression-level: 1

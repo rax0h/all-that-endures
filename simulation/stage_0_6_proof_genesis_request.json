@@ -2,8 +2,8 @@
   "schema": "ate-stage06-proof-genesis-request/1",
   "request_id": "bounded-mature-proof-genesis-2026-11-10-timeout-repair-1",
   "operation": "convert-then-one-year",
-  "green_commit": "1de9adc652f481e5e6471939ea605fb432589008",
-  "runtime_tree": "0d9dab5d4b36c89814dac6cb5904d589db4b8902",
+  "green_commit": "24c0c612ab51908826f35e867413c86a83b01db6",
+  "runtime_tree": "5464caa49acc4c27f24c247b60ee639afd9d150d",
   "database": {
     "bytes": 29922463744,
     "name": "candidate.sqlite",
@@ -18,12 +18,12 @@
     "captured_head": 126
   },
   "fingerprints": {
-    ".github/tests/run_genesis_recovery_drill.py": "43f1321a3a8e23528ff562f496cd13100351fb736e85405f347ced91229635ef",
+    ".github/tests/run_genesis_recovery_drill.py": "cd4b60605919d4187e164e797cca2ff24f17f3d61e1e86d1870800195b72ae6c",
     ".github/tests/test_stage_0_6_proof_mature_genesis.py": "e68737ee5221b6a51c8407b3a1f877f21b18649c3283bb1efd6f6177cd93cd01",
     ".github/tests/test_stage_0_6_proof_mature_preflight.py": "1dce11b312a4d45deb467e7e2b0da5bedf4f5a6e1908f7f39ce5eb048de65763",
     ".github/workflows/stage-0-5-proof-map-validation.yml": "27d43bd237f54e0ca65298bc07f36664e4c3ebe53de7425a20241848c33d3500",
     ".github/workflows/stage-0-6-proof-mature-preflight.yml": "e6c5bef879e4ba62f1faf487c8c4028681c614e865d157dba95bb2ac5e011d70",
-    ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "66c5b7f1be3901e0849237c5ec17f335435023606b0da070bc045b8facc62c62",
+    ".github/workflows/stage-0-6-resumable-proof-genesis.yml": "9bd6c2315f0f6038b2851dd327d52e70e4bfa665fa8fc44e786aea6e40855fe9",
     "docs/performance/stage-0-6-current/small-operation-profile/input.json": "5de59936dad7a7e408a8384e1d77a9769e561b420f0ae6bee1c4cad8871e98d2",
     "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
     "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
@@ -31,11 +31,11 @@
     "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
     "simulation/profile_stage_0_5_performance.py": "79e9e3abc5c8cfe342b0114157d8fa7b3578461a8d3d3868d45b286f92fcaf95",
     "simulation/stage_0_5_save1002_preflight.json": "7f0648786159007816c2a64ee1b8501c0210d2121f011052c4a2179db5a62b7a",
-    "simulation/stage_0_6_genesis_checkpoint.py": "d525978d57e7c5d9cdce6c777f02626f529676fea71f319da645f1e89aa0e538",
+    "simulation/stage_0_6_genesis_checkpoint.py": "d3a481e471964d354caaef4a2d0202ab4b185220e898967fdae7b808ab817071",
     "simulation/stage_0_6_genesis_control_compatibility.json": "727c2c03c25cf7d6a4ea2589f0ebb8f573e43992a771dcb59f1578eee2426094",
-    "simulation/stage_0_6_genesis_resume.py": "6f8da8912d70e113c552fa256f8bc0588ea0722ae7f828c8c65b1810e9e4a0f8",
-    "simulation/stage_0_6_genesis_source_control.py": "c91ea53665c81e6b57e1784fab917b966ca81910e95b7a1308b98c501f67745b",
-    "simulation/stage_0_6_genesis_stages.py": "4a24abd902ad8f5ee3be5c351d4f52ba770bf86db107030736d2e3481f9402dd",
+    "simulation/stage_0_6_genesis_resume.py": "177eb85113ab4bfc9c836051c1f50a23c028751dd6205ed0a19eb7c579f95f06",
+    "simulation/stage_0_6_genesis_source_control.py": "6f781d8bc429374c1c8878a2228941dc49805d5127f6a4134f6a0d7b0845b595",
+    "simulation/stage_0_6_genesis_stages.py": "829bec51f10d0efd03491bbee552fbeed4e504b4a5635f1dc5164b9b8754f158",
     "simulation/stage_0_6_genesis_transport.py": "5329b96b2cb23734e9eb27403d7ad3c261c7635d0122bbeab2886c1829be42bb",
     "simulation/stage_0_6_mature_benchmark.py": "1514455af928160a940e7d51e293abcd910b522e290478c027ae98263cd39629",
     "simulation/stage_0_6_preserve_fixtures.py": "b672f3efe9ab1a045e702f52c501f941e63d91cdbd24cebae76b32e6249a73e8",
@@ -48,7 +48,9 @@
     "simulation/stage_0_6_retained_producer.py": "f6ce0cf2327f39559b868a662f7c385ccd4156df950e01ef9277ad9eff70de9e",
     "simulation/stage_0_6_retained_transport.py": "07122d6a4cb86fd70f001cd2031dce1386faa50c3673c436520f65ab01fe0fff",
     "simulation/stage_0_6_catalog_admission.py": "40f6477ff9ea1e49a777f892c052df9cfb5df8180826485176977a34972d869d",
-    "simulation/stage_0_6_catalog_admission.json": "5e5da5681fe65c8f692c3b6893923c387537b6eb9ebe9ebb3435d44dc2aca0a2"
+    "simulation/stage_0_6_catalog_admission.json": "5e5da5681fe65c8f692c3b6893923c387537b6eb9ebe9ebb3435d44dc2aca0a2",
+    "simulation/stage_0_6_after_digest_admission.py": "589fc80333cd499a5df895c98a3dede7d9f004c85dd7ce7bf4935cfba1b5fb34",
+    "simulation/stage_0_6_after_digest_admission.json": "284e5c75d2bab90cbb8e2c704296007c12b7e19c2ada39253015fed6c95a8532"
   },
   "expected_saved_digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
   "budgets": {

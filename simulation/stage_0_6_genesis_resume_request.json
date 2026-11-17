@@ -1,9 +1,9 @@
 {
   "schema": "ate-proof-genesis-resume-request/1",
-  "request_id": "admitted-mature-catalog-2026-11-16-1",
-  "mode": "mature",
-  "smoke_run_id": 43916382557,
-  "resume_run_id": 43780946218,
+  "request_id": "admitted-small-after-digest-2026-11-17-1",
+  "mode": "smoke",
+  "smoke_run_id": 0,
+  "resume_run_id": 43916382557,
   "budgets": {
     "source_digest": 3600,
     "capture": 9000,

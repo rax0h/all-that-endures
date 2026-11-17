@@ -101,7 +101,9 @@ def validate_control_chain(root,value,*,current_runtime_tree):
     """Bind imported baseline metadata to the exact original authority on use."""
     c.validate(value)
     from simulation import stage_0_6_catalog_admission as admission
-    admitted=admission.validate_chain(root,value)
+    from simulation import stage_0_6_after_digest_admission as proof_admission
+    admitted=proof_admission.validate_chain(root,value)
+    if admitted is None:admitted=admission.validate_chain(root,value)
     if value['context']['mode']!='mature' or value['stage']=='source':return
     source=value
     while source['stage']!='source_digest':source=source['parent']['receipt']

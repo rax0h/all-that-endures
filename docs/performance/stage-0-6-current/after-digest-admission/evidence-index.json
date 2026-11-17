@@ -1,0 +1,42 @@
+{
+  "inputs.zip": {
+    "bytes": 30913,
+    "sha256": "b9c65a5154dd41f4104d272eb008d69c66102ba8baf64f081bbea859bc334def"
+  },
+  "local-evidence.zip": {
+    "bytes": 19422,
+    "sha256": "492e686e1b400bf83405272282e180c631b76f6e01b1b655e1412a1079351ee6"
+  },
+  "qualified/14288380650.zip": {
+    "bytes": 8298,
+    "sha256": "c122d00680943951effafb71ca4d0aeecbf46fcfdfcb6ab47c406bf12c97fd2e"
+  },
+  "qualified/14292956213.zip": {
+    "bytes": 216587,
+    "sha256": "5883b4aae8f0ffcab412fb87fad4516d4b1161bd2edd41197fbd47310766e490"
+  },
+  "qualified/14297230116.zip": {
+    "bytes": 198553,
+    "sha256": "91a89518dcc1e0a535c963a4a95e8a0069975d2f0bbd7c3f8e66cc89b2c28bb6"
+  },
+  "qualified/authenticated.json": {
+    "bytes": 4704,
+    "sha256": "0efcf280f71f9294d76b878093c2e965c773f7dd900a93d3a021ffd1e1aa2604"
+  },
+  "qualified/metadata.json": {
+    "bytes": 33309,
+    "sha256": "f49d90877655d1ecf0c0000c89ac9bc7c2ce818f35cdc867bc4d0cc8417794c2"
+  },
+  "independent-review.zip": {
+    "bytes": 5668,
+    "sha256": "1171b771d60dd10477efc43e7d554e82c8391a2c956a9a3a418e2cc03281ab84"
+  },
+  "complete-helper.zip": {
+    "bytes": 8161,
+    "sha256": "5f4b85ea8618624ef3cf689d6e4c50e4303db7531f6b2009e87ca010412a616a"
+  },
+  "hosted-preflight.json": {
+    "bytes": 2738,
+    "sha256": "b9763a9c294fc2b52c6e142973152f6072b67acb66c1bdec5e9d91ed3c767fc7"
+  }
+}

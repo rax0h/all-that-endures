@@ -50,3 +50,15 @@ Independent review is complete with all findings closed, including cleanup diagn
 [Hosted qualification43991230104](https://github.com/rax0h/all-that-endures/actions/runs/43991230104) is active at public **24c0c612ab51908826f35e867413c86a83b01db6**, engine5464caa. Request classifier133732018194passed; harness133732017719is running. This is engine qualification, not a mature simulation. Exact source tree and observed jobs are recorded in the repair's `qualification-launch.json`. No new mature request was activated.
 
 **Next:** inspect this qualification result and authenticate actual new green evidence, then prove the explicit retained-after-digest recovery boundary on a small hosted case. Measure the remaining proof audit before any long retry. Preserve original control digests and exact year1002acceptance.
+
+## Qualified proof audit engine and after-digest recovery
+
+Qualification43991230104 completed successfully. Actual full log5142passed+2subtests/9481.56s, proof1968cases and helper404cases; exact ZIP/job/source/runtime evidence is retained under `performance/stage-0-6-current/after-digest-admission/qualified/`. Engine5464caa/public24c0c612 is now the qualified baseline. The earlier pending-qualification observations are historical.
+
+A separate exact after_digest->proofs boundary is implemented, preserving the full nested catalog cut under its historical contract and reauthenticating all four old refs on later consumption. Local real-receipt/producer/expiry checks and real proof/crash/retry checks pass; helper/workflow composition is under complete quick validation and independent review. Existing engine code and targets are unchanged, and no mature request has been activated.
+
+The complete committed-clean helper suite passed432cases/179.02s. Independent whole-package review found no actionable findings, includingMinors:86targeted and22additional adversarial cases passed using the actual current source fence. Four-ref expiry/publication/hash/duplicate-producer checks and engine/helper/runtime rebinding all rejected. Exact33fingerprints/52criticalpaths and unchanged engine/old catalog contract were independently verified. Raw evidence is retained under the admission package.
+
+Request `admitted-small-after-digest-2026-11-17-1` selects old small after-digest14252280082/run43916382557, skipping source through after-digest and running only proofs onward with a real exit77 recovery drill. This is explicitly a **small functional recovery run**, not a mature simulation or performance acceptance. Engine/full-proof green is reused; no new engine validation is required for these helper-only changes.
+
+**Next:** authenticate actual hosted small crash/retry/fresh-restore completion, then attribute remaining mature proof-audit work before a new long retry. Do not replay completed rebase or canonical after-digest.

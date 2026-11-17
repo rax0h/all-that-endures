@@ -1,5 +1,5 @@
 """Independent offline stages around the exact existing persistence runtime."""
-from contextlib import contextmanager,nullcontext
+from contextlib import contextmanager,nullcontext,ExitStack
 import copy
 import os
 import json
@@ -84,6 +84,30 @@ def _digest(path,rules,progress):
         with catalog_snapshot(session.store,session.pin):return canonical_digest(session.world,progress)
 
 
+@contextmanager
+def _proof_audit_progress(progress):
+    """Report full construction/audit boundaries without profiling every row."""
+    from ate_sim import persistence_proof_world as world,persistence_proof_scope as scope,persistence_catalog_copy as catalog
+    def traced(real,label,counts):
+        def call(*args,**kwargs):
+            phase=label+('.'+str(args[2].count) if counts else '')
+            progress(phase+'.start')
+            try:result=real(*args,**kwargs)
+            except BaseException as exc:
+                try:progress(phase+'.error')
+                except BaseException as report:exc.add_note('audit progress failed: '+str(report))
+                raise
+            progress(phase+'.complete')
+            return result
+        return call
+    with ExitStack() as patches:
+        for module,name,label in ((world,'_audit_world','audit.World'),(world,'_check_sources','audit.sources'),
+                (world,'_check_source_map','audit.source_map'),(scope,'_construct_roots','audit.scope_roots'),
+                (catalog,'_verify_catalog','audit.catalog')):
+            patches.enter_context(patch.object(module,name,traced(getattr(module,name),label,name=='_check_source_map')))
+        yield
+
+
 def _build_proofs(path,rules,progress):
     from ate_sim.persistence_lazy_store import LazyRecordStore
     from ate_sim.persistence_adapters import WorldCodec,SCHEMA
@@ -98,7 +122,7 @@ def _build_proofs(path,rules,progress):
         store.db.execute("UPDATE store_metadata SET value='7' WHERE key='format_version'");store.db.commit()
         pin=store.capture_pin()
         try:
-            with ProofGenesisTransaction(store,pin,rank=True):
+            with _proof_audit_progress(progress),ProofGenesisTransaction(store,pin,rank=True):
                 progress('bootstrap.records');ra=bootstrap_record_proofs(store,pin)
                 progress('bootstrap.scopes');sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
                 progress('bootstrap.content');ca=bootstrap_content_proofs(store,pin)
@@ -167,7 +191,7 @@ def _measure(source,path,receipt,output,deadline):
 
 
 def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,progress=lambda _:None,source_control=None,
-              successor_context=None,catalog_admission=None):
+              successor_context=None,catalog_admission=None,proofs_admission=None):
     """Caller must authenticate remote provenance before supplying its receipt.
 
     Successful publication is the only completion marker. A failure discards
@@ -177,10 +201,15 @@ def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,p
     from ate_sim.persistence_adapters import WorldCodec,SCHEMA
     from ate_sim.persistence_conversion_workspace import ConversionWorkspace
     from ate_sim.persistence_conversion_audit import construction_spills
-    if successor_context is not None or catalog_admission is not None:
-        if stage!='rebase' or successor_context is None or catalog_admission is None:
-            raise ValueError('catalog context admission is rebase-only')
-        c.check_context(successor_context);c.check_admission(input_receipt,successor_context,catalog_admission)
+    if successor_context is not None or catalog_admission is not None or proofs_admission is not None:
+        if successor_context is None or (catalog_admission is None)==(proofs_admission is None):raise ValueError('stage requires one exact context admission')
+        c.check_context(successor_context)
+        if catalog_admission is not None:
+            if stage!='rebase':raise ValueError('catalog context admission is rebase-only')
+            c.check_admission(input_receipt,successor_context,catalog_admission)
+        else:
+            if stage!='proofs':raise ValueError('after-digest admission is proofs-only')
+            c.check_proofs_admission(input_receipt,successor_context,proofs_admission)
     c.validate(input_receipt)
     if stage not in c.STAGES or input_receipt['stage']!=c.ORDER[c.ORDER.index(stage)-1]:raise ValueError('stage requires its exact predecessor')
     c.integer(budget,'stage budget',1)
@@ -203,6 +232,7 @@ def run_stage(stage,input_receipt,input_database,destination,*,producer,budget,p
     ctx=successor_context if successor_context is not None else input_receipt['context']
     rules=ctx['rules_id'];metrics={};result=None
     if catalog_admission is not None:metrics['catalog_admission']=copy.deepcopy(catalog_admission)
+    if proofs_admission is not None:metrics['proofs_admission']=copy.deepcopy(proofs_admission)
     rec=Recorder(Path(tempfile.mkdtemp(prefix='evidence-'+stage+'-',dir=destination.parent)),{} if stage=='measure' else {stage:budget})
     with tempfile.TemporaryDirectory(prefix='.proof-stage-',dir=destination.parent) as directory:
         private=Path(directory);working=private/'working.sqlite'
