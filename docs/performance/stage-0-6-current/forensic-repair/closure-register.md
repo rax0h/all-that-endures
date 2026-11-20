@@ -154,9 +154,9 @@ qualification remains required for the candidate.
 
 | Finding | Action and evidence | Disposition |
 |---|---|---|
-| QH-R1: hosted harness compared a proposed engine to the existing canonical production pin | Bind canonical compatibility to the actual qualified commit and preserve its ancestry and exact file hashes. Verify rejection of the different candidate tree. Two focused cases passed in a byte-identical LF checkout. [Failed Linux harness](https://github.com/rax0h/all-that-endures/actions/runs/44803541620/job/136521491734) passed 431 other cases and its 9,036-byte [evidence archive](https://github.com/rax0h/all-that-endures/actions/runs/44803541620/artifacts/14662192115) was saved and hash-verified. | Awaiting hosted verification |
+| QH-R1: hosted harness compared a proposed engine to the existing canonical production pin | Bind canonical compatibility to the actual qualified commit and preserve its ancestry and exact file hashes. Verify rejection of the different candidate tree. Two focused LF cases passed. The [failed Linux harness](https://github.com/rax0h/all-that-endures/actions/runs/44803541620/job/136521491734) passed 431 other cases. The [retry harness](https://github.com/rax0h/all-that-endures/actions/runs/44805673467/job/136528898199) passed all 432 cases and consumed the preserved small archive. Both [failed](https://github.com/rax0h/all-that-endures/actions/runs/44803541620/artifacts/14662192115) and [successful](https://github.com/rax0h/all-that-endures/actions/runs/44805673467/artifacts/14662553047) harness archives were saved and hash-verified. | Closed |
 | QH-R2: independent review requested coverage for both partial-custody cases | The parity test now covers fully owned roots, a prebuilt scope, and a prebuilt directory. Both partial states reconstruct both components and agree with a fresh standalone full audit. All three focused cases passed. | Closed |
 
 The engine tree, compatibility contract, operational helpers, and request
-files are unchanged by the repair. The existing engine-test change trigger
-qualifies this same candidate tree after the complete harness passes.
+files were unchanged by the repair. The follow-up CI check verified that
+both proof-map and full-suite started. Their results remain pending.
