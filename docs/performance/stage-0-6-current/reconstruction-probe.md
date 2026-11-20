@@ -89,7 +89,7 @@ lanes reverified the retained parent checksum after teardown.
 
 Using the unrounded receipt values, the repeats total **1,949.00 seconds**
 across the two isolated jobs.
-That is **884.13 seconds** more than the **1,064.87-second historical
+That is **about 884 seconds** more than the **1,064.87-second historical
 margin** after charging the prior pre-World and catalog intervals. The
 sum compares isolated durations from different runners against a
 historical budget. The full integrated production proof duration remains
