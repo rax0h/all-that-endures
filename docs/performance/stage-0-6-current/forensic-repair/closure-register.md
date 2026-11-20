@@ -120,7 +120,10 @@ November20desktop handoff closes the hosted small recovery prerequisite:44028694
 | RP-R4: independent review found the small gate only checked root array lengths | Pin exact known root counts in the hosted small gate and document scope root order. Checked the counts against the authenticated closed small proofs. | Closed |
 | RP-R5: hosted small workflow could not list its finalized upload | Preserved the original artifact and independently checked its hash and 51 receipts. Download by upload ID with bounded retries, verify the uploader SHA-256, and compare the extracted files. Four local transport cases passed. Retry 44781897995 passed the complete hosted gate, including actual artifact 14652248017 and recursive byte comparison. | Closed |
 | RP-R6: independent review found the checkpoint still pointed to the closed first run | Replaced stale directions with the verified result, exact retry request, and one active first incomplete step. Independently rechecked the rewritten checkpoint. | Closed |
+| RP-R7: mature evidence review found the rounded table rows obscure the repeat total | Independently rechecked both ZIP hashes, 36 receipts, proof roots, parent hashes and historical margin arithmetic. The report identifies the raw timing values used for the total. | Closed |
 
-The [isolated diagnostic](../reconstruction-probe.md) requires its short
-hosted rollback/restart and artifact round trip before either mature lane.
-Current mature comparison, full audit cost and F7 acceptance remain open.
+The [isolated diagnostic](../reconstruction-probe.md) passed its short
+hosted rollback/restart and artifact round trip and both mature lanes.
+The retained receipts verify the first/repeat roots and exact parent hash.
+The isolated repeat durations total 1,949.00 seconds. Integrated full audit
+cost and F7 acceptance remain open.

@@ -64,8 +64,39 @@ are reused.
 The [retry](https://github.com/rax0h/all-that-endures/actions/runs/44781897995)
 passed the complete small gate. Job **136446481217** verified rollback,
 fresh reconstruction, uploaded artifact **14652248017**, checked the
-downloaded ZIP digest, and passed the recursive byte comparison. Both
-mature jobs entered runner setup. Their timing results remain pending.
+downloaded ZIP digest, and passed the recursive byte comparison.
+Both mature jobs completed successfully.
+
+## Verified mature results
+
+| Component | First construction | Repeated construction | Repeat CPU | Root counts |
+|---|---:|---:|---:|---|
+| Scope | 1,195.76 s | 1,186.47 s | 1,186.24 s | 1,181,812 / 2,210,495 / 242,238 / 1,534,414 / 639,840 / 8,457 / 70 |
+| Collection | 606.63 s | 762.54 s | 762.50 s | 70 |
+
+Scope ran on AMD EPYC 9V74 and collection on Intel Xeon 6975P-C.
+The two archives contain 18 unique JSON receipts each. Their admission
+stamps match, and both pin the exact retained after-digest and rebase
+inputs and qualified engine. Both used the same verified software
+fingerprint as the small retry. All seven phases in each lane completed
+within their recorded budgets, both root pairs match exactly, and both
+lanes reverified the retained parent checksum after teardown.
+
+| Raw evidence | Artifact | ZIP bytes | ZIP SHA-256 |
+|---|---:|---:|---|
+| [Scope](reconstruction-mature-scope-44781897995.zip) | 14655663996 | 15,918 | `f4193888043dacd941b9b79c17ada1c08c5e482404a897248585bc35cf386fa8` |
+| [Collection](reconstruction-mature-collection-44781897995.zip) | 14654762607 | 14,939 | `6c7707d7cf3ee821f6befa7be511c09fb38f98f12ef295d87575b51bd6cfdc4e` |
+
+Using the unrounded receipt values, the repeats total **1,949.00 seconds**
+across the two isolated jobs.
+That is **884.13 seconds** more than the **1,064.87-second historical
+margin** after charging the prior pre-World and catalog intervals. The
+sum compares isolated durations from different runners against a
+historical budget. The full integrated production proof duration remains
+unmeasured. Keep the production rerun on hold and use this evidence to
+investigate avoiding repeated construction within owned source custody
+while preserving exact checked roots and corruption detection.
+[Historical budget and remaining audit phases](mature-proof-audit-budget.md)
 
 | Mature budget per job | Limit |
 |---|---:|
