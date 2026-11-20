@@ -61,6 +61,12 @@ the workflow transport and request. The short gate still runs end to end.
 The production proof engine, reconstruction probe and retained databases
 are reused.
 
+The [retry](https://github.com/rax0h/all-that-endures/actions/runs/44781897995)
+passed the complete small gate. Job **136446481217** verified rollback,
+fresh reconstruction, uploaded artifact **14652248017**, checked the
+downloaded ZIP digest, and passed the recursive byte comparison. Both
+mature jobs entered runner setup. Their timing results remain pending.
+
 | Mature budget per job | Limit |
 |---|---:|
 | Green/software and admission checks | 5 min |
