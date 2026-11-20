@@ -12,6 +12,22 @@ from .persistence_sqlite_guard import GuardedConnection, _WRITES, _READ_PRAGMAS,
 from .persistence_validation_scope import ValidationScope
 
 
+# SQLite's authorizer also reports REPLACE as INSERT. Admit only the exact
+# append statements used by the builders for tables whose bytes are reused.
+_ROOT_APPENDS = {
+    'INSERT OR IGNORE INTO ate_ordered_seek_nodes VALUES(?,?,?)': 'ate_ordered_seek_nodes',
+    'INSERT OR IGNORE INTO ate_proof_nodes (map_domain,digest,node_bytes) VALUES(?,?,?)': 'ate_proof_nodes',
+    'INSERT OR IGNORE INTO ate_scope_descriptors VALUES(?,?,?)': 'ate_scope_descriptors',
+    'INSERT INTO ate_scope_generations VALUES(?,?,?,?,?,?,?,?)': 'ate_scope_generations',
+    'INSERT INTO ate_collection_generations VALUES(?,?,?,?,?,?,?,?)': 'ate_collection_generations',
+    'INSERT OR IGNORE INTO ate_collection_directory_bodies VALUES(?,?,?)': 'ate_collection_directory_bodies',
+    'INSERT INTO ate_directory_generations VALUES(?,?,?,?,?,?,?)': 'ate_directory_generations',
+}
+_CHECKED_ROOT_TABLES = frozenset(_ROOT_APPENDS.values())
+_APPEND_PARAMETER_TYPES = frozenset((bytes, str, int, type(None)))
+_APPEND_ADAPTER_KEYS = frozenset((cls, sqlite3.PrepareProtocol) for cls in _APPEND_PARAMETER_TYPES)
+
+
 def _schema_definitions():
     from . import persistence_proof_record as record, persistence_proof_scope as scope
     from . import persistence_proof_publication as content, persistence_proof_inventory as inventory
@@ -94,12 +110,15 @@ class _OwnedSources:
                       sqlite3.SQLITE_CREATE_VTABLE,sqlite3.SQLITE_DROP_VTABLE):denied=True
         if action==sqlite3.SQLITE_PRAGMA:
             reads=_READ_PRAGMAS|{'integrity_check','foreign_key_check','journal_mode','synchronous'}
+            if self.proof:reads=reads|{'writable_schema'}
             if name not in reads or second is not None and name not in _ARGUMENT_PRAGMAS:denied=True
         if action==sqlite3.SQLITE_FUNCTION and (second or '').lower()=='load_extension':denied=True
         if database=='main':
             if action in (sqlite3.SQLITE_INSERT,sqlite3.SQLITE_UPDATE,sqlite3.SQLITE_DELETE):
                 if (getattr(self,'sealed',False)
                         or name not in self.tables and name not in ('sqlite_master','sqlite_schema')):denied=True
+                if self.proof and name in _CHECKED_ROOT_TABLES:
+                    if action!=sqlite3.SQLITE_INSERT or name!=self._append_table:denied=True
             elif action==sqlite3.SQLITE_CREATE_TABLE:
                 if name not in self.tables:denied=True
             elif action==sqlite3.SQLITE_CREATE_INDEX:
@@ -112,8 +131,12 @@ class _OwnedSources:
             self.denied='source/schema/transaction mutation during owned genesis validation'
             if callback and self.boundary!='rollback':self.db.interrupt()
             return sqlite3.SQLITE_DENY
-        return (sqlite3.SQLITE_OK if self.previous is None else
-            self.db._invoke_sql_callback(self.previous,action,first,second,database,source))
+        if self.previous is None:return sqlite3.SQLITE_OK
+        decision=self.db._invoke_sql_callback(self.previous,action,first,second,database,source)
+        if self.proof and self._append_table is not None and not _APPEND_ADAPTER_KEYS.isdisjoint(sqlite3.adapters):
+            self.denied='checked proof appends cannot use SQLite binding adapters'
+            return sqlite3.SQLITE_DENY
+        return decision
 
     def __enter__(self):
         if type(self.db) is not GuardedConnection or self.db.in_transaction or self.store._active_read_transaction:
@@ -137,6 +160,8 @@ class _OwnedSources:
         sqlite3.Connection.set_authorizer(self.db,self.authorizer)
         self.db._known_authorizer=self.authorizer;self.db._native_write_guard=self
         try:
+            if self.proof and self.db.execute('PRAGMA main.writable_schema').fetchone()!=(0,):
+                raise StoreError('owned proof genesis requires writable_schema off')
             self.boundary='begin'
             try:self.db.execute('BEGIN IMMEDIATE' if self.proof else 'BEGIN')
             finally:self.boundary=False
@@ -210,6 +235,25 @@ class ProofGenesisTransaction(_OwnedSources):
         super().__init__(store,pin,proof=True,rank=rank)
         self.audit_result=None;self.audit_reuses=0;self.physical_checks=0
         self.sealed=False
+        self._append_table=None
+        self._reconstructed={}
+
+    def _execute_statement(self, execute, *args, **kwargs):
+        sql = args[0] if args else kwargs.get('sql')
+        table = _ROOT_APPENDS.get(sql) if type(sql) is str else None
+        if table is None:
+            return execute(*args, **kwargs)
+        # Keep the append capability out of arbitrary parameter hooks.
+        if (len(args)!=2 or kwargs or type(args[1]) is not tuple
+                or not all(type(value) in _APPEND_PARAMETER_TYPES for value in args[1])):
+            self.reject('checked proof appends require plain SQLite parameters')
+        if not _APPEND_ADAPTER_KEYS.isdisjoint(sqlite3.adapters):
+            self.reject('checked proof appends cannot use SQLite binding adapters')
+        self._append_table = table
+        try:
+            return execute(*args, **kwargs)
+        finally:
+            self._append_table = None
 
     def __enter__(self):
         from .persistence_lazy_store import _CONVERSION_AUDITS
@@ -235,6 +279,21 @@ class ProofGenesisTransaction(_OwnedSources):
         else:self.audit_reuses+=1
         return dict(self.audit_result)
 
+    def remember_reconstruction(self, component, authority):
+        self.check()
+        if self.audit_result is None or component in self._reconstructed:
+            self.reject('invalid owned genesis reconstruction')
+        self._reconstructed[component] = authority
+
+    def reuses_reconstruction(self, generation, scope, directory):
+        self.check()
+        if generation != self.pin.captured_head:
+            self.reject('owned genesis reconstruction generation differs')
+        for component, authority in (('scope', scope), ('directory', directory)):
+            if component in self._reconstructed and self._reconstructed[component] != authority:
+                self.reject('owned genesis reconstruction authority differs')
+        return 'scope' in self._reconstructed and 'directory' in self._reconstructed
+
     def final_physical_check(self):
         self.check()
         if self.audit_result is None or not self.sealed:
@@ -254,6 +313,7 @@ class ProofGenesisTransaction(_OwnedSources):
         sqlite3.Connection.set_authorizer(self.db,self.authorizer)
 
     def _restore(self):
+        self._reconstructed.clear()
         self.store._genesis_transaction=None
         super()._restore()
 
@@ -267,7 +327,7 @@ def bootstrap_stage(store,pin):
         transaction.check()
         if transaction.sealed:transaction.reject('genesis World audit already sealed the build')
         try:
-            yield
+            yield transaction
             transaction.check()
         except BaseException:
             transaction.denied=transaction.denied or 'proof bootstrap stage failed'

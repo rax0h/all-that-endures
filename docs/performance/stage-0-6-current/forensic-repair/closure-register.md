@@ -127,3 +127,25 @@ hosted rollback/restart and artifact round trip and both mature lanes.
 The retained receipts verify the first/repeat roots and exact parent hash.
 The isolated repeat durations total 1,949.00 seconds. Integrated full audit
 cost and F7 acceptance remain open.
+
+## Owned genesis root reuse
+
+The candidate retains the exact scope and collection-directory certificates
+formed under the same source transaction. It verifies persisted authority
+pairs and preserves source-map, World and physical checks. The fresh audit
+still rebuilds both components. The isolated 1,949.00-second repeat total
+motivates the candidate. Integrated mature compute and operation timings
+remain unmeasured.
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| GR-R1: regression tests found that warmed statements could mutate proof rows during construction | Admit only the builders' exact append statements during checked ownership. Five warmed insert/update/delete variants now deny the write and force rollback. | Closed |
+| GR-R2: independent review found writable-schema state and native configuration changes needed explicit guard coverage | Validate writable-schema state at entry, fence native connection changes while owned, and exercise both SQLite paths. | Closed |
+| GR-R3: independent review found the append authorization had to exclude Python parameter binding callbacks | Bind only plain SQLite parameters and reject applicable registered adapters. The regressions assert that neither custom nor registered binders are invoked. | Closed |
+| GR-R4: final independent review requested parity against the fresh World audit | Compared all published roots and persisted facts with a fresh audit on the same committed database. Both components reconstructed in the fresh audit. The reviewed full genesis suite passed. | Closed |
+
+Windows functional validation passed all 51 owned-genesis tests and all
+121 standalone World, scope and collection-directory tests. The separate
+hosted-oriented harness passed 45 cases locally and had 15 Windows failures
+at pinned LF byte checks, POSIX APIs and a path-separator assertion. Hosted
+qualification remains required for the candidate.

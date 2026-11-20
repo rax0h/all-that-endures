@@ -93,8 +93,16 @@ def _check_sources(store,g,ca,sa,ia,ra,da):
     selected._checked_components(store,ca,sa,ia,ra)
     directory._preflight(store,type('PinContext',(),{'captured_head':g,'store_identity':store.store_identity})(),*da,1048576)
     if directory_publish._load(store,g)[0]!=da:raise StoreIntegrityError('World directory authority disagreement')
-    scope._guard_construction(store.db);scope._guard_child_keys(store);scope._guard_sequence_keys(store)
-    if scope._construct_roots(store,g,sa[0].next_incarnation_id,include_children=True,include_sequence=True,include_rank=len(sa[0].roots)==7)!=sa[0].roots:raise StoreIntegrityError('World physical scoped relations disagree with accepted roots')
+    genesis=getattr(store,'_genesis_transaction',None)
+    reuse=False
+    if genesis is not None:
+        from .persistence_genesis_transaction import ProofGenesisTransaction
+        if type(genesis) is not ProofGenesisTransaction or genesis.store is not store:
+            raise StoreError('invalid owned genesis reconstruction custody')
+        reuse=genesis.reuses_reconstruction(g,sa,da)
+    if not reuse:
+        scope._guard_construction(store.db);scope._guard_child_keys(store);scope._guard_sequence_keys(store)
+        if scope._construct_roots(store,g,sa[0].next_incarnation_id,include_children=True,include_sequence=True,include_rank=len(sa[0].roots)==7)!=sa[0].roots:raise StoreIntegrityError('World physical scoped relations disagree with accepted roots')
     def versions():
         cursor=store.db.execute('SELECT namespace,typed_key FROM lazy_record_versions WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(g,g))
         try:
@@ -119,12 +127,13 @@ def _check_sources(store,g,ca,sa,ia,ra,da):
                 yield segment_key(ns,ordinal),target.content._event_value(ns,ordinal,row,store.codec.version)
         finally:cursor.close()
     _check_source_map(store,target.content._map(store,True),ca[0].events,events(),'World event source disagrees with accepted content')
-    m=OrderedSeekMap(store.db,directory.domain(store.store_identity,store.codec.version))
-    def collections():
-        for (ns,) in store.db.execute('SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY CAST(namespace AS BLOB)',(g,g)):
-            c,e=collection._construct_collection(store,g,ns)
-            yield directory._key(ns),directory._persist(store,m.domain,directory._key(ns),c)
-    if m.build(collections())!=da[0].root:raise StoreIntegrityError('World complete collection directory disagreement')
+    if not reuse:
+        m=OrderedSeekMap(store.db,directory.domain(store.store_identity,store.codec.version))
+        def collections():
+            for (ns,) in store.db.execute('SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY CAST(namespace AS BLOB)',(g,g)):
+                c,e=collection._construct_collection(store,g,ns)
+                yield directory._key(ns),directory._persist(store,m.domain,directory._key(ns),c)
+        if m.build(collections())!=da[0].root:raise StoreIntegrityError('World complete collection directory disagreement')
 
 
 

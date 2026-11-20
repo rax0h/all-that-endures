@@ -51,7 +51,11 @@ class _NativeGuardCursor(sqlite3.Cursor):
     def execute(self,*args,**kwargs):
         self.connection._reject_callback_sql()
         self.connection._note_fact_sql(args[0] if args else kwargs.get('sql'))
-        return super().execute(*args,**kwargs)
+        execute=super().execute
+        guard=getattr(self.connection,'_native_write_guard',None)
+        statement=getattr(guard,'_execute_statement',None)
+        if statement is None:return execute(*args,**kwargs)
+        return statement(execute,*args,**kwargs)
     def executemany(self,*args,**kwargs):
         self.connection._reject_callback_sql()
         self.connection._note_fact_sql(args[0] if args else kwargs.get('sql'))
@@ -122,6 +126,13 @@ class GuardedConnection(sqlite3.Connection):
         if guard is not None:guard.reject('guarded source cannot deserialize a replacement database')
         self._sql_callback_generation += 1
         return super().deserialize(data,name=name)
+
+    if hasattr(sqlite3.Connection,'setconfig'):
+        def setconfig(self,op,enabled=True,/):
+            guard=getattr(self,'_native_write_guard',None)
+            if guard is not None:guard.reject('owned SQLite configuration cannot change')
+            self._sql_callback_generation += 1
+            return super().setconfig(op,enabled)
 
     def enable_load_extension(self,enabled,/):
         self._reject_callback_registration()
@@ -195,7 +206,9 @@ class GuardedConnection(sqlite3.Connection):
 
     def _reject_callback_sql(self):
         guard=getattr(self,'_native_write_guard',None)
-        if guard is not None and getattr(self,'_native_sql_callback_depth',0):guard.reject('native SQLite callbacks cannot execute SQL')
+        if guard is not None:
+            if getattr(self,'_native_sql_callback_depth',0):guard.reject('native SQLite callbacks cannot execute SQL')
+            if getattr(guard,'_append_table',None) is not None:guard.reject('checked proof append cannot execute nested SQL')
 
     def _invoke_sql_callback(self,callback,*args):
         if getattr(self,'_native_write_guard',None) is None:return callback(*args)

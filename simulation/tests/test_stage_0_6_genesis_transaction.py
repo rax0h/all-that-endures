@@ -38,25 +38,102 @@ def construct(store,pin):
 
 def test_one_owned_transaction_reuses_source_audit_and_commits_all_roots(tmp_path):
     from ate_sim.persistence_proof_record import bootstrap_record_proofs
+    from ate_sim import persistence_proof_collection as collection, persistence_proof_scope as scope
     from ate_sim.persistence_proof_scope import bootstrap_scope_proofs
     from ate_sim.persistence_proof_publication import bootstrap_content_proofs
     from ate_sim.persistence_proof_collection_directory import bootstrap_collection_directory
     from ate_sim.persistence_proof_inventory import bootstrap_inventory
-    from ate_sim.persistence_proof_manifest_publish import bootstrap_world_manifest
-    from ate_sim.persistence_proof_generation import read_generation_manifest
+    from ate_sim.persistence_proof_manifest_publish import _load, bootstrap_world_manifest
+    from ate_sim.persistence_proof_world import audit_world_roots
     store,pin=ready(tmp_path)
-    with store,lazy._bounded_conversion_audits(),patch.object(store,'_verify_all_in_snapshot',wraps=store._verify_all_in_snapshot) as audits:
+    with (store,lazy._bounded_conversion_audits(),
+          patch.object(store,'_verify_all_in_snapshot',wraps=store._verify_all_in_snapshot) as audits,
+          patch.object(scope,'_construct_roots',wraps=scope._construct_roots) as scoped,
+          patch.object(collection,'_construct_collection',wraps=collection._construct_collection) as collections):
         with bundle()(store,pin) as owned:
             ra=bootstrap_record_proofs(store,pin)
             sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
             ca=bootstrap_content_proofs(store,pin)
             da=bootstrap_collection_directory(store,pin)
             ia=bootstrap_inventory(store,pin)
+            collection_count=collections.call_count
             manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
             assert store.db.in_transaction
             assert audits.call_count==1 and owned.audit_reuses>=5
+            assert scoped.call_count==1
+            assert collections.call_count==collection_count==da[0].root.count
         assert owned.physical_checks==1 and not store.db.in_transaction
-        assert read_generation_manifest(store,pin,expected)==manifest
+        pairs,facts=_load(store,pin,(manifest,expected))
+        fresh=audit_world_roots(store,pin,*pairs)
+        assert (fresh.roots,fresh.facts)==(manifest.roots,facts)
+        assert scoped.call_count==2 and collections.call_count==2*collection_count
+
+
+@pytest.mark.parametrize('sql',[
+    "INSERT OR REPLACE INTO ate_ordered_seek_nodes VALUES(?,?,?)",
+    "REPLACE INTO ate_ordered_seek_nodes VALUES(?,?,?)",
+    "INSERT INTO ate_ordered_seek_nodes VALUES(?,?,?) ON CONFLICT DO UPDATE SET raw=excluded.raw",
+    "UPDATE ate_ordered_seek_nodes SET raw=? WHERE domain=? AND digest=?",
+    "DELETE FROM ate_ordered_seek_nodes WHERE domain=? AND digest=? AND raw=?",
+])
+def test_prepared_seek_mutation_is_denied_in_owned_genesis(tmp_path,sql):
+    from ate_sim.persistence_proof_seek import OrderedSeekMap
+    store,pin=ready(tmp_path)
+    domain,digest,body=b'domain',b'digest',b'body'
+    if sql.startswith('UPDATE'):
+        args=(body,domain,digest)
+    else:
+        args=(domain,digest,body)
+    with store,lazy._bounded_conversion_audits():
+        store.db.execute('BEGIN IMMEDIATE')
+        OrderedSeekMap(store.db,domain).create_schema()
+        store.db.execute(sql,args).close()
+        store.db.commit()
+        with pytest.raises(StoreError,match='mutation'):
+            with bundle()(store,pin):
+                with pytest.raises(sqlite3.DatabaseError):
+                    store.db.execute(sql,args)
+        assert not store.db.in_transaction
+        assert store.db.execute("SELECT 1 FROM sqlite_schema WHERE name='ate_scope_generations'").fetchone() is None
+
+
+def test_owned_genesis_requires_writable_schema_disabled(tmp_path):
+    store,pin=ready(tmp_path)
+    with store,lazy._bounded_conversion_audits():
+        store.db.execute('PRAGMA writable_schema=ON')
+        with pytest.raises(StoreError,match='writable_schema'):
+            with bundle()(store,pin):
+                store.db.execute("UPDATE main.sqlite_schema SET sql=sql WHERE name='ate_ordered_seek_nodes'")
+        assert not store.db.in_transaction
+
+
+@pytest.mark.skipif(not hasattr(sqlite3.Connection,'setconfig'),reason='native SQLite config API unavailable')
+def test_genesis_denies_native_config_mutation(tmp_path):
+    store,pin=ready(tmp_path)
+    with store,lazy._bounded_conversion_audits():
+        with pytest.raises(StoreError,match='SQLite configuration'):
+            with bundle()(store,pin):
+                store.db.setconfig(sqlite3.SQLITE_DBCONFIG_WRITABLE_SCHEMA,True)
+        assert not store.db.in_transaction
+        assert store.db.execute('PRAGMA writable_schema').fetchone()==(0,)
+
+
+@pytest.mark.parametrize('registered',[False,True])
+def test_checked_append_never_invokes_binding_adapters(tmp_path,monkeypatch,registered):
+    store,pin=ready(tmp_path)
+    def called(_value):
+        pytest.fail('SQLite binding adapter ran during a checked append')
+    class Adapted:
+        def __conform__(self,_protocol):
+            return called(self)
+    with store,lazy._bounded_conversion_audits():
+        with pytest.raises(StoreError,match='SQLite parameters|binding adapters'):
+            with bundle()(store,pin):
+                if registered:
+                    monkeypatch.setitem(sqlite3.adapters,(bytes,sqlite3.PrepareProtocol),called)
+                store.db.execute('INSERT OR IGNORE INTO ate_ordered_seek_nodes VALUES(?,?,?)',
+                                 (b'domain',b'digest',b'plain' if registered else Adapted()))
+        assert not store.db.in_transaction
 
 
 @pytest.mark.parametrize('sql',[
@@ -188,7 +265,8 @@ def test_source_certificate_does_not_accept_corrupt_new_proof_nodes(tmp_path,mon
         return original(store,*a,**k)
     def corrupt(phase):
         if phase=='bootstrap.World_manifest':
-            captured['store'].db.execute("UPDATE ate_proof_nodes SET node_bytes=X'00'")
+            with pytest.raises(sqlite3.DatabaseError):
+                captured['store'].db.execute("UPDATE ate_proof_nodes SET node_bytes=X'00'")
     monkeypatch.setattr(records,'bootstrap_record_proofs',remember)
     monkeypatch.setattr(copy_api,'_genesis_phase',corrupt)
     with pytest.raises(StoreError):copy_api.copy_world_with_proofs(source,dest,rules_id=RULES,rank_proofs=True)
