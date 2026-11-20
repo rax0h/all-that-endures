@@ -5,7 +5,7 @@ complete repeat passes whose durations are hidden in the previous mature
 trace. The diagnostic measures scope roots and collection directory
 construction on the retained generation-zero, format-6 after-digest
 databases. The [explicit request](reconstruction-probe-request.json) is
-`retained-after-digest-root-pairs-2026-11-20-1`.
+`retained-after-digest-root-pairs-2026-11-20-2`.
 
 ## Measurement
 
@@ -42,8 +42,24 @@ qualified engine remain intact. The short hosted gate deliberately stops
 the scope trial after the first pass, verifies rollback and the parent
 hash, restores the same archive in a fresh process and compares all its
 roots. It checks the known small corpus counts in both lanes and downloads
-the actual uploaded small evidence for a byte comparison. Both mature jobs
-depend on that gate.
+the actual uploaded small evidence by immutable artifact ID. The gate
+checks the uploader's ZIP SHA-256 before extraction, then compares the
+downloaded files recursively with the originals. Both mature jobs depend
+on that gate.
+
+The [first hosted run](https://github.com/rax0h/all-that-endures/actions/runs/44696353813)
+passed reconstruction, deliberate interruption and fresh restart. Upload
+finalized artifact **14610723098**. Its immediate artifact list returned
+zero results, so the file comparison and both mature jobs were skipped.
+The [retained 40,201-byte ZIP](reconstruction-small-44696353813.zip) was
+subsequently fetched by exact ID. Its SHA-256 is
+`33d4d328c34748804948cf107b244b129752a3f867611f17862b5b4aff3ce886`.
+All 51 members were retained. The two successful trials matched their first
+and repeated roots, the interrupted trial matched the fresh scope run, and
+all three receipts verified the same parent hash. The retry updates only
+the workflow transport and request. The short gate still runs end to end.
+The production proof engine, reconstruction probe and retained databases
+are reused.
 
 | Mature budget per job | Limit |
 |---|---:|

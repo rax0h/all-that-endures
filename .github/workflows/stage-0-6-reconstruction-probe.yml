@@ -73,11 +73,27 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
       - name: Download and verify the actual small evidence artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        shell: bash
         timeout-minutes: 3
-        with:
-          artifact-ids: ${{ steps.small-evidence.outputs.artifact-id }}
-          path: downloaded-small
+        env:
+          ARTIFACT_ID: ${{ steps.small-evidence.outputs.artifact-id }}
+          ARTIFACT_SHA256: ${{ steps.small-evidence.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          [[ "$ARTIFACT_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          archive="$RUNNER_TEMP/reconstruction-small.zip"
+          downloaded=false
+          for delay in 0 1 2 4 8; do
+            sleep "$delay"
+            if timeout --kill-after=5s 15s gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" > "$archive"; then
+              downloaded=true
+              break
+            fi
+          done
+          test "$downloaded" = true
+          printf '%s  %s\n' "$ARTIFACT_SHA256" "$archive" | sha256sum --check
+          python -m zipfile -e "$archive" downloaded-small
       - run: diff -r evidence downloaded-small
 
   mature:
