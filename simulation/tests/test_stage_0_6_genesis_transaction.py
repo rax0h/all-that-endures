@@ -36,7 +36,8 @@ def construct(store,pin):
     return bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
 
 
-def test_one_owned_transaction_reuses_source_audit_and_commits_all_roots(tmp_path):
+@pytest.mark.parametrize('prebuilt',[None,'scope','directory'],ids=['owned','prebuilt-scope','prebuilt-directory'])
+def test_one_owned_transaction_reuses_checked_work_and_commits_all_roots(tmp_path,prebuilt):
     from ate_sim.persistence_proof_record import bootstrap_record_proofs
     from ate_sim import persistence_proof_collection as collection, persistence_proof_scope as scope
     from ate_sim.persistence_proof_scope import bootstrap_scope_proofs
@@ -46,27 +47,34 @@ def test_one_owned_transaction_reuses_source_audit_and_commits_all_roots(tmp_pat
     from ate_sim.persistence_proof_manifest_publish import _load, bootstrap_world_manifest
     from ate_sim.persistence_proof_world import audit_world_roots
     store,pin=ready(tmp_path)
+    scope_options=dict(include_children=True,include_sequence=True,include_rank=True)
     with (store,lazy._bounded_conversion_audits(),
           patch.object(store,'_verify_all_in_snapshot',wraps=store._verify_all_in_snapshot) as audits,
           patch.object(scope,'_construct_roots',wraps=scope._construct_roots) as scoped,
           patch.object(collection,'_construct_collection',wraps=collection._construct_collection) as collections):
+        prior_scope=bootstrap_scope_proofs(store,pin,**scope_options) if prebuilt=='scope' else None
+        prior_directory=bootstrap_collection_directory(store,pin) if prebuilt=='directory' else None
+        prior_audits=audits.call_count
         with bundle()(store,pin) as owned:
             ra=bootstrap_record_proofs(store,pin)
-            sa=bootstrap_scope_proofs(store,pin,include_children=True,include_sequence=True,include_rank=True)
+            sa=prior_scope if prior_scope is not None else bootstrap_scope_proofs(store,pin,**scope_options)
             ca=bootstrap_content_proofs(store,pin)
-            da=bootstrap_collection_directory(store,pin)
+            da=prior_directory if prior_directory is not None else bootstrap_collection_directory(store,pin)
             ia=bootstrap_inventory(store,pin)
             collection_count=collections.call_count
             manifest,expected=bootstrap_world_manifest(store,pin,ca,sa,ia,ra,da)
             assert store.db.in_transaction
-            assert audits.call_count==1 and owned.audit_reuses>=5
-            assert scoped.call_count==1
-            assert collections.call_count==collection_count==da[0].root.count
+            assert audits.call_count==prior_audits+1
+            assert owned.audit_reuses>=(4 if prebuilt else 5)
+            # Either component built before custody requires both to be rebuilt.
+            rounds=2 if prebuilt else 1
+            assert collection_count==da[0].root.count>0
+            assert scoped.call_count==rounds and collections.call_count==rounds*collection_count
         assert owned.physical_checks==1 and not store.db.in_transaction
         pairs,facts=_load(store,pin,(manifest,expected))
         fresh=audit_world_roots(store,pin,*pairs)
         assert (fresh.roots,fresh.facts)==(manifest.roots,facts)
-        assert scoped.call_count==2 and collections.call_count==2*collection_count
+        assert scoped.call_count==rounds+1 and collections.call_count==(rounds+1)*collection_count
 
 
 @pytest.mark.parametrize('sql',[

@@ -149,3 +149,14 @@ Windows functional validation passed all 51 owned-genesis tests and all
 hosted-oriented harness passed 45 cases locally and had 15 Windows failures
 at pinned LF byte checks, POSIX APIs and a path-separator assertion. Hosted
 qualification remains required for the candidate.
+
+## Qualification harness repair
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| QH-R1: hosted harness compared a proposed engine to the existing canonical production pin | Bind canonical compatibility to the actual qualified commit and preserve its ancestry and exact file hashes. Verify rejection of the different candidate tree. Two focused cases passed in a byte-identical LF checkout. [Failed Linux harness](https://github.com/rax0h/all-that-endures/actions/runs/44803541620/job/136521491734) passed 431 other cases and its 9,036-byte [evidence archive](https://github.com/rax0h/all-that-endures/actions/runs/44803541620/artifacts/14662192115) was saved and hash-verified. | Awaiting hosted verification |
+| QH-R2: independent review requested coverage for both partial-custody cases | The parity test now covers fully owned roots, a prebuilt scope, and a prebuilt directory. Both partial states reconstruct both components and agree with a fresh standalone full audit. All three focused cases passed. | Closed |
+
+The engine tree, compatibility contract, operational helpers, and request
+files are unchanged by the repair. The existing engine-test change trigger
+qualifies this same candidate tree after the complete harness passes.

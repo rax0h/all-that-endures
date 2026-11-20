@@ -175,11 +175,19 @@ def test_imported_control_preserves_actual_post_rebase_check(tmp_path,monkeypatc
     assert actual['baseline_digest']==control['digest'] and original is stages._digest
 
 
-def test_reviewed_current_canonical_pair_names_actual_committed_engine():
-    import subprocess
+def test_reviewed_canonical_pair_names_the_qualified_engine():
+    from simulation import stage_0_6_genesis_resume as launcher
     root=Path(__file__).resolve().parents[2]
-    declared=r.load_receipt(root/api().COMPATIBILITY)
-    actual=subprocess.check_output(['git','rev-parse','HEAD:simulation/ate_sim'],cwd=root,text=True).strip()
-    assert declared['current_runtime_tree']==actual
-    api().check_compatibility(root,historical_runtime_sha=declared['historical_runtime_sha'],
-        historical_runtime_tree=declared['historical_runtime_tree'],current_runtime_tree=actual)
+    controls=api()
+    declared=r.load_receipt(root/controls.COMPATIBILITY)
+    qualified=launcher.git(root,'rev-parse',launcher.GREEN_SHA+':simulation/ate_sim')
+    launcher.git(root,'merge-base','--is-ancestor',launcher.GREEN_SHA,'HEAD')
+    assert declared['current_runtime_tree']==launcher.RUNTIME==qualified
+    historical=dict(historical_runtime_sha=declared['historical_runtime_sha'],
+        historical_runtime_tree=declared['historical_runtime_tree'])
+    controls.check_compatibility(root,**historical,current_runtime_tree=qualified)
+
+    candidate=launcher.git(root,'rev-parse','HEAD:simulation/ate_sim')
+    if candidate!=qualified:
+        with pytest.raises(ValueError,match='unreviewed canonical/runtime compatibility pair'):
+            controls.check_compatibility(root,**historical,current_runtime_tree=candidate)
