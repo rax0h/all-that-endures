@@ -109,3 +109,16 @@ November20desktop handoff closes the hosted small recovery prerequisite:44028694
 | PA-R2: independent review found an inventory interval rounding mismatch | Recomputed archive records 00048 and 00049 and corrected the display to 459.84 s. The subtotal and remaining budget were verified independently. | Closed |
 | PA-R3: independent review found an earlier inherited smoke expiry | Verified all four original smoke refs live. Report and checkpoint identify the Dec 1 proof-map deadline, the Dec 16 00:15:38 UTC smoke dependency and the separate mature dependency deadline. | Closed |
 | PA-R4: independent review found missing audit call sites in the cost inventory | Included fixed World/head/event checks, the sealed event prefix pass and retirement/adoption validation. Verified their positions against the World audit call graph and marked their mature costs unmeasured. | Closed |
+
+## Isolated reconstruction diagnostic
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| RP-R1: independent review found a transitive PyYAML import in mature admission | Added the existing pinned 6.0.3 dependency after hosted Python setup. Verified YAML, shell and the admission import path. | Closed |
+| RP-R2: independent review found the rollback witness covered only a single proof table | Compare the complete main schema before and after rollback, plus transaction custody. Verified both real small pairs and deliberate abort against the exact parent and all eight production root digests/counts. | Closed |
+| RP-R3: independent review found interpretation and cleanup limits underdescribed | Documented immediate repeat/cache conditions and the outer watchdog's effect on private cleanup and evidence. Verified against the timed calls and job caps. | Closed |
+| RP-R4: independent review found the small gate only checked root array lengths | Pin exact known root counts in the hosted small gate and document scope root order. Checked the counts against the authenticated closed small proofs. | Closed |
+
+The [isolated diagnostic](../reconstruction-probe.md) requires its short
+hosted rollback/restart and artifact round trip before either mature lane.
+Current mature comparison, full audit cost and F7 acceptance remain open.
