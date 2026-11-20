@@ -1,6 +1,6 @@
 # A.T.E. — Codex desktop handoff
 
-Updated November 20, 2026. Read this before continuing Stage 0.6.
+Updated November 20, 2026. Read [CODEX_RESUME_STATE.md](CODEX_RESUME_STATE.md) for the active checkpoint before continuing Stage 0.6. Keep that file updated during work so a usage cutoff does not depend on a final handoff message.
 
 ## Repository and computer
 
@@ -76,4 +76,6 @@ Codex CLI0.169.1, the Codex desktop components and VS Code's OpenAI extension we
 - `docs/performance/stage-0-6-current/after-digest-admission/`: latest qualification, reviewed recovery, preflight and hosted evidence.
 - `docs/performance/stage-0-6-current/forensic-repair/closure-register.md`: consolidated findings and broader open/deferred items. Missing original review001 and owner-deferred gameplay issues must not be invented or silently closed.
 
-Suggested first Codex message: **Read `AGENTS.md` and `docs/CODEX_HANDOFF.md`, report the verified state, then continue the bounded mature performance investigation while preserving all completed checkpoints.**
+Suggested first or returning Codex message: **Read `AGENTS.md` and `docs/CODEX_RESUME_STATE.md`, reconcile the checkpoint with the actual files and running jobs, then continue the first incomplete step while preserving completed work.**
+
+Reuse the existing Codex conversation when available. The installed native CLI also supports `codex resume` to select a saved session, or `codex resume --last` from this repository for its most recent session. Avoid ephemeral sessions for work that needs saved conversation history. Returning after a usage limit still requires checking whether commands finished; do not assume an automatic restart or exact mid-command continuation.

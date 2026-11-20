@@ -1,6 +1,18 @@
 # Working agreement
 
-For the current Stage0.6 desktop/Codex continuation, read `docs/CODEX_HANDOFF.md` first, then `docs/STAGE_0_6_CONTINUATION.md`. The handoff distinguishes the current qualified engine, completed small recovery and preserved mature restart point. Historical `/workspace/scratch/...` runtime paths below describe the old Work Mode environment, not the user's Windows clone; inspect and qualify a new runtime before accepting persistence/performance evidence.
+At every start or resume, read `docs/CODEX_RESUME_STATE.md` first for the active task and first incomplete step, then `docs/CODEX_HANDOFF.md` and `docs/STAGE_0_6_CONTINUATION.md` for the Stage0.6 baseline. The handoff distinguishes the current qualified engine, completed small recovery and preserved mature restart point. Historical `/workspace/scratch/...` runtime paths below describe the old Work Mode environment, not the user's Windows clone; inspect and qualify a new runtime before accepting persistence/performance evidence.
+
+## Interruption and usage-limit recovery
+
+The user frequently reaches usage limits during a task. Keep `docs/CODEX_RESUME_STATE.md` current throughout work; do not depend on a final handoff, a usage warning or conversation memory. Keep it short and link detailed evidence rather than duplicating it. The user's latest instructions override an older checkpoint.
+
+Before a meaningful editing chunk, long command or external mutation, save the objective, planned step, branch/HEAD, affected files, exact command or request identifier, and intended output/log location. After launch record process/session/CI IDs promptly; after each completed chunk record the verified result and next action. Mark uncertain outcomes explicitly as unknown. Update the checkpoint before switching tasks or stopping. Never store credentials or signed download URLs in it.
+
+On resume, reconcile the checkpoint with actual `git status`, branch/HEAD, diff, output files and relevant process/CI status before acting. Preserve partial edits and user changes; do not reset, clean or automatically stash them. Check whether an interrupted command or external action finished before rerunning it. Reuse completed compatible tests and closed checkpoints; resume the first incomplete step, not the whole assignment. A recorded launch intent without a returned ID needs reconciliation, not an automatic second launch.
+
+Write checkpoints to disk immediately. Include them in small coherent progress commits and sync within existing user authorization, especially before changing machines; do not commit broken code solely to make a checkpoint or launch CI for every note. Report the last verified state separately from pending work. A saved chat and repository checkpoint support recovery, but do not guarantee restoration of an executing command or unsaved reasoning.
+
+## Review and validation
 
 Review findings must be resolved and verified within the overall work group that found or created them before that group is marked complete. This includes Minor findings. The user explicitly requires this; it overrides generic skill instructions to defer Minors. Do not carry findings into successive feature groups without explicit user acceptance.
 
