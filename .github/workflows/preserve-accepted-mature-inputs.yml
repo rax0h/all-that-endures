@@ -1,0 +1,40 @@
+name: Preserve accepted mature checkpoint inputs
+'on':
+  # The first archive-only job was launched at 5cfe4c7. Subsequent retention is explicit.
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: preserve-accepted-mature-inputs
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Verify bounded retention and measurement helpers
+        run: python -m pytest -q simulation/tests/test_preserve_mature_inputs.py .github/tests/test_stage_0_6_benchmark.py simulation/tests/test_stage_0_5_performance_attribution.py simulation/tests/test_stage_0_5_performance_runner.py
+      - name: Authenticate and retain exact original source and acceptance archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: timeout --signal=TERM --kill-after=30s 25m python -m simulation.preserve_mature_inputs
+      - name: Retain original ZIP bytes and producer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accepted-year-1001-original-archives
+          path: |
+            retained-mature-inputs/*.zip
+            retained-mature-inputs/*.json
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: error
