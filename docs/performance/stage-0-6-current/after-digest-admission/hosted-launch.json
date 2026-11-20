@@ -1,0 +1,27 @@
+{
+  "run_id": 44028694698,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/44028694698",
+  "head_sha": "6c7ab0001f14dc95f0b09554a84939810e88e692",
+  "source_tree": "55201a73dafeda097362853768b4453630c851ab",
+  "engine_tree": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "branch": "sol/durable-proof-map",
+  "path": ".github/workflows/stage-0-6-resumable-proof-genesis.yml",
+  "event": "push",
+  "observed_status": "in_progress",
+  "conclusion": null,
+  "created_at": "2026-11-17T06:05:53Z",
+  "scope": "Small retained after-digest crash/retry/fresh restore; no mature timing acceptance",
+  "request_id": "admitted-small-after-digest-2026-11-17-1",
+  "retained_metadata": 14252280082,
+  "retained_run": 43916382557,
+  "first_incomplete": "proofs",
+  "companion_helper_run": 44028694713,
+  "observed_jobs": [
+    {
+      "id": 133855113961,
+      "name": "gate",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ]
+}

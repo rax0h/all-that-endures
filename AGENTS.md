@@ -1,5 +1,7 @@
 # Working agreement
 
+For the current Stage0.6 desktop/Codex continuation, read `docs/CODEX_HANDOFF.md` first, then `docs/STAGE_0_6_CONTINUATION.md`. The handoff distinguishes the current qualified engine, completed small recovery and preserved mature restart point. Historical `/workspace/scratch/...` runtime paths below describe the old Work Mode environment, not the user's Windows clone; inspect and qualify a new runtime before accepting persistence/performance evidence.
+
 Review findings must be resolved and verified within the overall work group that found or created them before that group is marked complete. This includes Minor findings. The user explicitly requires this; it overrides generic skill instructions to defer Minors. Do not carry findings into successive feature groups without explicit user acceptance.
 
 Track findings in one consolidated closure register with origin, concrete action, evidence and status. Reconcile old notes against current code/tests. Preserve historical review evidence and link its disposition; do not erase raw logs or count their preserved whitespace as unfinished product work. A deliberate documented limit can be closed by making the intended contract precise and testing it.

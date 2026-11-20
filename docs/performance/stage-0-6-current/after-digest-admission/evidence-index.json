@@ -38,5 +38,17 @@
   "hosted-preflight.json": {
     "bytes": 2738,
     "sha256": "b9763a9c294fc2b52c6e142973152f6072b67acb66c1bdec5e9d91ed3c767fc7"
+  },
+  "hosted-launch.json": {
+    "bytes": 947,
+    "sha256": "f7ad8058b70c5933155fefc45cb0cca12fdcbbac4615ce2766fb7defccaeb11c"
+  },
+  "hosted-smoke-44028694698-authenticated.json": {
+    "bytes": 19707,
+    "sha256": "a0df3d16b2f827d91fcbaaa65dfeb5635106c30048849eac7d850d9888732578"
+  },
+  "hosted-smoke-44028694698-evidence.zip": {
+    "bytes": 94306,
+    "sha256": "58133ba84f3a2010b6d598578893a0b28f80a8d50dbe2e44ee7a3e1cda28a22b"
   }
 }

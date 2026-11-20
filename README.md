@@ -17,3 +17,5 @@ The first game-side milestone is the **Visual World Laboratory**: a deliberately
 The long-term presentation target is a **full 3D, AAA-quality RPG**, supporting first- or third-person play and built so future Unreal Engine, neural-rendering and related graphics technology can realize the same underlying simulated truth at progressively higher fidelity.
 
 Start with [`docs/PROJECT_CONSTITUTION.md`](docs/PROJECT_CONSTITUTION.md) and [`docs/ASTRA_FIRST_PASS.md`](docs/ASTRA_FIRST_PASS.md).
+
+Current Stage0.6 engineering continuation and desktop setup: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md). The active branch is `sol/durable-proof-map`.

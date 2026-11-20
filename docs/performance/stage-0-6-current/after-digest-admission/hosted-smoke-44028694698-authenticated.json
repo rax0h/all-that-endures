@@ -1,0 +1,524 @@
+{
+  "run_id": 44028694698,
+  "head": "6c7ab0001f14dc95f0b09554a84939810e88e692",
+  "engine": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "status": "success",
+  "archives_verified": 9,
+  "critical_paths_verified": 52,
+  "database_members_verified": 2,
+  "crash": {
+    "status": "passed",
+    "worker_exit": 77,
+    "interrupted_stage": "proofs",
+    "retained_stage": "after_digest",
+    "receipt_sha256": "d94c603afb613c443029b17edb353e9e9e3e12256404fa119561984cdf4e6e53",
+    "database_sha256": "c6fa7723bf5b10efc450c2f4b16fa7d412b6ba35ed0b88968aea77386454f5b5",
+    "next_action": "ordinary proofs step restores the same immutable parent in a fresh process"
+  },
+  "fresh_restore": {
+    "digest": "cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451",
+    "generation": 1,
+    "seed": 843000,
+    "world_audits": 0,
+    "year": 2
+  },
+  "original_prefix_skipped": true,
+  "proofs_receipt_sha256": "531fe1637c3ec0e0e4e0d468893484575c29f1864e24d1f93a7b6fca07aa99b0",
+  "fresh_restore_metadata": {
+    "kind": "github",
+    "artifact_id": 14303579148,
+    "run_id": 44028694698,
+    "head_sha": "6c7ab0001f14dc95f0b09554a84939810e88e692",
+    "name": "checkpoint-smoke-fresh_restore-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+    "job": "fresh-restore",
+    "archive_sha256": "9da0b2a97c14bca797750f93fee1398e6e4f0140c0be1ae538147d08243503d6",
+    "archive_bytes": 17277,
+    "expires_at": "2026-12-17T06:11:34Z"
+  },
+  "original_mature_state": "unchanged; last completed after_digest14267625292/run43918798385",
+  "mature_timings": "unmeasured",
+  "archives": [
+    {
+      "id": 14304870181,
+      "name": "checkpoint-smoke-measure-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 15363,
+      "sha256": "28265f964724a57771a437a295d6e916c07714bbe3bf28227e3fbfdf9d6add87",
+      "members": [
+        {
+          "name": "checkpoint.json",
+          "bytes": 99376,
+          "sha256": "787745d57d42a4d8dda1efbbd15d3db74022d2e83d0c69ce0855d0f1d18d5d25"
+        }
+      ]
+    },
+    {
+      "id": 14304283059,
+      "name": "resume-evidence-smoke-measure-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 14238,
+      "sha256": "860a60a883877736533ffa5301a6b160a4e1b048ec8fd2d2e60124b3871931f6",
+      "members": [
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-progress-first_step.json",
+          "bytes": 5570,
+          "sha256": "2f71f22a011c98c35f704139843fd84bc8d55c1f869d7eb70fa2364427c91da7"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-progress-open.json",
+          "bytes": 3400,
+          "sha256": "6dab7ccfbdff44bb376ebca2d60df77fb96f86bda165eeaea0cf9e4084e7335d"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-progress-close.json",
+          "bytes": 12077,
+          "sha256": "e18b01e7ee28aca84b8ace4ac387ee498ebb1b670f69d225cfb832b0b18536e3"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-progress-save.json",
+          "bytes": 7763,
+          "sha256": "c7776378fa1dd32fed107dd96b404f6db4aa90bdeab96c3c3c745486a416b451"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-progress-warm_step.json",
+          "bytes": 9915,
+          "sha256": "1f829b63dbe90dd72444706716b860c5be81524b7d24277d0cb231df45bb2cca"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-start-close.json",
+          "bytes": 108,
+          "sha256": "452467880240729853e0e9e74b198d87218d944253d40a871578e81e1b0eb2ac"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-progress-working_copy.json",
+          "bytes": 1738,
+          "sha256": "8da21aa27e565f59395a67a42b06526b5a0ee5d73c0ec2450ed0fa8be66a0f67"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-start-first_step.json",
+          "bytes": 114,
+          "sha256": "cdaabb4aabebde33be8ab7f95b833f80348b3b4d979475f79c1d42eb261d9ea4"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-start-open.json",
+          "bytes": 107,
+          "sha256": "0c44cd1c25261ffc451f3f4b06c846fbe59bff34825548cf17d3b275c9c46b08"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-start-save.json",
+          "bytes": 107,
+          "sha256": "581e0bb20dda8dc9fee6fdc3494526bc4732a08aec09b2ff7b5c8f5b2290fe40"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-start-warm_step.json",
+          "bytes": 113,
+          "sha256": "c55ab063caf32e4a7a372238941dbae259210eb604778e67ed05cf071bb5dd6b"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/operational/phase-start-working_copy.json",
+          "bytes": 125,
+          "sha256": "9b5109b71b4aa3e4dcc8ef759d22e127739adc4f7389a90d1b981350c8037959"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/phase-progress-measure.json",
+          "bytes": 1829,
+          "sha256": "c0ecbe674f880c8fb6e38d9118036075a237eae2f6b953c93ab72367db8c8965"
+        },
+        {
+          "name": "evidence-measure-_yi4z_0d/phase-start-measure.json",
+          "bytes": 112,
+          "sha256": "2a3cd1e6557bbd5fe9efb04f84a573925cde214ea51b791c3488b56591172867"
+        },
+        {
+          "name": "input-reference.json",
+          "bytes": 831,
+          "sha256": "080d340c6153fa0bdbc6c0ace4aee9223fa97e2715ce6392433844de74f4f73d"
+        },
+        {
+          "name": "transport/phase-progress-restore.json",
+          "bytes": 1724,
+          "sha256": "85a56106e5a13ab0eb5b82f9a512fb6845e077b92d448348dfe561a6cc1c168b"
+        },
+        {
+          "name": "transport/phase-start-restore.json",
+          "bytes": 112,
+          "sha256": "b211c05a3842a1f78842c6d3d4487c17c151faa71b40032cc16383deccec1dfe"
+        }
+      ]
+    },
+    {
+      "id": 14304233114,
+      "name": "database-smoke-measure-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 8719660,
+      "sha256": "d3408f8e42bf60af17257414374d102000c96927e08581deaa4cfc33754b3aba",
+      "members": [
+        {
+          "name": "candidate.sqlite",
+          "bytes": 29822976,
+          "sha256": "fdbae0f8ac1151c90532a0fa3bb4a853713611740a182ddd428961ca8aae8cc3"
+        }
+      ]
+    },
+    {
+      "id": 14304093176,
+      "name": "resume-evidence-gate-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 10908,
+      "sha256": "0c4b88d8066fc257161c69b220b6fcc05da83e5bd3494473b4e97feddf912b4c",
+      "members": [
+        {
+          "name": "resume-tests/harness.log",
+          "bytes": 985,
+          "sha256": "107cfbd1e5906042f08332482478c5b1c8f3138bbc7f308b2be863a1556c244c"
+        },
+        {
+          "name": "resume-work/green-reuse.json",
+          "bytes": 288,
+          "sha256": "676ae872d317231e0835b8e71951f3d4c6c75e20fb5308ebf84de8662d74e07d"
+        },
+        {
+          "name": "resume-tests/harness.xml",
+          "bytes": 67704,
+          "sha256": "b1f98f3752c20d1007d0f79d16ddf0284fff3482ca81faf6105f155194173873"
+        },
+        {
+          "name": "resume-work/runtime.json",
+          "bytes": 2215,
+          "sha256": "461b81b0154c4a9d3fe8be09f4b04c01d3c73773740c3a87ab18b271cd44a019"
+        }
+      ]
+    },
+    {
+      "id": 14304043681,
+      "name": "checkpoint-smoke-proofs-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 11246,
+      "sha256": "4e949f90058ca292453e42a1bb5f023afea63166536b4cb9be5da68833fcc267",
+      "members": [
+        {
+          "name": "checkpoint.json",
+          "bytes": 71732,
+          "sha256": "5ae91e8c114b65467062b0c3bd2ee6ca07551e82df04926602222853e2c89339"
+        }
+      ]
+    },
+    {
+      "id": 14304023790,
+      "name": "database-smoke-proofs-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 7406606,
+      "sha256": "947334429c98bc1fa750103cf7689b7bb8b7bc85253247cdc080d719e275218b",
+      "members": [
+        {
+          "name": "candidate.sqlite",
+          "bytes": 26324992,
+          "sha256": "5bc03387cdc8ece3e994fea90fbb81c0b891a1524186c3e9b30141fd278793d1"
+        }
+      ]
+    },
+    {
+      "id": 14303774093,
+      "name": "resume-evidence-smoke-fresh_restore-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 2636,
+      "sha256": "f8c0c8fa7ca7aa15db77c12134dbed171b50836295ca6e273873a1525ed99f6e",
+      "members": [
+        {
+          "name": "evidence-fresh_restore-fcek_ju4/phase-start-fresh_restore.json",
+          "bytes": 117,
+          "sha256": "498cd87164e1278795d07b8fc3222c82fe9fa43b3b65a7742221e48b3759c446"
+        },
+        {
+          "name": "transport/phase-progress-restore.json",
+          "bytes": 1713,
+          "sha256": "65203cdeba37c297b61056e137c1eadbc5d45ee6f48a924557d4f8dbefce4fe7"
+        },
+        {
+          "name": "evidence-fresh_restore-fcek_ju4/phase-progress-fresh_restore.json",
+          "bytes": 1719,
+          "sha256": "c47db140e90751ed1fbc85821219c39f0387e7c6964d0499f015b0f0c743d002"
+        },
+        {
+          "name": "input-reference.json",
+          "bytes": 840,
+          "sha256": "c3b773cf529d65d0f70bf5541ea8aa6bade9a31d106bf8338f9fd3009fe38347"
+        },
+        {
+          "name": "transport/phase-start-restore.json",
+          "bytes": 111,
+          "sha256": "8942466743cb0492739c090fffb6bdc6e0cf87d69a5446e0ecf9d335129b4058"
+        }
+      ]
+    },
+    {
+      "id": 14303709393,
+      "name": "resume-evidence-smoke-proofs-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 22357,
+      "sha256": "7b6a693f29131ccff5b67ff6dec1b2556d2974fdc2e1bcbcfde245f7f0c78424",
+      "members": [
+        {
+          "name": "resume-work/evidence-proofs-auhese9t/phase-progress-proofs.json",
+          "bytes": 1722,
+          "sha256": "590979164e9fb9b27aa4bbbec8f1672333980afd1297fbdfbb6ca38e699db374"
+        },
+        {
+          "name": "resume-work/evidence-proofs-auhese9t/phase-start-proofs.json",
+          "bytes": 111,
+          "sha256": "3f5f27e810da76d6c26f1da43aca69f05503b43fcbdb439dc87556624bfb9dff"
+        },
+        {
+          "name": "resume-work/input-reference.json",
+          "bytes": 843,
+          "sha256": "b344f8330a846cb5e140aaa791b2b1f237c11f577580e68470eb2a3e184becca"
+        },
+        {
+          "name": "resume-work/progress-00000.json",
+          "bytes": 496,
+          "sha256": "a086c15b4fb2d3b134752aee6232f7be46048198aaae8cfc807f6c2ecbfffb79"
+        },
+        {
+          "name": "resume-work/progress-00001.json",
+          "bytes": 505,
+          "sha256": "ac07b24cd3592593b8aa0598f65197a9641596a846f36d28690724e2db821b04"
+        },
+        {
+          "name": "resume-work/progress-00002.json",
+          "bytes": 502,
+          "sha256": "5aa3d862a4458236c6d72474837e335aac33e038bd2803d5cb39b90014233ea5"
+        },
+        {
+          "name": "resume-work/progress-00003.json",
+          "bytes": 494,
+          "sha256": "df37f32386af686abbc849902cca9cc1a43a17cc294d94b456658d6c20f2459e"
+        },
+        {
+          "name": "resume-work/progress-00004.json",
+          "bytes": 501,
+          "sha256": "4a1e4f0e99465a7173b64316d63cdca96f1c33f0ef1ff75f257e23e0e05f0a34"
+        },
+        {
+          "name": "resume-work/progress-00005.json",
+          "bytes": 505,
+          "sha256": "344041a5e936e43b4f0ad48b43fb239211d607d282d48e08da56b84f7a1c9e5e"
+        },
+        {
+          "name": "resume-work/progress-00006.json",
+          "bytes": 496,
+          "sha256": "47349e5ea2df24213d072af2ff3ddbd2497bb7782041309733a498e774d161b4"
+        },
+        {
+          "name": "resume-work/progress-00007.json",
+          "bytes": 498,
+          "sha256": "3516f0fdd61ef22a1520d700ea86fb85ff235ca55d6332519d1c82cd35a9fe74"
+        },
+        {
+          "name": "resume-work/progress-00008.json",
+          "bytes": 498,
+          "sha256": "74686175e39f27d5dccd9186f147fe4a372b98c034977e610a83bdc6aa13ff14"
+        },
+        {
+          "name": "resume-work/progress-00009.json",
+          "bytes": 502,
+          "sha256": "fa7c99d1b5d59658afbdecd896cf0a8f61262275b452a6750132625c29777cc5"
+        },
+        {
+          "name": "resume-work/progress-00010.json",
+          "bytes": 496,
+          "sha256": "475b01fcc9f30b87a3ebd9408464e9aebd7f677c2f15e849de751a8e7fc0a5e1"
+        },
+        {
+          "name": "resume-work/progress-00011.json",
+          "bytes": 498,
+          "sha256": "f1f23879285030268de6a7edf1df3a0c471168eced7bf5f89d32810a6b8196fd"
+        },
+        {
+          "name": "resume-work/progress-00012.json",
+          "bytes": 501,
+          "sha256": "4a433dac96e3f7efe535d36c2636203057f9c048e2d2df05cd21b49a5a081057"
+        },
+        {
+          "name": "resume-work/progress-00013.json",
+          "bytes": 504,
+          "sha256": "481073a9b145a716f607a55fb7e6ea54115bf7649fa36bb33ebfe3c3f30aca47"
+        },
+        {
+          "name": "resume-work/progress-00014.json",
+          "bytes": 506,
+          "sha256": "2249c29cb82a619e77158661360eece02b4ef68ce2a3505e8d509ffa411ec447"
+        },
+        {
+          "name": "resume-work/progress-00015.json",
+          "bytes": 510,
+          "sha256": "ccc70b91d5da19274a1d6784b4a40dcc98954996e627787965a8fa5e42c67289"
+        },
+        {
+          "name": "resume-work/progress-00016.json",
+          "bytes": 506,
+          "sha256": "e87113acb7134a9b9b6407bac7c95068ee8f6c5019f3bec3ca8eb599ea282bd8"
+        },
+        {
+          "name": "resume-work/progress-00017.json",
+          "bytes": 509,
+          "sha256": "0dca617160579d317fcefc11b6184fea5c82c93910d0e3d597f4e13638688504"
+        },
+        {
+          "name": "resume-work/progress-00018.json",
+          "bytes": 504,
+          "sha256": "3be36a048655ece07e18cf6383ae24bc833e1d49dad4899a6b53ace1aaa99690"
+        },
+        {
+          "name": "resume-work/progress-00019.json",
+          "bytes": 507,
+          "sha256": "6ab484a57d71e1280ad8b0fbeec4814fb2f9663f470ad419e9774f502d1ee3b9"
+        },
+        {
+          "name": "resume-work/progress-00020.json",
+          "bytes": 500,
+          "sha256": "82647ac58deba00d96cf1a3e1dcbb7adfe77dde024f44cc14a107ec8f0f7335c"
+        },
+        {
+          "name": "resume-work/progress-00021.json",
+          "bytes": 499,
+          "sha256": "dd5d4127e8b6037b2fc7b3c4c1a1348999747f3179496db9f2e56989ecd3bc01"
+        },
+        {
+          "name": "resume-work/progress-00022.json",
+          "bytes": 499,
+          "sha256": "0b72420bd02533e08d0fdc61931b78471ec3d480131660ecd9a27528c98ecb70"
+        },
+        {
+          "name": "resume-work/progress-00023.json",
+          "bytes": 493,
+          "sha256": "f56cda3fcc6ba46930ecf91accda27ca27c59dbaff789c775970f8ea50807317"
+        },
+        {
+          "name": "resume-work/progress-00024.json",
+          "bytes": 494,
+          "sha256": "1aa68644025320c9bee1f1eb896b388fdc16c57c3a074a1c3da58a268aa4caaf"
+        },
+        {
+          "name": "resume-work/progress-00025.json",
+          "bytes": 498,
+          "sha256": "1b8b655bdd61ec5d956c9041c414d878aa57bff2048a91c9da7f02b67bec06ce"
+        },
+        {
+          "name": "resume-work/progress-00026.json",
+          "bytes": 500,
+          "sha256": "b09ac5333f966a0d7313468d1d301bb0015ec24afed6d25ab4b539af301df887"
+        },
+        {
+          "name": "resume-work/progress-00027.json",
+          "bytes": 497,
+          "sha256": "1942129a32ec056995d2174b0f67a0b5ddc5b89cc0ec577e864f6170432ba4d7"
+        },
+        {
+          "name": "resume-work/progress-00028.json",
+          "bytes": 503,
+          "sha256": "5e8a5835d505c30a8e01159cd2e20cf1cda3f8004706adf5ec176ff261191d00"
+        },
+        {
+          "name": "resume-work/progress-00029.json",
+          "bytes": 503,
+          "sha256": "aab3c21c61e079dda87529c0d46a59d18e8b9b3fd7d86ef3ed43b3388edf7102"
+        },
+        {
+          "name": "resume-work/progress-00030.json",
+          "bytes": 500,
+          "sha256": "4c96cc1bcfd0ccee81b6cdbd656eb8aafcc09ca1830d8c6f77c1028ab10109c4"
+        },
+        {
+          "name": "resume-work/progress-00031.json",
+          "bytes": 509,
+          "sha256": "a7b541aeb86fa5e56f448e131c349ca96b5b5334ab3edb40b915523ccd37cd3b"
+        },
+        {
+          "name": "resume-work/transport/phase-progress-restore.json",
+          "bytes": 1712,
+          "sha256": "d34c28d523f8fd206fa8e47314a33ae7f8b872d39f3014abbf5a2b32e01d60ef"
+        },
+        {
+          "name": "resume-work/transport/phase-start-restore.json",
+          "bytes": 112,
+          "sha256": "a4780e27f930156fdf21c4bf80eaca3a92e44d8bc596a59d9cd44ff309e383fd"
+        },
+        {
+          "name": "recovery-work/evidence-proofs-6afgk8gx/phase-start-proofs.json",
+          "bytes": 111,
+          "sha256": "faec7598dea23e291d3ae563d0fab05942864abbfaf9b3530dcc1d8c7cf2ff4c"
+        },
+        {
+          "name": "recovery-work/input-reference.json",
+          "bytes": 843,
+          "sha256": "b344f8330a846cb5e140aaa791b2b1f237c11f577580e68470eb2a3e184becca"
+        },
+        {
+          "name": "recovery-work/progress-00000.json",
+          "bytes": 502,
+          "sha256": "b802c8062183517c0d3937ccd165dae3a782a485c9561ee1ee4da4fcdcfc3757"
+        },
+        {
+          "name": "recovery-work/progress-00001.json",
+          "bytes": 512,
+          "sha256": "788911376b2f38b0effbfd3f5b48a9090b6cae3a2461bd09657e5d7a8dc8e6cb"
+        },
+        {
+          "name": "recovery-work/progress-00002.json",
+          "bytes": 508,
+          "sha256": "a71a58abab44873bdbfa45c00a514702e005be90b2e6f6201f053041e7cde71e"
+        },
+        {
+          "name": "recovery-work/progress-00003.json",
+          "bytes": 501,
+          "sha256": "b4cdda5a102930eb9b11907e9952d101b5bbce249aa298d85af8f87bc2b6aab7"
+        },
+        {
+          "name": "recovery-work/progress-00005.json",
+          "bytes": 511,
+          "sha256": "2294565374a40b1a5ea154649e41260e83e8f9475a900d388517723c79026e7b"
+        },
+        {
+          "name": "recovery-work/progress-00004.json",
+          "bytes": 508,
+          "sha256": "a3ff3a3271be761035fcb7b937459990dc81c80751633fbf538c296827da9f24"
+        },
+        {
+          "name": "recovery-work/progress-00006.json",
+          "bytes": 502,
+          "sha256": "d6dc7a8ecf54354e508c86e5c59777be1aad561f5e7d5bf28beebbf307c3694d"
+        },
+        {
+          "name": "recovery-work/progress-00007.json",
+          "bytes": 504,
+          "sha256": "d820a2c64b692b770dbf8fc16787833020e860ad794b5736c177f248b3b4dff3"
+        },
+        {
+          "name": "recovery-work/progress-00008.json",
+          "bytes": 505,
+          "sha256": "f8d3027c08e79c12775fe38cbf01b93c39de4b4161157bed486b7583a1a3bb1d"
+        },
+        {
+          "name": "recovery-work/progress-00009.json",
+          "bytes": 509,
+          "sha256": "d986dd2959d1cccd83178a042455de94a74f63ff62d7fd67af467813f8722241"
+        },
+        {
+          "name": "recovery-work/recovery.json",
+          "bytes": 387,
+          "sha256": "69cf3259ad57a200aebd6e2c4f4af2a625fd1092452450892a5d49a110038276"
+        },
+        {
+          "name": "recovery-work/worker.log",
+          "bytes": 627,
+          "sha256": "e50700829f72ed1007c4fc5a9f2501ae1af6a41ef354e9b08e635a4b05e40a79"
+        }
+      ]
+    },
+    {
+      "id": 14303579148,
+      "name": "checkpoint-smoke-fresh_restore-6c7ab0001f14dc95f0b09554a84939810e88e692-1",
+      "archive_bytes": 17277,
+      "sha256": "9da0b2a97c14bca797750f93fee1398e6e4f0140c0be1ae538147d08243503d6",
+      "members": [
+        {
+          "name": "checkpoint.json",
+          "bytes": 115445,
+          "sha256": "717bac1f023a33962e5ba1b0ec745057fd5a421af688058f400f7df6557b0fb9"
+        }
+      ]
+    }
+  ]
+}

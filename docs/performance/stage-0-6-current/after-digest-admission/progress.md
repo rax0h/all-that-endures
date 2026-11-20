@@ -15,3 +15,5 @@ Base: ec871fa92dcc8a1115f0070a2c873cd3edeba17d
 - Task5reviewcomplete: independent86targeted+22adversarial passed; no findings includingMinors. Oldcontract/engine unchanged, full52path fence and33fingerprints checked.
 - Ruling: publish helper changes and the explicit retained-small-after-digest request in one batch; each hosted gate still runs complete quickvalidation, while unchanged full/proof engine jobs stay skipped. This avoids a separate redundant helper-only cycle.
 - Hosted small recovery is next; no mature activation.
+
+- November20desktop handoff: actual hosted44028694698and44028694713bothsuccess. Prefixskipped; realexit77/unchangedparent/retry/freshyear2gen1digestcebc verified. NineZIPs and two small rawDBmembers authenticated;52sourceblobs andbothcontracts checked. No mature retry. Currentstate/Codexhandoff refreshed and previously untracked launch record retained.
