@@ -1,0 +1,2 @@
+watchdog>=4.0,<7
+pywebview>=5.1,<7
