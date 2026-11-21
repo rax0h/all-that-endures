@@ -170,3 +170,7 @@ both proof-map and full-suite started. Their results remain pending.
 
 Both qualification jobs subsequently passed. The current candidate evidence
 and pending hosted recovery are recorded in the [admission ledger](../after-digest-admission/progress.md#checked-root-reuse-successor).
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| SA-R3: first hosted smoke harness found a changed legacy canonical rejection message | Keep the original public diagnostic and chain the detailed successor validation error. Reproduced the exact failed assertion in LF scratch, then verified both historical paths, the qualified successor hash, and the operational fingerprint. Four cases passed and independent follow-up found no other issues. [Failed gate evidence](https://github.com/rax0h/all-that-endures/actions/runs/44873108682/artifacts/14693999853) is preserved. | Awaiting hosted verification |

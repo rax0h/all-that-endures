@@ -43,3 +43,9 @@ launcher binds 34 explicit fingerprints and 53 critical Git blobs.
 The small request must prove an actual interruption before publication and
 an exact retry through fresh restore. The original after-digest and its five
 completed precursor stages remain reusable. Mature timings are pending.
+
+[First small request](https://github.com/rax0h/all-that-endures/actions/runs/44873108682)
+stopped in its initial harness with 438 passes and a legacy compatibility
+diagnostic assertion. It never reached source transport or proof workers.
+The corrected request retains the same source and budgets and restores the
+public rejection message with the successor detail preserved as its cause.

@@ -16,7 +16,10 @@ def check_compatibility(root,*,historical_runtime_sha,historical_runtime_tree,cu
     manifest_hash=c.file_hash(root/COMPATIBILITY)
     if manifest.get('current_runtime_tree')!=current_runtime_tree:
         from simulation import stage_0_6_after_digest_admission as proof_admission
-        manifest_hash=proof_admission.canonical_successor(root,current_runtime_tree,manifest_hash)
+        try:
+            manifest_hash=proof_admission.canonical_successor(root,current_runtime_tree,manifest_hash)
+        except ValueError as error:
+            raise ValueError('unreviewed canonical/runtime compatibility pair') from error
     for name,hashes in manifest['files'].items():
         path=root/name
         if path.is_symlink() or not path.is_file() or c.file_hash(path)!=hashes['current_sha256']:
