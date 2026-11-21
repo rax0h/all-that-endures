@@ -107,3 +107,48 @@ check, borrowed/snapshot rules, and distinct present-owner corruption.
 Use exact saved and warm continuation parity and a bounded work result
 before promoting the experiment to a new full engine qualification. Mature
 proof duration, operation targets and exact year-1002 restore remain open.
+
+## Checked owner absence experiment
+
+The replacement path now checks for an absent owner in its original
+validated snapshot. It keeps one authenticated witness lookup, one bounded
+physical witness existence probe, and checks for a lazy or ordinary source
+and any placement. The public required-owner and point-membership reads
+retain their existing behavior. The candidate is preserved at `f77905ee`
+on `sol/owner-absence-probe` while the working branch retains its qualified
+engine. [Reviewed candidate](https://github.com/rax0h/all-that-endures/commit/f77905ee1fe822af968ffe6c08912d5bd3ab0655)
+
+Functional playback used disposable copies of closed proof data **14694752653**.
+The baseline and candidate restored the exact saved year-2 digest and produced
+the same in-memory year-3 digest `a46d627d11ce2c12ff8f6fe0f14d01af35006afd56bdad3bf16417379b0166f3`.
+Both ran 1,141 owner changes. Owner checks fell from 472 to 361, source
+probes from 222 to 111, and fallback point-membership checks from 111 to zero.
+The 23 focused and 28 adjacent Windows cases passed. These checks establish
+functional parity and counted work on that platform.
+
+The [isolated Linux comparison](https://github.com/rax0h/all-that-endures/actions/runs/44877880567)
+ran baseline/candidate and candidate/baseline consecutively on one runner,
+with a fixed Python hash seed, the exact hosted fingerprint and a fresh proof
+database copy for each trial. All four saved digests matched the accepted
+year-2 digest. Times below are uninstrumented seconds.
+
+| Trial order | Open | First year | Save | Warm year |
+|---|---:|---:|---:|---:|
+| Baseline 1 | 1.3451 | 5.6211 | 4.4179 | 4.5327 |
+| Candidate 1 | 1.3974 | 5.1214 | 4.3727 | 4.1015 |
+| Candidate 2 | 1.2889 | 5.0999 | 4.2699 | 4.0090 |
+| Baseline 2 | 1.3195 | 5.6196 | 4.4145 | 4.5186 |
+
+Warm year decreased 9.5% and 11.3% on this fixture. Save still took at least
+4.27 seconds. The experiment has no mature timing or engine qualification
+effect. [Raw evidence 14697290497](https://github.com/rax0h/all-that-endures/actions/runs/44877880567/artifacts/14697290497)
+is 58,702 bytes with SHA-256
+`acc3dc5bd53da18524a27164f7f3a3a72a12b9c52a7cccae75a6f2b83cb803d7`.
+
+The existing save call graph shows 1,129 content proof-map lookups in the
+collection parent guard and 1,129 in the following authenticated content
+parent guard over the same prepared versions. Those call edges accounted
+for 0.348 and 0.342 instrumented seconds respectively. Insertion preparation
+inside the World guard accounted for 1.173 inclusive seconds. Use those
+measured boundaries and the prior negative TEMP-batch evidence when isolating
+the next save improvement. Retain all physical-content and collection checks.

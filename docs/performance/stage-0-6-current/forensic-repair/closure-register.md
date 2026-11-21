@@ -183,3 +183,14 @@ and pending hosted recovery are recorded in the [admission ledger](../after-dige
 | SO-R2: independent review found malformed shell continuation | Use one bounded shell command. Verified YAML parses and the shell argument list invokes the exact script and evidence directory. | Closed |
 | SO-R3: independent review requested original copy/journal headroom and unambiguous diagnostic fields | Check the same disk reserve as the production stage. Record profile phase observations and actual fresh restore without copied performance acceptance fields. | Closed |
 | SO-R4: independent review requested exact fresh acceptance and proof receipt provenance | Include both in input evidence. Cross-checked the selected proof ancestor and raw archived database against the successful fresh receipt. | Closed |
+
+## Checked owner absence experiment
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| OA-R1. Real generic and native reads repeated witness lookup for absent owners | Functional regressions reproduced four lookups and now require one authenticated lookup, with the physical witness probe retained. Borrowed read cleanup and public read contracts passed. | Closed |
+| OA-R2. Independent review requested separate ordinary-body refusal coverage | Exercised lazy body, ordinary body, placement, surviving witness, and witness decoder KeyError. Removed test witness sidecars in source-only cases and counted the intended source probe. All 23 focused tests passed. | Closed |
+| OA-R3. Independent review requested stronger paired-run controls | Bound all non-test simulation files and both import roots, fixed the child hash seed, and checked scratch copy/journal space. Authenticated the complete four-trial archive and all fresh restores. | Closed |
+
+The isolated [candidate and paired evidence](../small-operation-profile/report.md#checked-owner-absence-experiment)
+are retained for a later qualification bundle. Mature timing and acceptance remain open.
