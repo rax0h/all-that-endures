@@ -57,3 +57,53 @@ An engine change invalidates engine-green reuse and therefore requires one new
 full/proof validation after focused correctness and local measurements. Do not
 launch the old monolithic mature constructor or repeat expensive preparation
 while a small bounded diagnostic can resolve the next question.
+
+## Qualified successor profile
+
+The [successor smoke](https://github.com/rax0h/all-that-endures/actions/runs/44873730573)
+measured small save at 4.5389 s (4.3549 s CPU) and warm year at 4.7371 s
+(4.7366 s CPU). It published the exact saved year-2 control. The previous
+smoke recorded 4.5785 s and 4.5703 s with identical logical save and warm
+counters. Runner differences prevent a controlled latency comparison.
+
+The [short diagnostic](https://github.com/rax0h/all-that-endures/actions/runs/44875177238)
+profiled the same operational entry points on a disposable copy of the
+accepted proof database **14694752653**, with proof receipt **14695106875**
+and fresh authority **14695785020**. The retained original SHA, exact
+source/engine, Python 3.12.16 / SQLite 3.46.1 full fingerprint, and exact
+fresh year-2 control passed. [Artifact 14695926192](https://github.com/rax0h/all-that-endures/actions/runs/44875177238/artifacts/14695926192)
+is 276,376 bytes and SHA-256
+`ac0fa4ce6ab56a9ac488dab8e8e6e7de5e19edb2f72cca66c5afd3aa17e9c430`.
+Raw ZIP, complete call graphs and receipts are locally retained under
+`.validation/successor-operation-44875177238/`.
+
+| Profiled phase or function | Calls | Inclusive seconds |
+|---|---:|---:|
+| Save | 1 | 11.207 |
+| Save preparation | 1 | 2.378 |
+| Atomic proof commit | 1 | 5.642 |
+| Save acknowledgement | 1 | 3.135 |
+| Warm Simulation.run | 1 | 11.102 |
+| Warm native record loads | 438 | 4.660 |
+| Warm coordinator owner changes | 1,141 | 4.085 |
+| Full owner identity reads within coordinator owner changes | 1,141 | 2.746 |
+| Exact membership calls from the missing-owner fallback | 111 | 1.067 |
+
+Nested cumulative time overlaps, including the native record and
+owner-change paths. Profiled time includes instrumentation. The profiled
+save matched all logical counters from the raw successor smoke. Six warm
+counters differed, including metadata rows 32,615 to 35,519 and pin rows
+33,259 to 36,355. The difference's cause remains unverified. Use these
+calls to select and test a boundary, with a separate raw comparison before
+any latency claim.
+
+The first narrow experiment is checked absence during owner replacement.
+The call graph identifies the coordinator's exception fallback after a
+full owner lookup. It checks physical witness/source absence, then repeats
+the corresponding proof route through exact membership. Review whether the
+same complete absence proof can be returned within the original owned
+read. Keep the public owner/membership behaviors, every source and placement
+check, borrowed/snapshot rules, and distinct present-owner corruption.
+Use exact saved and warm continuation parity and a bounded work result
+before promoting the experiment to a new full engine qualification. Mature
+proof duration, operation targets and exact year-1002 restore remain open.

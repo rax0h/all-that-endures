@@ -1,5 +1,11 @@
 # Stage 0.6 current state
 
+November 21 checkpoint. The checked-root successor passed hosted engine
+qualification and exact retained small recovery. The
+[active resume state](CODEX_RESUME_STATE.md) links the verified runs and
+records the save and warm-year attribution. Mature proofs and acceptance
+remain open. The earlier baseline below is retained for provenance.
+
 Updated November 20, 2026. Desktop continuation starts with [CODEX_HANDOFF.md](CODEX_HANDOFF.md).
 
 Repository `rax0h/all-that-endures`, active branch **`sol/durable-proof-map`**. Latest implementation is **6c7ab0001f14dc95f0b09554a84939810e88e692**; later handoff commits change documentation/evidence only. Engine **5464caa49acc4c27f24c247b60ee639afd9d150d** is qualified. Stage0.5 original scope is complete; Stage0.6 and mature performance acceptance remain open.
