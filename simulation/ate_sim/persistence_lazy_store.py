@@ -2778,7 +2778,7 @@ class LazyRecordStore:
                 raise StoreIntegrityError('content publication requires unified record and scope requests')
             _check_content_request(self, pin, _content_proof)
         if _collection_proof is not None:
-            from .persistence_proof_collection_publish import _check as _check_collection, _guard as _guard_collection, _stage as _stage_collection
+            from .persistence_proof_collection_publish import _check as _check_collection, _stage as _stage_collection
             if _content_proof is None:raise StoreIntegrityError('collection publication requires unified content request')
             _check_collection(self,pin,_collection_proof)
         if _record_proof is not None or _scope_proof is not None:
@@ -2937,8 +2937,8 @@ class LazyRecordStore:
                 counts = _namespace_counts(self.codec, locked[6])
                 new_generation = locked_generation + 1
                 if _content_proof is not None:
-                    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
-                    _guard_content_parent(self, _content_proof, version_prepared, segment_prepared)
+                    _guard_content_parent(self, _content_proof, version_prepared, segment_prepared,
+                                          collection=_collection_proof, ordinary=ordinary_prepared)
                 self._write_lazy_changes(
                     version_prepared,
                     locked_generation,

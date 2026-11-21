@@ -10,12 +10,14 @@ import tempfile
 import time
 
 
-BASE = 'b8d9b2a5ba723fa40e397846289dea6d2932db8a'
+AUTHORITY = 'b8d9b2a5ba723fa40e397846289dea6d2932db8a'
+BASE = 'f77905ee1fe822af968ffe6c08912d5bd3ab0655'
 SMOKE = 44873730573
 PROOFS = 14695106875
 CHANGES = {
-    'simulation/ate_sim/persistence_lazy_identity_catalog.py',
-    'simulation/ate_sim/persistence_lazy_identity_coordinator.py',
+    'simulation/ate_sim/persistence_lazy_store.py',
+    'simulation/ate_sim/persistence_proof_collection_publish.py',
+    'simulation/ate_sim/persistence_proof_publication.py',
 }
 
 
@@ -40,7 +42,7 @@ def authenticate(scratch):
     from simulation import stage_0_6_genesis_transport as transport
 
     root = Path.cwd()
-    check_source(root, BASE)
+    check_source(root, AUTHORITY)
     green = resume.inspect_green(root)
     fresh_ref = resume.require_smoke(root, SMOKE, scratch/'acceptance')
     fresh = resume.restore_receipt(root, fresh_ref, scratch/'fresh', mode='smoke', stage='fresh_restore')
@@ -88,13 +90,14 @@ def trial(scratch, output, head):
         engine=git(root, 'rev-parse', 'HEAD:simulation/ate_sim'), fresh=fresh, timing=timing))
 
 
-def compare(baseline, output):
+def compare(authority, baseline, output):
     root = Path.cwd()
     script = Path(__file__).resolve()
     head = os.environ['GITHUB_SHA']
     changes = set(git(root, 'diff', '--name-only', BASE, head, '--', 'simulation',
                       ':(exclude)simulation/tests').splitlines())
-    if changes != CHANGES or git(baseline, 'rev-parse', 'HEAD') != BASE:
+    if (changes != CHANGES or git(baseline, 'rev-parse', 'HEAD') != BASE
+            or git(authority, 'rev-parse', 'HEAD') != AUTHORITY):
         raise ValueError('unexpected candidate delta or baseline')
     output.mkdir(parents=True, exist_ok=False)
     env = {key: value for key, value in os.environ.items() if key not in ('GH_TOKEN', 'GITHUB_TOKEN')}
@@ -103,7 +106,7 @@ def compare(baseline, output):
     order = ((baseline, BASE), (root, head), (root, head), (baseline, BASE))
     with tempfile.TemporaryDirectory(prefix='owner-pair-') as directory:
         scratch = Path(directory)
-        subprocess.run([sys.executable, script, 'authenticate', scratch], cwd=baseline, check=True, timeout=110)
+        subprocess.run([sys.executable, script, 'authenticate', scratch], cwd=authority, check=True, timeout=110)
         (output/'input.json').write_bytes((scratch/'input.json').read_bytes())
         rows = []
         for number, (checkout, commit) in enumerate(order, 1):
@@ -127,6 +130,6 @@ if __name__ == '__main__':
     elif mode == 'trial':
         trial(Path(args[0]), Path(args[1]), args[2])
     elif mode == 'compare':
-        compare(Path(args[0]).resolve(), Path(args[1]).resolve())
+        compare(*(Path(arg).resolve() for arg in args))
     else:
         raise SystemExit('unexpected comparison mode')

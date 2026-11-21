@@ -7,8 +7,7 @@ from .persistence_proof_seek import OrderedSeekMap
 from .persistence_proof_order import query_order_key
 from .persistence_proof_collection import CollectionCertificate,certificate_commitment,domain,member,_state,_schema,_indexes
 from .persistence_proof_projection import _require_closed_codec,_closed_snapshot_preflight
-from .persistence_proof_publication import commit_content_proof,resolve_content_commit,_map
-from .persistence_proof_content import version_key
+from .persistence_proof_publication import commit_content_proof,resolve_content_commit
 from .persistence_lazy_store import _order_checksum
 
 _SCHEMA='CREATE TABLE ate_collection_generations(generation INTEGER NOT NULL,namespace TEXT NOT NULL,certificate BLOB NOT NULL,commitment BLOB NOT NULL,parent BLOB,writer TEXT NOT NULL,token BLOB NOT NULL,checksum BLOB NOT NULL,PRIMARY KEY(generation,namespace)) WITHOUT ROWID'
@@ -72,7 +71,7 @@ def _order(store,g,ns,key):
  if type(ordinal) is not int or not 0<=ordinal<2**63 or type(start) is not int or not 0<=start<=g or et not in ('null','integer') or et=='integer' and (type(end) is not int or end<=g or end<=start) or checksum!=_order_checksum(ns,key,ordinal,start,end):raise StoreIntegrityError('invalid collection order source')
  return ordinal
 
-def _guard(store,r,prepared,content_parent,ordinary=(),segments=()):
+def _guard(store,r,prepared,checked_versions,ordinary=(),segments=()):
  _check(store,r.pin,r)
  if r.directory is not None:
   from .persistence_proof_directory_publish import _guard as guard_directory
@@ -82,12 +81,11 @@ def _guard(store,r,prepared,content_parent,ordinary=(),segments=()):
  for c,e in r.pairs:
   if r.directory is None and _load(store,c.generation,c.namespace)[0]!=(c,e) or _state(store,c.generation,c.namespace)!=(c.declared,c.member_count,c.next_ordinal):raise StoreIntegrityError('collection accepted parent changed')
  store.db.execute('CREATE TEMP TABLE ate_collection_pub_delta(namespace TEXT,key BLOB,old_position BLOB,new_position BLOB,PRIMARY KEY(namespace,key)) WITHOUT ROWID')
- for item in prepared:
+ for item,present in checked_versions:
   ns,key=item['namespace'],item['typed_key'];change=item['change']
   if ns not in parents:raise StoreError('missing touched collection authority')
   if len(key)>4096:raise StoreError('collection key exceeds supported path')
   c=parents[ns];old=_order(store,c.generation,ns,key);m=OrderedSeekMap(store.db,domain(c.store_identity,c.codec_version,ns))
-  present=_map(store).get(content_parent.versions,version_key(ns,key)) is not None
   if present!=(old is not None):raise StoreIntegrityError('collection predecessor presence disagreement')
   old_pos=None if old is None else query_order_key(old,key)
   if old is not None and (old>=c.next_ordinal or m.get(c.root,old_pos)!=member(m.domain,key,old)):raise StoreIntegrityError('collection predecessor root disagreement')

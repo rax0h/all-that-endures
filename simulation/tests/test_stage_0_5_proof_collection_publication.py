@@ -1,4 +1,5 @@
 import importlib
+from collections import Counter
 import pytest
 from ate_sim.incremental_store import StoreError,StoreIntegrityError
 from ate_sim.persistence_lazy_store import VersionChange
@@ -42,12 +43,26 @@ def test_missing_namespace_authority_rejects_before_writes(tmp_path):
  with pytest.raises(StoreError):save(s,p,a,c,(VersionChange('archive',0,{'new':1}),))
  assert s.generation==1;s.close()
 
-def test_coherent_old_order_tamper_rejected(tmp_path):
+def test_coherent_old_order_tamper_closes_spilled_parent_iterator(tmp_path,monkeypatch):
+ import sys
+ from ate_sim.persistence_conversion_workspace import PreparedRows
  from ate_sim.persistence_lazy_store import _order_checksum
  s,p,a,c=setup(tmp_path);key=s.codec.encode(0)
  s.db.execute("UPDATE lazy_order_versions SET ordinal=9,row_checksum=? WHERE namespace='people'",(_order_checksum('people',key,9,1,None),));s.db.commit()
- with pytest.raises(StoreIntegrityError):save(s,p,a,c,(VersionChange('people',0,{'wealth':2}),))
- assert s.generation==1;s.close()
+ events=[]; original=PreparedRows.__iter__
+ def watched(self):
+  if sys._getframe(1).f_code.co_name!='_checked_parent_versions':
+   yield from original(self);return
+  events.append('read')
+  try:yield from original(self)
+  finally:events.append(('close',s.db.in_transaction))
+ monkeypatch.setattr(PreparedRows,'__iter__',watched)
+ with pytest.raises(StoreIntegrityError,match='collection predecessor root'):
+  save(s,p,a,c,(VersionChange('people',0,{'wealth':2}),),preparation_budget=(1,1))
+ assert events==['read',('close',True)]
+ assert s.generation==1 and not s.db.in_transaction
+ assert s.db.execute("SELECT 1 FROM sqlite_temp_schema WHERE name='ate_collection_pub_delta'").fetchone() is None
+ s.close()
 
 def test_expected_type_rejected_without_comparison_hook(tmp_path):
  s,p,a,c=setup(tmp_path);calls=[]
@@ -71,13 +86,36 @@ def test_metadata_only_and_noop_share_all_collection_roots(tmp_path):
  args.update(commit_token='metadata',metadata=metadata(2));r=m().commit_collections(s,p,(c,),*a.content,**args)
  assert r.collections[0][0].root==c[0].root and r.collections[0][0].next_ordinal==c[0].next_ordinal;s.close()
 
-def test_multiple_namespaces_spilled_and_absent_delete(tmp_path):
+def test_one_parent_content_lookup_per_spilled_version(tmp_path,monkeypatch):
+ from ate_sim.persistence_proof_content import version_key
+ from ate_sim.persistence_proof_map import ProofMap
+ from ate_sim.persistence_proof_publication import _map
  s,p,a,c=setup(tmp_path);archive=bootstrap_collection(s,p,'archive')
+ domain=_map(s).map_domain; root=a.content[0].versions; calls=Counter(); get=ProofMap.get
+ def counted(self,parent,key):
+  if (self.map_domain,parent)==(domain,root):calls[key]+=1
+  return get(self,parent,key)
+ monkeypatch.setattr(ProofMap,'get',counted)
  r=m().commit_collections(s,p,(c,archive),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='multiple',
   version_changes=(VersionChange('people',0,{'wealth':2},reinsertion=True),VersionChange('archive',999,delete=True),VersionChange('people',1,{'wealth':3})),identity_changes=(),changes=(),new_segments=(),metadata=metadata(2),preparation_budget=(1,1))
+ assert calls=={version_key(ns,s.codec.encode(key)):1 for ns,key in (('people',0),('archive',999),('people',1))}
  assert r.collections[0][0].member_count==2 and r.collections[0][0].next_ordinal==3
  assert r.collections[1][0].declared and r.collections[1][0].member_count==r.collections[1][0].next_ordinal==0
  s.verify_all();s.close()
+
+def test_coherent_old_content_is_checked_in_collection_save(tmp_path):
+ from ate_sim.incremental_store import _framed_sha
+ from ate_sim.persistence_lazy_store import _version_checksum
+ s,p,a,c=setup(tmp_path);key=s.codec.encode(0); payload=s.codec.encode({'wealth':999})
+ members=s.db.execute("SELECT memberships FROM lazy_record_versions WHERE namespace='people'").fetchone()[0]
+ s.db.execute("UPDATE lazy_record_versions SET payload=?,payload_checksum=?,row_checksum=? WHERE namespace='people'",
+  (payload,_framed_sha(b'lazy-payload-v1',payload),_version_checksum('people',key,1,s.codec.version,1,None,members,payload)))
+ s.db.commit();s.verify_all()
+ with pytest.raises(StoreIntegrityError,match='actual predecessor version'):
+  save(s,p,a,c,(VersionChange('people',0,{'wealth':2}),))
+ assert s.generation==1 and not s.db.in_transaction
+ assert s.db.execute("SELECT 1 FROM sqlite_temp_schema WHERE name='ate_collection_pub_delta'").fetchone() is None
+ s.close()
 
 def test_actual_new_order_is_checked_outside_callbacks(tmp_path,monkeypatch):
  from ate_sim.persistence_lazy_store import LazyRecordStore,_order_checksum

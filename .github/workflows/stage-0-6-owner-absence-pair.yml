@@ -1,4 +1,4 @@
-name: Stage 0.6 owner absence raw pair
+name: Stage 0.6 save parent proof raw pair
 'on':
   push:
     branches: [sol/owner-absence-probe]
@@ -28,15 +28,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          authority="$RUNNER_TEMP/ate-qualified-authority"
           baseline="$RUNNER_TEMP/ate-owner-absence-baseline"
-          git worktree add --detach "$baseline" b8d9b2a5ba723fa40e397846289dea6d2932db8a
-          timeout --signal=TERM --kill-after=15s 12m python docs/performance/stage-0-6-current/small-operation-profile/owner_absence_pair.py compare "$baseline" evidence
+          git worktree add --detach "$authority" b8d9b2a5ba723fa40e397846289dea6d2932db8a
+          git worktree add --detach "$baseline" f77905ee1fe822af968ffe6c08912d5bd3ab0655
+          timeout --signal=TERM --kill-after=15s 12m python docs/performance/stage-0-6-current/small-operation-profile/owner_absence_pair.py compare "$authority" "$baseline" evidence
       - name: Publish trial evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         timeout-minutes: 3
         with:
-          name: owner-absence-pair-${{ github.sha }}
+          name: save-parent-proof-pair-${{ github.sha }}
           path: evidence/
           retention-days: 30
           if-no-files-found: error

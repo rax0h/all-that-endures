@@ -4,7 +4,7 @@ The public writer composes ordinary and scoped proofs in the existing store
 transaction. No format capability, alternate publisher or clean cache.
 """
 from dataclasses import dataclass
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from .incremental_store import StoreError,StoreIntegrityError,StoreConflictError,_segment_checksum,_framed_sha
 from .persistence_lazy_store import _version_checksum
 from .persistence_proof_content import _namespace,_integer,version_key,version_commitment,segment_key,segment_commitment
@@ -274,20 +274,35 @@ def _check_request(store,pin,request):
     if store.db.execute('PRAGMA data_version').fetchone()[0]!=request.data_version:raise StoreConflictError('external write invalidated content parent epoch')
 
 
-def _guard_content_parent(store,request,version_prepared,segment_prepared):
-    """Authenticate actual old content within the existing locked writer TX."""
+def _checked_parent_versions(store,request,version_prepared):
+    m=_map(store)
+    rows=iter(version_prepared)
+    try:
+        for item in rows:
+            ns,key=item['namespace'],item['typed_key']
+            if len(_namespace(ns))+len(key)>1048576:raise ContentProofBudgetError('changed version locator exceeds metadata path')
+            if not item['change'].delete and (type(item['payload']) is not bytes or type(item['memberships_blob']) is not bytes or len(item['payload'])+len(item['memberships_blob'])>MAX_BODY_BYTES):raise ContentProofBudgetError('prepared version exceeds content body path')
+            wanted=m.get(request.parent.versions,version_key(ns,key));row=_source_version(store,request.parent.generation,ns,key)
+            actual=None if row is None else _version_value(ns,key,row,store.codec.version)
+            if wanted!=actual:raise StoreIntegrityError('actual predecessor version disagrees with accepted parent content')
+            yield item,wanted is not None
+    finally:
+        close=getattr(rows,'close',None)
+        if close is not None:close()
+
+
+def _guard_content_parent(store,request,version_prepared,segment_prepared,*,collection=None,ordinary=()):
+    """Authenticate old content and, when present, its collection order in the writer."""
     _check_request(store,request.pin,request)
     if not store.db.in_transaction:raise StoreError('content parent check requires existing writer transaction')
     _schemas(store.db)
     if _load_root(store,request.parent.generation)[0]!=(request.parent,request.expected_parent):raise StoreIntegrityError('accepted content parent changed')
-    m=_map(store)
-    for item in version_prepared:
-        ns,key=item['namespace'],item['typed_key']
-        if len(_namespace(ns))+len(key)>1048576:raise ContentProofBudgetError('changed version locator exceeds metadata path')
-        if not item['change'].delete and (type(item['payload']) is not bytes or type(item['memberships_blob']) is not bytes or len(item['payload'])+len(item['memberships_blob'])>MAX_BODY_BYTES):raise ContentProofBudgetError('prepared version exceeds content body path')
-        wanted=m.get(request.parent.versions,version_key(ns,key));row=_source_version(store,request.parent.generation,ns,key)
-        actual=None if row is None else _version_value(ns,key,row,store.codec.version)
-        if wanted!=actual:raise StoreIntegrityError('actual predecessor version disagrees with accepted parent content')
+    with closing(_checked_parent_versions(store,request,version_prepared)) as checked:
+        if collection is None:
+            for _ in checked:pass
+        else:
+            from .persistence_proof_collection_publish import _guard as guard_collection
+            guard_collection(store,collection,version_prepared,checked,ordinary,segment_prepared)
     events=_map(store,True)
     for item in segment_prepared:
         ns=item['namespace'];segment=item['segment']
