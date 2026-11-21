@@ -780,7 +780,7 @@ class IdentityCatalog:
             _, prefix, count, checksum = child
         raise StoreIntegrityError('identity group disagrees with exact owner membership')
 
-    def read_owner_identity(self, pin, owner, *, _node_inventory=None):
+    def read_owner_identity(self, pin, owner, *, _node_inventory=None, _allow_absent=False):
         self.store._ensure_open()
         if _node_inventory is not None:
             from .persistence_genesis_transaction import _FrozenScope
@@ -820,7 +820,20 @@ class IdentityCatalog:
                     return cached[0]
             self._owner_cache_misses += 1
             self._descriptor(pin)
-            header = self._owner(pin, owner)
+            try:
+                header = self._owner(pin, owner)
+            except StoreIntegrityError as error:
+                if not _allow_absent or not isinstance(error.__cause__, KeyError):
+                    raise
+                # The normal read attempted the checked witness lookup. A
+                # physical presence check also catches a decoder KeyError.
+                witnesses = self.store._interval_rows('lazy_record_versions', '1',
+                    ('namespace', 'typed_key'), (OWNER_NAMESPACE, self.codec.encode(owner)),
+                    pin.captured_head, 'lazy_record_interval', limit=1)
+                self.store._metadata_rows += len(witnesses)
+                if witnesses or self._has_source(pin, owner):
+                    raise
+                return None
             actual = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,
                                   byte_limit=self.byte_limit, unique=True)
             leaves = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,

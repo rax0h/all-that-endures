@@ -13,7 +13,7 @@ import weakref
 import sys
 from .incremental_store import StoreIntegrityError, StoreConflictError, StoreFormatError, RecordChange
 from .persistence_lazy_identity import IncarnationId, Occurrence
-from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup, OWNER_NAMESPACE, placement_path
+from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup, placement_path
 from .persistence_lazy_store import IdentityOccurrenceChange, VersionChange, ORDINARY_QUERY_OWNER_INDEX
 from .persistence_lazy_families import ParticipantDelta, IDENTITY_OWNER_FAMILIES, FAMILIES
 from .persistence_lazy_spill import CheckedSpool
@@ -293,19 +293,7 @@ class IdentityCoordinator:
 
     def _owner_changes(self, owner, prefix):
         """Capture only metadata; no owner or child payload loading."""
-        try:
-            checked = self.catalog.read_owner_identity(self.pin, owner)
-        except StoreIntegrityError:
-            # Match the catalog's checked exact-membership new-owner rule.
-            # A present source/witness can never become an empty/new owner.
-            with self.store.read_snapshot(self.pin):
-                witness = self.store._visible_record_row(self.pin.captured_head,
-                    OWNER_NAMESPACE, self.store.codec.encode(owner))
-                if witness is not None or self.catalog._has_source(self.pin, owner):
-                    raise
-                if self.catalog.read_identity_membership(self.pin, owner, ()) is not None:
-                    raise StoreIntegrityError('new owner has a persisted placement')
-            checked = None
+        checked = self.catalog.read_owner_identity(self.pin, owner, _allow_absent=True)
         changes = {}
         try:
             if checked is not None:

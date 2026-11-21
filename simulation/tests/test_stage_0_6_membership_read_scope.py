@@ -34,6 +34,22 @@ def test_native_membership_bounds_head_checks(tmp_path):
         assert store._validation_scope is None and not store.db.in_transaction
 
 
+def test_native_owner_absence_keeps_one_authenticated_witness_lookup(tmp_path):
+    from ate_sim.persistence_lazy_identity_catalog import OWNER_NAMESPACE
+
+    path, pair = ranked_fixture(tmp_path, size=4)
+    owner = ('world.skills.skills', (1000, 'craft'))
+    with fast_open(path, pair) as session:
+        store = session.store
+        coord = session._identity_coordinator
+        witness_key = store.codec.encode(owner)
+        with patch.object(store, '_visible_record_row', wraps=store._visible_record_row) as visible:
+            assert coord._owner_changes(owner, ()) == {}
+        witness_calls = [row for row in visible.call_args_list if row.args[1:] == (OWNER_NAMESPACE, witness_key)]
+        assert len(witness_calls) == 1
+        assert store._validation_scope is None and not store.db.in_transaction
+
+
 def test_membership_scope_honors_small_catalog_budget(tmp_path, monkeypatch):
     from simulation.ate_sim.persistence_validation_scope import ValidationScope
     with make_store(tmp_path/'budget.sqlite') as store:

@@ -1,11 +1,13 @@
 """Owner/subtree replacement journals only checked affected placements."""
+from contextlib import nullcontext
 from dataclasses import dataclass
+from unittest.mock import patch
 
 import pytest
 
-from simulation.ate_sim.incremental_store import StoreConflictError, StoreIntegrityError
+from simulation.ate_sim.incremental_store import RecordChange, StoreConflictError, StoreIntegrityError
 from simulation.ate_sim.persistence_lazy_identity import LazyIdentityRegistry, IncarnationId, Occurrence
-from simulation.ate_sim.persistence_lazy_identity_catalog import initial_catalog_delta, GROUP_NAMESPACE
+from simulation.ate_sim.persistence_lazy_identity_catalog import initial_catalog_delta, GROUP_NAMESPACE, OWNER_NAMESPACE
 from simulation.ate_sim.persistence_lazy_identity_coordinator import IdentityCoordinator
 from simulation.ate_sim.persistence_lazy_store import VersionChange, IdentityOccurrenceChange
 from simulation.tests.test_persistence_lazy_store import make_store, metadata
@@ -156,6 +158,104 @@ def test_new_owner_then_retirement_cancels_paths_without_reusing_incarnations(tm
         coord.accept_delta(prepared, successor)
         assert all(store.read_identity_group(successor, inc).occurrences == () for inc in reserved)
         assert registry.bind(Child(30)).value > max(reserved)
+
+
+@pytest.mark.parametrize('borrowed', [False, True])
+def test_owner_absence_uses_one_checked_witness_lookup(tmp_path, borrowed):
+    with make_store(tmp_path / 'absent.sqlite') as store:
+        coord, *_ = setup(store)
+        owner = (NS, 3)
+        witness_key = store.codec.encode(owner)
+        scope = store.read_snapshot(coord.pin) if borrowed else nullcontext()
+        with scope, patch.object(store, '_visible_record_row', wraps=store._visible_record_row) as visible, \
+                patch.object(coord.catalog, '_has_source', wraps=coord.catalog._has_source) as source:
+            assert coord._owner_changes(owner, ()) == {}
+            witness_calls = [row for row in visible.call_args_list if row.args[1:] == (OWNER_NAMESPACE, witness_key)]
+            assert len(witness_calls) == 1
+            source.assert_called_once_with(coord.pin, owner)
+            assert store.db.in_transaction is borrowed
+        with pytest.raises(StoreIntegrityError, match='missing required identity authority'):
+            coord.catalog.read_owner_identity(coord.pin, owner)
+        assert coord.catalog.read_identity_membership(coord.pin, owner, ()) is None
+        assert not store.db.in_transaction
+
+
+def drop_witness(store, owner):
+    key = store.codec.encode(owner)
+    for table, column in (('lazy_record_versions', 'typed_key'), ('lazy_order_versions', 'typed_key'),
+                          ('lazy_query_versions', 'record_key')):
+        store.db.execute(f'DELETE FROM {table} WHERE namespace=? AND {column}=?', (OWNER_NAMESPACE, key))
+
+
+@pytest.mark.parametrize('remaining', ['witness', 'body', 'placement'])
+def test_owner_requires_all_persisted_authority_before_replacement(tmp_path, remaining):
+    with make_store(tmp_path / 'partial.sqlite') as store:
+        coord, registry, _, _, dirty, installed, _ = setup(store)
+        owner = (NS, 1)
+        if remaining != 'witness':
+            drop_witness(store, owner)
+        if remaining != 'body':
+            store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',
+                             (NS, store.codec.encode(owner[1])))
+        if remaining != 'placement':
+            store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=?',
+                             (NS, store.codec.encode(owner[1])))
+        store.db.commit()
+
+        next_incarnation = registry.next_incarnation
+        with patch.object(coord.catalog, '_has_source', wraps=coord.catalog._has_source) as source, \
+                pytest.raises(StoreIntegrityError):
+            coord.replace_owner(owner, (((), Header(Child(9), Child(10))),))
+        assert source.call_count == (0 if remaining == 'witness' else 1)
+        assert not dirty and not installed and not coord.placement_overlay
+        assert registry.next_incarnation == next_incarnation
+        assert not store.db.in_transaction
+
+
+def test_owner_requires_valid_witness_when_its_decoder_raises_key_error(tmp_path):
+    with make_store(tmp_path / 'decoder.sqlite') as store:
+        coord, *_ = setup(store)
+        owner = (NS, 1)
+        witness_key = store.codec.encode(owner)
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',
+                         (NS, store.codec.encode(owner[1])))
+        store.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=? AND owner_key=?',
+                         (NS, store.codec.encode(owner[1])))
+        store.db.commit()
+        check = store._check_record_row
+
+        def broken_witness(namespace, key, row, *, decode):
+            if (namespace, key) == (OWNER_NAMESPACE, witness_key):
+                raise KeyError('invalid witness body')
+            return check(namespace, key, row, decode=decode)
+
+        with patch.object(store, '_check_record_row', side_effect=broken_witness):
+            with pytest.raises(StoreIntegrityError, match='missing required identity authority'):
+                coord._owner_changes(owner, ())
+        assert not store.db.in_transaction
+
+
+def test_owner_requires_witness_for_an_ordinary_body_without_placements(tmp_path):
+    with make_store(tmp_path / 'ordinary.sqlite') as store:
+        coord, registry, *_ = setup(store)
+        owner = ('world.currency.minted', 'copper')
+        changes = (RecordChange(*owner, (0, 7)),)
+        allocator = registry.next_incarnation
+        delta = coord.catalog.prepare_delta(coord.pin, (), (), ordinary_changes=changes,
+                                            next_incarnation_id=allocator)
+        coord.pin = store.commit(coord.pin, commit_token='ordinary-body', changes=changes,
+            version_changes=delta.decode(store.codec)[0], identity_changes=(), new_segments=(),
+            next_incarnation_id=allocator, metadata=metadata(2, (NS, owner[0], 'world_identity_links'))).pin
+        assert coord._owner_changes(owner, ()) == {}
+        drop_witness(store, owner)
+        store.db.commit()
+
+        with patch.object(coord.catalog, '_has_source', wraps=coord.catalog._has_source) as source, \
+                pytest.raises(StoreIntegrityError, match='missing required identity authority'):
+            coord._owner_changes(owner, ())
+        source.assert_called_once_with(coord.pin, owner)
+        assert registry.next_incarnation == allocator and not coord.placement_overlay
+        assert not store.db.in_transaction
 
 
 def test_peer_loading_cannot_freeze_an_intermediate_routing_plan(tmp_path):
