@@ -160,3 +160,13 @@ qualification remains required for the candidate.
 The engine tree, compatibility contract, operational helpers, and request
 files were unchanged by the repair. The follow-up CI check verified that
 both proof-map and full-suite started. Their results remain pending.
+
+## Qualified successor admission
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| SA-R1: the original single-file delta could not admit the new qualified tree | Validated the original engine edge, then added a separately hashed successor contract for the exact five changes. Local receipt checks passed against both small and mature retained chains and rejected altered edge files and older proof stamps. Both original admission contracts stay byte-identical. | Closed |
+| SA-R2: independent review requested a canonical receipt hash assertion | The qualified-engine test now checks the successor contract hash as well as the engine tree. Six focused checks passed after closure. Independent review verified 35 canonical paths, 34 explicit fingerprints, 53 fenced blobs, and both qualification ZIPs. | Closed |
+
+Both qualification jobs subsequently passed. The current candidate evidence
+and pending hosted recovery are recorded in the [admission ledger](../after-digest-admission/progress.md#checked-root-reuse-successor).

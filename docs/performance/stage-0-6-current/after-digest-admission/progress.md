@@ -17,3 +17,29 @@ Base: ec871fa92dcc8a1115f0070a2c873cd3edeba17d
 - Hosted small recovery is next; no mature activation.
 
 - November20desktop handoff: actual hosted44028694698and44028694713bothsuccess. Prefixskipped; realexit77/unchangedparent/retry/freshyear2gen1digestcebc verified. NineZIPs and two small rawDBmembers authenticated;52sourceblobs andbothcontracts checked. No mature retry. Currentstate/Codexhandoff refreshed and previously untracked launch record retained.
+
+## Checked-root reuse successor
+
+[Qualification 44805673467](https://github.com/rax0h/all-that-endures/actions/runs/44805673467)
+passed all 432 harness tests, 5,155 full-suite cases, and 1,968 proof-map
+cases for commit `7a2c84065ab03118256e9cf551f7de1b483db524` and engine
+`6ce0a33711f4fb10b30e13d67df1eaaace9a2e35`. The two qualification ZIPs
+were downloaded by exact ID and verified against the uploader hashes.
+
+| Evidence | Job | Artifact | Expires (UTC) |
+|---|---:|---:|---|
+| [Full suite](https://github.com/rax0h/all-that-endures/actions/runs/44805673467/artifacts/14672941173) | 136530275664 | 14672941173 | Dec 4, 2026 21:46:18 |
+| [Proof-map](https://github.com/rax0h/all-that-endures/actions/runs/44805673467/artifacts/14666174462) | 136530275848 | 14666174462 | Dec 4, 2026 20:39:00 |
+
+The successor contract verifies exactly five modified engine files, their old
+and new blobs, the approved ancestor, and the hashes of the unchanged
+after-digest and canonical contracts. The original catalog transition and
+the original after-digest binding remain checked, and all four historical
+artifact references are authenticated on every consumption. The new cut
+stamps the successor contract hash and leaves the digest, source identity,
+rules, runtime signature and original parent chain intact. The staged
+launcher binds 34 explicit fingerprints and 53 critical Git blobs.
+
+The small request must prove an actual interruption before publication and
+an exact retry through fresh restore. The original after-digest and its five
+completed precursor stages remain reusable. Mature timings are pending.

@@ -7,6 +7,7 @@ from simulation import stage_0_6_genesis_transport as t
 from simulation import stage_0_6_catalog_admission as legacy
 
 CONTRACT='simulation/stage_0_6_after_digest_admission.json'
+SUCCESSOR_CONTRACT='simulation/stage_0_6_after_digest_successor.json'
 
 
 def contract(root):
@@ -37,11 +38,55 @@ def eligible(root,mode,run_id,artifact_id=None):
 
 def _target(root):
     from simulation import stage_0_6_genesis_resume as m
-    value=contract(root);runtime,blobs=m.fence(root)
-    if (runtime!=value['target_engine_tree'] or m.RUNTIME!=runtime or m.GREEN_SHA!=value['target_green_commit']
+    base=contract(root);runtime,_=m.fence(root)
+    successor=_successor(root,base) if runtime!=base['target_engine_tree'] else None
+    target=successor or base
+    if (runtime!=target['target_engine_tree'] or m.RUNTIME!=runtime or m.GREEN_SHA!=target['target_green_commit']
             or m.git(root,'rev-parse',m.GREEN_SHA+':simulation/ate_sim')!=runtime):raise ValueError('proof recovery target is not qualified')
     m.git(root,'merge-base','--is-ancestor',m.GREEN_SHA,'HEAD')
+    return base,successor
+
+
+def _successor(root,base):
+    from simulation import stage_0_6_genesis_resume as m
+    from simulation import stage_0_6_genesis_source_control as controls
+    root=Path(root);path=root/SUCCESSOR_CONTRACT
+    if path.is_symlink() or not path.is_file() or path.stat().st_size>c.MAX_METADATA:
+        raise ValueError('invalid proof successor contract file')
+    value=r.load_receipt(path)
+    c.exact(value,{'schema','base_sha256','canonical_sha256','target_engine_tree','target_green_commit','engine_delta'},'proof successor')
+    if (value['schema']!='ate-after-digest-proof-successor/1'
+            or value['target_engine_tree']!=m.RUNTIME or value['target_green_commit']!=m.GREEN_SHA
+            or c.file_hash(root/CONTRACT)!=value['base_sha256']
+            or c.file_hash(root/controls.COMPATIBILITY)!=value['canonical_sha256']):
+        raise ValueError('proof successor contract authority differs')
+    old=base['target_green_commit'];new=value['target_green_commit']
+    m.git(root,'merge-base','--is-ancestor',old,new)
+    if m.git(root,'rev-parse',old+':simulation/ate_sim')!=base['target_engine_tree']:
+        raise ValueError('proof successor base tree differs')
+    delta=value['engine_delta']
+    if type(delta) is not list or not delta:raise ValueError('proof successor engine delta is missing')
+    expected=[]
+    for entry in delta:
+        c.exact(entry,{'path','before_blob','after_blob'},'proof successor engine delta')
+        path=entry['path'];before=entry['before_blob'];after=entry['after_blob']
+        c.hexadecimal(before,40,'proof successor before blob')
+        c.hexadecimal(after,40,'proof successor after blob')
+        if type(path) is not str or not path.startswith('simulation/ate_sim/') or '..' in path.split('/'):
+            raise ValueError('invalid proof successor engine path')
+        expected.append(f':100644 100644 {before} {after} M\t{path}')
+    actual=m.git(root,'diff','--raw','--no-abbrev','--no-renames',old,new,'--','simulation/ate_sim')
+    if sorted(actual.splitlines())!=sorted(expected):raise ValueError('unreviewed proof successor engine delta')
     return value
+
+
+def canonical_successor(root,runtime,canonical_hash):
+    from simulation import stage_0_6_genesis_resume as m
+    if runtime!=m.RUNTIME:raise ValueError('unreviewed canonical/runtime compatibility pair')
+    _,successor=_target(root)
+    if successor is None or successor['canonical_sha256']!=canonical_hash:
+        raise ValueError('unreviewed canonical/runtime compatibility pair')
+    return c.file_hash(Path(root)/SUCCESSOR_CONTRACT)
 
 
 def _historical_contract(root,value):
@@ -70,9 +115,9 @@ def _delta(root,head,green,delta):
             or m.git(root,'rev-parse',green+':'+path)!=delta['after_blob']):raise ValueError('unreviewed historical proof engine delta')
 
 
-def verify_old_head(root,mode,head):
+def _verify_historical_head(root,value,old,mode,head):
     from simulation import stage_0_6_genesis_resume as m
-    value=_target(root);old=_historical_contract(root,value);pair=value['after_digests'][mode];catalog=old['catalogs'][mode]
+    pair=value['after_digests'][mode];catalog=old['catalogs'][mode]
     if head==pair['metadata']['head_sha']:
         _producer(root,head,pair['context'])
         if m.git(root,'rev-parse',head+':'+legacy.CONTRACT)!=value['historical_catalog_contract']['blob']:raise ValueError('producer inherited different catalog contract')
@@ -82,15 +127,20 @@ def verify_old_head(root,mode,head):
     else:raise ValueError('unadmitted historical producer')
 
 
-def validate_prior(root,parent):
+def verify_old_head(root,mode,head):
+    value,_=_target(root)
+    _verify_historical_head(root,value,_historical_contract(root,value),mode,head)
+
+
+def _validate_prior(root,parent):
     from simulation import stage_0_6_genesis_resume as m
-    c.validate(parent,require_remote=True);value=_target(root);mode=parent['context']['mode'];pair=value['after_digests'][mode]
+    c.validate(parent,require_remote=True);value,successor=_target(root);mode=parent['context']['mode'];pair=value['after_digests'][mode]
     if (parent['stage']!='after_digest' or c.receipt_hash(parent)!=pair['receipt_sha256']
             or parent['context']!=pair['context'] or parent['database']!=pair['database'] or parent['data_ref']!=pair['data_ref']):
         raise ValueError('historical after-digest differs from exact admitted receipt')
     m.match_receipt_reference(parent,pair['metadata'],mode=mode,stage='after_digest')
-    verify_old_head(root,mode,parent['producer']['head_sha'])
     old=_historical_contract(root,value);catalog=old['catalogs'][mode]
+    _verify_historical_head(root,value,old,mode,parent['producer']['head_sha'])
     rebased=parent['parent']['receipt'];prior=rebased['parent']['receipt']
     if (old['target_engine_tree']!=parent['context']['runtime_tree']
             or m.git(root,'rev-parse',old['target_green_commit']+':simulation/ate_sim')!=old['target_engine_tree']
@@ -99,28 +149,35 @@ def validate_prior(root,parent):
             or rebased['metrics']['catalog_admission']['contract_sha256']!=value['historical_catalog_contract']['sha256']):
         raise ValueError('inherited historical catalog authority differs')
     m.match_receipt_reference(prior,catalog['metadata'],mode=mode,stage='catalog')
-    verify_old_head(root,mode,prior['producer']['head_sha'])
+    _verify_historical_head(root,value,old,mode,prior['producer']['head_sha'])
     if pair['source_control']!=catalog['source_control']:raise ValueError('inherited source control differs')
     if mode=='mature':
         from simulation import stage_0_6_genesis_source_control as controls
         source=prior
         while source['stage']!='source_digest':source=source['parent']['receipt']
         if source['metrics'].get('source_control')!=pair['source_control']:raise ValueError('historical source control changed')
-        expected=controls.mature_control_contract(root,current_runtime_tree=value['target_engine_tree'])
+        runtime=(successor or value)['target_engine_tree']
+        expected=controls.mature_control_contract(root,current_runtime_tree=runtime)
         previous=copy.deepcopy(pair['source_control']);current=copy.deepcopy(expected)
         before=previous.pop('compatibility');after=current.pop('compatibility')
         if (previous!=current or before['historical_runtime_tree']!=after['historical_runtime_tree']
                 or before['current_runtime_tree']!=prior['context']['runtime_tree']
-                or after['current_runtime_tree']!=value['target_engine_tree']):raise ValueError('proof recovery canonical authority changed')
-    return pair
+                or after['current_runtime_tree']!=runtime):raise ValueError('proof recovery canonical authority changed')
+    return pair,successor
+
+
+def validate_prior(root,parent):
+    return _validate_prior(root,parent)[0]
 
 
 def attest(root,parent,successor_context):
     from simulation import stage_0_6_genesis_resume as m
-    validate_prior(root,parent);m.check_context(root,successor_context,parent['context']['mode'])
+    _,successor=_validate_prior(root,parent)
+    m.check_context(root,successor_context,parent['context']['mode'])
+    path=SUCCESSOR_CONTRACT if successor is not None else CONTRACT
     stamp=dict(schema='ate-after-digest-runtime-admission/1',parent_sha256=c.receipt_hash(parent),
         parent_database=copy.deepcopy(parent['database']),from_context_sha256=c.receipt_hash(parent['context']),
-        to_context_sha256=c.receipt_hash(successor_context),contract_sha256=c.file_hash(Path(root)/CONTRACT))
+        to_context_sha256=c.receipt_hash(successor_context),contract_sha256=c.file_hash(Path(root)/path))
     c.check_proofs_admission(parent,successor_context,stamp)
     return stamp
 
@@ -135,9 +192,10 @@ def cut(value):
 
 def inspect_prior(root,mode,run_id,artifact_id=None):
     if not eligible(root,mode,run_id,artifact_id):raise ValueError('after-digest resume is not admitted')
-    value=_target(root);pair=value['after_digests'][mode];old=_historical_contract(root,value)['catalogs'][mode]
-    for ref in (pair['metadata'],pair['data_ref'],old['metadata'],old['data_ref']):
-        t.inspect_reference(ref,compatible=lambda head:verify_old_head(root,mode,head))
+    value,_=_target(root);pair=value['after_digests'][mode];old=_historical_contract(root,value)
+    catalog=old['catalogs'][mode]
+    for ref in (pair['metadata'],pair['data_ref'],catalog['metadata'],catalog['data_ref']):
+        t.inspect_reference(ref,compatible=lambda head:_verify_historical_head(root,value,old,mode,head))
     return pair['metadata']
 
 

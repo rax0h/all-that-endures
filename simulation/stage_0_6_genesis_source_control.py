@@ -11,14 +11,17 @@ def check_compatibility(root,*,historical_runtime_sha,historical_runtime_tree,cu
     root=Path(root);manifest=r.load_receipt(root/COMPATIBILITY)
     if (manifest.get('schema')!='ate-accepted-source-canonical-compatibility/1'
             or manifest.get('historical_runtime_sha')!=historical_runtime_sha
-            or manifest.get('historical_runtime_tree')!=historical_runtime_tree
-            or manifest.get('current_runtime_tree')!=current_runtime_tree):
+            or manifest.get('historical_runtime_tree')!=historical_runtime_tree):
         raise ValueError('unreviewed canonical/runtime compatibility pair')
+    manifest_hash=c.file_hash(root/COMPATIBILITY)
+    if manifest.get('current_runtime_tree')!=current_runtime_tree:
+        from simulation import stage_0_6_after_digest_admission as proof_admission
+        manifest_hash=proof_admission.canonical_successor(root,current_runtime_tree,manifest_hash)
     for name,hashes in manifest['files'].items():
         path=root/name
         if path.is_symlink() or not path.is_file() or c.file_hash(path)!=hashes['current_sha256']:
             raise ValueError('canonical/schema/model/codec definition differs: '+name)
-    return dict(manifest_sha256=c.file_hash(root/COMPATIBILITY),
+    return dict(manifest_sha256=manifest_hash,
         historical_runtime_tree=historical_runtime_tree,current_runtime_tree=current_runtime_tree)
 
 

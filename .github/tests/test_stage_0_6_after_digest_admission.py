@@ -8,6 +8,7 @@ from pathlib import Path
 import zipfile
 
 import pytest
+from simulation import continuation_receipts as r
 from simulation import stage_0_6_genesis_checkpoint as c
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -103,6 +104,51 @@ def execution(monkeypatch,parent):
     monkeypatch.setattr(m,'fence',lambda root:(ctx['runtime_tree'],ctx['critical_blobs']))
     monkeypatch.setattr(m,'runtime_description',lambda:(ctx['execution_runtime'],{}))
     return ctx
+
+
+def candidate_execution(monkeypatch,parent):
+    from simulation import stage_0_6_genesis_resume as m
+    ctx=successor(parent)
+    ctx['runtime_tree']='6ce0a33711f4fb10b30e13d67df1eaaace9a2e35'
+    monkeypatch.setattr(m,'RUNTIME',ctx['runtime_tree'])
+    monkeypatch.setattr(m,'GREEN_SHA','7a2c84065ab03118256e9cf551f7de1b483db524')
+    monkeypatch.setattr(m,'fence',lambda root:(ctx['runtime_tree'],ctx['critical_blobs']))
+    monkeypatch.setattr(m,'runtime_description',lambda:(ctx['execution_runtime'],{}))
+    return ctx
+
+
+@pytest.mark.parametrize('mode',['smoke','mature'])
+def test_successor_admission_preserves_exact_predecessors(monkeypatch,mode):
+    parent=old_after(mode);original=copy.deepcopy(parent)
+    ctx=candidate_execution(monkeypatch,parent)
+    artifacts,_=recorded_service(monkeypatch)
+    proof=api();stamp=proof.attest(ROOT,parent,ctx)
+    assert stamp['contract_sha256']==c.file_hash(ROOT/'simulation/stage_0_6_after_digest_successor.json')
+    row=proved(parent,ctx,stamp)
+    assert proof.validate_chain(ROOT,row)['receipt_sha256']==c.receipt_hash(original)
+    assert parent==original
+    for aid in (14252280082,14252085073,14188030345,14187731783) if mode=='smoke' else (
+        14267625292,14261110486,14197005279,14195829058):
+        with monkeypatch.context() as change:
+            change.setitem(artifacts[aid],'expired',True)
+            with pytest.raises(ValueError):proof.validate_chain(ROOT,row)
+    with pytest.raises(ValueError,match='attestation'):
+        proof.validate_chain(ROOT,proved(parent,ctx,marker(parent,ctx)))
+
+
+@pytest.mark.parametrize('damage',['before_blob','after_blob','omitted_path','base_sha256','canonical_sha256'])
+def test_successor_admission_rejects_a_changed_edge(monkeypatch,damage):
+    parent=old_after();ctx=candidate_execution(monkeypatch,parent)
+    load=r.load_receipt
+    def damaged(path):
+        value=load(path)
+        if Path(path).name!='stage_0_6_after_digest_successor.json':return value
+        if damage=='omitted_path':value['engine_delta'].pop()
+        elif damage in ('before_blob','after_blob'):value['engine_delta'][0][damage]='0'*40
+        else:value[damage]='0'*64
+        return value
+    monkeypatch.setattr(r,'load_receipt',damaged)
+    with pytest.raises(ValueError,match='successor'):api().attest(ROOT,parent,ctx)
 
 
 @pytest.mark.parametrize('mode',['smoke','mature'])

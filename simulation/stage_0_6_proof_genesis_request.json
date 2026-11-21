@@ -2,8 +2,8 @@
   "schema": "ate-stage06-proof-genesis-request/1",
   "request_id": "bounded-mature-proof-genesis-2026-11-10-timeout-repair-1",
   "operation": "convert-then-one-year",
-  "green_commit": "24c0c612ab51908826f35e867413c86a83b01db6",
-  "runtime_tree": "5464caa49acc4c27f24c247b60ee639afd9d150d",
+  "green_commit": "7a2c84065ab03118256e9cf551f7de1b483db524",
+  "runtime_tree": "6ce0a33711f4fb10b30e13d67df1eaaace9a2e35",
   "database": {
     "bytes": 29922463744,
     "name": "candidate.sqlite",
@@ -33,8 +33,8 @@
     "simulation/stage_0_5_save1002_preflight.json": "7f0648786159007816c2a64ee1b8501c0210d2121f011052c4a2179db5a62b7a",
     "simulation/stage_0_6_genesis_checkpoint.py": "d3a481e471964d354caaef4a2d0202ab4b185220e898967fdae7b808ab817071",
     "simulation/stage_0_6_genesis_control_compatibility.json": "727c2c03c25cf7d6a4ea2589f0ebb8f573e43992a771dcb59f1578eee2426094",
-    "simulation/stage_0_6_genesis_resume.py": "177eb85113ab4bfc9c836051c1f50a23c028751dd6205ed0a19eb7c579f95f06",
-    "simulation/stage_0_6_genesis_source_control.py": "6f781d8bc429374c1c8878a2228941dc49805d5127f6a4134f6a0d7b0845b595",
+    "simulation/stage_0_6_genesis_resume.py": "4619366d370cc8be03bee5e87fc26a9894dde9b02940a884d6019a44106acc13",
+    "simulation/stage_0_6_genesis_source_control.py": "4a2eb440ec6ebdb27d3aa875e3d165dd79f32647607401bb54aa7b2fff94be52",
     "simulation/stage_0_6_genesis_stages.py": "829bec51f10d0efd03491bbee552fbeed4e504b4a5635f1dc5164b9b8754f158",
     "simulation/stage_0_6_genesis_transport.py": "5329b96b2cb23734e9eb27403d7ad3c261c7635d0122bbeab2886c1829be42bb",
     "simulation/stage_0_6_mature_benchmark.py": "1514455af928160a940e7d51e293abcd910b522e290478c027ae98263cd39629",
@@ -49,8 +49,9 @@
     "simulation/stage_0_6_retained_transport.py": "07122d6a4cb86fd70f001cd2031dce1386faa50c3673c436520f65ab01fe0fff",
     "simulation/stage_0_6_catalog_admission.py": "40f6477ff9ea1e49a777f892c052df9cfb5df8180826485176977a34972d869d",
     "simulation/stage_0_6_catalog_admission.json": "5e5da5681fe65c8f692c3b6893923c387537b6eb9ebe9ebb3435d44dc2aca0a2",
-    "simulation/stage_0_6_after_digest_admission.py": "589fc80333cd499a5df895c98a3dede7d9f004c85dd7ce7bf4935cfba1b5fb34",
-    "simulation/stage_0_6_after_digest_admission.json": "284e5c75d2bab90cbb8e2c704296007c12b7e19c2ada39253015fed6c95a8532"
+    "simulation/stage_0_6_after_digest_admission.py": "45073c35b73a759841c6b28c1d4ff8f5f0fad2d4b7093b1d19069a63172951a9",
+    "simulation/stage_0_6_after_digest_admission.json": "284e5c75d2bab90cbb8e2c704296007c12b7e19c2ada39253015fed6c95a8532",
+    "simulation/stage_0_6_after_digest_successor.json": "6bf7d850c209369bcab07736d542ed8cc558c8df7a5764f2aac13296ef24a6dc"
   },
   "expected_saved_digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
   "budgets": {

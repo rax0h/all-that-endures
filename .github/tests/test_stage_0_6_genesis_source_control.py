@@ -176,16 +176,20 @@ def test_imported_control_preserves_actual_post_rebase_check(tmp_path,monkeypatc
 
 
 def test_reviewed_canonical_pair_names_the_qualified_engine():
+    from simulation import stage_0_6_after_digest_admission as proof_admission
     from simulation import stage_0_6_genesis_resume as launcher
     root=Path(__file__).resolve().parents[2]
     controls=api()
     declared=r.load_receipt(root/controls.COMPATIBILITY)
     qualified=launcher.git(root,'rev-parse',launcher.GREEN_SHA+':simulation/ate_sim')
     launcher.git(root,'merge-base','--is-ancestor',launcher.GREEN_SHA,'HEAD')
-    assert declared['current_runtime_tree']==launcher.RUNTIME==qualified
+    assert launcher.RUNTIME==qualified
     historical=dict(historical_runtime_sha=declared['historical_runtime_sha'],
         historical_runtime_tree=declared['historical_runtime_tree'])
-    controls.check_compatibility(root,**historical,current_runtime_tree=qualified)
+    bound=controls.check_compatibility(root,**historical,current_runtime_tree=qualified)
+    assert bound['current_runtime_tree']==qualified
+    contract=controls.COMPATIBILITY if qualified==declared['current_runtime_tree'] else proof_admission.SUCCESSOR_CONTRACT
+    assert bound['manifest_sha256']==c.file_hash(root/contract)
 
     candidate=launcher.git(root,'rev-parse','HEAD:simulation/ate_sim')
     if candidate!=qualified:

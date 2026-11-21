@@ -1,0 +1,34 @@
+{
+  "schema": "ate-after-digest-proof-successor/1",
+  "base_sha256": "284e5c75d2bab90cbb8e2c704296007c12b7e19c2ada39253015fed6c95a8532",
+  "canonical_sha256": "727c2c03c25cf7d6a4ea2589f0ebb8f573e43992a771dcb59f1578eee2426094",
+  "target_engine_tree": "6ce0a33711f4fb10b30e13d67df1eaaace9a2e35",
+  "target_green_commit": "7a2c84065ab03118256e9cf551f7de1b483db524",
+  "engine_delta": [
+    {
+      "path": "simulation/ate_sim/persistence_genesis_transaction.py",
+      "before_blob": "37cc91d835dca4315425805ab1c98d1dcc3ccc8b",
+      "after_blob": "b626baf265bd1382a42c032cb23ebf0ae21d3f8a"
+    },
+    {
+      "path": "simulation/ate_sim/persistence_proof_collection_directory.py",
+      "before_blob": "1a0451ee422a04f7d8a56858b0ee2414d2fef247",
+      "after_blob": "dcf0c4b3c8ca8ef53a8d2b6f027dc1755114d927"
+    },
+    {
+      "path": "simulation/ate_sim/persistence_proof_scope.py",
+      "before_blob": "ebc5ee1647ed052e90246b79a8825c4689a4e34f",
+      "after_blob": "ea8cf85454a789afd6074b11e8e16efe45dc6ddd"
+    },
+    {
+      "path": "simulation/ate_sim/persistence_proof_world.py",
+      "before_blob": "b40a42be473102402dd18eccd91067e13acf0b57",
+      "after_blob": "7f77ea93a2ffe4e3fb67d5d2e699da7bdbb1b6cd"
+    },
+    {
+      "path": "simulation/ate_sim/persistence_sqlite_guard.py",
+      "before_blob": "af259edfafeee841b5756bbf650abe95db6d40e0",
+      "after_blob": "eee34bd7c01a90e6300845778d72a020787455bc"
+    }
+  ]
+}

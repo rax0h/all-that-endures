@@ -26,18 +26,18 @@ from simulation import checkpoint_artifacts as github
 from simulation import continuation_receipts as r
 from simulation.stage_0_6_retained_transport import _stream_archive,_signed_url
 
-GREEN_RUN=43991230104
-GREEN_JOBS={'full-suite':133733558051,'proof-map':133733558088}
-GREEN_SHA='24c0c612ab51908826f35e867413c86a83b01db6'
-RUNTIME='5464caa49acc4c27f24c247b60ee639afd9d150d'
+GREEN_RUN=44805673467
+GREEN_JOBS={'full-suite':136530275664,'proof-map':136530275848}
+GREEN_SHA='7a2c84065ab03118256e9cf551f7de1b483db524'
+RUNTIME='6ce0a33711f4fb10b30e13d67df1eaaace9a2e35'
 REQUEST='simulation/stage_0_6_genesis_resume_request.json'
 OLD_REQUEST='simulation/stage_0_6_proof_genesis_request.json'
 CRITICAL=('simulation/stage_0_6_genesis_checkpoint.py','simulation/stage_0_6_genesis_transport.py',
     'simulation/stage_0_6_genesis_stages.py','simulation/stage_0_6_genesis_resume.py',
     '.github/tests/run_genesis_recovery_drill.py',c.WORKFLOW)
 GREEN_ARTIFACTS={
-    'full-suite':(14297230116,'stage-0-5-proof-map-suite-'+GREEN_SHA,'91a89518dcc1e0a535c963a4a95e8a0069975d2f0bbd7c3f8e66cc89b2c28bb6'),
-    'proof-map':(14292956213,'stage-0-5-proof-map-'+GREEN_SHA,'5883b4aae8f0ffcab412fb87fad4516d4b1161bd2edd41197fbd47310766e490')}
+    'full-suite':(14672941173,'stage-0-5-proof-map-suite-'+GREEN_SHA,'fbe26c7af77ad94b4679ecfd31de8aece2da0065fe66bb15dbfea662cb0bdf59'),
+    'proof-map':(14666174462,'stage-0-5-proof-map-'+GREEN_SHA,'b424235ae80f6d8f9c44b12c092f6ef6c2b0fe5cf10391d99d80269e59a1635c')}
 TIMEOUTS=dict(source_digest=120,capture=240,catalog=240,rebase=240,after_digest=180,proofs=350,measure=150,fresh_restore=180)
 
 
