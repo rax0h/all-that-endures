@@ -543,6 +543,7 @@ class Laboratory:
             "samples": list(self.samples),
             "year": None if world is None else world.year,
             "seed": None if world is None else world.seed,
+            "population": None if world is None else sum(person.alive for person in world.people.values()),
             "loaded": world is not None,
         }
 

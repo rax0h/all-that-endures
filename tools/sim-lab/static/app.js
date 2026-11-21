@@ -235,7 +235,7 @@ function paintTop() {
   const run = state.run || {};
   const sample = state.samples[state.samples.length - 1];
   const year = sample ? val(sample.year) : run.year;
-  const population = sample ? val(sample.population) : null;
+  const population = sample ? val(sample.population) : run.population;
   const step = sample ? val(sample.step_seconds) : null;
   const rss = sample ? val(sample.rss_bytes) : null;
   live.replaceChildren(
