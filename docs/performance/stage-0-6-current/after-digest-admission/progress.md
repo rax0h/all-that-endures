@@ -49,3 +49,34 @@ stopped in its initial harness with 438 passes and a legacy compatibility
 diagnostic assertion. It never reached source transport or proof workers.
 The corrected request retains the same source and budgets and restores the
 public rejection message with the successor detail preserved as its cause.
+
+[Corrected small recovery 44873730573](https://github.com/rax0h/all-that-endures/actions/runs/44873730573)
+and [companion 44873730638](https://github.com/rax0h/all-that-endures/actions/runs/44873730638)
+passed both 439-case Linux harnesses. The small run skipped all five retained
+prefix stages. Proofs, measure, fresh restore and acceptance passed. All nine
+archives, both database members, 53 critical blobs and the full hosted
+software fingerprint were authenticated. The child exited 77 before
+publication. The ordinary proof retry consumed the same immutable parent.
+The World audit rebuilt scope once during proof construction.
+
+Fresh year 2, generation 1 and seed 843000 matched the original digest
+`cebc2fcd2660db6e87b9c29c3c8e88536a831214c306991778fba6ee58cc7451`;
+operational full World audits were zero. The exact evidence is available
+from the [closed proof receipt](https://github.com/rax0h/all-that-endures/actions/runs/44873730573/artifacts/14695106875),
+[interruption and proof trace](https://github.com/rax0h/all-that-endures/actions/runs/44873730573/artifacts/14694777609),
+and [fresh receipt](https://github.com/rax0h/all-that-endures/actions/runs/44873730573/artifacts/14695785020).
+
+| Small phase | Previous smoke (s) | Successor smoke (s) | Successor CPU (s) |
+|---|---:|---:|---:|
+| Open | 1.3655 | 1.5350 | 1.2384 |
+| First year | 5.6260 | 5.8039 | 5.8032 |
+| Save | 4.5785 | 4.5389 | 4.3549 |
+| Warm year | 4.5703 | 4.7371 | 4.7366 |
+
+Save and warm-year logical store work counts match the previous hosted
+smoke exactly. Warm-year physical reads and writes were zero in the
+successor. These were separate runners, so the difference in elapsed
+seconds establishes neither a regression nor an improvement. The current
+save and warm observations justify a short call profile of the closed
+proof database before spending hours rebuilding new mature proof output.
+The mature acceptance pair remains unmeasured.

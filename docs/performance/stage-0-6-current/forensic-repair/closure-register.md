@@ -173,4 +173,13 @@ and pending hosted recovery are recorded in the [admission ledger](../after-dige
 
 | Finding | Action and evidence | Disposition |
 |---|---|---|
-| SA-R3: first hosted smoke harness found a changed legacy canonical rejection message | Keep the original public diagnostic and chain the detailed successor validation error. Reproduced the exact failed assertion in LF scratch, then verified both historical paths, the qualified successor hash, and the operational fingerprint. Four cases passed and independent follow-up found no other issues. [Failed gate evidence](https://github.com/rax0h/all-that-endures/actions/runs/44873108682/artifacts/14693999853) is preserved. | Awaiting hosted verification |
+| SA-R3: first hosted smoke harness found a changed legacy canonical rejection message | Keep the original public diagnostic and chain the detailed successor validation error. Verified both historical paths, successor hash and envelope fingerprint. The [corrected small run](https://github.com/rax0h/all-that-endures/actions/runs/44873730573) and companion both passed 439 cases. [Failed gate evidence](https://github.com/rax0h/all-that-endures/actions/runs/44873108682/artifacts/14693999853) is preserved. | Closed |
+
+## Successor small operation diagnostic
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| SO-R1: local preflight found an empty profile could mask an original timeout | Produce call evidence only when the measured operation began. Exercised the original timeout path, normal save and warm profiles, and cleanup. | Closed |
+| SO-R2: independent review found malformed shell continuation | Use one bounded shell command. Verified YAML parses and the shell argument list invokes the exact script and evidence directory. | Closed |
+| SO-R3: independent review requested original copy/journal headroom and unambiguous diagnostic fields | Check the same disk reserve as the production stage. Record profile phase observations and actual fresh restore without copied performance acceptance fields. | Closed |
+| SO-R4: independent review requested exact fresh acceptance and proof receipt provenance | Include both in input evidence. Cross-checked the selected proof ancestor and raw archived database against the successful fresh receipt. | Closed |
