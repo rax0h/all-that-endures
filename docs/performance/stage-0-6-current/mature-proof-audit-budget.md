@@ -120,3 +120,48 @@ Continue using the [exact retained admission](after-digest-admission/README.md)
 and its actual small recovery. All five completed prerequisite stages remain
 reusable. This investigation used retained metadata and logs. Mature open,
 save, first/warm year and exact year-1002 continuation remain unmeasured.
+
+## Successor boundary check
+
+The qualified checked-root successor reuses scope and directory roots during
+owned construction. The two avoided repeats previously totaled 1,949.00 s
+in isolated mature jobs. The current integrated runtime remains unmeasured.
+[Isolated reconstruction evidence](reconstruction-probe.md#verified-mature-results)
+
+The [exact small successor trace](https://github.com/rax0h/all-that-endures/actions/runs/44873730573/artifacts/14694777609)
+identifies the remaining World boundaries in its successful proof attempt.
+The archive SHA-256 is
+`38e6facb0927bd0d487f9116f30ce9a030e46fd877d1eefa08571209456f5264`.
+
+| Start to completion | Progress records | Small seconds |
+|---|---|---:|
+| Full source comparisons | 00011 → 00018 | 0.660 |
+| Catalog verifier including workspace setup and cleanup | 00019 → 00027 | 2.459 |
+| Catalog completion to World completion | 00027 → 00028 | 0.712 |
+
+The mature ancestor provides a 3,421.72-second catalog subtotal before
+sequence verification and a further 1,334.79 seconds from sequence start to
+the catalog copy's pre-publication marker. The latter includes other work.
+The smallest next measurement is one complete `_verify_catalog` invocation
+with the same frozen source custody on a disposable, authenticated
+after-digest database. Existing catalog phase markers separate groups,
+owners, inventories, member types and the start of sequences. Record an
+explicit verifier return and keep authentication, restore, copy and setup
+outside the verifier interval. Prove the lane on the exact small input and
+verify rollback, preserved parent bytes and actual artifact round-trip
+before any mature diagnostic launch. The lane needs no record, scope,
+content, directory or World proof construction.
+
+The Windows functional probe authenticated original small receipt **14252280082**
+and data **14252085073**, and confirmed the receipt is the exact parent of the
+qualified successor's small proof. The verifier returned from all five catalog
+subphases inside `ProofGenesisTransaction`. The disposable transaction rolled
+back, the complete main schema matched its pre-operation schema, and the original
+database bytes retained SHA-256
+`c6fa7723bf5b10efc450c2f4b16fa7d412b6ba35ed0b88968aea77386454f5b5`.
+Local evidence is `.validation/catalog-verifier-smoke/verified.json`. The lane
+still needs a qualified Linux small gate with artifact publication and download
+before a mature catalog measurement.
+
+The current qualification and retained small recovery are documented in the
+[successor admission ledger](after-digest-admission/progress.md#checked-root-reuse-successor).

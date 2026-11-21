@@ -152,3 +152,40 @@ for 0.348 and 0.342 instrumented seconds respectively. Insertion preparation
 inside the World guard accounted for 1.173 inclusive seconds. Use those
 measured boundaries and the prior negative TEMP-batch evidence when isolating
 the next save improvement. Retain all physical-content and collection checks.
+
+## Shared authenticated save parent reads
+
+The [combined candidate](https://github.com/rax0h/all-that-endures/commit/ff4b118bfdeefa22ba2035e354cee6443a633fae)
+streams one checked parent result per prepared version inside the writer
+transaction. Content authenticates the exact physical record before collection
+uses its presence to check ordinal and order changes. Event validation and
+the replayable input for the nested guards remain in the transaction. The
+stream closes on downstream failure before rollback.
+
+Replaying the exact small proof reduced parent `ProofMap.get` calls from
+2,258 to 1,129. Its fresh saved year-2 digest and warm year-3 digest matched
+the accepted replay. The retained source archive hash was unchanged. On
+Windows 241 distinct functional cases passed, including spilled publication,
+coherent parent-body tamper and a downstream order fault with observed cursor
+close before rollback.
+
+The [Linux comparison](https://github.com/rax0h/all-that-endures/actions/runs/44925049413)
+compares the owner-absence candidate (`f77905ee`) with the combined candidate
+on one runner. The full fingerprint matched the accepted small proof. Each
+trial used a verified fresh copy and restored the same saved digest in a
+fresh process. Times are uninstrumented seconds.
+
+| Trial order | Open | First year | Save | Warm year |
+|---|---:|---:|---:|---:|
+| Owner absence 1 | 1.0783 | 4.3096 | 3.7882 | 3.4409 |
+| Combined 1 | 1.0587 | 4.2669 | 3.6083 | 3.4110 |
+| Combined 2 | 1.0213 | 4.2354 | 3.5161 | 3.3713 |
+| Owner absence 2 | 1.0232 | 4.2455 | 3.6727 | 3.3812 |
+
+Save decreased 4.7% and 4.3% across the pairs. The observed warm times differ
+by at most 0.03 seconds within a pair. Save and warm year remain above the
+stage's targets even on this small fixture. The engine bundle remains on
+`sol/owner-absence-probe` pending qualification. These results establish no
+mature timing. [Raw evidence 14715601078](https://github.com/rax0h/all-that-endures/actions/runs/44925049413/artifacts/14715601078)
+is 58,604 bytes with SHA-256
+`081e4d4373fd586c689eb8de573f1b2030cf4732e7989c94b277c0a0a1a08c84`.

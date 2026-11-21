@@ -194,3 +194,11 @@ and pending hosted recovery are recorded in the [admission ledger](../after-dige
 
 The isolated [candidate and paired evidence](../small-operation-profile/report.md#checked-owner-absence-experiment)
 are retained for a later qualification bundle. Mature timing and acceptance remain open.
+
+## Shared save parent reads
+
+| Finding | Action and evidence | Disposition |
+|---|---|---|
+| SP-R1. Collection and content guards repeated the same parent proof lookup under one writer transaction | The mixed spilled regression reproduced two reads per changed version. Share the checked physical parent result with collection and retain its exact order check. The coherent parent-body tamper test still refuses publication. The exact small replay halved parent-map calls and preserved saved and warm continuation. | Closed |
+| SP-R2. Independent review found rollback coverage did not observe cleanup after a downstream consumer fault | A coherent order fault now exercises the spilled stream and observes cursor closure before rollback. The active transaction and temporary collection delta are gone after failure. All 13 collection-publication cases passed. Independent follow-up found no outstanding issues. | Closed |
+| SP-R3. A work-count reduction does not establish a save latency reduction | Verified four same-runner Linux trials, two orderings, exact software and proof receipt, all fresh digests, exact candidate source and each timing against the hashed archive. Save decreased in both pairs. [Report and paired evidence](../small-operation-profile/report.md#shared-authenticated-save-parent-reads). | Closed for the isolated comparison |
